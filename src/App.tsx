@@ -26,6 +26,7 @@ import NextSessionGoal from "./components/NextSessionGoal";
 import ChibiShareCard from "./components/ChibiShareCard";
 import PersonalVsGlobalMeta from "./components/PersonalVsGlobalMeta";
 import ChibiIdentity from "./components/ChibiIdentity";
+import StyleShift from "./components/StyleShift";
 
 function cleanName(value:string){
   return value
@@ -474,12 +475,15 @@ function App() {
             />
           </>}
 
-          {profileTab==="review"&&<ChibiReview
-            matches={analysisMatches}
-            staticData={staticData}
-            journalVersion={journalVersion}
-            onEvidence={showEvidence}
-          />}
+          {profileTab==="review"&&<>
+            <ChibiReview
+              matches={analysisMatches}
+              staticData={staticData}
+              journalVersion={journalVersion}
+              onEvidence={showEvidence}
+            />
+            <StyleShift matches={analysisMatches}/>
+          </>}
 
           {profileTab==="meta"&&<>
             <PersonalVsGlobalMeta
