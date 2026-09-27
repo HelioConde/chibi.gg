@@ -253,6 +253,20 @@ function App() {
     return {total,top4,wins,bottom2,avgLabel};
   },[analysisMatches,dna.avgPlacement]);
 
+  const trendStats=useMemo(()=>{
+    if(analysisMatches.length<6) return {label:"Pouca amostra",detail:"carregue ao menos 6 partidas",tone:""};
+    const window=Math.min(3,Math.floor(analysisMatches.length/2));
+    const recent=analysisMatches.slice(0,window);
+    const previous=analysisMatches.slice(window,window*2);
+    const avg=(list:TftMatch[])=>list.reduce((sum,match)=>sum+match.placement,0)/Math.max(1,list.length);
+    const recentAvg=avg(recent);
+    const previousAvg=avg(previous);
+    const delta=recentAvg-previousAvg;
+    if(delta<=-.45) return {label:"Melhorando",detail:`${recentAvg.toFixed(2)} vs ${previousAvg.toFixed(2)} antes`,tone:"good"};
+    if(delta>=.45) return {label:"Piorando",detail:`${recentAvg.toFixed(2)} vs ${previousAvg.toFixed(2)} antes`,tone:"warning"};
+    return {label:"Estável",detail:`${recentAvg.toFixed(2)} vs ${previousAvg.toFixed(2)} antes`,tone:""};
+  },[analysisMatches]);
+
   const visibleMatches=useMemo(()=>{
     if(!evidenceIds?.length) return analysisMatches;
     const allowed=new Set(evidenceIds);
@@ -561,7 +575,7 @@ function App() {
             </div>
           </section>
 
-          <section className="stat-grid stat-grid-readable">
+          <section className="stat-grid stat-grid-readable profile-kpis">
             <article className={dna.avgPlacement!=null&&dna.avgPlacement>4.75?"signal-warning":dna.avgPlacement!=null&&dna.avgPlacement<=4?"signal-good":""}>
               <span>Colocação média</span>
               <strong>{dna.avgPlacement ?? "—"}</strong>
@@ -572,31 +586,28 @@ function App() {
               <strong>{dna.top4Rate}%</strong>
               <small>{headlineStats.top4} de {headlineStats.total} partidas</small>
             </article>
-            <article className={headlineStats.wins>0?"signal-good":headlineStats.top4>=2?"signal-warning":""}>
-              <span>Vitórias</span>
-              <strong>{headlineStats.wins}</strong>
-              <small>{headlineStats.top4?headlineStats.wins+" em "+headlineStats.top4+" Top 4":"nenhum Top 4 na amostra"}</small>
-            </article>
-            <article className={dna.bottom2Rate>=30?"signal-warning":dna.bottom2Rate<=15?"signal-good":""}>
-              <span>Bottom 2</span>
-              <strong>{dna.bottom2Rate}%</strong>
-              <small>{headlineStats.bottom2} de {headlineStats.total} partidas</small>
+            <article className={trendStats.tone==="good"?"signal-good":trendStats.tone==="warning"?"signal-warning":""}>
+              <span>Tendência recente</span>
+              <strong className="trend-label">{trendStats.label}</strong>
+              <small>{trendStats.detail}</small>
             </article>
           </section>
 
           {error && <div className="profile-error">{error}</div>}
 
-          <nav className="profile-tabs" aria-label="Seções do perfil">
+          <nav className="profile-tabs simplified-tabs" aria-label="Seções do perfil">
             <div className="profile-tab-list">
-              <button className={profileTab==="overview"?"active":""} onClick={()=>changeProfileTab("overview")}>Visão geral</button>
-              <button className={profileTab==="review"?"active":""} onClick={()=>changeProfileTab("review")}>Review</button>
-              <button className={profileTab==="meta"?"active":""} onClick={()=>changeProfileTab("meta")}>Meta pessoal</button>
+              <button className={profileTab==="overview"?"active":""} onClick={()=>changeProfileTab("overview")}>Resumo</button>
+              <button className={profileTab==="review"?"active":""} onClick={()=>changeProfileTab("review")}>Aprendizados</button>
               <button className={profileTab==="matches"?"active":""} onClick={()=>changeProfileTab("matches")}>Partidas</button>
-              <button className={profileTab==="share"?"active":""} onClick={()=>changeProfileTab("share")}>Compartilhar</button>
+              <button className={profileTab==="meta"?"active":""} onClick={()=>changeProfileTab("meta")}>Comparações</button>
             </div>
-            <button className="copy-analysis-link" onClick={copyCurrentAnalysisLink}>
-              {copiedAnalysisLink?"Link copiado ✓":"Copiar link"}
-            </button>
+            <div className="profile-tab-actions">
+              <button className="share-analysis-button" onClick={()=>changeProfileTab("share")}>Compartilhar</button>
+              <button className="copy-analysis-link" onClick={copyCurrentAnalysisLink}>
+                {copiedAnalysisLink?"Link copiado ✓":"Copiar link"}
+              </button>
+            </div>
           </nav>
 
           {profileTab==="overview"&&<>
@@ -606,15 +617,20 @@ function App() {
               onEvidence={showEvidence}
             />
 
-            <ChibiIdentity
-              matches={analysisMatches}
-            />
-
-            <ChibiInnovations
-              matches={analysisMatches}
-              staticData={staticData}
-              onEvidence={showEvidence}
-            />
+            <details className="overview-deep-dive">
+              <summary>
+                <span><b>Explorar padrões e sinais secundários</b><small>Arquétipo, sessão recente, linhas pessoais e outros sinais</small></span>
+                <em>Ver detalhes</em>
+              </summary>
+              <div className="overview-deep-dive-content">
+                <ChibiIdentity matches={analysisMatches}/>
+                <ChibiInnovations
+                  matches={analysisMatches}
+                  staticData={staticData}
+                  onEvidence={showEvidence}
+                />
+              </div>
+            </details>
           </>}
 
           {profileTab==="review"&&<>
@@ -624,7 +640,10 @@ function App() {
               journalVersion={journalVersion}
               onEvidence={showEvidence}
             />
-            <StyleShift matches={analysisMatches}/>
+            <details className="secondary-analysis">
+              <summary><span><b>Ver mudança de estilo recente</b><small>Compare blocos recentes sem tratar variação como evolução de habilidade</small></span><em>Style Shift</em></summary>
+              <StyleShift matches={analysisMatches}/>
+            </details>
           </>}
 
           {profileTab==="meta"&&<>
@@ -636,10 +655,13 @@ function App() {
               onEvidence={showEvidence}
             />
 
-            <PatchAdaptation
-              matches={analysisMatches}
-              onEvidence={showEvidence}
-            />
+            <details className="secondary-analysis">
+              <summary><span><b>Ver adaptação ao patch</b><small>Leitura histórica complementar da amostra atual</small></span><em>Patch</em></summary>
+              <PatchAdaptation
+                matches={analysisMatches}
+                onEvidence={showEvidence}
+              />
+            </details>
           </>}
 
           {profileTab==="share"&&<ChibiShareCard
