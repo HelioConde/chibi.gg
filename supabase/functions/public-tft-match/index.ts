@@ -1,5 +1,6 @@
 import { corsHeaders, json } from "../_shared/http.ts";
 import { normalizeParticipant, num, riotHeaders } from "../_shared/riot.ts";
+import { observeRawMatches } from "../_shared/observations.ts";
 
 function regionFromMatchId(matchId: string) {
   const prefix = matchId.split("_")[0]?.toUpperCase() || "";
@@ -36,6 +37,7 @@ Deno.serve(async (req) => {
   }
 
   const match = await response.json();
+  await observeRawMatches([match]);
   const info = match?.info || {};
 
   const participants = (info?.participants || []).map((participant: any) => ({
