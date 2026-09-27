@@ -10,3 +10,6 @@ verify_jwt = false
 verify_jwt = false
 
 # Deployment sync trigger: 2026-09-27
+
+[functions.public-tft-meta]
+verify_jwt = false
