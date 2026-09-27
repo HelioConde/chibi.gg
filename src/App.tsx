@@ -78,6 +78,19 @@ function placementClass(value:number){
   return "";
 }
 
+function matchReviewCue(match:TftMatch){
+  if(match.placement===1) return {tone:"good",label:"Vitória",title:"Veja o que funcionou e pode ser repetido."};
+  if(match.placement<=4) return {tone:"good",label:"Top 4",title:"Compare o que faltou para converter esta boa partida."};
+  if(match.placement>=7) return {tone:"bad",label:"Revisar primeiro",title:"Bottom 2: esta partida merece prioridade na revisão."};
+  return {tone:"neutral",label:"Meio da lobby",title:"Veja onde este board parou de ganhar força."};
+}
+
+function formatDuration(seconds?:number){
+  if(!seconds||seconds<=0) return "—";
+  const minutes=Math.round(seconds/60);
+  return minutes+" min";
+}
+
 function splitRiotId(value:string){
   const cut=value.lastIndexOf("#");
   if(cut<1 || cut===value.length-1) return null;
@@ -688,16 +701,23 @@ function App() {
                 <button onClick={clearEvidence}>Mostrar contexto completo</button>
               </div>}
 
-              <div className="match-list">
-                {visibleMatches.map((match)=>(
-                  <button className="match-row match-button" key={match.id} onClick={()=>openMatch(match)}>
+              <div className="match-list match-list-v2">
+                {visibleMatches.map((match)=>{
+                  const cue=matchReviewCue(match);
+                  return <button className={"match-row match-button match-row-v2 cue-"+cue.tone} key={match.id} onClick={()=>openMatch(match)}>
                     <div className={"placement "+placementClass(match.placement)}>{match.placement}º</div>
 
                     <div className="match-main">
-                      <strong>{activeTraits(match).slice(0,2).map((t)=>traitLabel(t,staticData)).filter(Boolean).join(" · ") || "Board TFT"}</strong>
+                      <div className="match-row-title">
+                        <div>
+                          <strong>{activeTraits(match).slice(0,2).map((t)=>traitLabel(t,staticData)).filter(Boolean).join(" · ") || "Board TFT"}</strong>
+                          <span className={"match-review-label "+cue.tone}>{cue.label}</span>
+                        </div>
+                        <p>{cue.title}</p>
+                      </div>
 
-                      <div className="trait-row">
-                        {activeTraits(match).slice(0,5).map((trait)=>{
+                      <div className="trait-row compact-traits">
+                        {activeTraits(match).slice(0,3).map((trait)=>{
                           const entry=staticEntry(staticData?.traits,trait.name);
                           const image=staticData?tftAssetUrl(staticData.version,"trait",entry):"";
                           return <span className={"trait-chip style-"+Math.max(0,trait.style)} key={trait.name}>
@@ -707,53 +727,43 @@ function App() {
                         })}
                       </div>
 
-                      <div className="board-row">
-                        {match.units.slice(0,9).map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact key={unit.characterId+index}/>)}
+                      <div className="board-row compact-board">
+                        {match.units.slice(0,6).map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact key={unit.characterId+index}/>)}
                       </div>
                     </div>
 
                     <div className="match-meta">
                       <span>{formatWhen(match.playedAt)} · Nível {match.level}</span>
                       <strong>{match.damageToPlayers} dano</strong>
-                      <small>{match.goldLeft}g</small>
+                      <small>{match.goldLeft}g · abrir análise →</small>
                     </div>
-                  </button>
-                ))}
+                  </button>;
+                })}
               </div>
 
               {!evidenceIds?.length&&hasMore && <button className="load-more" onClick={loadMore} disabled={loadingMore}>{loadingMore ? "Carregando..." : "Carregar mais partidas"}</button>}
             </section>
 
-            <aside className="panel insights dna-panel">
+            <aside className="panel insights dna-panel dna-panel-v2">
               <div className="panel-title">
                 <div>
-                  <span>CHIBI DNA</span>
-                  <h2>{evidenceIds?.length?"DNA da evidência":"Seu padrão recente"}</h2>
+                  <span>PADRÃO RECENTE</span>
+                  <h2>{evidenceIds?.length?"O que esta evidência mostra":"Resumo das suas partidas"}</h2>
                 </div>
                 <small>{visibleDna.sampleSize} partidas</small>
               </div>
 
               <div className="placement-strip" aria-label="Colocações recentes">
-                {visibleDna.placements.slice(0,12).map((p,index)=>(
+                {visibleDna.placements.slice(0,8).map((p,index)=>(
                   <span className={placementClass(p)} key={index} title={(index+1)+"ª partida mais recente: "+p+"º"}>{p}</span>
                 ))}
               </div>
 
-              <div className="dna-grid">
+              <div className="dna-grid dna-grid-primary">
                 <article>
                   <span>Consistência</span>
                   <strong>{visibleDna.consistency}%</strong>
                   <small>variação das colocações</small>
-                </article>
-                <article>
-                  <span>Flexibilidade</span>
-                  <strong>{visibleDna.flexibility}%</strong>
-                  <small>diversidade de linhas</small>
-                </article>
-                <article>
-                  <span>Conversão</span>
-                  <strong>{visibleDna.conversion}%</strong>
-                  <small>Top 4 que viraram 1º</small>
                 </article>
                 <article>
                   <span>Estabilidade</span>
@@ -762,26 +772,45 @@ function App() {
                 </article>
               </div>
 
-              <p className="dna-disclaimer">{evidenceIds?.length
-                ? "DNA recalculado somente com as partidas da evidência ativa. Não é MMR, elo alternativo nem avaliação oficial da Riot."
-                : "Indicadores descritivos da amostra carregada. Não são MMR, elo alternativo nem avaliação oficial da Riot."}</p>
+              {visibleDna.insights[0]&&(()=>{
+                const insight=visibleDna.insights[0];
+                const subject=insight.subject
+                  ? staticEntry(staticData?.traits,insight.subject)?.name || fallbackTraitName(insight.subject)
+                  : "";
+                return <article className={"insight dna-primary-insight "+insight.tone}>
+                  <div className="insight-head"><b>{insight.title}</b><span>{insight.confidence}</span></div>
+                  {subject&&<strong className="insight-subject">{subject}</strong>}
+                  <p>{insight.body}</p>
+                </article>;
+              })()}
 
-              <div className="dna-insights">
-                {visibleDna.insights.map((insight)=>{
-                  const subject=insight.subject
-                    ? staticEntry(staticData?.traits,insight.subject)?.name || fallbackTraitName(insight.subject)
-                    : "";
-                  return <article className={"insight "+insight.tone} key={insight.id}>
-                    <div className="insight-head">
-                      <b>{insight.title}</b>
-                      <span>{insight.confidence}</span>
-                    </div>
-                    {subject&&<strong className="insight-subject">{subject}</strong>}
-                    <p>{insight.body}</p>
-                    <small>{insight.evidence}</small>
-                  </article>;
-                })}
-              </div>
+              <details className="dna-more">
+                <summary><span><b>Ver DNA completo</b><small>flexibilidade, conversão e outros sinais</small></span><em>Detalhes</em></summary>
+                <div className="dna-more-body">
+                  <div className="dna-grid">
+                    <article><span>Flexibilidade</span><strong>{visibleDna.flexibility}%</strong><small>diversidade de linhas</small></article>
+                    <article><span>Conversão</span><strong>{visibleDna.conversion}%</strong><small>Top 4 que viraram 1º</small></article>
+                  </div>
+
+                  <div className="dna-insights">
+                    {visibleDna.insights.slice(1).map((insight)=>{
+                      const subject=insight.subject
+                        ? staticEntry(staticData?.traits,insight.subject)?.name || fallbackTraitName(insight.subject)
+                        : "";
+                      return <article className={"insight "+insight.tone} key={insight.id}>
+                        <div className="insight-head"><b>{insight.title}</b><span>{insight.confidence}</span></div>
+                        {subject&&<strong className="insight-subject">{subject}</strong>}
+                        <p>{insight.body}</p>
+                        <small>{insight.evidence}</small>
+                      </article>;
+                    })}
+                  </div>
+
+                  <p className="dna-disclaimer">{evidenceIds?.length
+                    ? "DNA recalculado somente com as partidas da evidência ativa. Não é MMR, elo alternativo nem avaliação oficial da Riot."
+                    : "Indicadores descritivos da amostra carregada. Não são MMR, elo alternativo nem avaliação oficial da Riot."}</p>
+                </div>
+              </details>
             </aside>
           </div>}
         </main>
@@ -795,19 +824,33 @@ function App() {
             {matchError && <div className="match-state error">{matchError}</div>}
 
             {selectedMatch && <>
-              <div className="panel-title">
+              <div className="match-modal-head">
                 <div>
-                  <span>DETALHES DA PARTIDA</span>
-                  <h2>{displaySetName(selectedMatch.match.setName,selectedMatch.match.setNumber)}</h2>
+                  <span>REVIEW DA PARTIDA</span>
+                  <h2>{openedMatch ? matchReviewCue(openedMatch).title : displaySetName(selectedMatch.match.setName,selectedMatch.match.setNumber)}</h2>
+                  <p>{displaySetName(selectedMatch.match.setName,selectedMatch.match.setNumber)} · {queueLabel(staticData,selectedMatch.match.queueId)} · {formatWhen(selectedMatch.match.playedAt)}</p>
                 </div>
-                <small>{queueLabel(staticData,selectedMatch.match.queueId)} · {selectedMatch.match.participants.length} jogadores</small>
+                {openedMatch&&<div className={"modal-placement "+placementClass(openedMatch.placement)}>{openedMatch.placement}º</div>}
               </div>
 
-              {openedMatch&&<MatchJournal
-                matchId={openedMatch.id}
-                placement={openedMatch.placement}
-                onSaved={()=>setJournalVersion((value)=>value+1)}
-              />}
+              {openedMatch&&<section className="match-summary-card">
+                <div className="match-summary-main">
+                  <span>SEU BOARD FINAL</span>
+                  <h3>{activeTraits(openedMatch).slice(0,2).map((t)=>traitLabel(t,staticData)).filter(Boolean).join(" · ") || "Board TFT"}</h3>
+                  <div className="trait-row">
+                    {activeTraits(openedMatch).slice(0,4).map((trait)=><span className={"trait-chip style-"+Math.max(0,trait.style)} key={trait.name}>{traitLabel(trait,staticData)} {trait.numUnits}</span>)}
+                  </div>
+                  <div className="board-row modal-board">
+                    {openedMatch.units.slice(0,9).map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact key={unit.characterId+index}/>)}
+                  </div>
+                </div>
+                <div className="match-summary-stats">
+                  <span><small>NÍVEL</small><b>{openedMatch.level}</b></span>
+                  <span><small>DANO</small><b>{openedMatch.damageToPlayers}</b></span>
+                  <span><small>OURO</small><b>{openedMatch.goldLeft}g</b></span>
+                  <span><small>DURAÇÃO</small><b>{formatDuration(selectedMatch.match.duration)}</b></span>
+                </div>
+              </section>}
 
               {openedMatch&&<BoardCounterfactual
                 target={openedMatch}
@@ -816,36 +859,48 @@ function App() {
                 onEvidence={showCounterEvidence}
               />}
 
-              <div className="lobby-list">
-                {selectedMatch.match.participants.slice().sort((a,b)=>a.placement-b.placement).map((participant,index)=>(
-                  <article className={"lobby-player "+(openedMatch?.placement===participant.placement?"current-player":"")} key={index}>
-                    <div className={"placement "+placementClass(participant.placement)}>{participant.placement}º</div>
-                    <div className="lobby-board">
-                      <div className="lobby-title">
-                        <strong>Nível {participant.level}</strong>
-                        {openedMatch?.placement===participant.placement&&<span>VOCÊ</span>}
+              {openedMatch&&<details className="match-detail-layer">
+                <summary><span><b>Adicionar contexto pessoal</b><small>O que a API não sabe sobre esta partida</small></span><em>Journal</em></summary>
+                <MatchJournal
+                  matchId={openedMatch.id}
+                  placement={openedMatch.placement}
+                  onSaved={()=>setJournalVersion((value)=>value+1)}
+                />
+              </details>}
+
+              <details className="match-detail-layer lobby-layer">
+                <summary><span><b>Ver lobby completo</b><small>Todos os 8 boards, itens, augments e resultados</small></span><em>{selectedMatch.match.participants.length} jogadores</em></summary>
+                <div className="lobby-list">
+                  {selectedMatch.match.participants.slice().sort((a,b)=>a.placement-b.placement).map((participant,index)=>(
+                    <article className={"lobby-player "+(openedMatch?.placement===participant.placement?"current-player":"")} key={index}>
+                      <div className={"placement "+placementClass(participant.placement)}>{participant.placement}º</div>
+                      <div className="lobby-board">
+                        <div className="lobby-title">
+                          <strong>Nível {participant.level}</strong>
+                          {openedMatch?.placement===participant.placement&&<span>VOCÊ</span>}
+                        </div>
+                        <div className="trait-row lobby-traits">
+                          {participant.traits
+                            .filter((t)=>t.numUnits>0&&(t.style>0||t.numUnits>=2))
+                            .sort((a,b)=>b.style-a.style||b.numUnits-a.numUnits)
+                            .slice(0,4)
+                            .map((trait)=><span className="trait-chip" key={trait.name}>{traitLabel(trait,staticData)} {trait.numUnits}</span>)}
+                        </div>
+                        <div className="board-row detailed">
+                          {participant.units.slice(0,9).map((unit,unitIndex)=><UnitVisual unit={unit} staticData={staticData} key={unit.characterId+unitIndex}/>)}
+                        </div>
+                        <div className="augment-row">
+                          {participant.augments.slice(0,3).map((augment)=><AugmentVisual id={augment} staticData={staticData} key={augment}/>)}
+                        </div>
                       </div>
-                      <div className="trait-row lobby-traits">
-                        {participant.traits
-                          .filter((t)=>t.numUnits>0&&(t.style>0||t.numUnits>=2))
-                          .sort((a,b)=>b.style-a.style||b.numUnits-a.numUnits)
-                          .slice(0,4)
-                          .map((trait)=><span className="trait-chip" key={trait.name}>{traitLabel(trait,staticData)} {trait.numUnits}</span>)}
+                      <div className="lobby-meta">
+                        <strong>{participant.damageToPlayers} dano</strong>
+                        <span>{participant.goldLeft}g</span>
                       </div>
-                      <div className="board-row detailed">
-                        {participant.units.slice(0,9).map((unit,unitIndex)=><UnitVisual unit={unit} staticData={staticData} key={unit.characterId+unitIndex}/>)}
-                      </div>
-                      <div className="augment-row">
-                        {participant.augments.slice(0,3).map((augment)=><AugmentVisual id={augment} staticData={staticData} key={augment}/>)}
-                      </div>
-                    </div>
-                    <div className="lobby-meta">
-                      <strong>{participant.damageToPlayers} dano</strong>
-                      <span>{participant.goldLeft}g</span>
-                    </div>
-                  </article>
-                ))}
-              </div>
+                    </article>
+                  ))}
+                </div>
+              </details>
             </>}
           </section>
         </div>
