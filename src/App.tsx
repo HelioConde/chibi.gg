@@ -23,6 +23,7 @@ import MatchJournal from "./components/MatchJournal";
 import PatchAdaptation from "./components/PatchAdaptation";
 import BoardCounterfactual from "./components/BoardCounterfactual";
 import NextSessionGoal from "./components/NextSessionGoal";
+import ChibiShareCard from "./components/ChibiShareCard";
 
 function cleanName(value:string){
   return value
@@ -143,6 +144,17 @@ function App() {
 
   useEffect(()=>{
     loadTftStaticData().then(setStaticData).catch(()=>{});
+
+    const params=new URLSearchParams(window.location.search);
+    const player=params.get("player")?.trim();
+    const tag=params.get("tag")?.trim();
+    const region=(params.get("region")||"br1").toLowerCase();
+
+    if(player&&tag){
+      setRiotId(player+"#"+tag);
+      setPlatform(region);
+      void loadPlayer(player,tag,region,false);
+    }
   },[]);
 
   const rank=useMemo(
@@ -216,13 +228,7 @@ function App() {
     showEvidence(ids,label);
   }
 
-  async function searchPlayer(){
-    const parsed=splitRiotId(riotId);
-    if(!parsed){
-      setError("Use o formato Nome#TAG.");
-      return;
-    }
-
+  async function loadPlayer(gameName:string,tagLine:string,region:string,updateUrl=true){
     setLoading(true);
     setError("");
     setProfile(null);
@@ -234,15 +240,33 @@ function App() {
     clearEvidence();
 
     try{
-      const data=await fetchTftProfile(parsed.gameName,parsed.tagLine,platform);
+      const data=await fetchTftProfile(gameName,tagLine,region);
       setProfile(data);
       setMatches(data.matches || []);
       setHasMore((data.matches?.length || 0) >= 12);
+
+      if(updateUrl){
+        const url=new URL(window.location.href);
+        url.search="";
+        url.searchParams.set("player",data.player.gameName||gameName);
+        url.searchParams.set("tag",data.player.tagLine||tagLine);
+        url.searchParams.set("region",region);
+        window.history.replaceState({},"",url.toString());
+      }
     }catch(err){
       setError(err instanceof Error ? err.message : "Não foi possível consultar este jogador agora.");
     }finally{
       setLoading(false);
     }
+  }
+
+  async function searchPlayer(){
+    const parsed=splitRiotId(riotId);
+    if(!parsed){
+      setError("Use o formato Nome#TAG.");
+      return;
+    }
+    await loadPlayer(parsed.gameName,parsed.tagLine,platform,true);
   }
 
   async function handleSubmit(event:FormEvent){
@@ -304,6 +328,10 @@ function App() {
     setOpenedMatch(null);
     setMatchError("");
     clearEvidence();
+
+    const url=new URL(window.location.href);
+    url.search="";
+    window.history.replaceState({},"",url.toString());
   }
 
   return (
@@ -428,6 +456,14 @@ function App() {
             playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
             matches={analysisMatches}
             onEvidence={showEvidence}
+          />
+
+          <ChibiShareCard
+            profile={profile}
+            dna={dna}
+            matches={analysisMatches}
+            staticData={staticData}
+            shareUrl={window.location.href}
           />
 
           {error && <div className="profile-error">{error}</div>}
