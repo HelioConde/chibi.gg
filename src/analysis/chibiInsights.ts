@@ -9,6 +9,7 @@ export type ChibiInsight = {
   evidence:string;
   tone:InsightTone;
   confidence:"alta"|"média"|"baixa";
+  subject?:string;
 };
 
 export type ChibiDNA = {
