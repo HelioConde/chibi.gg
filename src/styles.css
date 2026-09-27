@@ -1403,3 +1403,211 @@ a { color: inherit; text-decoration: none; }
     grid-template-columns:1fr!important;
   }
 }
+
+/* -----------------------------------------------------------------------
+   Lobby Autopsy — answer first, evidence second
+   ----------------------------------------------------------------------- */
+.lobby-autopsy{
+  margin:16px 0;
+  padding:18px;
+  border:1px solid rgba(239,146,96,.28);
+  border-radius:14px;
+  background:
+    radial-gradient(circle at 90% 0%,rgba(239,146,96,.07),transparent 30%),
+    #0b1018;
+}
+.autopsy-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+}
+.autopsy-head>div>span{
+  display:block;
+  color:#e29a66;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:1.2px;
+}
+.autopsy-head h3{
+  margin:6px 0 0;
+  font-size:clamp(20px,2.4vw,28px);
+  line-height:1.12;
+  letter-spacing:-.5px;
+}
+.autopsy-head>small{
+  color:#6f798c;
+  font-size:8px;
+  text-transform:uppercase;
+}
+.autopsy-priority{
+  margin-top:14px;
+  padding:12px 13px;
+  border:1px solid rgba(126,104,255,.25);
+  border-radius:10px;
+  background:rgba(117,99,231,.055);
+}
+.autopsy-priority span{
+  display:block;
+  color:#8f7cff;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:1px;
+}
+.autopsy-priority strong{
+  display:block;
+  margin-top:5px;
+  color:#d9dff0;
+  font-size:11px;
+  line-height:1.5;
+}
+.autopsy-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  margin-top:10px;
+}
+.autopsy-signal{
+  min-height:155px;
+  padding:12px;
+  border:1px solid #232b3b;
+  border-radius:10px;
+  background:#0d131c;
+}
+.autopsy-signal.warning{border-color:rgba(239,146,96,.24)}
+.autopsy-signal.good{border-color:rgba(72,209,153,.22)}
+.autopsy-signal>span{
+  display:block;
+  color:#6f7a8e;
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.9px;
+}
+.autopsy-signal.warning>span{color:#d99a6d}
+.autopsy-signal.good>span{color:#74d4aa}
+.autopsy-signal h4{
+  margin:7px 0 5px;
+  font-size:12px;
+  line-height:1.3;
+}
+.autopsy-signal p{
+  margin:0;
+  color:#8792a6;
+  font-size:9px;
+  line-height:1.5;
+}
+.autopsy-signal small{
+  display:block;
+  margin-top:9px;
+  color:#667388;
+  font-size:8px;
+}
+.autopsy-facts{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+  margin-top:10px;
+}
+.autopsy-facts>div{
+  padding:10px;
+  border:1px solid #21293a;
+  border-radius:9px;
+  background:#0c121a;
+}
+.autopsy-facts span{
+  display:block;
+  color:#6f7a8e;
+  font-size:7px;
+}
+.autopsy-facts strong{
+  display:block;
+  margin-top:4px;
+  font-size:15px;
+}
+.autopsy-facts small{
+  display:block;
+  margin-top:2px;
+  color:#69768a;
+  font-size:7px;
+}
+.autopsy-more{
+  margin-top:10px;
+  border:1px solid #232b3d;
+  border-radius:10px;
+  overflow:hidden;
+}
+.autopsy-more>summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:11px 12px;
+  cursor:pointer;
+  list-style:none;
+}
+.autopsy-more>summary::-webkit-details-marker{display:none}
+.autopsy-more>summary span{display:grid;gap:2px}
+.autopsy-more>summary b{font-size:9px;color:#d2d9e6}
+.autopsy-more>summary small{font-size:8px;color:#69758a}
+.autopsy-more>summary em{
+  font-size:8px;
+  font-style:normal;
+  color:#d39a70;
+  font-weight:900;
+}
+.autopsy-more[open]>summary{border-bottom:1px solid #232b3d}
+.autopsy-contested-list{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:6px;
+  padding:10px;
+}
+.autopsy-contested-list>div{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:8px 9px;
+  border-radius:8px;
+  background:#101720;
+}
+.autopsy-contested-list strong{font-size:9px}
+.autopsy-contested-list span{font-size:8px;color:#758198}
+.autopsy-closest{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:10px;
+  padding:11px 12px;
+  border:1px solid rgba(76,167,226,.22);
+  border-radius:10px;
+  background:rgba(76,167,226,.04);
+}
+.autopsy-closest>span{
+  color:#72bde9;
+  font-size:8px;
+  letter-spacing:.9px;
+  font-weight:900;
+}
+.autopsy-closest>div{text-align:right}
+.autopsy-closest strong{display:block;font-size:10px}
+.autopsy-closest small{display:block;margin-top:3px;color:#718095;font-size:8px}
+.autopsy-disclaimer{
+  margin:10px 0 0;
+  color:#5f6c80;
+  font-size:8px;
+  line-height:1.45;
+}
+.counter-layer>.counterfactual-lab{
+  margin:12px!important;
+}
+@media(max-width:820px){
+  .autopsy-grid{grid-template-columns:1fr}
+  .autopsy-facts{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){
+  .autopsy-head,.autopsy-closest{flex-direction:column}
+  .autopsy-closest>div{text-align:left}
+  .autopsy-contested-list{grid-template-columns:1fr}
+}
