@@ -54,6 +54,12 @@ function confidence(games:number,total:number):Confidence{
   return "baixa";
 }
 
+function confidenceWeight(value:Confidence){
+  if(value==="alta") return 1;
+  if(value==="média") return .8;
+  return .55;
+}
+
 function coreTraits(match:TftMatch){
   return match.traits
     .filter(t=>t.numUnits>0&&(t.style>0||t.numUnits>=2))
@@ -168,26 +174,28 @@ export function buildLeakMap(matches:TftMatch[]):LeakMap{
 
   if(bottom2.length){
     const rate=pct(bottom2.length,total);
+    const signalConfidence=confidence(bottom2.length,total);
     items.push({
       id:"bottom2",
       title:"Bottom 2",
       description:"Partidas que terminam em 7º/8º aumentam bastante a variância da amostra.",
       evidence:`${bottom2.length} de ${total} partidas · ${rate}%`,
-      severity:Math.min(100,Math.round(rate*2.1)),
-      confidence:confidence(bottom2.length,total),
+      severity:Math.min(100,Math.round(rate*2.1*confidenceWeight(signalConfidence))),
+      confidence:signalConfidence,
       matchIds:bottom2.map(m=>m.id),
     });
   }
 
   if(top4.length>=2){
     const conversion=pct(wins.length,top4.length);
+    const signalConfidence=confidence(top4.length,total);
     items.push({
       id:"conversion",
       title:"Conversão",
       description:"Mede quantos Top 4 viraram vitória. Não diz por que a conversão falhou; mostra onde investigar.",
       evidence:`${wins.length} vitórias em ${top4.length} Top 4 · ${conversion}%`,
-      severity:Math.max(0,100-conversion),
-      confidence:confidence(top4.length,total),
+      severity:Math.round(Math.max(0,100-conversion)*confidenceWeight(signalConfidence)),
+      confidence:signalConfidence,
       matchIds:top4.map(m=>m.id),
     });
   }
@@ -205,13 +213,14 @@ export function buildLeakMap(matches:TftMatch[]):LeakMap{
   if(dominant&&dominant[1].length>=2){
     const share=pct(dominant[1].length,total);
     if(share>=35){
+      const signalConfidence=confidence(dominant[1].length,total);
       items.push({
         id:"dominance",
         title:"Dependência de linha",
         description:"Uma única identidade de board aparece em grande parte da amostra. Isso pode ser estilo pessoal ou sinal de pouca flexibilidade.",
         evidence:`${dominant[1].length} de ${total} partidas · ${share}%`,
-        severity:Math.min(100,Math.max(20,share)),
-        confidence:confidence(dominant[1].length,total),
+        severity:Math.min(100,Math.round(Math.max(20,share)*confidenceWeight(signalConfidence))),
+        confidence:signalConfidence,
         matchIds:dominant[1].map(m=>m.id),
       });
     }
@@ -223,13 +232,14 @@ export function buildLeakMap(matches:TftMatch[]):LeakMap{
   if(top4.length>=2&&bottom4.length>=2&&topLevel!=null&&bottomLevel!=null){
     const delta=bottomLevel-topLevel;
     if(delta>=.3){
+      const signalConfidence=confidence(Math.min(top4.length,bottom4.length),total);
       items.push({
         id:"level-conversion",
         title:"Nível sem conversão",
         description:"Os Bottom 4 terminaram em nível igual ou maior que os Top 4. Chegar ao nível não foi suficiente para converter o board.",
         evidence:`Top 4: ${topLevel.toFixed(1)} · Bottom 4: ${bottomLevel.toFixed(1)}`,
-        severity:Math.min(100,Math.round(45+delta*18)),
-        confidence:confidence(Math.min(top4.length,bottom4.length),total),
+        severity:Math.min(100,Math.round((45+delta*18)*confidenceWeight(signalConfidence))),
+        confidence:signalConfidence,
         matchIds:bottom4.map(m=>m.id),
       });
     }
