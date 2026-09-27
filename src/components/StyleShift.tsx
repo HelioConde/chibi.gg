@@ -27,11 +27,7 @@ export default function StyleShift({matches}:Props){
   const shift=useMemo(()=>buildStyleShift(matches),[matches]);
 
   if(!shift){
-    const headline=shift.confidence==="baixa"
-    ? "Sinal inicial: "+rawHeadline.charAt(0).toLowerCase()+rawHeadline.slice(1)
-    : rawHeadline;
-
-  return <section className="panel style-shift">
+    return <section className="panel style-shift">
       <div className="innovation-head">
         <div>
           <span>STYLE SHIFT</span>
@@ -97,11 +93,15 @@ export default function StyleShift({matches}:Props){
     if(Math.abs(biggest.value)<10){
       return "Seu estilo mudou pouco entre os dois blocos";
     }
-    if(biggest.label==="mais flexível"&&biggest.value<0) return "Seu jogo ficou mais concentrado em menos linhas";
+    if(biggest.label==="mais flexível"&&biggest.value<0) return "Sua flexibilidade caiu no bloco recente";
     if(biggest.label==="mais estável"&&biggest.value<0) return "Sua estabilidade caiu no bloco recente";
     if(biggest.label==="mais orientado a 3★"&&biggest.value<0) return "Você terminou menos partidas com 3★";
     return "Seu bloco recente ficou "+biggest.label;
   })();
+
+  const headline=shift.confidence==="baixa"
+    ? "Sinal inicial: "+rawHeadline.charAt(0).toLowerCase()+rawHeadline.slice(1)
+    : rawHeadline;
 
   return <section className="panel style-shift">
     <div className="innovation-head">
