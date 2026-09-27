@@ -128,3 +128,8 @@ a { color: inherit; text-decoration: none; }
   .lobby-player{grid-template-columns:44px minmax(0,1fr)}
   .lobby-meta{grid-column:2;text-align:left;flex-direction:row}
 }
+
+.unit-chip{max-width:118px}
+.unit-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:78px}
+.match-main>div:not(.unit-row){display:flex;flex-wrap:wrap}
+.match-meta span:first-child{white-space:nowrap}
