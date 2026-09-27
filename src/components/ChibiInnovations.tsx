@@ -53,7 +53,7 @@ export default function ChibiInnovations({matches,staticData,onEvidence}:Props){
               <div className="meta-line-main">
                 <div className="meta-line-title">
                   <strong>{traitName(line.id,staticData)}</strong>
-                  <span>{line.fitScore}% fit</span>
+                  <span>score {line.fitScore}</span>
                 </div>
                 <div className="fit-track"><i style={{width:line.fitScore+"%"}}/></div>
                 <small>{line.games} jogos · média {line.avgPlacement} · Top 4 {line.top4Rate}% · confiança {line.confidence}</small>
@@ -66,7 +66,7 @@ export default function ChibiInnovations({matches,staticData,onEvidence}:Props){
         <p className="innovation-empty">Carregue mais partidas para identificar linhas repetidas com segurança.</p>
       )}
 
-      <p className="innovation-note">Este ranking é pessoal e usa apenas seu histórico. Comparação com o meta global será uma camada separada.</p>
+      <p className="innovation-note">Score pessoal de 0–100 para ordenar sinais do seu histórico. Não é probabilidade de vitória nem tier global.</p>
     </article>
 
     <article className="panel innovation-card session-card">
