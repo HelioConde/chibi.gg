@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { TftMatch } from "../api/tft";
 import { buildActionPlan } from "../analysis/actionPlan";
 import { getGoal, goalProgress, saveGoal, suggestGoal, ChibiGoal } from "../goals";
@@ -12,6 +12,11 @@ type Props={
 export default function ChibiActionCenter({playerKey,matches,onEvidence}:Props){
   const plan=useMemo(()=>buildActionPlan(matches),[matches]);
   const [goal,setGoal]=useState<ChibiGoal|null>(()=>getGoal(playerKey));
+
+  useEffect(()=>{
+    setGoal(getGoal(playerKey));
+  },[playerKey]);
+
   const progress=useMemo(()=>goal?goalProgress(goal,matches):null,[goal,matches]);
 
   function startGoal(){
