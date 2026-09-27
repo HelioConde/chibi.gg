@@ -25,6 +25,7 @@ import BoardCounterfactual from "./components/BoardCounterfactual";
 import NextSessionGoal from "./components/NextSessionGoal";
 import ChibiShareCard from "./components/ChibiShareCard";
 import PersonalVsGlobalMeta from "./components/PersonalVsGlobalMeta";
+import ChibiIdentity from "./components/ChibiIdentity";
 
 function cleanName(value:string){
   return value
@@ -455,6 +456,11 @@ function App() {
           </nav>
 
           {profileTab==="overview"&&<>
+            <ChibiIdentity
+              matches={analysisMatches}
+              onEvidence={showEvidence}
+            />
+
             <ChibiInnovations
               matches={analysisMatches}
               staticData={staticData}
