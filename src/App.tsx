@@ -14,6 +14,7 @@ import {
   staticEntry,
   tftAssetUrl,
   TftStaticData,
+  queueLabel,
 } from "./tftStatic";
 import { buildChibiDNA } from "./analysis/chibiInsights";
 
@@ -118,6 +119,8 @@ function App() {
   const [matchLoading,setMatchLoading]=useState(false);
   const [matchError,setMatchError]=useState("");
   const [staticData,setStaticData]=useState<TftStaticData|null>(null);
+  const [selectedQueue,setSelectedQueue]=useState<number|null>(null);
+  const [openedMatch,setOpenedMatch]=useState<TftMatch|null>(null);
 
   useEffect(()=>{
     loadTftStaticData().then(setStaticData).catch(()=>{});
@@ -131,7 +134,36 @@ function App() {
     [profile]
   );
 
-  const dna=useMemo(()=>buildChibiDNA(matches),[matches]);
+  const currentSet=useMemo(
+    ()=>matches.find((m)=>Number(m.setNumber)>0)?.setNumber || null,
+    [matches]
+  );
+
+  const setMatches=useMemo(
+    ()=>currentSet ? matches.filter((m)=>m.setNumber===currentSet) : matches,
+    [matches,currentSet]
+  );
+
+  const availableQueues=useMemo(
+    ()=>[...new Set(setMatches.map((m)=>m.queueId).filter((q):q is number=>Number.isFinite(q)))],
+    [setMatches]
+  );
+
+  const analysisMatches=useMemo(
+    ()=>selectedQueue==null ? setMatches : setMatches.filter((m)=>m.queueId===selectedQueue),
+    [setMatches,selectedQueue]
+  );
+
+  const dna=useMemo(()=>buildChibiDNA(analysisMatches),[analysisMatches]);
+
+  const latestPlayedAt=useMemo(
+    ()=>Math.max(0,...analysisMatches.map((m)=>Number(m.playedAt)||0)),
+    [analysisMatches]
+  );
+
+  const freshnessDays=latestPlayedAt
+    ? Math.floor((Date.now()-latestPlayedAt)/86400000)
+    : null;
 
   async function searchPlayer(){
     const parsed=splitRiotId(riotId);
@@ -146,6 +178,8 @@ function App() {
     setMatches([]);
     setHasMore(true);
     setSelectedMatch(null);
+    setOpenedMatch(null);
+    setSelectedQueue(null);
 
     try{
       const data=await fetchTftProfile(parsed.gameName,parsed.tagLine,platform);
@@ -198,6 +232,7 @@ function App() {
     setMatchLoading(true);
     setMatchError("");
     setSelectedMatch(null);
+    setOpenedMatch(match);
 
     try{
       const detail=await fetchTftMatch(match.id);
@@ -214,6 +249,7 @@ function App() {
     setMatches([]);
     setError("");
     setSelectedMatch(null);
+    setOpenedMatch(null);
     setMatchError("");
   }
 
@@ -281,11 +317,34 @@ function App() {
             <button className="refresh-button" onClick={searchPlayer} disabled={loading}>{loading ? "Atualizando..." : "Atualizar"}</button>
           </section>
 
+          <section className="context-bar">
+            <div className="context-copy">
+              <span>CONTEXTO ANALISADO</span>
+              <strong>{currentSet ? "Set "+currentSet : "Set atual"}</strong>
+              <small>{analysisMatches.length} partidas nesta amostra</small>
+            </div>
+
+            <div className="queue-tabs">
+              <button className={selectedQueue==null?"active":""} onClick={()=>setSelectedQueue(null)}>Todas</button>
+              {availableQueues.map((queueId)=>(
+                <button className={selectedQueue===queueId?"active":""} onClick={()=>setSelectedQueue(queueId)} key={queueId}>
+                  {queueLabel(staticData,queueId)}
+                </button>
+              ))}
+            </div>
+
+            <div className={"freshness "+(freshnessDays!=null&&freshnessDays>14?"stale":"")}>
+              <span>ÚLTIMA PARTIDA</span>
+              <strong>{latestPlayedAt ? formatWhen(latestPlayedAt) : "—"}</strong>
+              {freshnessDays!=null&&freshnessDays>14&&<small>Amostra antiga</small>}
+            </div>
+          </section>
+
           <section className="stat-grid">
-            <article><span>Colocação média</span><strong>{profile.summary.averagePlacement ?? "—"}</strong><small>amostra recente</small></article>
-            <article><span>Top 4</span><strong>{profile.summary.top4Rate}%</strong><small>consistência recente</small></article>
-            <article><span>Win rate</span><strong>{profile.summary.winRate}%</strong><small>{profile.summary.firsts} primeiros lugares</small></article>
-            <article><span>8º lugares</span><strong>{profile.summary.eighths}</strong><small>risco recente</small></article>
+            <article><span>Colocação média</span><strong>{dna.avgPlacement ?? "—"}</strong><small>{dna.sampleSize} partidas</small></article>
+            <article><span>Top 4</span><strong>{dna.top4Rate}%</strong><small>no contexto selecionado</small></article>
+            <article><span>Win rate</span><strong>{dna.winRate}%</strong><small>{Math.round(dna.winRate*dna.sampleSize/100)} primeiros lugares</small></article>
+            <article><span>Bottom 2</span><strong>{dna.bottom2Rate}%</strong><small>7º ou 8º lugar</small></article>
           </section>
 
           {error && <div className="profile-error">{error}</div>}
@@ -294,11 +353,11 @@ function App() {
             <section className="panel history">
               <div className="panel-title">
                 <div><span>PARTIDAS RIOT</span><h2>Histórico recente</h2></div>
-                <small>{matches.length} carregadas</small>
+                <small>{analysisMatches.length} no contexto</small>
               </div>
 
               <div className="match-list">
-                {matches.map((match)=>(
+                {analysisMatches.map((match)=>(
                   <button className="match-row match-button" key={match.id} onClick={()=>openMatch(match)}>
                     <div className={"placement "+placementClass(match.placement)}>{match.placement}º</div>
 
@@ -392,9 +451,9 @@ function App() {
       )}
 
       {(matchLoading || selectedMatch || matchError) && (
-        <div className="match-overlay" onClick={()=>{setSelectedMatch(null);setMatchError("");}}>
+        <div className="match-overlay" onClick={()=>{setSelectedMatch(null);setOpenedMatch(null);setMatchError("");}}>
           <section className="match-modal" onClick={(e)=>e.stopPropagation()}>
-            <button className="match-close" onClick={()=>{setSelectedMatch(null);setMatchError("");}}>×</button>
+            <button className="match-close" onClick={()=>{setSelectedMatch(null);setOpenedMatch(null);setMatchError("");}}>×</button>
             {matchLoading && <div className="match-state">Carregando detalhes da partida...</div>}
             {matchError && <div className="match-state error">{matchError}</div>}
 
@@ -406,10 +465,20 @@ function App() {
 
               <div className="lobby-list">
                 {selectedMatch.match.participants.slice().sort((a,b)=>a.placement-b.placement).map((participant,index)=>(
-                  <article className="lobby-player" key={index}>
+                  <article className={"lobby-player "+(openedMatch?.placement===participant.placement?"current-player":"")} key={index}>
                     <div className={"placement "+placementClass(participant.placement)}>{participant.placement}º</div>
                     <div className="lobby-board">
-                      <strong>Nível {participant.level}</strong>
+                      <div className="lobby-title">
+                        <strong>Nível {participant.level}</strong>
+                        {openedMatch?.placement===participant.placement&&<span>VOCÊ</span>}
+                      </div>
+                      <div className="trait-row lobby-traits">
+                        {participant.traits
+                          .filter((t)=>t.numUnits>0&&(t.style>0||t.numUnits>=2))
+                          .sort((a,b)=>b.style-a.style||b.numUnits-a.numUnits)
+                          .slice(0,4)
+                          .map((trait)=><span className="trait-chip" key={trait.name}>{traitLabel(trait,staticData)} {trait.numUnits}</span>)}
+                      </div>
                       <div className="board-row detailed">
                         {participant.units.slice(0,9).map((unit,unitIndex)=><UnitVisual unit={unit} staticData={staticData} key={unit.characterId+unitIndex}/>)}
                       </div>
