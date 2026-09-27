@@ -548,3 +548,14 @@ a { color: inherit; text-decoration: none; }
   .style-shift-row{grid-template-columns:1fr repeat(3,auto)}
   .style-shift-row>span,.style-shift-row>b{min-width:48px}
 }
+
+.profile-tabs{justify-content:space-between;align-items:center}
+.profile-tab-list{display:flex;gap:6px;min-width:0}
+.copy-analysis-link{margin-left:auto!important;border:1px solid #2c3448!important;background:#111722!important;color:#8f9ab0!important;white-space:nowrap}
+.copy-analysis-link:hover{border-color:#4a5574!important;color:#d0d6e4!important}
+@media (max-width:700px){
+  .profile-tabs{align-items:stretch}
+  .profile-tab-list{display:flex;overflow-x:auto;scrollbar-width:none}
+  .profile-tab-list::-webkit-scrollbar{display:none}
+  .copy-analysis-link{flex:0 0 auto}
+}
