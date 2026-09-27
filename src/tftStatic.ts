@@ -1,7 +1,9 @@
 export type TftStaticEntry = {
-  id?: string;
+  id?: string | number;
   name?: string;
   tier?: number | string;
+  queueId?: string | number;
+  queueType?: string;
   image?: { full?: string; group?: string };
 };
 
@@ -11,7 +13,7 @@ export type TftStaticData = {
   items: Record<string,TftStaticEntry>;
   traits: Record<string,TftStaticEntry>;
   augments: Record<string,TftStaticEntry>;
-  queues: Record<string,TftStaticEntry & { queueType?: string }>;
+  queues: Record<string,TftStaticEntry>;
 };
 
 let cached: Promise<TftStaticData> | null = null;
@@ -68,4 +70,28 @@ export function tftAssetUrl(version:string, kind:"champion"|"item"|"trait"|"augm
   const full=entry?.image?.full;
   if(!full) return "";
   return "https://ddragon.leagueoflegends.com/cdn/"+version+"/img/tft-"+kind+"/"+encodeURIComponent(full);
+}
+
+
+export function queueLabel(data:TftStaticData|null, queueId?:number){
+  if(queueId==null) return "Todas";
+  const raw=String(queueId);
+  const entry=data?.queues?.[raw] || Object.values(data?.queues||{}).find((item)=>
+    String(item.queueId??item.id??"")===raw
+  );
+  const name=String(entry?.name||entry?.queueType||"").trim();
+  if(name) return name
+    .replace(/Teamfight Tactics/gi,"TFT")
+    .replace(/\s+/g," ")
+    .trim();
+
+  const fallback:Record<number,string>={
+    1090:"Normal",
+    1100:"Ranked",
+    1110:"Tutorial",
+    1130:"Hyper Roll",
+    1150:"Double Up",
+    1160:"Double Up",
+  };
+  return fallback[queueId] || "Fila "+queueId;
 }
