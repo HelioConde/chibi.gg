@@ -402,7 +402,7 @@ function App() {
               <div className="eyebrow">PERFIL TFT · {profile.player.platform}</div>
               <h1>{profile.player.gameName}<span className="player-tag">#{profile.player.tagLine}</span></h1>
               <div className="rank-line">
-                {rank ? rank.tier+" "+rank.rank+" · "+rank.leaguePoints+" LP" : "Sem rank TFT"}
+                {rank ? rank.tier+" "+rank.rank+" · "+rank.leaguePoints+" LP" : "Sem rank atual"}
                 <span>{matches.length} partidas carregadas</span>
               </div>
             </div>
