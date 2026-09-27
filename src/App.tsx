@@ -242,6 +242,11 @@ function App() {
     return analysisMatches.filter((match)=>allowed.has(match.id));
   },[analysisMatches,evidenceIds]);
 
+  const visibleDna=useMemo(
+    ()=>evidenceIds?.length ? buildChibiDNA(visibleMatches) : dna,
+    [evidenceIds,visibleMatches,dna]
+  );
+
   const latestPlayedAt=useMemo(
     ()=>Math.max(0,...analysisMatches.map((m)=>Number(m.playedAt)||0)),
     [analysisMatches]
@@ -667,12 +672,15 @@ function App() {
 
             <aside className="panel insights dna-panel">
               <div className="panel-title">
-                <div><span>CHIBI DNA</span><h2>Seu padrão recente</h2></div>
-                <small>{dna.sampleSize} partidas</small>
+                <div>
+                  <span>CHIBI DNA</span>
+                  <h2>{evidenceIds?.length?"DNA da evidência":"Seu padrão recente"}</h2>
+                </div>
+                <small>{visibleDna.sampleSize} partidas</small>
               </div>
 
               <div className="placement-strip" aria-label="Colocações recentes">
-                {dna.placements.slice(0,12).map((p,index)=>(
+                {visibleDna.placements.slice(0,12).map((p,index)=>(
                   <span className={placementClass(p)} key={index} title={(index+1)+"ª partida mais recente: "+p+"º"}>{p}</span>
                 ))}
               </div>
@@ -680,30 +688,32 @@ function App() {
               <div className="dna-grid">
                 <article>
                   <span>Consistência</span>
-                  <strong>{dna.consistency}%</strong>
+                  <strong>{visibleDna.consistency}%</strong>
                   <small>variação das colocações</small>
                 </article>
                 <article>
                   <span>Flexibilidade</span>
-                  <strong>{dna.flexibility}%</strong>
+                  <strong>{visibleDna.flexibility}%</strong>
                   <small>diversidade de linhas</small>
                 </article>
                 <article>
                   <span>Conversão</span>
-                  <strong>{dna.conversion}%</strong>
+                  <strong>{visibleDna.conversion}%</strong>
                   <small>Top 4 que viraram 1º</small>
                 </article>
                 <article>
                   <span>Estabilidade</span>
-                  <strong>{dna.stability}%</strong>
+                  <strong>{visibleDna.stability}%</strong>
                   <small>evitou Bottom 2</small>
                 </article>
               </div>
 
-              <p className="dna-disclaimer">Indicadores descritivos da amostra carregada. Não são MMR, elo alternativo nem avaliação oficial da Riot.</p>
+              <p className="dna-disclaimer">{evidenceIds?.length
+                ? "DNA recalculado somente com as partidas da evidência ativa. Não é MMR, elo alternativo nem avaliação oficial da Riot."
+                : "Indicadores descritivos da amostra carregada. Não são MMR, elo alternativo nem avaliação oficial da Riot."}</p>
 
               <div className="dna-insights">
-                {dna.insights.map((insight)=>{
+                {visibleDna.insights.map((insight)=>{
                   const subject=insight.subject
                     ? staticEntry(staticData?.traits,insight.subject)?.name || fallbackTraitName(insight.subject)
                     : "";
