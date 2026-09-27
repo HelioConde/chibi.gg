@@ -34,6 +34,19 @@ export default function ChibiInnovations({matches,staticData,onEvidence}:Props){
   const personalMeta=useMemo(()=>buildPersonalMeta(matches),[matches]);
   const session=useMemo(()=>buildSessionCoach(matches),[matches]);
   const leaks=useMemo(()=>buildLeakMap(matches),[matches]);
+  const secondaryLeaks=useMemo(
+    ()=>leaks.items.filter((item)=>item.id!==leaks.primary?.id).slice(0,3),
+    [leaks]
+  );
+
+  const sessionHeadline=useMemo(()=>{
+    if(session.games<3) return "Sessão curta";
+    if(session.bottom2Rate>=34) return "Sessão instável";
+    if((session.avgPlacement??8)<=4) return "Sessão positiva";
+    if(session.top4Rate>=50) return "Boa consistência na sessão";
+    if((session.avgPlacement??8)>4.5) return "Sessão abaixo do meio";
+    return "Sessão recente";
+  },[session]);
 
   return <section className="innovation-grid">
     <article className="panel innovation-card personal-meta-card">
@@ -72,8 +85,8 @@ export default function ChibiInnovations({matches,staticData,onEvidence}:Props){
     <article className="panel innovation-card session-card">
       <div className="innovation-head">
         <div>
-          <span>SESSION COACH</span>
-          <h2>{session.focus}</h2>
+          <span>SESSÃO RECENTE</span>
+          <h2>{sessionHeadline}</h2>
         </div>
         <small>{session.games} jogos</small>
       </div>
@@ -84,7 +97,11 @@ export default function ChibiInnovations({matches,staticData,onEvidence}:Props){
         <div><span>Bottom 2</span><strong>{session.bottom2Rate}%</strong></div>
       </div>
 
-      <p className="session-reason">{session.reason}</p>
+      <p className="session-reason">
+        {session.games<3
+          ? "Amostra curta: o Chibi evita transformar uma sessão pequena em diagnóstico."
+          : "Use estes números como contexto da sessão. O diagnóstico principal fica concentrado no Focus Brief acima."}
+      </p>
 
       <div className="session-time">
         <span>{formatSessionTime(session.startedAt)}</span>
@@ -98,14 +115,14 @@ export default function ChibiInnovations({matches,staticData,onEvidence}:Props){
     <article className="panel innovation-card leak-card">
       <div className="innovation-head">
         <div>
-          <span>LP LEAK MAP</span>
-          <h2>{leaks.primary?leaks.primary.title:"Sem vazamento dominante"}</h2>
+          <span>SINAIS SECUNDÁRIOS</span>
+          <h2>{secondaryLeaks.length?"O que mais merece atenção":"Sem outro sinal forte"}</h2>
         </div>
-        {leaks.primary&&<small>{leaks.primary.severity}/100</small>}
+        <small>{secondaryLeaks.length} sinais</small>
       </div>
 
       <div className="leak-list">
-        {leaks.items.length?leaks.items.map((leak)=>(
+        {secondaryLeaks.length?secondaryLeaks.map((leak)=>(
           <div className="leak-row" key={leak.id}>
             <div className="leak-top">
               <strong>{leak.title}</strong>
@@ -118,10 +135,10 @@ export default function ChibiInnovations({matches,staticData,onEvidence}:Props){
               <button onClick={()=>onEvidence(leak.matchIds,"LP Leak · "+leak.title)}>Ver partidas</button>
             </div>
           </div>
-        )):<p className="innovation-empty">A amostra ainda não mostra um padrão de vazamento forte.</p>}
+        )):<p className="innovation-empty">Além do Focus Brief, a amostra atual não mostra outro sinal forte o suficiente para destacar.</p>}
       </div>
 
-      <p className="innovation-note">“Leak” é um sinal de investigação baseado em colocação. Não representa LP calculado nem prova causalidade.</p>
+      <p className="innovation-note">Os sinais secundários complementam o Focus Brief. Eles não representam LP calculado nem prova causalidade.</p>
     </article>
   </section>;
 }
