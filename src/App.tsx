@@ -142,6 +142,7 @@ function App() {
   const [evidenceIds,setEvidenceIds]=useState<string[]|null>(null);
   const [evidenceLabel,setEvidenceLabel]=useState("");
   const [journalVersion,setJournalVersion]=useState(0);
+  const [profileTab,setProfileTab]=useState<"overview"|"review"|"meta"|"matches"|"share">("overview");
 
   useEffect(()=>{
     loadTftStaticData().then(setStaticData).catch(()=>{});
@@ -217,9 +218,10 @@ function App() {
   function showEvidence(ids:string[],label:string){
     setEvidenceIds(ids);
     setEvidenceLabel(label);
-    requestAnimationFrame(()=>{
+    setProfileTab("matches");
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
       document.getElementById("match-history")?.scrollIntoView({behavior:"smooth",block:"start"});
-    });
+    }));
   }
 
   function clearEvidence(){
@@ -243,6 +245,7 @@ function App() {
     setSelectedMatch(null);
     setOpenedMatch(null);
     setSelectedQueue(null);
+    setProfileTab("overview");
     clearEvidence();
 
     try{
@@ -333,6 +336,7 @@ function App() {
     setSelectedMatch(null);
     setOpenedMatch(null);
     setMatchError("");
+    setProfileTab("overview");
     clearEvidence();
 
     const url=new URL(window.location.href);
@@ -440,49 +444,61 @@ function App() {
             <article><span>Bottom 2</span><strong>{dna.bottom2Rate}%</strong><small>7º ou 8º lugar</small></article>
           </section>
 
-          <ChibiInnovations
-            matches={analysisMatches}
-            staticData={staticData}
-            onEvidence={showEvidence}
-          />
+          {error && <div className="profile-error">{error}</div>}
 
-          <PersonalVsGlobalMeta
-            matches={analysisMatches}
-            setNumber={currentSet}
-            queueId={metaQueueId}
-            staticData={staticData}
-            onEvidence={showEvidence}
-          />
+          <nav className="profile-tabs" aria-label="Seções do perfil">
+            <button className={profileTab==="overview"?"active":""} onClick={()=>setProfileTab("overview")}>Visão geral</button>
+            <button className={profileTab==="review"?"active":""} onClick={()=>setProfileTab("review")}>Review</button>
+            <button className={profileTab==="meta"?"active":""} onClick={()=>setProfileTab("meta")}>Meta pessoal</button>
+            <button className={profileTab==="matches"?"active":""} onClick={()=>setProfileTab("matches")}>Partidas</button>
+            <button className={profileTab==="share"?"active":""} onClick={()=>setProfileTab("share")}>Compartilhar</button>
+          </nav>
 
-          <ChibiReview
+          {profileTab==="overview"&&<>
+            <ChibiInnovations
+              matches={analysisMatches}
+              staticData={staticData}
+              onEvidence={showEvidence}
+            />
+
+            <NextSessionGoal
+              playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
+              matches={analysisMatches}
+              onEvidence={showEvidence}
+            />
+          </>}
+
+          {profileTab==="review"&&<ChibiReview
             matches={analysisMatches}
             staticData={staticData}
             journalVersion={journalVersion}
             onEvidence={showEvidence}
-          />
+          />}
 
-          <PatchAdaptation
-            matches={analysisMatches}
-            onEvidence={showEvidence}
-          />
+          {profileTab==="meta"&&<>
+            <PersonalVsGlobalMeta
+              matches={analysisMatches}
+              setNumber={currentSet}
+              queueId={metaQueueId}
+              staticData={staticData}
+              onEvidence={showEvidence}
+            />
 
-          <NextSessionGoal
-            playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
-            matches={analysisMatches}
-            onEvidence={showEvidence}
-          />
+            <PatchAdaptation
+              matches={analysisMatches}
+              onEvidence={showEvidence}
+            />
+          </>}
 
-          <ChibiShareCard
+          {profileTab==="share"&&<ChibiShareCard
             profile={profile}
             dna={dna}
             matches={analysisMatches}
             staticData={staticData}
             shareUrl={window.location.href}
-          />
+          />}
 
-          {error && <div className="profile-error">{error}</div>}
-
-          <div className="content-grid">
+          {profileTab==="matches"&&<div className="content-grid">
             <section className="panel history" id="match-history">
               <div className="panel-title">
                 <div><span>PARTIDAS RIOT</span><h2>Histórico recente</h2></div>
@@ -588,7 +604,7 @@ function App() {
                 })}
               </div>
             </aside>
-          </div>
+          </div>}
         </main>
       )}
 
