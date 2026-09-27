@@ -16,6 +16,32 @@ function cleanName(value:string){
     .replace(/([a-z])([A-Z])/g,"$1 $2");
 }
 
+function traitName(value:string){
+  return cleanName(value)
+    .replace(/\bUnique Trait\b/gi,"")
+    .replace(/\bTrait\b$/i,"")
+    .replace(/\s{2,}/g," ")
+    .trim();
+}
+
+function activeTraits(match:TftMatch){
+  return match.traits
+    .filter((t)=>t.numUnits>0 && (t.style>0 || t.numUnits>=2))
+    .sort((a,b)=>b.style-a.style || b.numUnits-a.numUnits);
+}
+
+function formatWhen(timestamp?:number){
+  if(!timestamp) return "";
+  const date=new Date(timestamp);
+  const diff=Date.now()-date.getTime();
+  const hours=Math.floor(diff/3600000);
+  if(hours<1) return "agora";
+  if(hours<24) return hours+"h";
+  const days=Math.floor(hours/24);
+  if(days<7) return days+"d";
+  return date.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"});
+}
+
 function placementClass(value:number){
   if(value===1) return "p1";
   if(value<=4) return "p2";
@@ -46,9 +72,42 @@ function App() {
   const [matchError,setMatchError]=useState("");
 
   const rank=useMemo(
-    ()=>profile?.ranked?.find((r)=>r.queueType==="RANKED_TFT") || profile?.ranked?.[0] || null,
+    ()=>profile?.ranked?.find((r)=>String(r.queueType).toUpperCase()==="RANKED_TFT")
+      || profile?.ranked?.find((r)=>String(r.queueType).toUpperCase().includes("RANKED_TFT"))
+      || profile?.ranked?.[0]
+      || null,
     [profile]
   );
+
+  const recentTrend=useMemo(()=>{
+    if(matches.length<6) return null;
+    const recent=matches.slice(0,6);
+    const previous=matches.slice(6,12);
+    const avg=(items:TftMatch[])=>items.length
+      ? items.reduce((sum,m)=>sum+m.placement,0)/items.length
+      : null;
+    const a=avg(recent);
+    const b=avg(previous);
+    if(a==null||b==null) return null;
+    return { recent:+a.toFixed(2), previous:+b.toFixed(2), delta:+(a-b).toFixed(2) };
+  },[matches]);
+
+  const favoriteTrait=useMemo(()=>{
+    const counts=new Map<string,{games:number,total:number}>();
+    for(const match of matches){
+      for(const trait of activeTraits(match).slice(0,4)){
+        const name=traitName(trait.name);
+        if(!name) continue;
+        const current=counts.get(name)||{games:0,total:0};
+        current.games+=1;
+        current.total+=match.placement;
+        counts.set(name,current);
+      }
+    }
+    return [...counts.entries()]
+      .map(([name,value])=>({name,games:value.games,avg:+(value.total/value.games).toFixed(2)}))
+      .sort((a,b)=>b.games-a.games||a.avg-b.avg)[0]||null;
+  },[matches]);
 
   async function searchPlayer(){
     const parsed=splitRiotId(riotId);
@@ -241,28 +300,25 @@ function App() {
 
                     <div className="match-main">
                       <strong>
-                        {match.traits
-                          .filter((t)=>t.numUnits>0)
-                          .sort((a,b)=>b.style-a.style || b.numUnits-a.numUnits)
+{activeTraits(match)
                           .slice(0,2)
-                          .map((t)=>cleanName(t.name))
+                          .map((t)=>traitName(t.name))
+                          .filter(Boolean)
                           .join(" · ") || "Board TFT"}
                       </strong>
 
                       <div>
-                        {match.traits
-                          .filter((t)=>t.numUnits>0)
-                          .sort((a,b)=>b.style-a.style || b.numUnits-a.numUnits)
+{activeTraits(match)
                           .slice(0,5)
                           .map((trait)=>(
-                            <span key={trait.name}>{cleanName(trait.name)} {trait.numUnits}</span>
+                            <span key={trait.name}>{traitName(trait.name)} {trait.numUnits}</span>
                           ))}
                       </div>
 
                       <div className="unit-row">
                         {match.units.slice(0,9).map((unit,index)=>(
                           <span className="unit-chip" key={unit.characterId+index}>
-                            {cleanName(unit.characterId).slice(0,4)}
+                            <span className="unit-name">{cleanName(unit.characterId)}</span>
                             <b>{unit.tier}★</b>
                           </span>
                         ))}
@@ -270,7 +326,7 @@ function App() {
                     </div>
 
                     <div className="match-meta">
-                      <span>Nível {match.level}</span>
+                      <span>{formatWhen(match.playedAt)} · Nível {match.level}</span>
                       <strong>{match.damageToPlayers} dano</strong>
                       <small>{match.goldLeft}g</small>
                     </div>
@@ -290,17 +346,25 @@ function App() {
 
               <article className="insight positive">
                 <b>Consistência</b>
-                <p>Top 4 em {profile.summary.top4Rate}% das partidas analisadas.</p>
+                <p>Top 4 em {profile.summary.top4Rate}% das {profile.summary.matches} partidas usadas no resumo.</p>
               </article>
+
+              {favoriteTrait && <article className="insight neutral">
+                <b>Linha mais recorrente</b>
+                <p>{favoriteTrait.name} apareceu em {favoriteTrait.games} partidas, com colocação média {favoriteTrait.avg}.</p>
+              </article>}
+
+              {recentTrend && <article className={`insight ${recentTrend.delta<0?"positive":recentTrend.delta>0?"warning":"neutral"}`}>
+                <b>Forma recente</b>
+                <p>
+                  Últimas 6: média {recentTrend.recent}. Anteriores: {recentTrend.previous}.
+                  {recentTrend.delta<0?" Sua colocação média melhorou.":recentTrend.delta>0?" Sua colocação média piorou.":" Ritmo estável."}
+                </p>
+              </article>}
 
               <article className="insight neutral">
                 <b>Conversão</b>
-                <p>{profile.summary.firsts} vitórias na amostra recente.</p>
-              </article>
-
-              <article className="insight warning">
-                <b>Próxima camada</b>
-                <p>Vamos cruzar augments, itens, economia e transições para gerar insights realmente específicos.</p>
+                <p>{profile.summary.firsts} vitória{profile.summary.firsts===1?"":"s"} e {profile.summary.eighths} oitavo{profile.summary.eighths===1?"":"s"} lugar{profile.summary.eighths===1?"":"es"} na amostra.</p>
               </article>
             </aside>
           </div>
@@ -336,7 +400,7 @@ function App() {
                         <div className="unit-row">
                           {participant.units.slice(0,9).map((unit,unitIndex)=>(
                             <span className="unit-chip" key={unit.characterId+unitIndex}>
-                              {cleanName(unit.characterId).slice(0,4)}
+                              <span className="unit-name">{cleanName(unit.characterId)}</span>
                               <b>{unit.tier}★</b>
                             </span>
                           ))}
