@@ -559,3 +559,60 @@ a { color: inherit; text-decoration: none; }
   .profile-tab-list::-webkit-scrollbar{display:none}
   .copy-analysis-link{flex:0 0 auto}
 }
+
+.topbar nav button{border:0;background:transparent;color:#8f97aa;padding:0;font-size:14px;font-weight:650}
+.topbar nav button:hover,.topbar nav button.active{color:#fff}
+
+.global-meta-page{width:min(1180px,92vw);margin:0 auto;padding:56px 0 90px}
+.global-meta-hero{display:grid;grid-template-columns:1fr auto;gap:26px;align-items:end;margin-bottom:22px}
+.global-meta-hero .back-search{margin-bottom:28px}
+.global-meta-hero h1{margin:8px 0 10px;font-size:clamp(36px,5vw,58px);line-height:1.02;letter-spacing:-2.4px}
+.global-meta-hero h1 em{font-style:normal;color:#9c89ff}
+.global-meta-hero p{max-width:650px;margin:0;color:#8a94a9;font-size:14px;line-height:1.65}
+.meta-dataset-card{min-width:190px;padding:16px;border:1px solid #2a3244;border-radius:14px;background:#0d131d;text-align:right}
+.meta-dataset-card>span{display:block;color:#6e7a90;font-size:8px;letter-spacing:1.1px;font-weight:900}
+.meta-dataset-card>strong{display:block;margin-top:5px;font-size:32px;letter-spacing:-1px}
+.meta-dataset-card>small{display:block;color:#6d788d;font-size:8px}
+.meta-dataset-card>b{display:inline-block;margin-top:9px;padding:4px 7px;border-radius:999px;background:#171e2a;color:#8e99ae;font-size:8px;text-transform:uppercase}
+.meta-dataset-card.crescendo{border-color:rgba(94,164,255,.28)}
+.meta-dataset-card.robusta{border-color:rgba(72,209,153,.3)}
+.meta-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;padding:8px;border:1px solid #20283a;border-radius:11px;background:#0b1018}
+.meta-toolbar>div{display:flex;gap:6px}
+.meta-toolbar button{border:1px solid transparent;background:transparent;color:#7a859a;border-radius:8px;padding:8px 10px;font-size:9px;font-weight:900}
+.meta-toolbar button.active{border-color:#6556d4;background:rgba(117,99,231,.14);color:#c8bfff}
+.meta-toolbar>span{color:#68758a;font-size:9px;margin-right:4px}
+.meta-page-state{margin:14px 0;color:#8490a5;font-size:11px}
+.meta-page-state.error{border-color:rgba(255,96,96,.25);color:#d88d8d}
+.meta-signal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.meta-signal-grid article{min-height:155px}
+.meta-signal-grid article>span{display:block;color:#718096;font-size:8px;letter-spacing:1px;font-weight:900}
+.meta-signal-grid article h2{margin:24px 0 7px;font-size:18px}
+.meta-signal-grid article p{margin:0;color:#7f8a9e;font-size:9px;line-height:1.55}
+.meta-signal-grid article.established{border-color:rgba(72,209,153,.22)}
+.meta-signal-grid article.emerging{border-color:rgba(255,180,83,.22)}
+.meta-explorer{margin-top:0}
+.meta-explorer-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px}
+.meta-explorer-head span{display:block;color:#7563e7;font-size:9px;letter-spacing:1.2px;font-weight:900}
+.meta-explorer-head h2{margin:4px 0 0;font-size:20px}
+.meta-explorer-head small{color:#647185;font-size:8px}
+.meta-table-head,.meta-table article{display:grid;grid-template-columns:minmax(220px,1.6fr) repeat(5,.7fr) .8fr;gap:8px;align-items:center}
+.meta-table-head{padding:0 10px 7px;color:#637084;font-size:8px}
+.meta-table-head span:not(:first-child){text-align:right}
+.meta-table{display:flex;flex-direction:column;gap:6px}
+.meta-table article{padding:10px;border:1px solid #20293a;border-radius:10px;background:#0c121a}
+.meta-trait-name{min-width:0}
+.meta-trait-name strong{display:block;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta-trait-name small{display:block;margin-top:2px;color:#59667a;font-size:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta-table article>b{text-align:right;font-size:10px}
+.meta-confidence{justify-self:end;padding:4px 6px;border-radius:6px;background:#161d28;color:#7f8a9e;font-size:8px;font-weight:900}
+.meta-confidence.medium{background:rgba(255,180,83,.1);color:#d6a76a}
+.meta-confidence.high{background:rgba(72,209,153,.1);color:#77d7ac}
+
+@media (max-width:850px){
+  .global-meta-hero{grid-template-columns:1fr}
+  .meta-dataset-card{text-align:left;min-width:0}
+  .meta-signal-grid{grid-template-columns:1fr}
+  .meta-table-head{display:none}
+  .meta-table article{grid-template-columns:1fr repeat(3,auto)}
+  .meta-table article>b:nth-of-type(n+4),.meta-confidence{display:none}
+}
