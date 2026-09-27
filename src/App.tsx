@@ -1,39 +1,81 @@
 import { FormEvent, useMemo, useState } from "react";
+import { supabase } from "./supabase";
 
-type Match = {
-  placement: number;
-  comp: string;
-  traits: string[];
-  avg: string;
-  lp: string;
+type Profile = {
+  player: { gameName:string; tagLine:string; platform:string; level:number };
+  ranked: Array<{ queueType:string; tier:string; rank:string; leaguePoints:number; wins:number; losses:number }>;
+  summary: { matches:number; averagePlacement:number|null; top4Rate:number; winRate:number; firsts:number; eighths:number };
+  matches: Array<{
+    id:string; placement:number; level:number; goldLeft:number; damageToPlayers:number;
+    traits:Array<{name:string;numUnits:number;style:number}>;
+    units:Array<{characterId:string;rarity:number;tier:number;itemNames:string[]}>;
+    augments:string[];
+  }>;
 };
 
-const matches: Match[] = [
-  { placement: 1, comp: "Fast 8 AP", traits: ["Arcanist", "Bastion"], avg: "4.2", lp: "+42 LP" },
-  { placement: 3, comp: "Flex AD", traits: ["Duelist", "Strategist"], avg: "4.7", lp: "+18 LP" },
-  { placement: 7, comp: "Reroll", traits: ["Bruiser", "Invoker"], avg: "5.9", lp: "-36 LP" },
-  { placement: 2, comp: "Fast 9", traits: ["Legendary", "Bastion"], avg: "3.8", lp: "+31 LP" },
-];
+function cleanName(value:string){
+  return value
+    .replace(/^TFT\d+_/i,"")
+    .replace(/^Set\d+_/i,"")
+    .replace(/_/g," ")
+    .replace(/([a-z])([A-Z])/g,"$1 $2");
+}
+
+function placementClass(value:number){
+  if(value===1) return "p1";
+  if(value<=4) return "p2";
+  if(value>=7) return "p7";
+  return "";
+}
 
 function App() {
-  const [riotId, setRiotId] = useState("");
-  const [searched, setSearched] = useState(false);
+  const [riotId,setRiotId]=useState("");
+  const [platform,setPlatform]=useState("br1");
+  const [profile,setProfile]=useState<Profile|null>(null);
+  const [loading,setLoading]=useState(false);
+  const [error,setError]=useState("");
 
-  const playerName = useMemo(() => riotId.trim() || "Conde#BR1", [riotId]);
+  const rank=useMemo(
+    ()=>profile?.ranked?.find((r)=>r.queueType==="RANKED_TFT") || profile?.ranked?.[0] || null,
+    [profile]
+  );
 
-  function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    if (!riotId.trim()) return;
-    setSearched(true);
+    const cut=riotId.lastIndexOf("#");
+    if(cut<1 || cut===riotId.length-1){
+      setError("Use o formato Nome#TAG.");
+      return;
+    }
+
+    const gameName=riotId.slice(0,cut).trim();
+    const tagLine=riotId.slice(cut+1).trim();
+
+    setLoading(true);
+    setError("");
+    setProfile(null);
+
+    const {data,error:invokeError}=await supabase.functions.invoke("public-tft-profile",{
+      body:{gameName,tagLine,platform}
+    });
+
+    setLoading(false);
+
+    if(invokeError || data?.error){
+      setError(data?.message || "Não foi possível consultar este jogador agora.");
+      return;
+    }
+
+    setProfile(data as Profile);
   }
 
   return (
     <div className="app-shell">
       <header className="topbar">
-        <a className="brand" href="#" onClick={() => setSearched(false)}>
+        <button className="brand brand-button" onClick={()=>{setProfile(null);setError("");}}>
           <span className="brand-mark">c</span>
           <span>chibi<span>.gg</span></span>
-        </a>
+        </button>
         <nav>
           <a href="#meta">Meta</a>
           <a href="#comps">Comps</a>
@@ -42,7 +84,7 @@ function App() {
         <button className="ghost-button">Entrar</button>
       </header>
 
-      {!searched ? (
+      {!profile ? (
         <main className="landing">
           <section className="hero">
             <div className="eyebrow">TFT FIRST. DATA THAT HELPS YOU CLIMB.</div>
@@ -51,23 +93,37 @@ function App() {
               Busque qualquer Riot ID e veja rank, histórico, comps, padrões e insights
               pensados especificamente para Teamfight Tactics.
             </p>
+
             <form className="search-box" onSubmit={handleSubmit}>
-              <select aria-label="Região" defaultValue="BR">
-                <option>BR</option>
-                <option>NA</option>
-                <option>EUW</option>
+              <select aria-label="Região" value={platform} onChange={(e)=>setPlatform(e.target.value)}>
+                <option value="br1">BR</option>
+                <option value="na1">NA</option>
+                <option value="euw1">EUW</option>
+                <option value="eun1">EUNE</option>
+                <option value="kr">KR</option>
+                <option value="jp1">JP</option>
+                <option value="la1">LAN</option>
+                <option value="la2">LAS</option>
+                <option value="oc1">OCE</option>
               </select>
+
               <input
                 value={riotId}
-                onChange={(e) => setRiotId(e.target.value)}
+                onChange={(e)=>setRiotId(e.target.value)}
                 placeholder="Nome#TAG"
                 aria-label="Riot ID"
               />
-              <button type="submit">Buscar jogador</button>
+
+              <button type="submit" disabled={loading}>
+                {loading ? "Buscando..." : "Buscar jogador"}
+              </button>
             </form>
+
+            {error && <div className="lookup-error">{error}</div>}
+
             <div className="quick-stats">
-              <div><strong>Sem cadastro</strong><span>perfil público instantâneo</span></div>
-              <div><strong>TFT-first</strong><span>dados sem ruído de LoL</span></div>
+              <div><strong>Sem cadastro</strong><span>perfil TFT instantâneo</span></div>
+              <div><strong>Dados Riot</strong><span>rank + partidas oficiais</span></div>
               <div><strong>Insights</strong><span>o que melhorar, não só números</span></div>
             </div>
           </section>
@@ -76,54 +132,92 @@ function App() {
             <article>
               <span>01</span>
               <h3>Seu jogo, não só o meta</h3>
-              <p>Descubra quais estilos, comps e ritmos realmente funcionam para você.</p>
+              <p>Descubra quais estilos, traits e ritmos realmente funcionam para você.</p>
             </article>
             <article>
               <span>02</span>
               <h3>Partidas explicadas</h3>
-              <p>Veja colocação, comp, traits, economia e padrões de performance em contexto.</p>
+              <p>Veja colocação, board, augments, unidades e economia em contexto.</p>
             </article>
             <article>
               <span>03</span>
-              <h3>Meta sem planilha</h3>
-              <p>Informação visual e prática para decidir quando forçar, flexionar ou pivotar.</p>
+              <h3>TFT de verdade</h3>
+              <p>Um tracker pensado primeiro para TFT, não como uma aba secundária de LoL.</p>
             </article>
           </section>
         </main>
       ) : (
         <main className="profile-page">
+          <button className="back-search" onClick={()=>setProfile(null)}>← Nova busca</button>
+
           <section className="player-header">
-            <div className="avatar">C</div>
+            <div className="avatar">{profile.player.gameName.slice(0,1).toUpperCase()}</div>
             <div>
-              <div className="eyebrow">PERFIL TFT</div>
-              <h1>{playerName}</h1>
-              <div className="rank-line">Diamond II · 43 LP <span>+127 LP / 7 dias</span></div>
+              <div className="eyebrow">PERFIL TFT · {profile.player.platform}</div>
+              <h1>{profile.player.gameName}<span className="player-tag">#{profile.player.tagLine}</span></h1>
+              <div className="rank-line">
+                {rank ? rank.tier+" "+rank.rank+" · "+rank.leaguePoints+" LP" : "Sem rank TFT"}
+                <span>{profile.summary.matches} partidas analisadas</span>
+              </div>
             </div>
-            <button className="refresh-button">Atualizar</button>
+            <button className="refresh-button" onClick={handleSubmit} disabled={loading}>
+              {loading ? "Atualizando..." : "Atualizar"}
+            </button>
           </section>
 
           <section className="stat-grid">
-            <article><span>Colocação média</span><strong>4.18</strong><small>↑ 0.34 neste patch</small></article>
-            <article><span>Top 4</span><strong>56%</strong><small>42 de 75 partidas</small></article>
-            <article><span>Win rate</span><strong>14%</strong><small>11 vitórias</small></article>
-            <article><span>Partidas</span><strong>75</strong><small>Patch atual</small></article>
+            <article><span>Colocação média</span><strong>{profile.summary.averagePlacement ?? "—"}</strong><small>amostra recente</small></article>
+            <article><span>Top 4</span><strong>{profile.summary.top4Rate}%</strong><small>consistência recente</small></article>
+            <article><span>Win rate</span><strong>{profile.summary.winRate}%</strong><small>{profile.summary.firsts} primeiros lugares</small></article>
+            <article><span>8º lugares</span><strong>{profile.summary.eighths}</strong><small>risco recente</small></article>
           </section>
 
           <div className="content-grid">
             <section className="panel history">
               <div className="panel-title">
-                <div><span>ÚLTIMAS PARTIDAS</span><h2>Histórico</h2></div>
-                <button>Ver todas</button>
+                <div><span>PARTIDAS RIOT</span><h2>Histórico recente</h2></div>
               </div>
+
               <div className="match-list">
-                {matches.map((match, index) => (
-                  <article className="match-row" key={index}>
-                    <div className={"placement p" + match.placement}>{match.placement}º</div>
+                {profile.matches.map((match)=>(
+                  <article className="match-row" key={match.id}>
+                    <div className={"placement "+placementClass(match.placement)}>{match.placement}º</div>
+
                     <div className="match-main">
-                      <strong>{match.comp}</strong>
-                      <div>{match.traits.map((trait) => <span key={trait}>{trait}</span>)}</div>
+                      <strong>
+                        {match.traits
+                          .filter((t)=>t.numUnits>0)
+                          .sort((a,b)=>b.style-a.style || b.numUnits-a.numUnits)
+                          .slice(0,2)
+                          .map((t)=>cleanName(t.name))
+                          .join(" · ") || "Board TFT"}
+                      </strong>
+
+                      <div>
+                        {match.traits
+                          .filter((t)=>t.numUnits>0)
+                          .sort((a,b)=>b.style-a.style || b.numUnits-a.numUnits)
+                          .slice(0,5)
+                          .map((trait)=>(
+                            <span key={trait.name}>{cleanName(trait.name)} {trait.numUnits}</span>
+                          ))}
+                      </div>
+
+                      <div className="unit-row">
+                        {match.units.slice(0,9).map((unit,index)=>(
+                          <span className="unit-chip" key={unit.characterId+index}>
+                            {cleanName(unit.characterId).slice(0,4)}
+                            <b>{unit.tier}★</b>
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                    <div className="match-meta"><span>Avg {match.avg}</span><strong>{match.lp}</strong></div>
+
+                    <div className="match-meta">
+                      <span>Nível {match.level}</span>
+                      <strong>{match.damageToPlayers} dano</strong>
+                      <small>{match.goldLeft}g</small>
+                    </div>
                   </article>
                 ))}
               </div>
@@ -131,19 +225,22 @@ function App() {
 
             <aside className="panel insights">
               <div className="panel-title">
-                <div><span>CHIBI INSIGHTS</span><h2>Seu padrão</h2></div>
+                <div><span>CHIBI INSIGHTS</span><h2>Primeira leitura</h2></div>
               </div>
+
               <article className="insight positive">
-                <b>Melhor caminho</b>
-                <p>Seu Top 4 com linhas AP está acima do seu desempenho médio.</p>
+                <b>Consistência</b>
+                <p>Top 4 em {profile.summary.top4Rate}% das partidas analisadas.</p>
               </article>
-              <article className="insight warning">
-                <b>Ponto de atenção</b>
-                <p>Suas piores partidas concentram perda de HP antes do Stage 4.</p>
-              </article>
+
               <article className="insight neutral">
-                <b>Estilo detectado</b>
-                <p>Você performa melhor jogando flex e convertendo para boards de custo alto.</p>
+                <b>Conversão</b>
+                <p>{profile.summary.firsts} vitórias na amostra recente.</p>
+              </article>
+
+              <article className="insight warning">
+                <b>Próxima camada</b>
+                <p>Vamos cruzar augments, itens, economia e transições para gerar insights realmente específicos.</p>
               </article>
             </aside>
           </div>
