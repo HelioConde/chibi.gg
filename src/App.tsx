@@ -52,6 +52,14 @@ function formatWhen(timestamp?:number){
   return date.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"});
 }
 
+function displaySetName(value:string|undefined,setNumber?:number){
+  const raw=String(value||"").trim();
+  const match=raw.match(/^TFTSet(\d+)$/i);
+  if(match) return "Set "+match[1];
+  if(raw) return raw;
+  return setNumber ? "Set "+setNumber : "Teamfight Tactics";
+}
+
 function placementClass(value:number){
   if(value===1) return "p1";
   if(value<=4) return "p2";
@@ -79,7 +87,8 @@ function UnitVisual({unit,staticData,compact=false}:{unit:TftUnit;staticData:Tft
 
   return <div className={"unit-card "+(compact?"compact":"")} title={name}>
     <div className={"unit-portrait cost-"+Math.max(1,Math.min(5,Number(entry?.tier||unit.rarity||1)))}>
-      {image?<img src={image} alt={name}/>:<span>{name.slice(0,2)}</span>}
+      <span className="unit-fallback">{name.slice(0,2)}</span>
+      {image&&<img src={image} alt={name} onError={(e)=>{e.currentTarget.style.display="none";}}/>}
       <div className="unit-stars">{"★".repeat(Math.max(1,Math.min(3,unit.tier||1)))}</div>
     </div>
     {!compact&&<div className="unit-caption">{name}</div>}
@@ -89,7 +98,8 @@ function UnitVisual({unit,staticData,compact=false}:{unit:TftUnit;staticData:Tft
         const itemImage=staticData?tftAssetUrl(staticData.version,"item",item):"";
         const itemName=item?.name||cleanName(itemId);
         return <span className="item-icon" title={itemName} key={itemId+index}>
-          {itemImage?<img src={itemImage} alt={itemName}/>:itemName.slice(0,1)}
+          <span>{itemName.slice(0,1)}</span>
+          {itemImage&&<img src={itemImage} alt={itemName} onError={(e)=>{e.currentTarget.style.display="none";}}/>}
         </span>;
       })}
     </div>
@@ -331,12 +341,18 @@ function App() {
             </div>
 
             <div className="queue-tabs">
-              <button className={selectedQueue==null?"active":""} onClick={()=>setSelectedQueue(null)}>Todas</button>
-              {availableQueues.map((queueId)=>(
-                <button className={selectedQueue===queueId?"active":""} onClick={()=>setSelectedQueue(queueId)} key={queueId}>
-                  {queueLabel(staticData,queueId)}
-                </button>
-              ))}
+              {availableQueues.length<=1 ? (
+                availableQueues.map((queueId)=>(
+                  <button className="active" disabled key={queueId}>{queueLabel(staticData,queueId)}</button>
+                ))
+              ) : <>
+                <button className={selectedQueue==null?"active":""} onClick={()=>setSelectedQueue(null)}>Todas</button>
+                {availableQueues.map((queueId)=>(
+                  <button className={selectedQueue===queueId?"active":""} onClick={()=>setSelectedQueue(queueId)} key={queueId}>
+                    {queueLabel(staticData,queueId)}
+                  </button>
+                ))}
+              </>}
             </div>
 
             <div className={"freshness "+(freshnessDays!=null&&freshnessDays>14?"stale":"")}>
@@ -465,8 +481,11 @@ function App() {
 
             {selectedMatch && <>
               <div className="panel-title">
-                <div><span>DETALHES DA PARTIDA</span><h2>{selectedMatch.match.setName || "Teamfight Tactics"}</h2></div>
-                <small>{selectedMatch.match.participants.length} jogadores</small>
+                <div>
+                  <span>DETALHES DA PARTIDA</span>
+                  <h2>{displaySetName(selectedMatch.match.setName,selectedMatch.match.setNumber)}</h2>
+                </div>
+                <small>{queueLabel(staticData,selectedMatch.match.queueId)} · {selectedMatch.match.participants.length} jogadores</small>
               </div>
 
               <div className="lobby-list">
