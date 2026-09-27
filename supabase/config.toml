@@ -2,3 +2,9 @@ project_id = "pbosggnpdzrirjhuswkj"
 
 [functions.public-tft-profile]
 verify_jwt = false
+
+[functions.public-tft-history]
+verify_jwt = false
+
+[functions.public-tft-match]
+verify_jwt = false
