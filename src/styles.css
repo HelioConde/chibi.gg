@@ -103,3 +103,28 @@ a { color: inherit; text-decoration: none; }
 .unit-chip{display:inline-flex!important;align-items:center;gap:4px;min-width:44px;justify-content:center;border:1px solid #262d40!important;background:#141925!important;color:#bac2d5!important}
 .unit-chip b{color:#9b87ff;font-size:9px}
 .match-meta small{color:#6f7890;font-size:10px}
+
+.profile-error{margin:0 0 14px;padding:11px 14px;border:1px solid rgba(255,95,95,.25);background:rgba(255,95,95,.08);color:#ff9b9b;border-radius:10px;font-size:13px}
+.match-button{width:100%;color:inherit;text-align:left;cursor:pointer}
+.match-button:hover{border-color:#343d57;background:#111722}
+.load-more{width:100%;margin-top:12px;border:1px solid #2b3247;background:#111722;color:#dfe4f2;border-radius:11px;padding:13px 16px;font-weight:800}
+.load-more:disabled{opacity:.6;cursor:wait}
+.panel-title>small{color:#6f7890;font-size:11px}
+.match-overlay{position:fixed;inset:0;z-index:100;background:rgba(3,5,10,.78);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:24px}
+.match-modal{position:relative;width:min(980px,100%);max-height:min(820px,90vh);overflow:auto;background:#0b0f18;border:1px solid #2a3145;border-radius:18px;padding:24px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.match-close{position:absolute;right:16px;top:14px;width:34px;height:34px;border-radius:9px;border:1px solid #2b3245;background:#121722;color:#aeb7ca;font-size:22px;line-height:1}
+.match-state{padding:40px 20px;text-align:center;color:#aab2c4}
+.match-state.error{color:#ff9b9b}
+.lobby-list{display:flex;flex-direction:column;gap:8px}
+.lobby-player{display:grid;grid-template-columns:50px minmax(0,1fr) auto;gap:14px;align-items:center;padding:12px;border:1px solid #1e2535;border-radius:12px;background:#0e131d}
+.lobby-board>strong{font-size:12px;color:#c8cedd}
+.augment-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.augment-row span{font-size:10px;padding:4px 7px;border-radius:6px;background:#19172a;color:#a998ff}
+.lobby-meta{text-align:right;display:flex;flex-direction:column;gap:4px;font-size:11px;color:#778198}
+.lobby-meta strong{color:#cdd4e5}
+@media (max-width:800px){
+  .match-overlay{padding:0;align-items:flex-end}
+  .match-modal{max-height:92vh;border-radius:18px 18px 0 0;padding:18px}
+  .lobby-player{grid-template-columns:44px minmax(0,1fr)}
+  .lobby-meta{grid-column:2;text-align:left;flex-direction:row}
+}
