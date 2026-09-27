@@ -31,5 +31,5 @@ jobs:
             exit 1
           fi
           supabase functions deploy public-tft-profile \
-            --project-ref bieihhaobdztjyoweewa \
+            --project-ref pbosggnpdzrirjhuswkj \
             --no-verify-jwt
