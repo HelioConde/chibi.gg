@@ -27,6 +27,7 @@ import ChibiShareCard from "./components/ChibiShareCard";
 import PersonalVsGlobalMeta from "./components/PersonalVsGlobalMeta";
 import ChibiIdentity from "./components/ChibiIdentity";
 import StyleShift from "./components/StyleShift";
+import GlobalMetaPage from "./components/GlobalMetaPage";
 
 function cleanName(value:string){
   return value
@@ -154,6 +155,9 @@ function App() {
   const [journalVersion,setJournalVersion]=useState(0);
   const [profileTab,setProfileTab]=useState<ProfileTab>("overview");
   const [copiedAnalysisLink,setCopiedAnalysisLink]=useState(false);
+  const [sitePage,setSitePage]=useState<"main"|"meta">(
+    window.location.hash==="#meta"?"meta":"main"
+  );
 
   useEffect(()=>{
     loadTftStaticData().then(setStaticData).catch(()=>{});
@@ -179,8 +183,16 @@ function App() {
       setSelectedQueue(Number.isFinite(raw)&&raw>0?raw:null);
     };
 
+    const onHashChange=()=>{
+      setSitePage(window.location.hash==="#meta"?"meta":"main");
+    };
+
     window.addEventListener("popstate",onPopState);
-    return ()=>window.removeEventListener("popstate",onPopState);
+    window.addEventListener("hashchange",onHashChange);
+    return ()=>{
+      window.removeEventListener("popstate",onPopState);
+      window.removeEventListener("hashchange",onHashChange);
+    };
   },[]);
 
   const rank=useMemo(
@@ -397,7 +409,22 @@ function App() {
     }
   }
 
+  function openMeta(){
+    setSitePage("meta");
+    if(window.location.hash!=="#meta"){
+      window.history.pushState({},"",window.location.pathname+window.location.search+"#meta");
+    }
+  }
+
+  function closeMeta(){
+    setSitePage("main");
+    if(window.location.hash){
+      window.history.replaceState({},"",window.location.pathname+window.location.search);
+    }
+  }
+
   function resetSearch(){
+    setSitePage("main");
     setProfile(null);
     setMatches([]);
     setError("");
@@ -409,6 +436,7 @@ function App() {
 
     const url=new URL(window.location.href);
     url.search="";
+    url.hash="";
     window.history.replaceState({},"",url.toString());
   }
 
@@ -420,14 +448,20 @@ function App() {
           <span>chibi<span>.gg</span></span>
         </button>
         <nav>
-          <a href="#meta">Meta</a>
+          <button className={sitePage==="meta"?"active":""} onClick={openMeta}>Meta</button>
           <a href="#comps">Comps</a>
           <a href="#leaderboard">Leaderboard</a>
         </nav>
         <button className="ghost-button">Entrar</button>
       </header>
 
-      {!profile ? (
+      {sitePage==="meta" ? (
+        <GlobalMetaPage
+          staticData={staticData}
+          hasProfile={Boolean(profile)}
+          onBack={closeMeta}
+        />
+      ) : !profile ? (
         <main className="landing">
           <section className="hero">
             <div className="eyebrow">TFT FIRST. DATA THAT HELPS YOU CLIMB.</div>
