@@ -99,6 +99,7 @@ Deno.serve(async (req) => {
       playedAt: num(info?.game_datetime),
       duration: num(info?.game_length),
       gameVersion: String(info?.game_version || ""),
+      queueId: num(info?.queue_id),
       setNumber: num(info?.tft_set_number),
       setName: String(info?.tft_set_core_name || ""),
       placement: num(me?.placement),
