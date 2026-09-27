@@ -126,6 +126,14 @@ function AugmentVisual({id,staticData}:{id:string;staticData:TftStaticData|null}
   </span>;
 }
 
+type ProfileTab = "overview"|"review"|"meta"|"matches"|"share";
+
+function parseProfileTab(value:string|null):ProfileTab{
+  return value==="review"||value==="meta"||value==="matches"||value==="share"
+    ? value
+    : "overview";
+}
+
 function App() {
   const [riotId,setRiotId]=useState("");
   const [platform,setPlatform]=useState("br1");
@@ -144,7 +152,7 @@ function App() {
   const [evidenceIds,setEvidenceIds]=useState<string[]|null>(null);
   const [evidenceLabel,setEvidenceLabel]=useState("");
   const [journalVersion,setJournalVersion]=useState(0);
-  const [profileTab,setProfileTab]=useState<"overview"|"review"|"meta"|"matches"|"share">("overview");
+  const [profileTab,setProfileTab]=useState<ProfileTab>("overview");
 
   useEffect(()=>{
     loadTftStaticData().then(setStaticData).catch(()=>{});
@@ -153,12 +161,25 @@ function App() {
     const player=params.get("player")?.trim();
     const tag=params.get("tag")?.trim();
     const region=(params.get("region")||"br1").toLowerCase();
+    const tab=parseProfileTab(params.get("tab"));
+    const queueRaw=Number(params.get("queue"));
+    const queue=Number.isFinite(queueRaw)&&queueRaw>0?queueRaw:null;
 
     if(player&&tag){
       setRiotId(player+"#"+tag);
       setPlatform(region);
-      void loadPlayer(player,tag,region,false);
+      void loadPlayer(player,tag,region,false,tab,queue);
     }
+
+    const onPopState=()=>{
+      const nextParams=new URLSearchParams(window.location.search);
+      setProfileTab(parseProfileTab(nextParams.get("tab")));
+      const raw=Number(nextParams.get("queue"));
+      setSelectedQueue(Number.isFinite(raw)&&raw>0?raw:null);
+    };
+
+    window.addEventListener("popstate",onPopState);
+    return ()=>window.removeEventListener("popstate",onPopState);
   },[]);
 
   const rank=useMemo(
@@ -217,10 +238,33 @@ function App() {
     ? Math.floor((Date.now()-latestPlayedAt)/86400000)
     : null;
 
+  function updateProfileUrl(tab:ProfileTab=profileTab,queue:number|null=selectedQueue){
+    if(!profile) return;
+    const url=new URL(window.location.href);
+    url.searchParams.set("player",profile.player.gameName);
+    url.searchParams.set("tag",profile.player.tagLine);
+    url.searchParams.set("region",profile.player.platform);
+    url.searchParams.set("tab",tab);
+    if(queue!=null) url.searchParams.set("queue",String(queue));
+    else url.searchParams.delete("queue");
+    window.history.replaceState({},"",url.toString());
+  }
+
+  function changeProfileTab(tab:ProfileTab){
+    setProfileTab(tab);
+    updateProfileUrl(tab,selectedQueue);
+  }
+
+  function changeQueue(queue:number|null){
+    setSelectedQueue(queue);
+    clearEvidence();
+    updateProfileUrl(profileTab,queue);
+  }
+
   function showEvidence(ids:string[],label:string){
     setEvidenceIds(ids);
     setEvidenceLabel(label);
-    setProfileTab("matches");
+    changeProfileTab("matches");
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
       document.getElementById("match-history")?.scrollIntoView({behavior:"smooth",block:"start"});
     }));
@@ -238,7 +282,14 @@ function App() {
     showEvidence(ids,label);
   }
 
-  async function loadPlayer(gameName:string,tagLine:string,region:string,updateUrl=true){
+  async function loadPlayer(
+    gameName:string,
+    tagLine:string,
+    region:string,
+    updateUrl=true,
+    initialTab:ProfileTab="overview",
+    initialQueue:number|null=null,
+  ){
     setLoading(true);
     setError("");
     setProfile(null);
@@ -246,8 +297,8 @@ function App() {
     setHasMore(true);
     setSelectedMatch(null);
     setOpenedMatch(null);
-    setSelectedQueue(null);
-    setProfileTab("overview");
+    setSelectedQueue(initialQueue);
+    setProfileTab(initialTab);
     clearEvidence();
 
     try{
@@ -262,6 +313,9 @@ function App() {
         url.searchParams.set("player",data.player.gameName||gameName);
         url.searchParams.set("tag",data.player.tagLine||tagLine);
         url.searchParams.set("region",region);
+        url.searchParams.set("tab",initialTab);
+        if(initialQueue!=null) url.searchParams.set("queue",String(initialQueue));
+        else url.searchParams.delete("queue");
         window.history.replaceState({},"",url.toString());
       }
     }catch(err){
@@ -423,9 +477,9 @@ function App() {
                   <button className="active" disabled key={queueId}>{queueLabel(staticData,queueId)}</button>
                 ))
               ) : <>
-                <button className={selectedQueue==null?"active":""} onClick={()=>setSelectedQueue(null)}>Todas</button>
+                <button className={selectedQueue==null?"active":""} onClick={()=>changeQueue(null)}>Todas</button>
                 {availableQueues.map((queueId)=>(
-                  <button className={selectedQueue===queueId?"active":""} onClick={()=>setSelectedQueue(queueId)} key={queueId}>
+                  <button className={selectedQueue===queueId?"active":""} onClick={()=>changeQueue(queueId)} key={queueId}>
                     {queueLabel(staticData,queueId)}
                   </button>
                 ))}
@@ -449,11 +503,11 @@ function App() {
           {error && <div className="profile-error">{error}</div>}
 
           <nav className="profile-tabs" aria-label="Seções do perfil">
-            <button className={profileTab==="overview"?"active":""} onClick={()=>setProfileTab("overview")}>Visão geral</button>
-            <button className={profileTab==="review"?"active":""} onClick={()=>setProfileTab("review")}>Review</button>
-            <button className={profileTab==="meta"?"active":""} onClick={()=>setProfileTab("meta")}>Meta pessoal</button>
-            <button className={profileTab==="matches"?"active":""} onClick={()=>setProfileTab("matches")}>Partidas</button>
-            <button className={profileTab==="share"?"active":""} onClick={()=>setProfileTab("share")}>Compartilhar</button>
+            <button className={profileTab==="overview"?"active":""} onClick={()=>changeProfileTab("overview")}>Visão geral</button>
+            <button className={profileTab==="review"?"active":""} onClick={()=>changeProfileTab("review")}>Review</button>
+            <button className={profileTab==="meta"?"active":""} onClick={()=>changeProfileTab("meta")}>Meta pessoal</button>
+            <button className={profileTab==="matches"?"active":""} onClick={()=>changeProfileTab("matches")}>Partidas</button>
+            <button className={profileTab==="share"?"active":""} onClick={()=>changeProfileTab("share")}>Compartilhar</button>
           </nav>
 
           {profileTab==="overview"&&<>
