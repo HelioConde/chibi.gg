@@ -35,13 +35,20 @@ export default function ChibiShareCard({profile,dna,matches,staticData,shareUrl}
 
   const best=meta[0]||null;
   const leak=leaks.primary||null;
+  const leakLabel=leak
+    ? (leak.confidence==="baixa"
+        ? "Sinal inicial: "+leak.title
+        : leak.confidence==="média"
+          ? "Sinal relevante: "+leak.title
+          : "Sinal consistente: "+leak.title)
+    : "Sem leak dominante";
 
   const text=[
     `chibi.gg · ${profile.player.gameName}#${profile.player.tagLine}`,
     `Média ${dna.avgPlacement??"—"} · Top 4 ${dna.top4Rate}% · Bottom 2 ${dna.bottom2Rate}%`,
     `DNA: consistência ${dna.consistency}% · flexibilidade ${dna.flexibility}% · conversão ${dna.conversion}%`,
     best?`Melhor linha pessoal: ${traitName(best.id,staticData)} · média ${best.avgPlacement}`:"",
-    leak?`Principal ponto de investigação: ${leak.title} · ${leak.evidence}`:"",
+    leak?`Principal ponto de investigação: ${leakLabel} · ${leak.evidence}`:"",
     shareUrl,
   ].filter(Boolean).join("\n");
 
@@ -106,8 +113,8 @@ export default function ChibiShareCard({profile,dna,matches,staticData,shareUrl}
         </div>
         <div>
           <span>Principal investigação</span>
-          <strong>{leak?.title||"Sem leak dominante"}</strong>
-          <small>{leak?.evidence||"nenhum padrão forte na amostra"}</small>
+          <strong>{leakLabel}</strong>
+          <small>{leak?(leak.evidence+" · confiança "+leak.confidence):"nenhum padrão forte na amostra"}</small>
         </div>
       </div>
 
