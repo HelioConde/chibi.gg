@@ -665,3 +665,10 @@ a { color: inherit; text-decoration: none; }
   .action-evidence{align-items:flex-start;flex-direction:column}
   .action-evidence button{width:100%}
 }
+
+.stat-grid-readable article{position:relative;overflow:hidden}
+.stat-grid-readable article::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:#252d3f}
+.stat-grid-readable article.signal-good::after{background:#4fd39a}
+.stat-grid-readable article.signal-warning::after{background:#e59a5d}
+.stat-grid-readable article.signal-good small{color:#79cfa8}
+.stat-grid-readable article.signal-warning small{color:#d4a06f}
