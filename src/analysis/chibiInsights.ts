@@ -80,9 +80,10 @@ export function buildChibiDNA(matches:TftMatch[]):ChibiDNA{
 
   const insights:ChibiInsight[]=[];
 
-  if(total>=6){
-    const recent=valid.slice(0,6);
-    const previous=valid.slice(6,12);
+  const trendWindow=Math.min(6,Math.floor(total/2));
+  if(trendWindow>=3){
+    const recent=valid.slice(0,trendWindow);
+    const previous=valid.slice(trendWindow,trendWindow*2);
     const recentAvg=avg(recent.map(m=>m.placement));
     const previousAvg=avg(previous.map(m=>m.placement));
     if(recentAvg!=null && previousAvg!=null){
@@ -91,11 +92,11 @@ export function buildChibiDNA(matches:TftMatch[]):ChibiDNA{
         id:"form",
         title:delta<-0.25?"Forma recente melhorando":delta>0.25?"Forma recente em queda":"Forma recente estável",
         body:delta<-0.25
-          ? "Suas 6 partidas mais recentes tiveram colocação média melhor que as 6 anteriores."
+          ? `Suas ${trendWindow} partidas mais recentes tiveram colocação média melhor que as ${trendWindow} anteriores.`
           : delta>0.25
-            ? "Suas 6 partidas mais recentes tiveram colocação média pior que as 6 anteriores."
-            : "A diferença entre os dois blocos recentes é pequena.",
-        evidence:`Últimas 6: ${recentAvg.toFixed(2)} · Anteriores: ${previousAvg.toFixed(2)}`,
+            ? `Suas ${trendWindow} partidas mais recentes tiveram colocação média pior que as ${trendWindow} anteriores.`
+            : "A diferença entre os dois blocos comparáveis é pequena.",
+        evidence:`Últimas ${trendWindow}: ${recentAvg.toFixed(2)} · Anteriores: ${previousAvg.toFixed(2)}`,
         tone:delta<-0.25?"positive":delta>0.25?"warning":"neutral",
         confidence:total>=12?"média":"baixa",
       });
@@ -121,7 +122,7 @@ export function buildChibiDNA(matches:TftMatch[]):ChibiDNA{
     const t=traitStats[0];
     insights.push({
       id:"best-trait",
-      title:"Linha com melhor resultado recente",
+      title:"Melhor média entre linhas repetidas",
       subject:t.name,
       body:"Entre as linhas repetidas na amostra, esta foi a que terminou melhor em média.",
       evidence:`${t.games} partidas · média ${t.avg.toFixed(2)}`,
@@ -138,7 +139,7 @@ export function buildChibiDNA(matches:TftMatch[]):ChibiDNA{
     const better=with3Avg<without3Avg;
     insights.push({
       id:"three-star",
-      title:better?"3★ aparece nas suas melhores partidas":"3★ não está convertendo sozinho",
+      title:better?"Partidas com 3★ tiveram melhor média":"3★ não teve vantagem clara",
       body:better
         ? "Partidas em que seu board final teve pelo menos uma unidade 3★ terminaram melhor na amostra."
         : "Ter uma unidade 3★ no board final não esteve associado a uma colocação melhor nesta amostra.",
@@ -156,10 +157,10 @@ export function buildChibiDNA(matches:TftMatch[]):ChibiDNA{
     if(Math.abs(delta)>=0.35){
       insights.push({
         id:"level",
-        title:delta>0?"Seus Top 4 terminam em nível mais alto":"Nível final não explica seus Top 4",
+        title:delta>0?"Top 4 terminaram em nível mais alto":"Nível final não separou seus Top 4",
         body:delta>0
           ? "Na amostra, suas partidas de Top 4 encerraram com nível final mais alto que as de Bottom 4."
-          : "Seu nível final foi semelhante ou até maior nas partidas de Bottom 4, então o problema provavelmente está em outro aspecto do board final.",
+          : "Na amostra, as partidas de Bottom 4 terminaram em nível semelhante ou maior. O nível final sozinho não diferenciou os resultados.",
         evidence:`Top 4: nível ${topLevel.toFixed(1)} · Bottom 4: ${bottomLevel.toFixed(1)}`,
         tone:delta>0?"positive":"warning",
         confidence:confidenceFor(Math.min(top4.length,bottom.length),total),
