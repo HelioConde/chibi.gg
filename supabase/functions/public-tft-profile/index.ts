@@ -1,21 +1,5 @@
 import { corsHeaders, json } from "../_shared/http.ts";
-
-const supportedPlatforms = new Set([
-  "br1","na1","la1","la2","euw1","eun1","kr","jp1","oc1","tr1","ru",
-  "ph2","sg2","th2","tw2","vn2"
-]);
-
-function regionFor(platform: string) {
-  if (["br1","na1","la1","la2"].includes(platform)) return "americas";
-  if (["kr","jp1"].includes(platform)) return "asia";
-  if (["ph2","sg2","th2","tw2","vn2","oc1"].includes(platform)) return "sea";
-  return "europe";
-}
-
-function num(value: unknown) {
-  const n = Number(value);
-  return Number.isFinite(n) ? n : 0;
-}
+import { supportedPlatforms, regionFor, num } from "../_shared/riot.ts";
 
 function percent(n: number, total: number) {
   return total ? Math.round((n / total) * 100) : 0;
