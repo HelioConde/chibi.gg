@@ -134,25 +134,31 @@ function App() {
     [profile]
   );
 
-  const currentSet=useMemo(
-    ()=>matches.find((m)=>Number(m.setNumber)>0)?.setNumber || null,
-    [matches]
-  );
+  const currentSet=useMemo(()=>{
+    const found=matches.find((m)=>Number(m.setNumber)>0);
+    return found ? Number(found.setNumber) : null;
+  },[matches]);
 
-  const currentSetMatches=useMemo(
-    ()=>currentSet ? matches.filter((m)=>m.setNumber===currentSet) : matches,
-    [matches,currentSet]
-  );
+  const currentSetMatches=useMemo(()=>{
+    if(currentSet==null) return matches;
+    const filtered=matches.filter((m)=>Number(m.setNumber)===currentSet);
+    return filtered.length ? filtered : matches;
+  },[matches,currentSet]);
 
   const availableQueues=useMemo(
-    ()=>[...new Set(currentSetMatches.map((m)=>m.queueId).filter((q):q is number=>Number.isFinite(q)))],
+    ()=>[...new Set(
+      currentSetMatches
+        .map((m)=>Number(m.queueId))
+        .filter((q)=>Number.isFinite(q) && q>0)
+    )],
     [currentSetMatches]
   );
 
-  const analysisMatches=useMemo(
-    ()=>selectedQueue==null ? currentSetMatches : currentSetMatches.filter((m)=>m.queueId===selectedQueue),
-    [currentSetMatches,selectedQueue]
-  );
+  const analysisMatches=useMemo(()=>{
+    if(selectedQueue==null) return currentSetMatches;
+    const filtered=currentSetMatches.filter((m)=>Number(m.queueId)===Number(selectedQueue));
+    return filtered.length ? filtered : currentSetMatches;
+  },[currentSetMatches,selectedQueue]);
 
   const dna=useMemo(()=>buildChibiDNA(analysisMatches),[analysisMatches]);
 
