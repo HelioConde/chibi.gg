@@ -27,12 +27,29 @@ Deno.serve(async (req)=>{
   let body:any={};
   try{ body=await req.json(); }catch{}
 
-  const setNumber=Math.max(0,num(body?.setNumber));
+  let setNumber=Math.max(0,num(body?.setNumber));
   const queueId=Math.max(0,num(body?.queueId));
   const minGames=Math.max(2,Math.min(100,num(body?.minGames)||4));
   const limit=Math.max(1,Math.min(50,num(body?.limit)||20));
 
-  if(!setNumber) return json({error:"set_number_required"},400);
+  if(!setNumber){
+    const latestRes=await fetch(
+      supabaseUrl+"/rest/v1/tft_participant_observations?select=set_number,played_at&set_number=gt.0&order=played_at.desc&limit=1",
+      {headers:serviceHeaders()},
+    );
+    if(latestRes.ok){
+      const latestRows=await latestRes.json();
+      setNumber=Math.max(0,num(latestRows?.[0]?.set_number));
+    }
+  }
+
+  if(!setNumber){
+    return json({
+      context:{setNumber:0,queueId:queueId||null,minGames},
+      sampleParticipants:0,
+      traits:[],
+    });
+  }
 
   const filters=[
     "set_number=eq."+encodeURIComponent(setNumber),
