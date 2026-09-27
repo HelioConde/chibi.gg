@@ -616,3 +616,52 @@ a { color: inherit; text-decoration: none; }
   .meta-table article{grid-template-columns:1fr repeat(3,auto)}
   .meta-table article>b:nth-of-type(n+4),.meta-confidence{display:none}
 }
+
+.action-center{margin:14px 0;border-color:rgba(126,104,255,.34);background:linear-gradient(180deg,rgba(117,99,231,.055),#0d121b 34%)}
+.action-center-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
+.action-center-head>div>span{display:block;color:#8f7cff;font-size:10px;letter-spacing:1.4px;font-weight:900}
+.action-center-head h2{margin:5px 0 0;font-size:22px;letter-spacing:-.4px}
+.action-center-head>small{color:#6f7890;font-size:9px}
+.action-center-grid{display:grid;grid-template-columns:1fr 1.15fr .85fr;gap:10px}
+.action-center-grid>article{min-height:250px;padding:14px;border:1px solid #242b3c;border-radius:12px;background:#0c1119}
+.action-problem{border-color:rgba(255,164,92,.25)!important}
+.action-now{border-color:rgba(126,104,255,.32)!important}
+.action-measure{border-color:rgba(72,209,153,.24)!important}
+.action-step-label{display:flex;align-items:center;gap:8px;margin-bottom:11px}
+.action-step-label b{width:23px;height:23px;display:grid;place-items:center;border-radius:7px;background:#171e2a;color:#b7c1d4;font-size:9px}
+.action-step-label span{color:#748096;font-size:8px;letter-spacing:1.1px;font-weight:900}
+.action-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.action-title-row h3,.action-now h3,.action-measure h3{margin:0;font-size:15px;line-height:1.3}
+.action-title-row em{padding:4px 6px;border-radius:6px;background:#171e2a;color:#7d8799;font-size:8px;font-style:normal;font-weight:900;text-transform:uppercase}
+.action-center-grid p{color:#8590a4;font-size:10px;line-height:1.55}
+.action-evidence{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px;padding-top:11px;border-top:1px solid #202738}
+.action-evidence strong{font-size:10px;color:#c9d0df}
+.action-evidence button,.action-start-goal{border:1px solid #343c51;background:#121823;color:#b7bfd1;border-radius:8px;padding:8px 9px;font-size:9px;font-weight:900}
+.action-now ol{display:flex;flex-direction:column;gap:8px;margin:12px 0 0;padding:0;list-style:none}
+.action-now li{display:grid;grid-template-columns:24px 1fr;gap:8px;align-items:flex-start}
+.action-now li>span{width:22px;height:22px;display:grid;place-items:center;border-radius:7px;background:rgba(117,99,231,.14);color:#b9afff;font-size:8px;font-weight:900}
+.action-now li p{margin:2px 0 0}
+.action-avoid{margin-top:12px;padding:10px;border-radius:9px;background:rgba(255,164,92,.055);border:1px solid rgba(255,164,92,.16)}
+.action-avoid span{display:block;color:#c79161;font-size:8px;letter-spacing:.8px;font-weight:900}
+.action-avoid p{margin:5px 0 0}
+.action-metric{margin-top:12px!important;padding:12px;border-radius:10px;background:#101721;border:1px solid #233044;color:#d6ddec!important;font-size:11px!important;font-weight:800}
+.action-start-goal{width:100%;margin-top:12px;border-color:#6656d4;background:rgba(117,99,231,.13);color:#cfc7ff}
+.action-goal-progress{margin-top:12px}
+.action-goal-bar{height:7px;border-radius:999px;background:#1a2130;overflow:hidden}
+.action-goal-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#6f5be8,#7ddab0)}
+.action-goal-meta{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-top:8px}
+.action-goal-meta span{color:#6f7b90;font-size:8px}
+.action-goal-meta strong{max-width:65%;text-align:right;font-size:9px;color:#aeb8c9}
+.action-goal-progress>small{display:block;margin-top:7px;color:#778298;font-size:8px}
+.archetype-compact{margin:14px 0;min-height:0}
+@media (max-width:980px){
+  .action-center-grid{grid-template-columns:1fr 1fr}
+  .action-measure{grid-column:1/-1}
+}
+@media (max-width:720px){
+  .action-center-head{flex-direction:column}
+  .action-center-grid{grid-template-columns:1fr}
+  .action-measure{grid-column:auto}
+  .action-evidence{align-items:flex-start;flex-direction:column}
+  .action-evidence button{width:100%}
+}
