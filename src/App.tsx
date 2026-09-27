@@ -1,17 +1,12 @@
 import { FormEvent, useMemo, useState } from "react";
-import { supabase } from "./supabase";
-
-type Profile = {
-  player: { gameName:string; tagLine:string; platform:string; level:number };
-  ranked: Array<{ queueType:string; tier:string; rank:string; leaguePoints:number; wins:number; losses:number }>;
-  summary: { matches:number; averagePlacement:number|null; top4Rate:number; winRate:number; firsts:number; eighths:number };
-  matches: Array<{
-    id:string; placement:number; level:number; goldLeft:number; damageToPlayers:number;
-    traits:Array<{name:string;numUnits:number;style:number}>;
-    units:Array<{characterId:string;rarity:number;tier:number;itemNames:string[]}>;
-    augments:string[];
-  }>;
-};
+import {
+  fetchTftHistory,
+  fetchTftMatch,
+  fetchTftProfile,
+  TftMatch,
+  TftMatchDetail,
+  TftProfile,
+} from "./api/tft";
 
 function cleanName(value:string){
   return value
@@ -28,51 +23,121 @@ function placementClass(value:number){
   return "";
 }
 
+function splitRiotId(value:string){
+  const cut=value.lastIndexOf("#");
+  if(cut<1 || cut===value.length-1) return null;
+  return {
+    gameName:value.slice(0,cut).trim(),
+    tagLine:value.slice(cut+1).trim(),
+  };
+}
+
 function App() {
   const [riotId,setRiotId]=useState("");
   const [platform,setPlatform]=useState("br1");
-  const [profile,setProfile]=useState<Profile|null>(null);
+  const [profile,setProfile]=useState<TftProfile|null>(null);
+  const [matches,setMatches]=useState<TftMatch[]>([]);
   const [loading,setLoading]=useState(false);
+  const [loadingMore,setLoadingMore]=useState(false);
   const [error,setError]=useState("");
+  const [hasMore,setHasMore]=useState(true);
+  const [selectedMatch,setSelectedMatch]=useState<TftMatchDetail|null>(null);
+  const [matchLoading,setMatchLoading]=useState(false);
+  const [matchError,setMatchError]=useState("");
 
   const rank=useMemo(
     ()=>profile?.ranked?.find((r)=>r.queueType==="RANKED_TFT") || profile?.ranked?.[0] || null,
     [profile]
   );
 
-  async function handleSubmit(event: FormEvent) {
-    event.preventDefault();
-    const cut=riotId.lastIndexOf("#");
-    if(cut<1 || cut===riotId.length-1){
+  async function searchPlayer(){
+    const parsed=splitRiotId(riotId);
+    if(!parsed){
       setError("Use o formato Nome#TAG.");
       return;
     }
 
-    const gameName=riotId.slice(0,cut).trim();
-    const tagLine=riotId.slice(cut+1).trim();
-
     setLoading(true);
     setError("");
     setProfile(null);
+    setMatches([]);
+    setHasMore(true);
+    setSelectedMatch(null);
 
-    const {data,error:invokeError}=await supabase.functions.invoke("public-tft-profile",{
-      body:{gameName,tagLine,platform}
-    });
-
-    setLoading(false);
-
-    if(invokeError || data?.error){
-      setError(data?.message || "Não foi possível consultar este jogador agora.");
-      return;
+    try{
+      const data=await fetchTftProfile(parsed.gameName,parsed.tagLine,platform);
+      setProfile(data);
+      setMatches(data.matches || []);
+      setHasMore((data.matches?.length || 0) >= 12);
+    }catch(err){
+      setError(err instanceof Error ? err.message : "Não foi possível consultar este jogador agora.");
+    }finally{
+      setLoading(false);
     }
+  }
 
-    setProfile(data as Profile);
+  async function handleSubmit(event:FormEvent){
+    event.preventDefault();
+    await searchPlayer();
+  }
+
+  async function loadMore(){
+    if(!profile || loadingMore || !hasMore) return;
+    const parsed=splitRiotId(riotId);
+    if(!parsed) return;
+
+    setLoadingMore(true);
+    setError("");
+
+    try{
+      const result=await fetchTftHistory(
+        parsed.gameName,
+        parsed.tagLine,
+        platform,
+        matches.length,
+        20,
+      );
+
+      const next=result.matches || [];
+      setMatches((current)=>{
+        const seen=new Set(current.map((m)=>m.id));
+        return [...current,...next.filter((m)=>!seen.has(m.id))];
+      });
+      setHasMore(next.length >= 20);
+    }catch(err){
+      setError(err instanceof Error ? err.message : "Não foi possível carregar mais partidas.");
+    }finally{
+      setLoadingMore(false);
+    }
+  }
+
+  async function openMatch(match:TftMatch){
+    setMatchLoading(true);
+    setMatchError("");
+    setSelectedMatch(null);
+
+    try{
+      const detail=await fetchTftMatch(match.id);
+      setSelectedMatch(detail);
+    }catch(err){
+      setMatchError(err instanceof Error ? err.message : "Não foi possível abrir esta partida.");
+    }finally{
+      setMatchLoading(false);
+    }
+  }
+
+  function resetSearch(){
+    setProfile(null);
+    setMatches([]);
+    setError("");
+    setSelectedMatch(null);
+    setMatchError("");
   }
 
   return (
     <div className="app-shell">
       <header className="topbar">
-        <button className="brand brand-button" onClick={()=>{setProfile(null);setError("");}}>
+        <button className="brand brand-button" onClick={resetSearch}>
           <span className="brand-mark">c</span>
           <span>chibi<span>.gg</span></span>
         </button>
@@ -129,26 +194,14 @@ function App() {
           </section>
 
           <section className="feature-grid">
-            <article>
-              <span>01</span>
-              <h3>Seu jogo, não só o meta</h3>
-              <p>Descubra quais estilos, traits e ritmos realmente funcionam para você.</p>
-            </article>
-            <article>
-              <span>02</span>
-              <h3>Partidas explicadas</h3>
-              <p>Veja colocação, board, augments, unidades e economia em contexto.</p>
-            </article>
-            <article>
-              <span>03</span>
-              <h3>TFT de verdade</h3>
-              <p>Um tracker pensado primeiro para TFT, não como uma aba secundária de LoL.</p>
-            </article>
+            <article><span>01</span><h3>Seu jogo, não só o meta</h3><p>Descubra quais estilos, traits e ritmos realmente funcionam para você.</p></article>
+            <article><span>02</span><h3>Partidas explicadas</h3><p>Veja colocação, board, augments, unidades e economia em contexto.</p></article>
+            <article><span>03</span><h3>TFT de verdade</h3><p>Um tracker pensado primeiro para TFT, não como uma aba secundária de LoL.</p></article>
           </section>
         </main>
       ) : (
         <main className="profile-page">
-          <button className="back-search" onClick={()=>setProfile(null)}>← Nova busca</button>
+          <button className="back-search" onClick={resetSearch}>← Nova busca</button>
 
           <section className="player-header">
             <div className="avatar">{profile.player.gameName.slice(0,1).toUpperCase()}</div>
@@ -157,10 +210,10 @@ function App() {
               <h1>{profile.player.gameName}<span className="player-tag">#{profile.player.tagLine}</span></h1>
               <div className="rank-line">
                 {rank ? rank.tier+" "+rank.rank+" · "+rank.leaguePoints+" LP" : "Sem rank TFT"}
-                <span>{profile.summary.matches} partidas analisadas</span>
+                <span>{matches.length} partidas carregadas</span>
               </div>
             </div>
-            <button className="refresh-button" onClick={handleSubmit} disabled={loading}>
+            <button className="refresh-button" onClick={searchPlayer} disabled={loading}>
               {loading ? "Atualizando..." : "Atualizar"}
             </button>
           </section>
@@ -172,15 +225,18 @@ function App() {
             <article><span>8º lugares</span><strong>{profile.summary.eighths}</strong><small>risco recente</small></article>
           </section>
 
+          {error && <div className="profile-error">{error}</div>}
+
           <div className="content-grid">
             <section className="panel history">
               <div className="panel-title">
                 <div><span>PARTIDAS RIOT</span><h2>Histórico recente</h2></div>
+                <small>{matches.length} carregadas</small>
               </div>
 
               <div className="match-list">
-                {profile.matches.map((match)=>(
-                  <article className="match-row" key={match.id}>
+                {matches.map((match)=>(
+                  <button className="match-row match-button" key={match.id} onClick={()=>openMatch(match)}>
                     <div className={"placement "+placementClass(match.placement)}>{match.placement}º</div>
 
                     <div className="match-main">
@@ -218,9 +274,13 @@ function App() {
                       <strong>{match.damageToPlayers} dano</strong>
                       <small>{match.goldLeft}g</small>
                     </div>
-                  </article>
+                  </button>
                 ))}
               </div>
+
+              {hasMore && <button className="load-more" onClick={loadMore} disabled={loadingMore}>
+                {loadingMore ? "Carregando..." : "Carregar mais partidas"}
+              </button>}
             </section>
 
             <aside className="panel insights">
@@ -245,6 +305,58 @@ function App() {
             </aside>
           </div>
         </main>
+      )}
+
+      {(matchLoading || selectedMatch || matchError) && (
+        <div className="match-overlay" onClick={()=>{setSelectedMatch(null);setMatchError("");}}>
+          <section className="match-modal" onClick={(e)=>e.stopPropagation()}>
+            <button className="match-close" onClick={()=>{setSelectedMatch(null);setMatchError("");}}>×</button>
+
+            {matchLoading && <div className="match-state">Carregando detalhes da partida...</div>}
+            {matchError && <div className="match-state error">{matchError}</div>}
+
+            {selectedMatch && <>
+              <div className="panel-title">
+                <div>
+                  <span>DETALHES DA PARTIDA</span>
+                  <h2>{selectedMatch.match.setName || "Teamfight Tactics"}</h2>
+                </div>
+                <small>{selectedMatch.match.participants.length} jogadores</small>
+              </div>
+
+              <div className="lobby-list">
+                {selectedMatch.match.participants
+                  .slice()
+                  .sort((a,b)=>a.placement-b.placement)
+                  .map((participant,index)=>(
+                    <article className="lobby-player" key={index}>
+                      <div className={"placement "+placementClass(participant.placement)}>{participant.placement}º</div>
+                      <div className="lobby-board">
+                        <strong>Nível {participant.level}</strong>
+                        <div className="unit-row">
+                          {participant.units.slice(0,9).map((unit,unitIndex)=>(
+                            <span className="unit-chip" key={unit.characterId+unitIndex}>
+                              {cleanName(unit.characterId).slice(0,4)}
+                              <b>{unit.tier}★</b>
+                            </span>
+                          ))}
+                        </div>
+                        <div className="augment-row">
+                          {participant.augments.slice(0,3).map((augment)=>(
+                            <span key={augment}>{cleanName(augment)}</span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="lobby-meta">
+                        <strong>{participant.damageToPlayers} dano</strong>
+                        <span>{participant.goldLeft}g</span>
+                      </div>
+                    </article>
+                  ))}
+              </div>
+            </>}
+          </section>
+        </div>
       )}
     </div>
   );
