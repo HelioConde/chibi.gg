@@ -1611,3 +1611,390 @@ a { color: inherit; text-decoration: none; }
   .autopsy-closest>div{text-align:left}
   .autopsy-contested-list{grid-template-columns:1fr}
 }
+
+/* -----------------------------------------------------------------------
+   UX simplification pass v3 — coach-led learning and comparisons
+   ----------------------------------------------------------------------- */
+
+.coach-review{
+  margin-top:14px;
+  padding:24px!important;
+  border-color:rgba(117,99,231,.35)!important;
+  background:
+    radial-gradient(circle at 82% -12%,rgba(117,99,231,.11),transparent 30%),
+    #0d121b!important;
+}
+.coach-review-head{
+  margin-bottom:18px;
+  padding-bottom:16px;
+  border-bottom:1px solid #222a3a;
+}
+.coach-review-head>div>span{
+  color:#9b89ff;
+}
+.coach-review-head h2{
+  font-size:clamp(24px,3vw,34px);
+  letter-spacing:-1px;
+}
+.coach-review-head p{
+  margin:6px 0 0;
+  color:#7f8a9d;
+  font-size:10px;
+  line-height:1.55;
+}
+.coach-signal-row{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+.coach-signal{
+  min-height:205px;
+  padding:18px;
+  border:1px solid #252d3f;
+  border-radius:13px;
+  background:#0b1018;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+}
+.coach-signal.positive{
+  border-color:rgba(72,209,153,.24);
+}
+.coach-signal.warning{
+  border-color:rgba(255,167,92,.26);
+}
+.coach-signal.change.good{
+  border-color:rgba(72,209,153,.22);
+}
+.coach-signal.change.bad{
+  border-color:rgba(255,102,102,.22);
+}
+.coach-signal>span{
+  color:#728096;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:1px;
+}
+.coach-signal h3{
+  margin:10px 0 8px;
+  font-size:18px;
+  line-height:1.12;
+  letter-spacing:-.35px;
+}
+.coach-signal p{
+  margin:0;
+  color:#8792a5;
+  font-size:10px;
+  line-height:1.55;
+}
+.coach-signal>div{
+  width:100%;
+  margin-top:auto;
+  padding-top:14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  border-top:1px solid #20283a;
+}
+.coach-signal em{
+  color:#6d788b;
+  font-size:8px;
+  font-style:normal;
+  text-transform:uppercase;
+}
+.coach-signal button,
+.coach-experiment button,
+.comparison-coach button{
+  border:1px solid #343d52;
+  background:#111823;
+  color:#b8c1d2;
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:9px;
+  font-weight:900;
+  cursor:pointer;
+}
+.coach-signal button:hover,
+.coach-experiment button:hover,
+.comparison-coach button:hover{
+  border-color:#5b6788;
+  color:#fff;
+}
+
+.coach-experiment{
+  margin-top:12px;
+  padding:20px;
+  border:1px solid rgba(117,99,231,.42);
+  border-radius:14px;
+  background:linear-gradient(120deg,rgba(117,99,231,.11),#0b1018 58%);
+  display:grid;
+  grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);
+  gap:22px;
+}
+.coach-experiment>div>span{
+  color:#9c8bff;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:1.1px;
+}
+.coach-experiment h3{
+  margin:8px 0 8px;
+  font-size:clamp(22px,2.8vw,31px);
+  line-height:1.08;
+  letter-spacing:-.7px;
+}
+.coach-experiment p{
+  margin:0;
+  max-width:720px;
+  color:#8c97aa;
+  font-size:11px;
+  line-height:1.6;
+}
+.coach-experiment aside{
+  padding:15px;
+  border:1px solid #2b3448;
+  border-radius:11px;
+  background:#0d131d;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+}
+.coach-experiment aside small{
+  color:#6f7d92;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.9px;
+}
+.coach-experiment aside strong{
+  margin-top:7px;
+  color:#dbe2ed;
+  font-size:12px;
+  line-height:1.4;
+}
+.coach-experiment aside button{
+  width:100%;
+  margin-top:auto;
+  border-color:#6556d4;
+  background:rgba(117,99,231,.13);
+  color:#d2caff;
+}
+
+.coach-evidence-layer,
+.comparison-evidence-layer{
+  margin-top:12px;
+  border:1px solid #222a3a;
+  border-radius:12px;
+  background:#0a0f17;
+  overflow:hidden;
+}
+.coach-evidence-layer>summary,
+.comparison-evidence-layer>summary{
+  min-height:62px;
+  padding:13px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  cursor:pointer;
+  list-style:none;
+}
+.coach-evidence-layer>summary::-webkit-details-marker,
+.comparison-evidence-layer>summary::-webkit-details-marker{
+  display:none;
+}
+.coach-evidence-layer>summary span,
+.comparison-evidence-layer>summary span{
+  display:grid;
+  gap:3px;
+}
+.coach-evidence-layer>summary b,
+.comparison-evidence-layer>summary b{
+  color:#d9e0eb;
+  font-size:11px;
+}
+.coach-evidence-layer>summary small,
+.comparison-evidence-layer>summary small{
+  color:#6d788b;
+  font-size:8px;
+}
+.coach-evidence-layer>summary em,
+.comparison-evidence-layer>summary em{
+  color:#9787f6;
+  font-size:8px;
+  font-style:normal;
+  font-weight:900;
+}
+.coach-evidence-layer>summary em::after,
+.comparison-evidence-layer>summary em::after{
+  content:" +";
+}
+.coach-evidence-layer[open]>summary,
+.comparison-evidence-layer[open]>summary{
+  border-bottom:1px solid #222a3a;
+}
+.coach-evidence-layer[open]>summary em::after,
+.comparison-evidence-layer[open]>summary em::after{
+  content:" −";
+}
+.coach-evidence-body{
+  margin:0!important;
+  padding:14px;
+  border:0!important;
+}
+
+/* Comparisons becomes a decision page, not a wall of deltas. */
+.comparison-coach{
+  margin-top:14px;
+  padding:24px!important;
+}
+.comparison-coach-head{
+  margin-bottom:16px;
+}
+.comparison-coach-head>div:first-child>span{
+  color:#8f7cff;
+}
+.comparison-coach-head>div:first-child>p{
+  margin:7px 0 0;
+  max-width:690px;
+  color:#7e899c;
+  font-size:10px;
+  line-height:1.55;
+}
+.comparison-coach-hero{
+  display:grid;
+  grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);
+  gap:14px;
+  padding:20px;
+  border:1px solid rgba(117,99,231,.35);
+  border-radius:14px;
+  background:linear-gradient(120deg,rgba(117,99,231,.09),#0b1018 62%);
+}
+.comparison-coach-hero>div>span{
+  color:#9c8aff;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:1px;
+}
+.comparison-coach-hero h3{
+  margin:8px 0 8px;
+  font-size:clamp(22px,2.8vw,30px);
+  line-height:1.08;
+  letter-spacing:-.65px;
+}
+.comparison-coach-hero p{
+  margin:0;
+  color:#8894a7;
+  font-size:10px;
+  line-height:1.6;
+}
+.comparison-coach-hero>div>button{
+  margin-top:14px;
+}
+.comparison-coach-hero aside{
+  padding:15px;
+  border:1px solid #2a3346;
+  border-radius:11px;
+  background:#0d131d;
+}
+.comparison-coach-hero aside small{
+  display:block;
+  color:#6e7b8f;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.8px;
+}
+.comparison-coach-hero aside strong{
+  display:block;
+  margin-top:7px;
+  color:#d8dfeb;
+  font-size:12px;
+  line-height:1.45;
+}
+.comparison-signal-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:12px;
+}
+.comparison-signal-row article{
+  min-height:170px;
+  padding:17px;
+  border:1px solid #252d3e;
+  border-radius:12px;
+  background:#0b1018;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+}
+.comparison-signal-row article.positive{
+  border-color:rgba(72,209,153,.24);
+}
+.comparison-signal-row article.warning{
+  border-color:rgba(255,165,92,.25);
+}
+.comparison-signal-row article>span{
+  color:#718097;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.9px;
+}
+.comparison-signal-row article h3{
+  margin:9px 0 7px;
+  font-size:17px;
+}
+.comparison-signal-row article p{
+  margin:0;
+  color:#818da1;
+  font-size:10px;
+  line-height:1.55;
+}
+.comparison-signal-row article button{
+  margin-top:auto;
+}
+.comparison-evidence-body{
+  padding:14px;
+}
+.comparison-evidence-body .personal-global-list{
+  margin-top:0;
+}
+.comparison-evidence-body .global-leaders{
+  margin-top:14px;
+}
+.comparison-evidence-body .global-meta-disclaimer{
+  margin-bottom:0;
+}
+
+@media(max-width:920px){
+  .coach-signal-row{
+    grid-template-columns:1fr;
+  }
+  .coach-signal{
+    min-height:0;
+  }
+  .coach-experiment,
+  .comparison-coach-hero{
+    grid-template-columns:1fr;
+  }
+}
+@media(max-width:720px){
+  .coach-review,
+  .comparison-coach{
+    padding:18px!important;
+  }
+  .coach-signal>div{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .coach-signal button,
+  .comparison-signal-row article button{
+    width:100%;
+  }
+  .comparison-signal-row{
+    grid-template-columns:1fr;
+  }
+  .coach-evidence-layer>summary,
+  .comparison-evidence-layer>summary{
+    align-items:flex-start;
+  }
+}
