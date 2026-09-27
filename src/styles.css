@@ -93,3 +93,13 @@ a { color: inherit; text-decoration: none; }
   .player-header .refresh-button { display: none; }
   .stat-grid { grid-template-columns: repeat(2,1fr); }
 }
+
+.brand-button{border:0;background:transparent;color:inherit;padding:0;cursor:pointer}
+.lookup-error{margin-top:14px;padding:11px 14px;border:1px solid rgba(255,95,95,.25);background:rgba(255,95,95,.08);color:#ff9b9b;border-radius:10px;font-size:13px}
+.search-box button:disabled,.refresh-button:disabled{opacity:.65;cursor:wait}
+.back-search{border:0;background:transparent;color:#9099ae;padding:0;margin:0 0 20px;cursor:pointer}
+.player-tag{color:#7f879c;font-size:.6em;margin-left:5px}
+.unit-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.unit-chip{display:inline-flex!important;align-items:center;gap:4px;min-width:44px;justify-content:center;border:1px solid #262d40!important;background:#141925!important;color:#bac2d5!important}
+.unit-chip b{color:#9b87ff;font-size:9px}
+.match-meta small{color:#6f7890;font-size:10px}
