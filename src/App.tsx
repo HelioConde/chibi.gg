@@ -22,6 +22,7 @@ import ChibiReview from "./components/ChibiReview";
 import MatchJournal from "./components/MatchJournal";
 import PatchAdaptation from "./components/PatchAdaptation";
 import BoardCounterfactual from "./components/BoardCounterfactual";
+import LobbyAutopsy from "./components/LobbyAutopsy";
 import ChibiShareCard from "./components/ChibiShareCard";
 import PersonalVsGlobalMeta from "./components/PersonalVsGlobalMeta";
 import ChibiIdentity from "./components/ChibiIdentity";
@@ -610,10 +611,10 @@ function App() {
 
           <nav className="profile-tabs simplified-tabs" aria-label="Seções do perfil">
             <div className="profile-tab-list">
-              <button className={profileTab==="overview"?"active":""} onClick={()=>changeProfileTab("overview")}>Resumo</button>
-              <button className={profileTab==="review"?"active":""} onClick={()=>changeProfileTab("review")}>Aprendizados</button>
+              <button className={profileTab==="overview"?"active":""} onClick={()=>changeProfileTab("overview")}>Agora</button>
+              <button className={profileTab==="review"?"active":""} onClick={()=>changeProfileTab("review")}>Por quê?</button>
               <button className={profileTab==="matches"?"active":""} onClick={()=>changeProfileTab("matches")}>Partidas</button>
-              <button className={profileTab==="meta"?"active":""} onClick={()=>changeProfileTab("meta")}>Comparações</button>
+              <button className={profileTab==="meta"?"active":""} onClick={()=>changeProfileTab("meta")}>Comparar</button>
             </div>
             <div className="profile-tab-actions">
               <button className="share-analysis-button" onClick={()=>changeProfileTab("share")}>Compartilhar</button>
@@ -852,12 +853,21 @@ function App() {
                 </div>
               </section>}
 
-              {openedMatch&&<BoardCounterfactual
+              {openedMatch&&<LobbyAutopsy
                 target={openedMatch}
-                history={analysisMatches}
+                detail={selectedMatch}
                 staticData={staticData}
-                onEvidence={showCounterEvidence}
               />}
+
+              {openedMatch&&<details className="match-detail-layer counter-layer">
+                <summary><span><b>Comparar com seu próprio histórico</b><small>Boards parecidos seus que terminaram melhor ou pior</small></span><em>Counterfactual</em></summary>
+                <BoardCounterfactual
+                  target={openedMatch}
+                  history={analysisMatches}
+                  staticData={staticData}
+                  onEvidence={showCounterEvidence}
+                />
+              </details>}
 
               {openedMatch&&<details className="match-detail-layer">
                 <summary><span><b>Adicionar contexto pessoal</b><small>O que a API não sabe sobre esta partida</small></span><em>Journal</em></summary>
