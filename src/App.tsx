@@ -24,6 +24,7 @@ import PatchAdaptation from "./components/PatchAdaptation";
 import BoardCounterfactual from "./components/BoardCounterfactual";
 import NextSessionGoal from "./components/NextSessionGoal";
 import ChibiShareCard from "./components/ChibiShareCard";
+import PersonalVsGlobalMeta from "./components/PersonalVsGlobalMeta";
 
 function cleanName(value:string){
   return value
@@ -190,6 +191,11 @@ function App() {
     const filtered=currentSetMatches.filter((m)=>Number(m.queueId)===Number(selectedQueue));
     return filtered.length ? filtered : currentSetMatches;
   },[currentSetMatches,selectedQueue]);
+
+  const metaQueueId=useMemo(
+    ()=>selectedQueue ?? (availableQueues.length===1 ? availableQueues[0] : null),
+    [selectedQueue,availableQueues]
+  );
 
   const dna=useMemo(()=>buildChibiDNA(analysisMatches),[analysisMatches]);
 
@@ -436,6 +442,14 @@ function App() {
 
           <ChibiInnovations
             matches={analysisMatches}
+            staticData={staticData}
+            onEvidence={showEvidence}
+          />
+
+          <PersonalVsGlobalMeta
+            matches={analysisMatches}
+            setNumber={currentSet}
+            queueId={metaQueueId}
             staticData={staticData}
             onEvidence={showEvidence}
           />
