@@ -27,7 +27,11 @@ export default function StyleShift({matches}:Props){
   const shift=useMemo(()=>buildStyleShift(matches),[matches]);
 
   if(!shift){
-    return <section className="panel style-shift">
+    const headline=shift.confidence==="baixa"
+    ? "Sinal inicial: "+rawHeadline.charAt(0).toLowerCase()+rawHeadline.slice(1)
+    : rawHeadline;
+
+  return <section className="panel style-shift">
       <div className="innovation-head">
         <div>
           <span>STYLE SHIFT</span>
@@ -82,7 +86,7 @@ export default function StyleShift({matches}:Props){
     },
   ];
 
-  const headline=(()=>{
+  const rawHeadline=(()=>{
     const candidates=[
       {label:"mais flexível",value:shift.deltas.flexibility},
       {label:"mais estável",value:shift.deltas.stability},
@@ -128,6 +132,8 @@ export default function StyleShift({matches}:Props){
       ))}
     </div>
 
-    <p className="innovation-note">Style Shift compara dois blocos iguais de partidas no mesmo contexto. Ele descreve mudança observada, não evolução de habilidade.</p>
+    <p className="innovation-note">{shift.confidence==="baixa"
+      ? "Amostra pequena: trate esta mudança como sinal inicial. Style Shift descreve diferença observada, não evolução de habilidade."
+      : "Style Shift compara dois blocos iguais de partidas no mesmo contexto. Ele descreve mudança observada, não evolução de habilidade."}</p>
   </section>;
 }
