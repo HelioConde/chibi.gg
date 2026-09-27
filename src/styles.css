@@ -419,3 +419,54 @@ a { color: inherit; text-decoration: none; }
   .snapshot-stats{grid-template-columns:repeat(2,1fr)}
   .snapshot-findings{grid-template-columns:1fr}
 }
+
+.global-meta-card{margin:14px 0;border-color:rgba(74,155,255,.24)}
+.global-meta-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
+.global-meta-head>div:first-child>span{display:block;color:#69b7ff;font-size:10px;letter-spacing:1.4px;font-weight:900}
+.global-meta-head h2{margin:5px 0 0;font-size:20px}
+.dataset-badge{min-width:120px;text-align:right;padding:8px 10px;border-radius:10px;background:#0d141f;border:1px solid #22324a}
+.dataset-badge strong{display:block;font-size:17px}
+.dataset-badge small{display:block;margin-top:2px;color:#6f7e94;font-size:8px}
+.dataset-badge.robusta{border-color:rgba(72,209,153,.3)}
+.dataset-badge.crescendo{border-color:rgba(95,171,255,.3)}
+.dataset-badge.inicial{border-color:rgba(255,180,83,.26)}
+.dataset-warning,.global-meta-state{padding:11px 12px;border-radius:10px;border:1px solid #243149;background:#0d141f;color:#8190a7;font-size:9px;line-height:1.45}
+.dataset-warning{display:flex;gap:9px;align-items:flex-start;margin-bottom:10px;border-color:rgba(255,180,83,.24);background:rgba(255,180,83,.055)}
+.dataset-warning strong{color:#e3b36f;white-space:nowrap}
+.global-meta-state.warning{border-color:rgba(255,115,115,.2);color:#d08e8e}
+.personal-global-list{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.personal-global-row{padding:12px;border:1px solid #222d40;border-radius:11px;background:#0d131c}
+.personal-global-row.better{border-color:rgba(72,209,153,.24)}
+.personal-global-row.worse{border-color:rgba(255,146,91,.22)}
+.pg-title{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.pg-title strong{display:block;font-size:12px}
+.pg-title small{display:block;margin-top:3px;color:#69788e;font-size:8px}
+.pg-title>span{padding:4px 6px;border-radius:6px;background:#171e2a;color:#8c9ab0;font-size:8px;font-weight:900;white-space:nowrap}
+.personal-global-row.better .pg-title>span{background:rgba(72,209,153,.11);color:#7adbb1}
+.personal-global-row.worse .pg-title>span{background:rgba(255,146,91,.1);color:#e8a06e}
+.pg-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+.pg-metrics>div{padding:8px;border-radius:8px;background:#111823}
+.pg-metrics span{display:block;color:#69788d;font-size:7px}
+.pg-metrics strong{display:block;margin-top:4px;font-size:11px}
+.personal-global-row>button{margin-top:9px;border:1px solid #2e3b52;background:#121a25;color:#9cb0ca;border-radius:8px;padding:7px 9px;font-size:8px;font-weight:900}
+.global-leaders{margin-top:12px;padding-top:11px;border-top:1px solid #202b3b}
+.global-leaders-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:7px}
+.global-leaders-head span{color:#6f7f95;font-size:8px;letter-spacing:1px;font-weight:900}
+.global-leaders-head small{color:#5f6d81;font-size:8px}
+.global-leaders>div{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.global-leaders article{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:7px;align-items:center;padding:9px;border:1px solid #212c3d;border-radius:9px;background:#0c121a}
+.global-leaders article>span{width:20px;height:20px;display:grid;place-items:center;border-radius:6px;background:#17202d;color:#8392a8;font-size:8px;font-weight:900}
+.global-leaders article strong{display:block;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.global-leaders article small{display:block;margin-top:2px;color:#68768a;font-size:7px}
+.global-leaders article b{font-size:10px}
+.global-meta-disclaimer{margin:10px 0 0;color:#5f6d81;font-size:8px;line-height:1.45}
+@media (max-width:900px){
+  .personal-global-list{grid-template-columns:1fr}
+  .global-leaders>div{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:620px){
+  .global-meta-head{flex-direction:column}
+  .dataset-badge{text-align:left;width:100%}
+  .pg-metrics{grid-template-columns:repeat(2,1fr)}
+  .global-leaders>div{grid-template-columns:1fr}
+}
