@@ -236,6 +236,23 @@ function App() {
 
   const dna=useMemo(()=>buildChibiDNA(analysisMatches),[analysisMatches]);
 
+  const headlineStats=useMemo(()=>{
+    const total=analysisMatches.length;
+    const top4=analysisMatches.filter(match=>match.placement<=4).length;
+    const wins=analysisMatches.filter(match=>match.placement===1).length;
+    const bottom2=analysisMatches.filter(match=>match.placement>=7).length;
+    const avg=dna.avgPlacement;
+    const avgLabel=avg==null
+      ? "amostra insuficiente"
+      : avg<=4
+        ? "acima do meio da lobby"
+        : avg<=4.75
+          ? "próximo do meio da lobby"
+          : "abaixo do meio da lobby";
+
+    return {total,top4,wins,bottom2,avgLabel};
+  },[analysisMatches,dna.avgPlacement]);
+
   const visibleMatches=useMemo(()=>{
     if(!evidenceIds?.length) return analysisMatches;
     const allowed=new Set(evidenceIds);
@@ -544,11 +561,27 @@ function App() {
             </div>
           </section>
 
-          <section className="stat-grid">
-            <article><span>Colocação média</span><strong>{dna.avgPlacement ?? "—"}</strong><small>{dna.sampleSize} partidas</small></article>
-            <article><span>Top 4</span><strong>{dna.top4Rate}%</strong><small>no contexto selecionado</small></article>
-            <article><span>Win rate</span><strong>{dna.winRate}%</strong><small>{Math.round(dna.winRate*dna.sampleSize/100)} primeiros lugares</small></article>
-            <article><span>Bottom 2</span><strong>{dna.bottom2Rate}%</strong><small>7º ou 8º lugar</small></article>
+          <section className="stat-grid stat-grid-readable">
+            <article className={dna.avgPlacement!=null&&dna.avgPlacement>4.75?"signal-warning":dna.avgPlacement!=null&&dna.avgPlacement<=4?"signal-good":""}>
+              <span>Colocação média</span>
+              <strong>{dna.avgPlacement ?? "—"}</strong>
+              <small>{headlineStats.avgLabel}</small>
+            </article>
+            <article className={dna.top4Rate>=50?"signal-good":dna.top4Rate<35?"signal-warning":""}>
+              <span>Top 4</span>
+              <strong>{dna.top4Rate}%</strong>
+              <small>{headlineStats.top4} de {headlineStats.total} partidas</small>
+            </article>
+            <article className={headlineStats.wins>0?"signal-good":headlineStats.top4>=2?"signal-warning":""}>
+              <span>Vitórias</span>
+              <strong>{headlineStats.wins}</strong>
+              <small>{headlineStats.top4?headlineStats.wins+" em "+headlineStats.top4+" Top 4":"nenhum Top 4 na amostra"}</small>
+            </article>
+            <article className={dna.bottom2Rate>=30?"signal-warning":dna.bottom2Rate<=15?"signal-good":""}>
+              <span>Bottom 2</span>
+              <strong>{dna.bottom2Rate}%</strong>
+              <small>{headlineStats.bottom2} de {headlineStats.total} partidas</small>
+            </article>
           </section>
 
           {error && <div className="profile-error">{error}</div>}
