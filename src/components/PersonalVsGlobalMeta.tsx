@@ -84,6 +84,26 @@ export default function PersonalVsGlobalMeta({matches,setNumber,queueId,staticDa
       }>;
   },[personal,meta]);
 
+  const trusted=useMemo(
+    ()=>comparisons.filter(row=>row.personal.games>=3&&row.global.games>=20),
+    [comparisons],
+  );
+
+  const strongest=useMemo(
+    ()=>trusted.slice().sort((a,b)=>Math.abs(b.placementDelta)-Math.abs(a.placementDelta))[0]||null,
+    [trusted],
+  );
+
+  const advantage=useMemo(
+    ()=>trusted.filter(row=>row.placementDelta<-.35).sort((a,b)=>a.placementDelta-b.placementDelta)[0]||null,
+    [trusted],
+  );
+
+  const opportunity=useMemo(
+    ()=>trusted.filter(row=>row.placementDelta>.35).sort((a,b)=>b.placementDelta-a.placementDelta)[0]||null,
+    [trusted],
+  );
+
   const globalLeaders=useMemo(()=>{
     if(!meta) return [];
     return meta.traits
@@ -99,50 +119,59 @@ export default function PersonalVsGlobalMeta({matches,setNumber,queueId,staticDa
       : "inicial"
     : "inicial";
 
-  const narrative=useMemo(()=>{
-    const trusted=comparisons.filter(row=>row.personal.games>=3&&row.global.games>=20);
+  const coach=useMemo(()=>{
+    if(!meta){
+      return {
+        title:"Ainda sem comparação agregada",
+        body:"Seu perfil continua funcionando normalmente. Esta área depende de uma base comparável do mesmo contexto.",
+        experiment:"Continue acumulando partidas e volte quando houver interseção suficiente com o Chibi Dataset.",
+        ids:[] as string[],
+      };
+    }
+
     if(!trusted.length){
       return {
-        title:"Ainda não há comparação confiável suficiente",
-        body:"O Chibi vai liberar uma leitura direta quando houver pelo menos 3 partidas suas e 20 observações agregadas na mesma linha.",
-        tone:"neutral",
+        title:"Ainda é cedo para comparar você com a base",
+        body:"O Chibi exige pelo menos 3 partidas suas e 20 observações agregadas na mesma linha antes de tratar a diferença como leitura confiável.",
+        experiment:"Escolha uma linha recorrente e acumule uma amostra maior antes de reagir ao delta.",
+        ids:[] as string[],
       };
     }
 
-    const strongest=trusted
-      .slice()
-      .sort((a,b)=>Math.abs(b.placementDelta)-Math.abs(a.placementDelta))[0];
-
-    const name=traitName(strongest.personal.id,staticData);
-
-    if(strongest.placementDelta<-.35){
+    if(opportunity){
+      const name=traitName(opportunity.personal.id,staticData);
       return {
-        title:"Seu histórico está acima da base em "+name,
-        body:`Sua colocação média foi ${Math.abs(strongest.placementDelta).toFixed(2)} melhor e o delta de Top 4 foi ${signed(strongest.top4Delta,"%")}.`,
-        tone:"positive",
+        title:"Investigue "+name+" antes de copiar a base",
+        body:`Sua colocação média ficou ${opportunity.placementDelta.toFixed(2)} abaixo da base observada nessa linha. Isso mostra onde investigar, não prova que a linha é ruim para você.`,
+        experiment:"Compare seus boards finais nessa linha com suas melhores partidas e mude apenas uma variável observável por vez.",
+        ids:opportunity.personal.matchIds,
       };
     }
 
-    if(strongest.placementDelta>.35){
+    if(advantage){
+      const name=traitName(advantage.personal.id,staticData);
       return {
-        title:"A base está performando melhor em "+name,
-        body:`Sua colocação média ficou ${strongest.placementDelta.toFixed(2)} abaixo da base observada. Use isso como ponto de investigação, não como recomendação automática.`,
-        tone:"warning",
+        title:"Use "+name+" como referência pessoal",
+        body:`Seu histórico ficou ${Math.abs(advantage.placementDelta).toFixed(2)} melhor que a base observada nessa linha, com delta de Top 4 ${signed(advantage.top4Delta,"%")}.`,
+        experiment:"Repita a linha apenas quando os mesmos sinais de entrada aparecerem e anote quando ela deixar de funcionar.",
+        ids:advantage.personal.matchIds,
       };
     }
 
     return {
       title:"Seu resultado está próximo da base observada",
-      body:"Nas linhas com amostra confiável, não apareceu uma diferença grande de colocação média.",
-      tone:"neutral",
+      body:"As linhas confiáveis não mostraram uma diferença grande de colocação média.",
+      experiment:"Use a base como contexto, não como direção automática. Priorize os sinais do seu próprio histórico.",
+      ids:strongest?.personal.matchIds||[],
     };
-  },[comparisons,staticData]);
+  },[meta,trusted,opportunity,advantage,strongest,staticData]);
 
-  return <section className="panel global-meta-card">
-    <div className="global-meta-head">
+  return <section className="panel global-meta-card comparison-coach">
+    <div className="global-meta-head comparison-coach-head">
       <div>
-        <span>SEU META × CHIBI DATASET</span>
-        <h2>O que funciona para você versus o que aparece na base</h2>
+        <span>COMPARAÇÕES</span>
+        <h2>O que parece ser seu versus o que é só popular</h2>
+        <p>Primeiro mostramos diferenças que têm amostra suficiente. O dataset completo fica como evidência.</p>
       </div>
       <div className={"dataset-badge "+maturity}>
         <strong>{meta?.sampleParticipants??0}</strong>
@@ -150,93 +179,113 @@ export default function PersonalVsGlobalMeta({matches,setNumber,queueId,staticDa
       </div>
     </div>
 
-    {!loading&&!error&&meta&&<div className={"meta-narrative "+narrative.tone}>
-      <span>LEITURA RÁPIDA</span>
-      <strong>{narrative.title}</strong>
-      <p>{narrative.body}</p>
-    </div>}
-
     {loading&&<div className="global-meta-state">Atualizando comparação agregada...</div>}
 
     {!loading&&error&&<div className="global-meta-state warning">
       O dataset agregado ainda não está disponível neste projeto. Seu Meta pessoal continua funcionando normalmente.
     </div>}
 
-    {!loading&&!error&&meta&&meta.sampleParticipants<250&&<div className="dataset-warning">
-      <strong>Base em construção</strong>
-      <span>Comparações com menos de 3 partidas suas ou 20 observações agregadas aparecem apenas como “Sinal inicial”.</span>
+    {!loading&&!error&&meta&&<article className="comparison-coach-hero">
+      <div>
+        <span>LEITURA PRINCIPAL</span>
+        <h3>{coach.title}</h3>
+        <p>{coach.body}</p>
+        {coach.ids.length>0&&<button onClick={()=>onEvidence(coach.ids,"Comparações · leitura principal")}>Ver suas partidas</button>}
+      </div>
+      <aside>
+        <small>PRÓXIMO EXPERIMENTO</small>
+        <strong>{coach.experiment}</strong>
+      </aside>
+    </article>}
+
+    {!loading&&!error&&meta&&<div className="comparison-signal-row">
+      <article className={advantage?"positive":"neutral"}>
+        <span>ONDE VOCÊ ESTÁ MELHOR</span>
+        <h3>{advantage?traitName(advantage.personal.id,staticData):"Nenhuma vantagem confiável ainda"}</h3>
+        <p>{advantage
+          ? `Média pessoal ${advantage.personal.avgPlacement} vs base ${advantage.global.averagePlacement} · Δ ${signed(advantage.placementDelta)}.`
+          : "Não há linha com diferença positiva grande e amostra suficiente."}</p>
+        {advantage&&<button onClick={()=>onEvidence(advantage.personal.matchIds,"Comparações · vantagem pessoal")}>Ver evidências</button>}
+      </article>
+
+      <article className={opportunity?"warning":"neutral"}>
+        <span>ONDE VALE INVESTIGAR</span>
+        <h3>{opportunity?traitName(opportunity.personal.id,staticData):"Nenhum gap dominante"}</h3>
+        <p>{opportunity
+          ? `Média pessoal ${opportunity.personal.avgPlacement} vs base ${opportunity.global.averagePlacement} · Δ ${signed(opportunity.placementDelta)}.`
+          : "Nenhuma linha confiável ficou muito atrás da base observada."}</p>
+        {opportunity&&<button onClick={()=>onEvidence(opportunity.personal.matchIds,"Comparações · oportunidade")}>Ver evidências</button>}
+      </article>
     </div>}
 
-    {!loading&&!error&&meta&&<>
-      {comparisons.length>0?(
-        <div className="personal-global-list">
-          {comparisons.slice(0,4).map(row=>{
-            const trusted=row.personal.games>=3 && row.global.games>=20;
-            const better=trusted && row.placementDelta<-.35;
-            const worse=trusted && row.placementDelta>.35;
-            const status=!trusted?"Sinal inicial":better?"Seu diferencial":worse?"Base > pessoal":"Alinhado";
-            return <article className={"personal-global-row "+(!trusted?"early":better?"better":worse?"worse":"even")} key={row.personal.id}>
-              <div className="pg-title">
-                <div>
-                  <strong>{traitName(row.personal.id,staticData)}</strong>
-                  <small>{row.personal.games} partidas suas · {row.global.games} observações agregadas</small>
-                </div>
-                <span>{status}</span>
-              </div>
+    {!loading&&!error&&meta&&meta.sampleParticipants<250&&<div className="dataset-warning">
+      <strong>Base ainda em construção</strong>
+      <span>Diferenças com pouca amostra continuam aparecendo apenas como sinal inicial dentro dos detalhes.</span>
+    </div>}
 
-              <div className="pg-metrics">
-                <div>
-                  <span>Sua média</span>
-                  <strong>{row.personal.avgPlacement}</strong>
-                </div>
-                <div>
-                  <span>Base Chibi</span>
-                  <strong>{row.global.averagePlacement}</strong>
-                </div>
-                <div>
-                  <span>Δ colocação</span>
-                  <strong>{signed(row.placementDelta)}</strong>
-                </div>
-                <div>
-                  <span>Δ Top 4</span>
-                  <strong>{signed(row.top4Delta,"%")}</strong>
-                </div>
-              </div>
+    {!loading&&!error&&meta&&<details className="comparison-evidence-layer">
+      <summary>
+        <span><b>Ver comparações completas</b><small>Todas as linhas, deltas, destaques do dataset e metodologia</small></span>
+        <em>Evidências</em>
+      </summary>
 
-              <button onClick={()=>onEvidence(row.personal.matchIds,"Seu Meta vs base · "+traitName(row.personal.id,staticData))}>
-                Ver suas evidências
-              </button>
-            </article>;
-          })}
-        </div>
-      ):(
-        <div className="global-meta-state">
-          Ainda não há interseção suficiente entre suas linhas repetidas e o dataset agregado.
-        </div>
-      )}
+      <div className="comparison-evidence-body">
+        {comparisons.length>0?(
+          <div className="personal-global-list">
+            {comparisons.slice(0,6).map(row=>{
+              const isTrusted=row.personal.games>=3 && row.global.games>=20;
+              const better=isTrusted && row.placementDelta<-.35;
+              const worse=isTrusted && row.placementDelta>.35;
+              const status=!isTrusted?"Sinal inicial":better?"Seu diferencial":worse?"Base > pessoal":"Alinhado";
+              return <article className={"personal-global-row "+(!isTrusted?"early":better?"better":worse?"worse":"even")} key={row.personal.id}>
+                <div className="pg-title">
+                  <div>
+                    <strong>{traitName(row.personal.id,staticData)}</strong>
+                    <small>{row.personal.games} partidas suas · {row.global.games} observações agregadas</small>
+                  </div>
+                  <span>{status}</span>
+                </div>
 
-      {globalLeaders.length>0&&<div className="global-leaders">
-        <div className="global-leaders-head">
-          <span>DESTAQUES OBSERVADOS NO CHIBI</span>
-          <small>não é tier list oficial</small>
-        </div>
-        <div>
-          {globalLeaders.map((row,index)=>(
-            <article key={row.id}>
-              <span>{index+1}</span>
-              <div>
-                <strong>{traitName(row.id,staticData)}</strong>
-                <small>{row.games} jogos · Top 4 {row.top4Rate}%</small>
-              </div>
-              <b>{row.averagePlacement}</b>
-            </article>
-          ))}
-        </div>
-      </div>}
+                <div className="pg-metrics">
+                  <div><span>Sua média</span><strong>{row.personal.avgPlacement}</strong></div>
+                  <div><span>Base Chibi</span><strong>{row.global.averagePlacement}</strong></div>
+                  <div><span>Δ colocação</span><strong>{signed(row.placementDelta)}</strong></div>
+                  <div><span>Δ Top 4</span><strong>{signed(row.top4Delta,"%")}</strong></div>
+                </div>
 
-      <p className="global-meta-disclaimer">
-        O Chibi Dataset é construído com observações anônimas das partidas consultadas no site. Ele não representa toda a população de TFT e não substitui dados oficiais da Riot.
-      </p>
-    </>}
+                <button onClick={()=>onEvidence(row.personal.matchIds,"Seu Meta vs base · "+traitName(row.personal.id,staticData))}>
+                  Ver suas evidências
+                </button>
+              </article>;
+            })}
+          </div>
+        ):(
+          <div className="global-meta-state">Ainda não há interseção suficiente entre suas linhas repetidas e o dataset agregado.</div>
+        )}
+
+        {globalLeaders.length>0&&<div className="global-leaders">
+          <div className="global-leaders-head">
+            <span>DESTAQUES OBSERVADOS NO CHIBI</span>
+            <small>não é tier list oficial</small>
+          </div>
+          <div>
+            {globalLeaders.map((row,index)=>(
+              <article key={row.id}>
+                <span>{index+1}</span>
+                <div>
+                  <strong>{traitName(row.id,staticData)}</strong>
+                  <small>{row.games} jogos · Top 4 {row.top4Rate}%</small>
+                </div>
+                <b>{row.averagePlacement}</b>
+              </article>
+            ))}
+          </div>
+        </div>}
+
+        <p className="global-meta-disclaimer">
+          O Chibi Dataset é construído com observações anônimas das partidas consultadas no site. Ele não representa toda a população de TFT e não substitui dados oficiais da Riot.
+        </p>
+      </div>
+    </details>}
   </section>;
 }
