@@ -87,7 +87,7 @@ export default function PersonalVsGlobalMeta({matches,setNumber,queueId,staticDa
   const globalLeaders=useMemo(()=>{
     if(!meta) return [];
     return meta.traits
-      .filter(row=>row.games>=2)
+      .filter(row=>row.games>=12)
       .slice()
       .sort((a,b)=>a.averagePlacement-b.averagePlacement||b.games-a.games)
       .slice(0,4);
@@ -117,24 +117,26 @@ export default function PersonalVsGlobalMeta({matches,setNumber,queueId,staticDa
       O dataset agregado ainda não está disponível neste projeto. Seu Meta pessoal continua funcionando normalmente.
     </div>}
 
-    {!loading&&!error&&meta&&meta.sampleParticipants<40&&<div className="dataset-warning">
+    {!loading&&!error&&meta&&meta.sampleParticipants<250&&<div className="dataset-warning">
       <strong>Base em construção</strong>
-      <span>Esses números ainda têm amostra pequena. O Chibi vai ganhar precisão conforme mais perfis forem pesquisados.</span>
+      <span>Comparações com menos de 3 partidas suas ou 20 observações agregadas aparecem apenas como “Sinal inicial”.</span>
     </div>}
 
     {!loading&&!error&&meta&&<>
       {comparisons.length>0?(
         <div className="personal-global-list">
           {comparisons.slice(0,4).map(row=>{
-            const better=row.placementDelta<-.35;
-            const worse=row.placementDelta>.35;
-            return <article className={"personal-global-row "+(better?"better":worse?"worse":"even")} key={row.personal.id}>
+            const trusted=row.personal.games>=3 && row.global.games>=20;
+            const better=trusted && row.placementDelta<-.35;
+            const worse=trusted && row.placementDelta>.35;
+            const status=!trusted?"Sinal inicial":better?"Seu diferencial":worse?"Base > pessoal":"Alinhado";
+            return <article className={"personal-global-row "+(!trusted?"early":better?"better":worse?"worse":"even")} key={row.personal.id}>
               <div className="pg-title">
                 <div>
                   <strong>{traitName(row.personal.id,staticData)}</strong>
                   <small>{row.personal.games} partidas suas · {row.global.games} observações agregadas</small>
                 </div>
-                <span>{better?"Seu diferencial":worse?"Meta > pessoal":"Alinhado"}</span>
+                <span>{status}</span>
               </div>
 
               <div className="pg-metrics">
