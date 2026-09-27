@@ -66,9 +66,14 @@ export function buildChibiDNA(matches:TftMatch[]):ChibiDNA{
   const std=Math.sqrt(variance);
   const consistency=clamp(Math.round(100-(std/3.5)*100));
 
-  const primary=valid.map(m=>coreTraits(m)[0]).filter(Boolean);
-  const uniquePrimary=new Set(primary).size;
-  const flexibility=clamp(Math.round((uniquePrimary/Math.max(1,Math.min(total,8)))*100));
+  const primary=valid.map(m=>coreTraits(m)[0]).filter(Boolean) as string[];
+  const primaryCounts=new Map<string,number>();
+  for(const line of primary) primaryCounts.set(line,(primaryCounts.get(line)||0)+1);
+  const uniquePrimary=primaryCounts.size;
+  const maxPrimary=Math.max(0,...primaryCounts.values());
+  const diversityRatio=primary.length ? uniquePrimary/primary.length : 0;
+  const nonDominance=primary.length ? 1-(maxPrimary/primary.length) : 0;
+  const flexibility=clamp(Math.round((diversityRatio*0.6+nonDominance*0.4)*100));
 
   const conversion=pct(wins.length,top4.length);
   const stability=100-pct(bottom2.length,total);
@@ -117,6 +122,7 @@ export function buildChibiDNA(matches:TftMatch[]):ChibiDNA{
     insights.push({
       id:"best-trait",
       title:"Linha com melhor resultado recente",
+      subject:t.name,
       body:"Entre as linhas repetidas na amostra, esta foi a que terminou melhor em média.",
       evidence:`${t.games} partidas · média ${t.avg.toFixed(2)}`,
       tone:"positive",
