@@ -1,5 +1,6 @@
 import { corsHeaders, json } from "../_shared/http.ts";
 import { supportedPlatforms, regionFor, num } from "../_shared/riot.ts";
+import { observeRawMatches } from "../_shared/observations.ts";
 
 function percent(n: number, total: number) {
   return total ? Math.round((n / total) * 100) : 0;
@@ -87,6 +88,8 @@ Deno.serve(async (req) => {
       }
     }),
   );
+
+  await observeRawMatches(matchDetails.filter(Boolean));
 
   const matches = matchDetails.map((match: any) => {
     if (!match) return null;
