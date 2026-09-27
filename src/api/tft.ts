@@ -42,6 +42,21 @@ export type TftProfile = {
   matches: TftMatch[];
 };
 
+export type TftGlobalTraitStat = {
+  id:string;
+  games:number;
+  averagePlacement:number;
+  top4Rate:number;
+  winRate:number;
+  averageLevel:number;
+};
+
+export type TftGlobalMeta = {
+  context:{setNumber:number;queueId:number|null;minGames:number};
+  sampleParticipants:number;
+  traits:TftGlobalTraitStat[];
+};
+
 export type TftMatchDetail = {
   match: {
     id: string;
@@ -97,4 +112,14 @@ export function fetchTftHistory(
 
 export function fetchTftMatch(matchId:string){
   return invoke<TftMatchDetail>("public-tft-match",{ matchId });
+}
+
+
+export function fetchTftMeta(setNumber:number,queueId?:number|null,minGames=4,limit=20){
+  return invoke<TftGlobalMeta>("public-tft-meta",{
+    setNumber,
+    queueId:queueId||0,
+    minGames,
+    limit,
+  });
 }
