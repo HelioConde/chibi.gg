@@ -99,6 +99,45 @@ export default function PersonalVsGlobalMeta({matches,setNumber,queueId,staticDa
       : "inicial"
     : "inicial";
 
+  const narrative=useMemo(()=>{
+    const trusted=comparisons.filter(row=>row.personal.games>=3&&row.global.games>=20);
+    if(!trusted.length){
+      return {
+        title:"Ainda não há comparação confiável suficiente",
+        body:"O Chibi vai liberar uma leitura direta quando houver pelo menos 3 partidas suas e 20 observações agregadas na mesma linha.",
+        tone:"neutral",
+      };
+    }
+
+    const strongest=trusted
+      .slice()
+      .sort((a,b)=>Math.abs(b.placementDelta)-Math.abs(a.placementDelta))[0];
+
+    const name=traitName(strongest.personal.id,staticData);
+
+    if(strongest.placementDelta<-.35){
+      return {
+        title:"Seu histórico está acima da base em "+name,
+        body:`Sua colocação média foi ${Math.abs(strongest.placementDelta).toFixed(2)} melhor e o delta de Top 4 foi ${signed(strongest.top4Delta,"%")}.`,
+        tone:"positive",
+      };
+    }
+
+    if(strongest.placementDelta>.35){
+      return {
+        title:"A base está performando melhor em "+name,
+        body:`Sua colocação média ficou ${strongest.placementDelta.toFixed(2)} abaixo da base observada. Use isso como ponto de investigação, não como recomendação automática.`,
+        tone:"warning",
+      };
+    }
+
+    return {
+      title:"Seu resultado está próximo da base observada",
+      body:"Nas linhas com amostra confiável, não apareceu uma diferença grande de colocação média.",
+      tone:"neutral",
+    };
+  },[comparisons,staticData]);
+
   return <section className="panel global-meta-card">
     <div className="global-meta-head">
       <div>
@@ -110,6 +149,12 @@ export default function PersonalVsGlobalMeta({matches,setNumber,queueId,staticDa
         <small>participantes observados</small>
       </div>
     </div>
+
+    {!loading&&!error&&meta&&<div className={"meta-narrative "+narrative.tone}>
+      <span>LEITURA RÁPIDA</span>
+      <strong>{narrative.title}</strong>
+      <p>{narrative.body}</p>
+    </div>}
 
     {loading&&<div className="global-meta-state">Atualizando comparação agregada...</div>}
 
