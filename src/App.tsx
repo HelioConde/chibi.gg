@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import {
   fetchTftHistory,
   fetchTftMatch,
@@ -6,7 +6,15 @@ import {
   TftMatch,
   TftMatchDetail,
   TftProfile,
+  TftTrait,
+  TftUnit,
 } from "./api/tft";
+import {
+  loadTftStaticData,
+  staticEntry,
+  tftAssetUrl,
+  TftStaticData,
+} from "./tftStatic";
 
 function cleanName(value:string){
   return value
@@ -16,7 +24,7 @@ function cleanName(value:string){
     .replace(/([a-z])([A-Z])/g,"$1 $2");
 }
 
-function traitName(value:string){
+function fallbackTraitName(value:string){
   return cleanName(value)
     .replace(/\bUnique Trait\b/gi,"")
     .replace(/\bTrait\b$/i,"")
@@ -58,6 +66,44 @@ function splitRiotId(value:string){
   };
 }
 
+function traitLabel(trait:TftTrait, staticData:TftStaticData|null){
+  return staticEntry(staticData?.traits,trait.name)?.name || fallbackTraitName(trait.name);
+}
+
+function UnitVisual({unit,staticData,compact=false}:{unit:TftUnit;staticData:TftStaticData|null;compact?:boolean}){
+  const entry=staticEntry(staticData?.champions,unit.characterId);
+  const name=entry?.name || cleanName(unit.characterId);
+  const image=staticData? tftAssetUrl(staticData.version,"champion",entry) : "";
+
+  return <div className={"unit-card "+(compact?"compact":"")} title={name}>
+    <div className={"unit-portrait cost-"+Math.max(1,Math.min(5,Number(entry?.tier||unit.rarity||1)))}>
+      {image?<img src={image} alt={name}/>:<span>{name.slice(0,2)}</span>}
+      <div className="unit-stars">{"★".repeat(Math.max(1,Math.min(3,unit.tier||1)))}</div>
+    </div>
+    {!compact&&<div className="unit-caption">{name}</div>}
+    <div className="item-row">
+      {unit.itemNames.slice(0,3).map((itemId,index)=>{
+        const item=staticEntry(staticData?.items,itemId);
+        const itemImage=staticData?tftAssetUrl(staticData.version,"item",item):"";
+        const itemName=item?.name||cleanName(itemId);
+        return <span className="item-icon" title={itemName} key={itemId+index}>
+          {itemImage?<img src={itemImage} alt={itemName}/>:itemName.slice(0,1)}
+        </span>;
+      })}
+    </div>
+  </div>;
+}
+
+function AugmentVisual({id,staticData}:{id:string;staticData:TftStaticData|null}){
+  const entry=staticEntry(staticData?.augments,id);
+  const image=staticData?tftAssetUrl(staticData.version,"augment",entry):"";
+  const name=entry?.name||cleanName(id);
+  return <span className="augment-chip" title={name}>
+    {image&&<img src={image} alt=""/>}
+    <span>{name}</span>
+  </span>;
+}
+
 function App() {
   const [riotId,setRiotId]=useState("");
   const [platform,setPlatform]=useState("br1");
@@ -70,6 +116,11 @@ function App() {
   const [selectedMatch,setSelectedMatch]=useState<TftMatchDetail|null>(null);
   const [matchLoading,setMatchLoading]=useState(false);
   const [matchError,setMatchError]=useState("");
+  const [staticData,setStaticData]=useState<TftStaticData|null>(null);
+
+  useEffect(()=>{
+    loadTftStaticData().then(setStaticData).catch(()=>{});
+  },[]);
 
   const rank=useMemo(
     ()=>profile?.ranked?.find((r)=>String(r.queueType).toUpperCase()==="RANKED_TFT")
@@ -96,7 +147,7 @@ function App() {
     const counts=new Map<string,{games:number,total:number}>();
     for(const match of matches){
       for(const trait of activeTraits(match).slice(0,4)){
-        const name=traitName(trait.name);
+        const name=traitLabel(trait,staticData);
         if(!name) continue;
         const current=counts.get(name)||{games:0,total:0};
         current.games+=1;
@@ -107,7 +158,7 @@ function App() {
     return [...counts.entries()]
       .map(([name,value])=>({name,games:value.games,avg:+(value.total/value.games).toFixed(2)}))
       .sort((a,b)=>b.games-a.games||a.avg-b.avg)[0]||null;
-  },[matches]);
+  },[matches,staticData]);
 
   async function searchPlayer(){
     const parsed=splitRiotId(riotId);
@@ -213,34 +264,16 @@ function App() {
           <section className="hero">
             <div className="eyebrow">TFT FIRST. DATA THAT HELPS YOU CLIMB.</div>
             <h1>Entenda suas partidas.<br /><span>Suba com intenção.</span></h1>
-            <p>
-              Busque qualquer Riot ID e veja rank, histórico, comps, padrões e insights
-              pensados especificamente para Teamfight Tactics.
-            </p>
+            <p>Busque qualquer Riot ID e veja rank, histórico, comps, padrões e insights pensados especificamente para Teamfight Tactics.</p>
 
             <form className="search-box" onSubmit={handleSubmit}>
               <select aria-label="Região" value={platform} onChange={(e)=>setPlatform(e.target.value)}>
-                <option value="br1">BR</option>
-                <option value="na1">NA</option>
-                <option value="euw1">EUW</option>
-                <option value="eun1">EUNE</option>
-                <option value="kr">KR</option>
-                <option value="jp1">JP</option>
-                <option value="la1">LAN</option>
-                <option value="la2">LAS</option>
-                <option value="oc1">OCE</option>
+                <option value="br1">BR</option><option value="na1">NA</option><option value="euw1">EUW</option>
+                <option value="eun1">EUNE</option><option value="kr">KR</option><option value="jp1">JP</option>
+                <option value="la1">LAN</option><option value="la2">LAS</option><option value="oc1">OCE</option>
               </select>
-
-              <input
-                value={riotId}
-                onChange={(e)=>setRiotId(e.target.value)}
-                placeholder="Nome#TAG"
-                aria-label="Riot ID"
-              />
-
-              <button type="submit" disabled={loading}>
-                {loading ? "Buscando..." : "Buscar jogador"}
-              </button>
+              <input value={riotId} onChange={(e)=>setRiotId(e.target.value)} placeholder="Nome#TAG" aria-label="Riot ID"/>
+              <button type="submit" disabled={loading}>{loading ? "Buscando..." : "Buscar jogador"}</button>
             </form>
 
             {error && <div className="lookup-error">{error}</div>}
@@ -272,9 +305,7 @@ function App() {
                 <span>{matches.length} partidas carregadas</span>
               </div>
             </div>
-            <button className="refresh-button" onClick={searchPlayer} disabled={loading}>
-              {loading ? "Atualizando..." : "Atualizar"}
-            </button>
+            <button className="refresh-button" onClick={searchPlayer} disabled={loading}>{loading ? "Atualizando..." : "Atualizar"}</button>
           </section>
 
           <section className="stat-grid">
@@ -299,29 +330,21 @@ function App() {
                     <div className={"placement "+placementClass(match.placement)}>{match.placement}º</div>
 
                     <div className="match-main">
-                      <strong>
-{activeTraits(match)
-                          .slice(0,2)
-                          .map((t)=>traitName(t.name))
-                          .filter(Boolean)
-                          .join(" · ") || "Board TFT"}
-                      </strong>
+                      <strong>{activeTraits(match).slice(0,2).map((t)=>traitLabel(t,staticData)).filter(Boolean).join(" · ") || "Board TFT"}</strong>
 
-                      <div>
-{activeTraits(match)
-                          .slice(0,5)
-                          .map((trait)=>(
-                            <span key={trait.name}>{traitName(trait.name)} {trait.numUnits}</span>
-                          ))}
+                      <div className="trait-row">
+                        {activeTraits(match).slice(0,5).map((trait)=>{
+                          const entry=staticEntry(staticData?.traits,trait.name);
+                          const image=staticData?tftAssetUrl(staticData.version,"trait",entry):"";
+                          return <span className={"trait-chip style-"+Math.max(0,trait.style)} key={trait.name}>
+                            {image&&<img src={image} alt=""/>}
+                            {traitLabel(trait,staticData)} {trait.numUnits}
+                          </span>;
+                        })}
                       </div>
 
-                      <div className="unit-row">
-                        {match.units.slice(0,9).map((unit,index)=>(
-                          <span className="unit-chip" key={unit.characterId+index}>
-                            <span className="unit-name">{cleanName(unit.characterId)}</span>
-                            <b>{unit.tier}★</b>
-                          </span>
-                        ))}
+                      <div className="board-row">
+                        {match.units.slice(0,9).map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact key={unit.characterId+index}/>)}
                       </div>
                     </div>
 
@@ -334,15 +357,11 @@ function App() {
                 ))}
               </div>
 
-              {hasMore && <button className="load-more" onClick={loadMore} disabled={loadingMore}>
-                {loadingMore ? "Carregando..." : "Carregar mais partidas"}
-              </button>}
+              {hasMore && <button className="load-more" onClick={loadMore} disabled={loadingMore}>{loadingMore ? "Carregando..." : "Carregar mais partidas"}</button>}
             </section>
 
             <aside className="panel insights">
-              <div className="panel-title">
-                <div><span>CHIBI INSIGHTS</span><h2>Primeira leitura</h2></div>
-              </div>
+              <div className="panel-title"><div><span>CHIBI INSIGHTS</span><h2>Primeira leitura</h2></div></div>
 
               <article className="insight positive">
                 <b>Consistência</b>
@@ -356,10 +375,7 @@ function App() {
 
               {recentTrend && <article className={`insight ${recentTrend.delta<0?"positive":recentTrend.delta>0?"warning":"neutral"}`}>
                 <b>Forma recente</b>
-                <p>
-                  Últimas 6: média {recentTrend.recent}. Anteriores: {recentTrend.previous}.
-                  {recentTrend.delta<0?" Sua colocação média melhorou.":recentTrend.delta>0?" Sua colocação média piorou.":" Ritmo estável."}
-                </p>
+                <p>Últimas 6: média {recentTrend.recent}. Anteriores: {recentTrend.previous}.{recentTrend.delta<0?" Sua colocação média melhorou.":recentTrend.delta>0?" Sua colocação média piorou.":" Ritmo estável."}</p>
               </article>}
 
               <article className="insight neutral">
@@ -375,48 +391,34 @@ function App() {
         <div className="match-overlay" onClick={()=>{setSelectedMatch(null);setMatchError("");}}>
           <section className="match-modal" onClick={(e)=>e.stopPropagation()}>
             <button className="match-close" onClick={()=>{setSelectedMatch(null);setMatchError("");}}>×</button>
-
             {matchLoading && <div className="match-state">Carregando detalhes da partida...</div>}
             {matchError && <div className="match-state error">{matchError}</div>}
 
             {selectedMatch && <>
               <div className="panel-title">
-                <div>
-                  <span>DETALHES DA PARTIDA</span>
-                  <h2>{selectedMatch.match.setName || "Teamfight Tactics"}</h2>
-                </div>
+                <div><span>DETALHES DA PARTIDA</span><h2>{selectedMatch.match.setName || "Teamfight Tactics"}</h2></div>
                 <small>{selectedMatch.match.participants.length} jogadores</small>
               </div>
 
               <div className="lobby-list">
-                {selectedMatch.match.participants
-                  .slice()
-                  .sort((a,b)=>a.placement-b.placement)
-                  .map((participant,index)=>(
-                    <article className="lobby-player" key={index}>
-                      <div className={"placement "+placementClass(participant.placement)}>{participant.placement}º</div>
-                      <div className="lobby-board">
-                        <strong>Nível {participant.level}</strong>
-                        <div className="unit-row">
-                          {participant.units.slice(0,9).map((unit,unitIndex)=>(
-                            <span className="unit-chip" key={unit.characterId+unitIndex}>
-                              <span className="unit-name">{cleanName(unit.characterId)}</span>
-                              <b>{unit.tier}★</b>
-                            </span>
-                          ))}
-                        </div>
-                        <div className="augment-row">
-                          {participant.augments.slice(0,3).map((augment)=>(
-                            <span key={augment}>{cleanName(augment)}</span>
-                          ))}
-                        </div>
+                {selectedMatch.match.participants.slice().sort((a,b)=>a.placement-b.placement).map((participant,index)=>(
+                  <article className="lobby-player" key={index}>
+                    <div className={"placement "+placementClass(participant.placement)}>{participant.placement}º</div>
+                    <div className="lobby-board">
+                      <strong>Nível {participant.level}</strong>
+                      <div className="board-row detailed">
+                        {participant.units.slice(0,9).map((unit,unitIndex)=><UnitVisual unit={unit} staticData={staticData} key={unit.characterId+unitIndex}/>)}
                       </div>
-                      <div className="lobby-meta">
-                        <strong>{participant.damageToPlayers} dano</strong>
-                        <span>{participant.goldLeft}g</span>
+                      <div className="augment-row">
+                        {participant.augments.slice(0,3).map((augment)=><AugmentVisual id={augment} staticData={staticData} key={augment}/>)}
                       </div>
-                    </article>
-                  ))}
+                    </div>
+                    <div className="lobby-meta">
+                      <strong>{participant.damageToPlayers} dano</strong>
+                      <span>{participant.goldLeft}g</span>
+                    </div>
+                  </article>
+                ))}
               </div>
             </>}
           </section>
