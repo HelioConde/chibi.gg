@@ -53,23 +53,29 @@ export default function PatchAdaptation({matches,onEvidence}:Props){
   },[matches]);
 
   const current=patches[0]||null;
+  const freshnessDays=current?.latest
+    ? Math.floor((Date.now()-current.latest)/86400000)
+    : null;
+  const stale=freshnessDays!=null&&freshnessDays>14;
 
   return <section className="panel patch-adaptation">
     <div className="innovation-head">
       <div>
         <span>PATCH ADAPTATION</span>
         <h2>{current
-          ? current.adaptation
-            ? current.adaptation.delta<-.25
-              ? "Você está se adaptando ao patch"
-              : current.adaptation.delta>.25
-                ? "O patch recente ainda está custando"
-                : "Seu desempenho está estável no patch"
-            : "Construindo sua curva de adaptação"
+          ? stale
+            ? "Amostra histórica deste patch"
+            : current.adaptation
+              ? current.adaptation.delta<-.25
+                ? "Você está se adaptando ao patch"
+                : current.adaptation.delta>.25
+                  ? "O patch atual ainda está custando"
+                  : "Seu desempenho está estável no patch"
+              : "Construindo sua curva de adaptação"
           : "Sem dados de patch"}
         </h2>
       </div>
-      {current&&<small>Patch {current.patch}</small>}
+      {current&&<small>Patch {current.patch}{stale&&freshnessDays!=null?" · "+freshnessDays+"d atrás":""}</small>}
     </div>
 
     {current&&current.adaptation&&<div className="adaptation-hero">
@@ -101,6 +107,8 @@ export default function PatchAdaptation({matches,onEvidence}:Props){
       ))}
     </div>
 
-    <p className="innovation-note">A curva compara blocos de partidas dentro do mesmo patch. Ela descreve adaptação observada, não mede aprendizado diretamente.</p>
+    <p className="innovation-note">{stale
+      ? "Esta leitura usa uma amostra histórica. Ela não descreve necessariamente seu desempenho atual."
+      : "A curva compara blocos de partidas dentro do mesmo patch. Ela descreve adaptação observada, não mede aprendizado diretamente."}</p>
   </section>;
 }
