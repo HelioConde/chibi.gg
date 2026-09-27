@@ -17,6 +17,7 @@ import {
   queueLabel,
 } from "./tftStatic";
 import { buildChibiDNA } from "./analysis/chibiInsights";
+import ChibiInnovations from "./components/ChibiInnovations";
 
 function cleanName(value:string){
   return value
@@ -131,6 +132,8 @@ function App() {
   const [staticData,setStaticData]=useState<TftStaticData|null>(null);
   const [selectedQueue,setSelectedQueue]=useState<number|null>(null);
   const [openedMatch,setOpenedMatch]=useState<TftMatch|null>(null);
+  const [evidenceIds,setEvidenceIds]=useState<string[]|null>(null);
+  const [evidenceLabel,setEvidenceLabel]=useState("");
 
   useEffect(()=>{
     loadTftStaticData().then(setStaticData).catch(()=>{});
@@ -172,6 +175,12 @@ function App() {
 
   const dna=useMemo(()=>buildChibiDNA(analysisMatches),[analysisMatches]);
 
+  const visibleMatches=useMemo(()=>{
+    if(!evidenceIds?.length) return analysisMatches;
+    const allowed=new Set(evidenceIds);
+    return analysisMatches.filter((match)=>allowed.has(match.id));
+  },[analysisMatches,evidenceIds]);
+
   const latestPlayedAt=useMemo(
     ()=>Math.max(0,...analysisMatches.map((m)=>Number(m.playedAt)||0)),
     [analysisMatches]
@@ -180,6 +189,19 @@ function App() {
   const freshnessDays=latestPlayedAt
     ? Math.floor((Date.now()-latestPlayedAt)/86400000)
     : null;
+
+  function showEvidence(ids:string[],label:string){
+    setEvidenceIds(ids);
+    setEvidenceLabel(label);
+    requestAnimationFrame(()=>{
+      document.getElementById("match-history")?.scrollIntoView({behavior:"smooth",block:"start"});
+    });
+  }
+
+  function clearEvidence(){
+    setEvidenceIds(null);
+    setEvidenceLabel("");
+  }
 
   async function searchPlayer(){
     const parsed=splitRiotId(riotId);
@@ -196,6 +218,7 @@ function App() {
     setSelectedMatch(null);
     setOpenedMatch(null);
     setSelectedQueue(null);
+    clearEvidence();
 
     try{
       const data=await fetchTftProfile(parsed.gameName,parsed.tagLine,platform);
@@ -267,6 +290,7 @@ function App() {
     setSelectedMatch(null);
     setOpenedMatch(null);
     setMatchError("");
+    clearEvidence();
   }
 
   return (
@@ -369,17 +393,32 @@ function App() {
             <article><span>Bottom 2</span><strong>{dna.bottom2Rate}%</strong><small>7º ou 8º lugar</small></article>
           </section>
 
+          <ChibiInnovations
+            matches={analysisMatches}
+            staticData={staticData}
+            onEvidence={showEvidence}
+          />
+
           {error && <div className="profile-error">{error}</div>}
 
           <div className="content-grid">
-            <section className="panel history">
+            <section className="panel history" id="match-history">
               <div className="panel-title">
                 <div><span>PARTIDAS RIOT</span><h2>Histórico recente</h2></div>
-                <small>{analysisMatches.length} no contexto</small>
+                <small>{visibleMatches.length} exibidas</small>
               </div>
 
+              {evidenceIds?.length&&<div className="evidence-banner">
+                <div>
+                  <span>EVIDÊNCIA ATIVA</span>
+                  <strong>{evidenceLabel}</strong>
+                  <small>{visibleMatches.length} partida{visibleMatches.length===1?"":"s"} relacionada{visibleMatches.length===1?"":"s"}</small>
+                </div>
+                <button onClick={clearEvidence}>Mostrar contexto completo</button>
+              </div>}
+
               <div className="match-list">
-                {analysisMatches.map((match)=>(
+                {visibleMatches.map((match)=>(
                   <button className="match-row match-button" key={match.id} onClick={()=>openMatch(match)}>
                     <div className={"placement "+placementClass(match.placement)}>{match.placement}º</div>
 
@@ -411,7 +450,7 @@ function App() {
                 ))}
               </div>
 
-              {hasMore && <button className="load-more" onClick={loadMore} disabled={loadingMore}>{loadingMore ? "Carregando..." : "Carregar mais partidas"}</button>}
+              {!evidenceIds?.length&&hasMore && <button className="load-more" onClick={loadMore} disabled={loadingMore}>{loadingMore ? "Carregando..." : "Carregar mais partidas"}</button>}
             </section>
 
             <aside className="panel insights dna-panel">
