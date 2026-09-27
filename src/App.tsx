@@ -22,6 +22,7 @@ import ChibiReview from "./components/ChibiReview";
 import MatchJournal from "./components/MatchJournal";
 import PatchAdaptation from "./components/PatchAdaptation";
 import BoardCounterfactual from "./components/BoardCounterfactual";
+import NextSessionGoal from "./components/NextSessionGoal";
 
 function cleanName(value:string){
   return value
@@ -419,6 +420,12 @@ function App() {
           />
 
           <PatchAdaptation
+            matches={analysisMatches}
+            onEvidence={showEvidence}
+          />
+
+          <NextSessionGoal
+            playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
             matches={analysisMatches}
             onEvidence={showEvidence}
           />
