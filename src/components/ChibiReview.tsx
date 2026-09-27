@@ -105,11 +105,48 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
     };
   })();
 
-  const nextFocus={
-    title:session.focus,
-    body:session.reason,
-    ids:session.matchIds,
-  };
+  const nextFocus=(()=>{
+    const primary=leaks.primary;
+
+    if(primary?.id==="conversion"){
+      return {
+        title:"Revise seus Top 4",
+        body:"Compare os boards finais das partidas em que você chegou ao Top 4 antes da próxima sessão. O objetivo é encontrar diferenças observáveis sem assumir uma causa que a API não mostra.",
+        ids:top4.map(match=>match.id),
+      };
+    }
+
+    if(primary?.id==="bottom2"){
+      const bottom2=matches.filter(match=>match.placement>=7);
+      return {
+        title:"Revise seus Bottom 2",
+        body:"Olhe primeiro para as derrotas grandes e compare board final, nível e linha principal. Reduzir a frequência de 7º/8º é um experimento mais claro do que perseguir highroll.",
+        ids:bottom2.map(match=>match.id),
+      };
+    }
+
+    if(primary?.id==="dominance"){
+      return {
+        title:"Teste uma segunda linha",
+        body:"Sua amostra ficou concentrada em uma identidade de board. Na próxima sessão, observe quando o jogo oferece uma alternativa viável e registre o contexto no Journal.",
+        ids:primary.matchIds,
+      };
+    }
+
+    if(primary?.id==="level-conversion"){
+      return {
+        title:"Compare qualidade do board final",
+        body:"Os níveis finais não separaram bem Top 4 e Bottom 4. Revise unidades, estrelas, itens e traits antes de tratar nível como a principal explicação.",
+        ids:primary.matchIds,
+      };
+    }
+
+    return {
+      title:session.focus,
+      body:session.reason,
+      ids:session.matchIds,
+    };
+  })();
 
   return <section className="panel chibi-review">
     <div className="review-head">
