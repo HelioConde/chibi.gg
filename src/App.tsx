@@ -415,7 +415,7 @@ function App() {
             onEvidence={showEvidence}
           />
 
-          {error && <div className="profile-error">{error}</div>
+          {error && <div className="profile-error">{error}</div>}
 
           <div className="content-grid">
             <section className="panel history" id="match-history">
