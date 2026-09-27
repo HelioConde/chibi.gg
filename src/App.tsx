@@ -15,6 +15,7 @@ import {
   tftAssetUrl,
   TftStaticData,
 } from "./tftStatic";
+import { buildChibiDNA } from "./analysis/chibiInsights";
 
 function cleanName(value:string){
   return value
@@ -130,35 +131,7 @@ function App() {
     [profile]
   );
 
-  const recentTrend=useMemo(()=>{
-    if(matches.length<6) return null;
-    const recent=matches.slice(0,6);
-    const previous=matches.slice(6,12);
-    const avg=(items:TftMatch[])=>items.length
-      ? items.reduce((sum,m)=>sum+m.placement,0)/items.length
-      : null;
-    const a=avg(recent);
-    const b=avg(previous);
-    if(a==null||b==null) return null;
-    return { recent:+a.toFixed(2), previous:+b.toFixed(2), delta:+(a-b).toFixed(2) };
-  },[matches]);
-
-  const favoriteTrait=useMemo(()=>{
-    const counts=new Map<string,{games:number,total:number}>();
-    for(const match of matches){
-      for(const trait of activeTraits(match).slice(0,4)){
-        const name=traitLabel(trait,staticData);
-        if(!name) continue;
-        const current=counts.get(name)||{games:0,total:0};
-        current.games+=1;
-        current.total+=match.placement;
-        counts.set(name,current);
-      }
-    }
-    return [...counts.entries()]
-      .map(([name,value])=>({name,games:value.games,avg:+(value.total/value.games).toFixed(2)}))
-      .sort((a,b)=>b.games-a.games||a.avg-b.avg)[0]||null;
-  },[matches,staticData]);
+  const dna=useMemo(()=>buildChibiDNA(matches),[matches]);
 
   async function searchPlayer(){
     const parsed=splitRiotId(riotId);
@@ -360,28 +333,59 @@ function App() {
               {hasMore && <button className="load-more" onClick={loadMore} disabled={loadingMore}>{loadingMore ? "Carregando..." : "Carregar mais partidas"}</button>}
             </section>
 
-            <aside className="panel insights">
-              <div className="panel-title"><div><span>CHIBI INSIGHTS</span><h2>Primeira leitura</h2></div></div>
+            <aside className="panel insights dna-panel">
+              <div className="panel-title">
+                <div><span>CHIBI DNA</span><h2>Seu padrão recente</h2></div>
+                <small>{dna.sampleSize} partidas</small>
+              </div>
 
-              <article className="insight positive">
-                <b>Consistência</b>
-                <p>Top 4 em {profile.summary.top4Rate}% das {profile.summary.matches} partidas usadas no resumo.</p>
-              </article>
+              <div className="placement-strip" aria-label="Colocações recentes">
+                {dna.placements.slice(0,12).map((p,index)=>(
+                  <span className={placementClass(p)} key={index} title={(index+1)+"ª partida mais recente: "+p+"º"}>{p}</span>
+                ))}
+              </div>
 
-              {favoriteTrait && <article className="insight neutral">
-                <b>Linha mais recorrente</b>
-                <p>{favoriteTrait.name} apareceu em {favoriteTrait.games} partidas, com colocação média {favoriteTrait.avg}.</p>
-              </article>}
+              <div className="dna-grid">
+                <article>
+                  <span>Consistência</span>
+                  <strong>{dna.consistency}%</strong>
+                  <small>variação das colocações</small>
+                </article>
+                <article>
+                  <span>Flexibilidade</span>
+                  <strong>{dna.flexibility}%</strong>
+                  <small>diversidade de linhas</small>
+                </article>
+                <article>
+                  <span>Conversão</span>
+                  <strong>{dna.conversion}%</strong>
+                  <small>Top 4 que viraram 1º</small>
+                </article>
+                <article>
+                  <span>Estabilidade</span>
+                  <strong>{dna.stability}%</strong>
+                  <small>evitou Bottom 2</small>
+                </article>
+              </div>
 
-              {recentTrend && <article className={`insight ${recentTrend.delta<0?"positive":recentTrend.delta>0?"warning":"neutral"}`}>
-                <b>Forma recente</b>
-                <p>Últimas 6: média {recentTrend.recent}. Anteriores: {recentTrend.previous}.{recentTrend.delta<0?" Sua colocação média melhorou.":recentTrend.delta>0?" Sua colocação média piorou.":" Ritmo estável."}</p>
-              </article>}
+              <p className="dna-disclaimer">Indicadores descritivos da amostra carregada. Não são MMR, elo alternativo nem avaliação oficial da Riot.</p>
 
-              <article className="insight neutral">
-                <b>Conversão</b>
-                <p>{profile.summary.firsts} vitória{profile.summary.firsts===1?"":"s"} e {profile.summary.eighths} oitavo{profile.summary.eighths===1?"":"s"} lugar{profile.summary.eighths===1?"":"es"} na amostra.</p>
-              </article>
+              <div className="dna-insights">
+                {dna.insights.map((insight)=>{
+                  const subject=insight.subject
+                    ? staticEntry(staticData?.traits,insight.subject)?.name || fallbackTraitName(insight.subject)
+                    : "";
+                  return <article className={"insight "+insight.tone} key={insight.id}>
+                    <div className="insight-head">
+                      <b>{insight.title}</b>
+                      <span>{insight.confidence}</span>
+                    </div>
+                    {subject&&<strong className="insight-subject">{subject}</strong>}
+                    <p>{insight.body}</p>
+                    <small>{insight.evidence}</small>
+                  </article>;
+                })}
+              </div>
             </aside>
           </div>
         </main>
