@@ -18,6 +18,8 @@ import {
 } from "./tftStatic";
 import { buildChibiDNA } from "./analysis/chibiInsights";
 import ChibiInnovations from "./components/ChibiInnovations";
+import ChibiReview from "./components/ChibiReview";
+import MatchJournal from "./components/MatchJournal";
 
 function cleanName(value:string){
   return value
@@ -134,6 +136,7 @@ function App() {
   const [openedMatch,setOpenedMatch]=useState<TftMatch|null>(null);
   const [evidenceIds,setEvidenceIds]=useState<string[]|null>(null);
   const [evidenceLabel,setEvidenceLabel]=useState("");
+  const [journalVersion,setJournalVersion]=useState(0);
 
   useEffect(()=>{
     loadTftStaticData().then(setStaticData).catch(()=>{});
@@ -399,6 +402,13 @@ function App() {
             onEvidence={showEvidence}
           />
 
+          <ChibiReview
+            matches={analysisMatches}
+            staticData={staticData}
+            journalVersion={journalVersion}
+            onEvidence={showEvidence}
+          />
+
           {error && <div className="profile-error">{error}</div>}
 
           <div className="content-grid">
@@ -526,6 +536,12 @@ function App() {
                 </div>
                 <small>{queueLabel(staticData,selectedMatch.match.queueId)} · {selectedMatch.match.participants.length} jogadores</small>
               </div>
+
+              {openedMatch&&<MatchJournal
+                matchId={openedMatch.id}
+                placement={openedMatch.placement}
+                onSaved={()=>setJournalVersion((value)=>value+1)}
+              />}
 
               <div className="lobby-list">
                 {selectedMatch.match.participants.slice().sort((a,b)=>a.placement-b.placement).map((participant,index)=>(
