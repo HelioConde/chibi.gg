@@ -36,7 +36,7 @@ export function loadTftStaticData():Promise<TftStaticData>{
       fetchJson(base+"tft-champion.json"),
       fetchJson(base+"tft-item.json"),
       fetchJson(base+"tft-trait.json"),
-      fetchJson(base+"tft-augment.json").catch(()=>({data:{}})),
+      fetchJson(base+"tft-augments.json").catch(()=>({data:{}})),
       fetchJson(base+"tft-queues.json").catch(()=>({data:{}})),
     ]);
 
