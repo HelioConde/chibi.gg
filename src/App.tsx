@@ -22,10 +22,10 @@ import ChibiReview from "./components/ChibiReview";
 import MatchJournal from "./components/MatchJournal";
 import PatchAdaptation from "./components/PatchAdaptation";
 import BoardCounterfactual from "./components/BoardCounterfactual";
-import NextSessionGoal from "./components/NextSessionGoal";
 import ChibiShareCard from "./components/ChibiShareCard";
 import PersonalVsGlobalMeta from "./components/PersonalVsGlobalMeta";
 import ChibiIdentity from "./components/ChibiIdentity";
+import ChibiActionCenter from "./components/ChibiActionCenter";
 import StyleShift from "./components/StyleShift";
 import GlobalMetaPage from "./components/GlobalMetaPage";
 
@@ -567,20 +567,19 @@ function App() {
           </nav>
 
           {profileTab==="overview"&&<>
-            <ChibiIdentity
+            <ChibiActionCenter
+              playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
               matches={analysisMatches}
               onEvidence={showEvidence}
+            />
+
+            <ChibiIdentity
+              matches={analysisMatches}
             />
 
             <ChibiInnovations
               matches={analysisMatches}
               staticData={staticData}
-              onEvidence={showEvidence}
-            />
-
-            <NextSessionGoal
-              playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
-              matches={analysisMatches}
               onEvidence={showEvidence}
             />
           </>}
