@@ -20,6 +20,7 @@ import { buildChibiDNA } from "./analysis/chibiInsights";
 import ChibiInnovations from "./components/ChibiInnovations";
 import ChibiReview from "./components/ChibiReview";
 import MatchJournal from "./components/MatchJournal";
+import PatchAdaptation from "./components/PatchAdaptation";
 
 function cleanName(value:string){
   return value
@@ -409,7 +410,12 @@ function App() {
             onEvidence={showEvidence}
           />
 
-          {error && <div className="profile-error">{error}</div>}
+          <PatchAdaptation
+            matches={analysisMatches}
+            onEvidence={showEvidence}
+          />
+
+          {error && <div className="profile-error">{error}</div>
 
           <div className="content-grid">
             <section className="panel history" id="match-history">
