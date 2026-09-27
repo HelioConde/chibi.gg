@@ -153,6 +153,7 @@ function App() {
   const [evidenceLabel,setEvidenceLabel]=useState("");
   const [journalVersion,setJournalVersion]=useState(0);
   const [profileTab,setProfileTab]=useState<ProfileTab>("overview");
+  const [copiedAnalysisLink,setCopiedAnalysisLink]=useState(false);
 
   useEffect(()=>{
     loadTftStaticData().then(setStaticData).catch(()=>{});
@@ -253,6 +254,17 @@ function App() {
   function changeProfileTab(tab:ProfileTab){
     setProfileTab(tab);
     updateProfileUrl(tab,selectedQueue);
+  }
+
+  async function copyCurrentAnalysisLink(){
+    updateProfileUrl(profileTab,selectedQueue);
+    try{
+      await navigator.clipboard.writeText(window.location.href);
+      setCopiedAnalysisLink(true);
+      window.setTimeout(()=>setCopiedAnalysisLink(false),1600);
+    }catch{
+      setCopiedAnalysisLink(false);
+    }
   }
 
   function changeQueue(queue:number|null){
@@ -503,11 +515,16 @@ function App() {
           {error && <div className="profile-error">{error}</div>}
 
           <nav className="profile-tabs" aria-label="Seções do perfil">
-            <button className={profileTab==="overview"?"active":""} onClick={()=>changeProfileTab("overview")}>Visão geral</button>
-            <button className={profileTab==="review"?"active":""} onClick={()=>changeProfileTab("review")}>Review</button>
-            <button className={profileTab==="meta"?"active":""} onClick={()=>changeProfileTab("meta")}>Meta pessoal</button>
-            <button className={profileTab==="matches"?"active":""} onClick={()=>changeProfileTab("matches")}>Partidas</button>
-            <button className={profileTab==="share"?"active":""} onClick={()=>changeProfileTab("share")}>Compartilhar</button>
+            <div className="profile-tab-list">
+              <button className={profileTab==="overview"?"active":""} onClick={()=>changeProfileTab("overview")}>Visão geral</button>
+              <button className={profileTab==="review"?"active":""} onClick={()=>changeProfileTab("review")}>Review</button>
+              <button className={profileTab==="meta"?"active":""} onClick={()=>changeProfileTab("meta")}>Meta pessoal</button>
+              <button className={profileTab==="matches"?"active":""} onClick={()=>changeProfileTab("matches")}>Partidas</button>
+              <button className={profileTab==="share"?"active":""} onClick={()=>changeProfileTab("share")}>Compartilhar</button>
+            </div>
+            <button className="copy-analysis-link" onClick={copyCurrentAnalysisLink}>
+              {copiedAnalysisLink?"Link copiado ✓":"Copiar link"}
+            </button>
           </nav>
 
           {profileTab==="overview"&&<>
