@@ -139,19 +139,19 @@ function App() {
     [matches]
   );
 
-  const setMatches=useMemo(
+  const currentSetMatches=useMemo(
     ()=>currentSet ? matches.filter((m)=>m.setNumber===currentSet) : matches,
     [matches,currentSet]
   );
 
   const availableQueues=useMemo(
-    ()=>[...new Set(setMatches.map((m)=>m.queueId).filter((q):q is number=>Number.isFinite(q)))],
-    [setMatches]
+    ()=>[...new Set(currentSetMatches.map((m)=>m.queueId).filter((q):q is number=>Number.isFinite(q)))],
+    [currentSetMatches]
   );
 
   const analysisMatches=useMemo(
-    ()=>selectedQueue==null ? setMatches : setMatches.filter((m)=>m.queueId===selectedQueue),
-    [setMatches,selectedQueue]
+    ()=>selectedQueue==null ? currentSetMatches : currentSetMatches.filter((m)=>m.queueId===selectedQueue),
+    [currentSetMatches,selectedQueue]
   );
 
   const dna=useMemo(()=>buildChibiDNA(analysisMatches),[analysisMatches]);
