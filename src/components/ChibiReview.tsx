@@ -62,35 +62,40 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
   const top4AvgLevel=avg(top4.map(match=>match.level));
   const bottom4AvgLevel=avg(bottom4.map(match=>match.level));
 
-  const working=meta[0]
+  const strength=meta[0]
     ? {
         title:traitName(meta[0].id,staticData),
         body:`Sua melhor média entre linhas repetidas foi ${meta[0].avgPlacement}, com Top 4 em ${meta[0].top4Rate}% de ${meta[0].games} partidas.`,
+        confidence:meta[0].confidence,
         ids:meta[0].matchIds,
       }
     : {
-        title:"Amostra ainda aberta",
-        body:"Ainda não há uma linha repetida o suficiente para destacar como padrão forte.",
+        title:"Ainda sem força recorrente",
+        body:"A amostra não repetiu uma linha o suficiente para destacar um padrão confiável.",
+        confidence:"baixa" as const,
         ids:[] as string[],
       };
 
-  const costing=leaks.primary
+  const problem=leaks.primary
     ? {
         title:leaks.primary.title,
         body:`${leaks.primary.description} ${leaks.primary.evidence}.`,
+        confidence:leaks.primary.confidence,
         ids:leaks.primary.matchIds,
       }
     : {
-        title:"Sem vazamento dominante",
-        body:"A amostra atual não mostra um padrão de perda suficientemente claro.",
+        title:"Nenhum problema dominante",
+        body:"A amostra atual não mostra um vazamento suficientemente claro para virar prioridade.",
+        confidence:"baixa" as const,
         ids:[] as string[],
       };
 
-  const change=(()=>{
+  const change=useMemo(()=>{
     const window=Math.min(5,Math.floor(matches.length/2));
     if(window<3) return {
-      title:"Poucos jogos para comparar",
-      body:"Carregue mais partidas para comparar blocos recentes com segurança.",
+      title:"Ainda cedo para comparar blocos",
+      body:"Carregue mais partidas para comparar mudança recente com segurança.",
+      tone:"neutral",
       ids:[] as string[],
     };
     const recent=matches.slice(0,window);
@@ -100,18 +105,20 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
     const diff=a-b;
     return {
       title:diff<-.25?"Seu bloco recente melhorou":diff>.25?"Seu bloco recente piorou":"Seu ritmo ficou parecido",
-      body:`Últimas ${window}: média ${a.toFixed(2)}. ${window} anteriores: ${b.toFixed(2)}.`,
+      body:`Últimas ${window}: média ${a.toFixed(2)} · ${window} anteriores: ${b.toFixed(2)}.`,
+      tone:diff<-.25?"good":diff>.25?"bad":"neutral",
       ids:[...recent,...previous].map(match=>match.id),
     };
-  })();
+  },[matches]);
 
-  const nextFocus=(()=>{
+  const experiment=useMemo(()=>{
     const primary=leaks.primary;
 
     if(primary?.id==="conversion"){
       return {
-        title:"Revise seus Top 4",
-        body:"Compare os boards finais das partidas em que você chegou ao Top 4 antes da próxima sessão. O objetivo é encontrar diferenças observáveis sem assumir uma causa que a API não mostra.",
+        title:"Converta um Top 4 em vitória",
+        body:"Nas próximas 5 partidas, marque quando chegar ao Top 4 e depois compare board final, nível, estrelas e itens. O objetivo é encontrar uma diferença observável antes de mudar toda a sua linha.",
+        metric:"Meta: pelo menos 1 vitória entre seus próximos Top 4.",
         ids:top4.map(match=>match.id),
       };
     }
@@ -119,24 +126,27 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
     if(primary?.id==="bottom2"){
       const bottom2=matches.filter(match=>match.placement>=7);
       return {
-        title:"Revise seus Bottom 2",
-        body:"Olhe primeiro para as derrotas grandes e compare board final, nível e linha principal. Reduzir a frequência de 7º/8º é um experimento mais claro do que perseguir highroll.",
+        title:"Proteja o piso da próxima sessão",
+        body:"Revise primeiro os 7º/8º e observe se existe um padrão de board final fraco, nível sem conversão ou linha forçada. O experimento é evitar decisões que repetem esse padrão.",
+        metric:"Meta: reduzir a frequência de Bottom 2 nas próximas 5 partidas.",
         ids:bottom2.map(match=>match.id),
       };
     }
 
     if(primary?.id==="dominance"){
       return {
-        title:"Teste uma segunda linha",
-        body:"Sua amostra ficou concentrada em uma identidade de board. Na próxima sessão, observe quando o jogo oferece uma alternativa viável e registre o contexto no Journal.",
+        title:"Teste uma segunda linha quando o jogo oferecer",
+        body:"Não abandone sua linha forte. Apenas registre uma partida em que o lobby e os itens apontem para uma alternativa viável e compare o resultado.",
+        metric:"Meta: concluir pelo menos 1 partida com uma segunda identidade de board.",
         ids:primary.matchIds,
       };
     }
 
     if(primary?.id==="level-conversion"){
       return {
-        title:"Compare qualidade do board final",
-        body:"Os níveis finais não separaram bem Top 4 e Bottom 4. Revise unidades, estrelas, itens e traits antes de tratar nível como a principal explicação.",
+        title:"Pare de usar nível como explicação única",
+        body:"Compare os boards finais em que nível foi parecido, mas o resultado foi diferente. Procure diferenças de unidades, estrelas, itens e traits.",
+        metric:"Meta: identificar uma diferença observável em pelo menos 2 partidas.",
         ids:primary.matchIds,
       };
     }
@@ -144,69 +154,83 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
     return {
       title:session.focus,
       body:session.reason,
+      metric:"Use a próxima sessão para testar só uma mudança de cada vez.",
       ids:session.matchIds,
     };
-  })();
+  },[leaks,session,top4,matches]);
 
-  return <section className="panel chibi-review">
-    <div className="review-head">
+  return <section className="panel chibi-review coach-review">
+    <div className="review-head coach-review-head">
       <div>
-        <span>CHIBI REVIEW</span>
-        <h2>O que seus jogos estão tentando te ensinar</h2>
+        <span>CHIBI COACH</span>
+        <h2>O que repetir, corrigir e testar</h2>
+        <p>Primeiro o que repetir, depois o que corrigir. O resto fica como evidência.</p>
       </div>
       <small>{matches.length} partidas</small>
     </div>
 
-    <div className="review-grid">
-      <article className="review-block positive">
-        <span>O QUE ESTÁ FUNCIONANDO</span>
-        <h3>{working.title}</h3>
-        <p>{working.body}</p>
-        {working.ids.length>0&&<button onClick={()=>onEvidence(working.ids,"Review · O que está funcionando")}>Ver evidências</button>}
+    <div className="coach-signal-row">
+      <article className="coach-signal positive">
+        <span>FORÇA</span>
+        <h3>{strength.title}</h3>
+        <p>{strength.body}</p>
+        <div><em>confiança {strength.confidence}</em>{strength.ids.length>0&&<button onClick={()=>onEvidence(strength.ids,"Coach · força")}>Ver evidências</button>}</div>
       </article>
 
-      <article className="review-block warning">
-        <span>O QUE ESTÁ TE PUNINDO</span>
-        <h3>{costing.title}</h3>
-        <p>{costing.body}</p>
-        {costing.ids.length>0&&<button onClick={()=>onEvidence(costing.ids,"Review · O que está te punindo")}>Ver evidências</button>}
+      <article className="coach-signal warning">
+        <span>PROBLEMA</span>
+        <h3>{problem.title}</h3>
+        <p>{problem.body}</p>
+        <div><em>confiança {problem.confidence}</em>{problem.ids.length>0&&<button onClick={()=>onEvidence(problem.ids,"Coach · problema")}>Ver evidências</button>}</div>
       </article>
 
-      <article className="review-block neutral">
-        <span>O QUE MUDOU</span>
+      <article className={"coach-signal change "+change.tone}>
+        <span>MUDANÇA RECENTE</span>
         <h3>{change.title}</h3>
         <p>{change.body}</p>
-        {change.ids.length>0&&<button onClick={()=>onEvidence(change.ids,"Review · O que mudou")}>Comparar partidas</button>}
-      </article>
-
-      <article className="review-block focus">
-        <span>PRÓXIMO FOCO</span>
-        <h3>{nextFocus.title}</h3>
-        <p>{nextFocus.body}</p>
-        {nextFocus.ids.length>0&&<button onClick={()=>onEvidence(nextFocus.ids,"Review · Próximo foco")}>Ver sessão</button>}
+        <div>{change.ids.length>0&&<button onClick={()=>onEvidence(change.ids,"Coach · mudança recente")}>Comparar blocos</button>}</div>
       </article>
     </div>
 
-    <div className="review-foot">
+    <article className="coach-experiment">
       <div>
-        <span>SINAL DO JOURNAL</span>
-        {journalSignal?(
-          <>
-            <strong>{journalSignal.label}</strong>
-            <p>Marcado em {journalSignal.games} partidas, com colocação média {journalSignal.avg.toFixed(2)}.</p>
-            <button onClick={()=>onEvidence(journalSignal.ids,"Journal · "+journalSignal.label)}>Ver partidas marcadas</button>
-          </>
-        ):(
-          <p>Marque contexto nas partidas para o Chibi cruzar decisões percebidas com seus resultados.</p>
-        )}
+        <span>PRÓXIMO EXPERIMENTO</span>
+        <h3>{experiment.title}</h3>
+        <p>{experiment.body}</p>
       </div>
-      <div>
-        <span>LEITURA DE NÍVEL</span>
-        <strong>{top4AvgLevel!=null&&bottom4AvgLevel!=null
-          ? "Top 4 "+top4AvgLevel.toFixed(1)+" · Bottom 4 "+bottom4AvgLevel.toFixed(1)
-          : "Amostra insuficiente"}</strong>
-        <p>Esse indicador descreve o board final; não revela quando você subiu de nível.</p>
+      <aside>
+        <small>COMO VALIDAR</small>
+        <strong>{experiment.metric}</strong>
+        {experiment.ids.length>0&&<button onClick={()=>onEvidence(experiment.ids,"Coach · próximo experimento")}>Abrir partidas relevantes</button>}
+      </aside>
+    </article>
+
+    <details className="coach-evidence-layer">
+      <summary>
+        <span><b>Ver sinais de apoio</b><small>Journal, leitura de nível e contexto usado pelo coach</small></span>
+        <em>Evidências</em>
+      </summary>
+      <div className="review-foot coach-evidence-body">
+        <div>
+          <span>SINAL DO JOURNAL</span>
+          {journalSignal?(
+            <>
+              <strong>{journalSignal.label}</strong>
+              <p>Marcado em {journalSignal.games} partidas, com colocação média {journalSignal.avg.toFixed(2)}.</p>
+              <button onClick={()=>onEvidence(journalSignal.ids,"Journal · "+journalSignal.label)}>Ver partidas marcadas</button>
+            </>
+          ):(
+            <p>Marque contexto nas partidas para o Chibi cruzar decisões percebidas com seus resultados.</p>
+          )}
+        </div>
+        <div>
+          <span>LEITURA DE NÍVEL</span>
+          <strong>{top4AvgLevel!=null&&bottom4AvgLevel!=null
+            ? "Top 4 "+top4AvgLevel.toFixed(1)+" · Bottom 4 "+bottom4AvgLevel.toFixed(1)
+            : "Amostra insuficiente"}</strong>
+          <p>Esse indicador descreve o board final; não revela quando você subiu de nível.</p>
+        </div>
       </div>
-    </div>
+    </details>
   </section>;
 }
