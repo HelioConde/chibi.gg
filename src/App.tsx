@@ -21,6 +21,7 @@ import ChibiInnovations from "./components/ChibiInnovations";
 import ChibiReview from "./components/ChibiReview";
 import MatchJournal from "./components/MatchJournal";
 import PatchAdaptation from "./components/PatchAdaptation";
+import BoardCounterfactual from "./components/BoardCounterfactual";
 
 function cleanName(value:string){
   return value
@@ -205,6 +206,13 @@ function App() {
   function clearEvidence(){
     setEvidenceIds(null);
     setEvidenceLabel("");
+  }
+
+  function showCounterEvidence(ids:string[],label:string){
+    setSelectedMatch(null);
+    setOpenedMatch(null);
+    setMatchError("");
+    showEvidence(ids,label);
   }
 
   async function searchPlayer(){
@@ -547,6 +555,13 @@ function App() {
                 matchId={openedMatch.id}
                 placement={openedMatch.placement}
                 onSaved={()=>setJournalVersion((value)=>value+1)}
+              />}
+
+              {openedMatch&&<BoardCounterfactual
+                target={openedMatch}
+                history={analysisMatches}
+                staticData={staticData}
+                onEvidence={showCounterEvidence}
               />}
 
               <div className="lobby-list">
