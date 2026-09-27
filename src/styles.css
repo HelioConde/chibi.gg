@@ -219,3 +219,52 @@ a { color: inherit; text-decoration: none; }
 .item-icon>span{position:absolute;inset:0;display:grid;place-items:center}
 .item-icon img{position:relative;z-index:1}
 .queue-tabs button:disabled{cursor:default;opacity:1}
+
+.innovation-grid{display:grid;grid-template-columns:1.1fr .9fr 1fr;gap:14px;margin:14px 0}
+.innovation-card{min-height:300px;overflow:hidden}
+.innovation-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+.innovation-head>div>span{display:block;color:#7563e7;font-size:10px;letter-spacing:1.5px;font-weight:900}
+.innovation-head h2{margin:5px 0 0;font-size:18px;line-height:1.2}
+.innovation-head>small{color:#6f7890;font-size:10px;text-transform:uppercase}
+.personal-meta-list{display:flex;flex-direction:column;gap:9px}
+.personal-meta-row{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:9px;align-items:center;padding:10px;border:1px solid #202738;border-radius:11px;background:#0d121b}
+.meta-rank{width:28px;height:28px;display:grid;place-items:center;border-radius:8px;background:#171d2a;color:#b7c0d6;font-size:11px;font-weight:900}
+.meta-line-main{min-width:0}
+.meta-line-title{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.meta-line-title strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+.meta-line-title span{color:#a99cff;font-size:10px;font-weight:900;white-space:nowrap}
+.fit-track,.leak-track{height:5px;border-radius:999px;background:#1c2230;overflow:hidden;margin:7px 0}
+.fit-track i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#6e5bec,#9a7cff)}
+.meta-line-main small{display:block;color:#6f7890;font-size:9px;line-height:1.4}
+.personal-meta-row>button,.leak-bottom button{border:1px solid #2b3246;background:#131925;color:#aeb7cd;border-radius:8px;padding:6px 8px;font-size:9px;font-weight:800}
+.innovation-note,.innovation-empty{margin:12px 0 0;color:#697287;font-size:9px;line-height:1.5}
+.session-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.session-metrics>div{padding:11px;border-radius:10px;background:#0d121b;border:1px solid #202738}
+.session-metrics span{display:block;color:#737d92;font-size:9px}
+.session-metrics strong{display:block;margin-top:5px;font-size:18px}
+.session-reason{color:#919aae;font-size:11px;line-height:1.6;margin:15px 0}
+.session-time{display:flex;align-items:center;gap:8px;color:#697287;font-size:9px}
+.session-time i{height:1px;flex:1;background:#272e40}
+.evidence-button{width:100%;margin-top:15px;border:1px solid #5f52c3;background:rgba(117,99,231,.12);color:#c7beff;border-radius:9px;padding:10px 12px;font-size:10px;font-weight:900}
+.leak-list{display:flex;flex-direction:column;gap:9px}
+.leak-row{padding:10px;border:1px solid #202738;border-radius:11px;background:#0d121b}
+.leak-top,.leak-bottom{display:flex;align-items:center;justify-content:space-between;gap:9px}
+.leak-top strong{font-size:11px}
+.leak-top span{font-size:8px;text-transform:uppercase;color:#7f899e;letter-spacing:.8px}
+.leak-track i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#d18a4e,#e05f66)}
+.leak-row p{margin:6px 0;color:#7f899e;font-size:9px;line-height:1.45}
+.leak-bottom small{color:#687287;font-size:9px}
+.evidence-banner{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;padding:11px 12px;border:1px solid rgba(117,99,231,.35);border-radius:11px;background:rgba(117,99,231,.09)}
+.evidence-banner span{display:block;color:#8f7cff;font-size:8px;letter-spacing:1.1px;font-weight:900}
+.evidence-banner strong{display:block;margin:2px 0;font-size:11px}
+.evidence-banner small{color:#6f7890;font-size:9px}
+.evidence-banner button{border:1px solid #333b50;background:#111722;color:#aeb7c9;border-radius:8px;padding:7px 9px;font-size:9px;font-weight:800}
+@media (max-width:1050px){
+  .innovation-grid{grid-template-columns:1fr 1fr}
+  .leak-card{grid-column:1/-1}
+}
+@media (max-width:760px){
+  .innovation-grid{grid-template-columns:1fr}
+  .leak-card{grid-column:auto}
+  .evidence-banner{align-items:flex-start;flex-direction:column}
+}
