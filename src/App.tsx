@@ -26,6 +26,7 @@ import ChibiLearningLab from "./components/ChibiLearningLab";
 import ChibiLearningPath from "./components/ChibiLearningPath";
 import ChibiCoachMode from "./components/ChibiCoachMode";
 import ChibiStudyShare, { studyFocusById } from "./components/ChibiStudyShare";
+import ChibiStudyReply from "./components/ChibiStudyReply";
 import MatchJournal from "./components/MatchJournal";
 import PatchAdaptation from "./components/PatchAdaptation";
 import BoardCounterfactual from "./components/BoardCounterfactual";
@@ -238,6 +239,8 @@ type StudyRequest={
   matchId:string;
   focusId:string;
   note:string;
+  reply:string;
+  reviewer:string;
 };
 
 function readStudyRequest():StudyRequest|null{
@@ -248,6 +251,8 @@ function readStudyRequest():StudyRequest|null{
     matchId,
     focusId:params.get("focus")?.trim()||"lost",
     note:params.get("note")?.trim().slice(0,220)||"",
+    reply:params.get("reply")?.trim().slice(0,320)||"",
+    reviewer:params.get("reviewer")?.trim().slice(0,32)||"",
   };
 }
 
@@ -1621,6 +1626,10 @@ function App() {
                     <small>{focus.hint}</small>
                   </div>
                   {studyRequest.note&&<blockquote>{studyRequest.note}</blockquote>}
+                  {studyRequest.reply&&<div className="study-reply-inline">
+                    <span>RESPOSTA {studyRequest.reviewer?"· "+studyRequest.reviewer:""}</span>
+                    <p>{studyRequest.reply}</p>
+                  </div>}
                 </div>;
               })()}
               <div className="match-modal-head">
@@ -1667,6 +1676,11 @@ function App() {
               {openedMatch&&<MatchStory
                 target={openedMatch}
                 detail={selectedMatch}
+              />}
+
+              {openedMatch&&studyRequest?.matchId===openedMatch.id&&<ChibiStudyReply
+                playerName={profile?.player.gameName||"Jogador"}
+                existingReply={studyRequest.reply}
               />}
 
               {openedMatch&&<MatchBoardMap
