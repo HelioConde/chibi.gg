@@ -160,12 +160,18 @@ export default function StatisticsPage({
   const [loading,setLoading]=useState(true);
   const [error,setError]=useState("");
   const [query,setQuery]=useState(initialQuery);
+  const [selectedEntityId,setSelectedEntityId]=useState<string|null>(null);
 
   useEffect(()=>{
     setCategory(initialCategory);
     setQuery(initialQuery);
     setView(initialView);
+    setSelectedEntityId(null);
   },[initialCategory,initialQuery,initialView]);
+
+  useEffect(()=>{
+    setSelectedEntityId(null);
+  },[category,queueId]);
 
   useEffect(()=>{
     let cancelled=false;
@@ -219,6 +225,55 @@ export default function StatisticsPage({
       .sort((a,b)=>a.name.localeCompare(b.name))
       .slice(0,80);
   },[staticData,query]);
+
+  const selectedRow=useMemo(
+    ()=>selectedEntityId?rows.find(row=>row.id===selectedEntityId)||null:null,
+    [selectedEntityId,rows],
+  );
+
+  const selectedInterpretation=useMemo(()=>{
+    if(!selectedRow)return null;
+    const personalRow=selectedRow.personal;
+
+    if(!personalRow){
+      return {
+        tone:"neutral",
+        title:"Sem amostra pessoal ainda",
+        body:"O Chibi tem leitura da base observada, mas este elemento ainda não apareceu nas partidas carregadas deste perfil.",
+      };
+    }
+
+    if(personalRow.games<3||selectedRow.games<20){
+      return {
+        tone:"neutral",
+        title:"Sinal inicial — ainda não trate como padrão",
+        body:"Há pouca amostra pessoal ou agregada. Use os números para investigação, não como conclusão sobre força.",
+      };
+    }
+
+    const delta=personalRow.averagePlacement-selectedRow.averagePlacement;
+    if(delta<=-.5){
+      return {
+        tone:"good",
+        title:"No seu histórico, apareceu melhor que na base",
+        body:"Sua colocação média foi "+Math.abs(delta).toFixed(2)+" melhor. Isso descreve associação na amostra; não prova que o elemento causou o resultado.",
+      };
+    }
+
+    if(delta>=.5){
+      return {
+        tone:"warning",
+        title:"No seu histórico, apareceu pior que na base",
+        body:"Sua colocação média foi "+delta.toFixed(2)+" pior. Vale abrir as partidas para entender contexto de board, itens e lobby.",
+      };
+    }
+
+    return {
+      tone:"neutral",
+      title:"Seu resultado ficou próximo da base",
+      body:"A diferença de colocação média é pequena nesta amostra. O contexto da partida provavelmente importa mais que o número isolado.",
+    };
+  },[selectedRow]);
 
   const tiers=useMemo(()=>{
     const map:{S:typeof rows;A:typeof rows;B:typeof rows;C:typeof rows}={
@@ -303,6 +358,57 @@ export default function StatisticsPage({
       <span>{stats?.context.setNumber?"Set "+stats.context.setNumber:"Set atual"}</span>
     </section>
 
+    {!loading&&!error&&selectedRow&&<section className={"panel statistics-entity-detail "+(selectedInterpretation?.tone||"neutral")}>
+      <div className="statistics-detail-head">
+        <div className="statistics-detail-identity">
+          <span className={"statistics-detail-icon "+category}>
+            {imageFor(category,selectedRow.id,staticData)&&<img src={imageFor(category,selectedRow.id,staticData)} alt=""/>}
+          </span>
+          <div>
+            <span>LEITURA CONTEXTUAL</span>
+            <h2>{labelFor(category,selectedRow.id,staticData)}</h2>
+            <small>{selectedRow.id}</small>
+          </div>
+        </div>
+        <button onClick={()=>setSelectedEntityId(null)}>Fechar ×</button>
+      </div>
+
+      <div className="statistics-detail-grid">
+        <article>
+          <span>BASE CHIBI</span>
+          <strong>{selectedRow.averagePlacement}</strong>
+          <small>média · {selectedRow.games} jogos</small>
+          <div><b>Top 4 {selectedRow.top4Rate}%</b><b>Pick {selectedRow.pickRate}%</b><b>Win {selectedRow.winRate}%</b></div>
+        </article>
+
+        <article>
+          <span>SEU HISTÓRICO</span>
+          {selectedRow.personal?<>
+            <strong>{selectedRow.personal.averagePlacement}</strong>
+            <small>média · {selectedRow.personal.games} suas</small>
+            <div>
+              <b>Top 4 {selectedRow.personal.top4Rate}%</b>
+              <b>Win {selectedRow.personal.winRate}%</b>
+              <b>Δ {signed(selectedRow.personal.averagePlacement-selectedRow.averagePlacement)}</b>
+            </div>
+          </>:<>
+            <strong>—</strong>
+            <small>sem partidas carregadas com este elemento</small>
+          </>}
+        </article>
+
+        <article className={"statistics-detail-reading "+(selectedInterpretation?.tone||"neutral")}>
+          <span>O QUE ISSO SIGNIFICA</span>
+          <strong>{selectedInterpretation?.title}</strong>
+          <p>{selectedInterpretation?.body}</p>
+          {selectedRow.personal&&<button onClick={()=>onEvidence(
+            selectedRow.personal!.matchIds,
+            categoryLabel+" · "+labelFor(category,selectedRow.id,staticData),
+          )}>Abrir suas evidências</button>}
+        </article>
+      </div>
+    </section>}
+
     {loading&&<section className="panel meta-page-state">Carregando estatísticas...</section>}
     {!loading&&error&&<section className="panel meta-page-state error">Não foi possível carregar as estatísticas agora.</section>}
 
@@ -346,7 +452,19 @@ export default function StatisticsPage({
           const personalRow=row.personal;
           const delta=personalRow?personalRow.averagePlacement-row.averagePlacement:null;
 
-          return <article key={row.id}>
+          return <article
+            className={selectedEntityId===row.id?"selected":""}
+            role="button"
+            tabIndex={0}
+            onClick={()=>setSelectedEntityId(row.id)}
+            onKeyDown={event=>{
+              if(event.key==="Enter"||event.key===" "){
+                event.preventDefault();
+                setSelectedEntityId(row.id);
+              }
+            }}
+            key={row.id}
+          >
             <div className="statistics-entity">
               <b>{index+1}</b>
               <span className={"statistics-icon "+category}>
@@ -370,7 +488,10 @@ export default function StatisticsPage({
                   <b>{personalRow.averagePlacement}</b>
                   <small>{personalRow.games} suas · Δ {signed(delta||0)}</small>
                 </div>
-                <button onClick={()=>onEvidence(personalRow.matchIds,categoryLabel+" · "+label)}>Ver</button>
+                <button onClick={event=>{
+                  event.stopPropagation();
+                  onEvidence(personalRow.matchIds,categoryLabel+" · "+label);
+                }}>Ver</button>
               </>:<small>sem amostra pessoal</small>}
             </div>}
           </article>;
@@ -394,9 +515,8 @@ export default function StatisticsPage({
                 className="tier-entity"
                 title={label+" · média "+row.averagePlacement+" · "+row.games+" jogos"}
                 onClick={()=>{
-                  if(row.personal?.matchIds.length){
-                    onEvidence(row.personal.matchIds,"Tier "+tier+" · "+label);
-                  }
+                  setSelectedEntityId(row.id);
+                  setView("stats");
                 }}
                 key={row.id}
               >
