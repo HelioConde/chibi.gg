@@ -27,6 +27,9 @@ type PackageRow={
   variants:number;
   connectors:Array<{id:string;games:number}>;
   score:number;
+  usageRate:number;
+  flexScore:number;
+  confidence:"alta"|"média"|"inicial";
 };
 
 function avg(values:number[]){
@@ -133,6 +136,18 @@ function buildPackages(matches:TftMatch[]):PackageRow[]{
           .slice(0,3);
 
         const top4Rate=pct(top4,row.games.length);
+        const usageRate=pct(row.games.length,valid.length);
+        const flexScore=clamp(Math.round(
+          Math.min(35,row.games.length*6)+
+          Math.min(30,outsideSets.size*10)+
+          top4Rate*.25
+        ));
+        const packageConfidence:"alta"|"média"|"inicial"=
+          valid.length>=15&&row.games.length>=6&&outsideSets.size>=3
+            ?"alta"
+            :row.games.length>=3&&outsideSets.size>=2
+              ?"média"
+              :"inicial";
         const score=row.games.length*18+top4Rate*.45+(9-average)*5+Math.min(4,outsideSets.size)*5;
 
         return {
@@ -144,6 +159,9 @@ function buildPackages(matches:TftMatch[]):PackageRow[]{
           variants:outsideSets.size,
           connectors,
           score,
+          usageRate,
+          flexScore,
+          confidence:packageConfidence,
         };
       })
       .sort((a,b)=>b.score-a.score||a.avgPlacement-b.avgPlacement)
@@ -423,7 +441,10 @@ export default function ChibiLearningLab({matches,staticData,onEvidence}:Props){
             <article className="flex-package" key={pack.id}>
               <div className="flex-package-top">
                 <span>PACKAGE {String(index+1).padStart(2,"0")}</span>
-                <em>{pack.variants} variação{pack.variants===1?"":"ões"}</em>
+                <div className="flex-package-badges">
+                  <em>{pack.variants} variação{pack.variants===1?"":"ões"}</em>
+                  <b className={"package-confidence "+pack.confidence}>{pack.confidence}</b>
+                </div>
               </div>
               <div className="flex-core">
                 {pack.units.map(unitId=><Champion id={unitId} staticData={staticData} key={unitId}/>)}
@@ -431,8 +452,9 @@ export default function ChibiLearningLab({matches,staticData,onEvidence}:Props){
               <strong className="flex-package-names">{pack.units.map(id=>championName(id,staticData)).join(" + ")}</strong>
               <div className="flex-package-stats">
                 <span><small>Jogos</small><b>{pack.games.length}</b></span>
-                <span><small>Média</small><b>{pack.avgPlacement}</b></span>
+                <span><small>Uso</small><b>{pack.usageRate}%</b></span>
                 <span><small>Top 4</small><b>{pack.top4Rate}%</b></span>
+                <span><small>Flex</small><b>{pack.flexScore}</b></span>
               </div>
 
               <div className="flex-connectors">
@@ -464,7 +486,7 @@ export default function ChibiLearningLab({matches,staticData,onEvidence}:Props){
 
       <footer className="flex-package-method">
         <b>Como funciona nesta versão</b>
-        <span>O Chibi encontra campeões que reaparecem juntos nos seus boards, mede resultado e conta quantas variações foram usadas ao redor do núcleo. Futuramente isso pode ser cruzado com o dataset global.</span>
+        <span>O Chibi encontra campeões que reaparecem juntos, mede frequência, resultado e quantas variações existiram ao redor do núcleo. A confiança indica recorrência na sua própria amostra — não força global nem probabilidade de vitória. Futuramente isso pode ser cruzado com o dataset global.</span>
       </footer>
     </article>
   </section>;
