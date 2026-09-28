@@ -28,6 +28,8 @@ class TelemetryState:
         if message_type == "heartbeat":
             self.telemetry = replace(self.telemetry, connected=True, updated_at=time())
             return True
+        if message_type in {"feature_status", "gep_debug", "overwolf_game_status"}:
+            return isinstance(message.get("data"), dict)
         if message_type != "tft_live_snapshot" or not isinstance(message.get("data"), dict):
             return False
         self.telemetry = self._merge(message["data"], float(message.get("timestamp", time())) / 1000)
@@ -51,10 +53,11 @@ class TelemetryState:
     def _merge(self, data: dict[str, object], timestamp: float) -> TftTelemetry:
         me = data.get("me") if isinstance(data.get("me"), dict) else {}
         match = data.get("match_info") if isinstance(data.get("match_info"), dict) else {}
+        stage = data.get("stage") if isinstance(data.get("stage"), str) else match.get("stage")
         return TftTelemetry(
             connected=True,
             game_running=bool(data.get("gameRunning", self.telemetry.game_running)),
-            stage=self._value(match.get("stage"), str, timestamp, self.telemetry.stage),
+            stage=self._value(stage, str, timestamp, self.telemetry.stage),
             gold=self._value(me.get("gold"), int, timestamp, self.telemetry.gold),
             hp=self._value(me.get("health"), int, timestamp, self.telemetry.hp),
             level=self._value(me.get("level"), int, timestamp, self.telemetry.level),

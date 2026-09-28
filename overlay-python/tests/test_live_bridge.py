@@ -8,6 +8,7 @@ from websockets.asyncio.client import connect
 
 from chibi_overlay.live_bridge.server import LiveBridgeServer
 from chibi_overlay.live_bridge.state import TelemetryState
+from chibi_overlay.live_bridge.debug_report import OverwolfDebugReport
 
 
 def message(data: dict[str, object], version: int = 1) -> dict[str, object]:
@@ -49,6 +50,19 @@ def test_stale_values_are_marked_after_timeout() -> None:
     assert state.receive(message({"me": {"gold": 42}}))
     telemetry = state.refresh_staleness(now=1_006)
     assert telemetry.gold.stale is True
+
+
+def test_overwolf_report_captures_only_overwolf_validation_messages(tmp_path) -> None:
+    report = OverwolfDebugReport(tmp_path)
+    report.receive({"type": "hello", "data": {"source": "chibi-overwolf"}})
+    report.receive({"type": "overwolf_game_status", "data": {"gameRunning": True, "gameId": 5426}})
+    report.receive({"type": "gep_debug", "data": {"kind": "first_payload", "feature": "me", "payload": {"gold": "42"}}})
+    report.receive({"type": "tft_live_snapshot", "data": {"me": {"gold": 42}, "stage": "3-2", "board": []}})
+    assert json.loads((tmp_path / "me.first.json").read_text(encoding="utf-8"))["gold"] == "42"
+    validation = json.loads((tmp_path / "overwolf-validation-report.json").read_text(encoding="utf-8"))
+    assert validation["game_detected"] is True
+    assert validation["observed"]["gold"] is True
+    assert validation["observed"]["stage"] is True
 
 
 def test_loopback_server_handshake_and_reconnect() -> None:

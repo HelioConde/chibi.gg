@@ -8,6 +8,7 @@ import threading
 from websockets.asyncio.server import ServerConnection, serve
 
 from .state import TelemetryState
+from .debug_report import OverwolfDebugReport
 
 
 LOGGER = logging.getLogger("chibi.live_bridge")
@@ -16,8 +17,9 @@ LOGGER = logging.getLogger("chibi.live_bridge")
 class LiveBridgeServer:
     """Loopback-only WebSocket server. It accepts telemetry; it never controls a game."""
 
-    def __init__(self, state: TelemetryState | None = None, host: str = "127.0.0.1", port: int = 8765) -> None:
+    def __init__(self, state: TelemetryState | None = None, host: str = "127.0.0.1", port: int = 8765, report: OverwolfDebugReport | None = None) -> None:
         self.state = state or TelemetryState()
+        self.report = report or OverwolfDebugReport()
         self.host, self.port = host, port
         self._thread: threading.Thread | None = None
         self._loop: asyncio.AbstractEventLoop | None = None
@@ -59,7 +61,9 @@ class LiveBridgeServer:
                 if not self.state.receive(message):
                     await websocket.send(json.dumps({"type": "error", "message": "invalid_message"}))
                     continue
+                self.report.receive(message)
                 if message.get("type") == "hello":
                     await websocket.send(json.dumps({"type": "hello_ack", "source": "chibi-python", "version": 1}))
         finally:
             self.state.mark_disconnected()
+            self.report.mark_disconnected()
