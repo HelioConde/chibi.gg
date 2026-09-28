@@ -1374,7 +1374,7 @@ function App() {
                 <span>PRINCIPAL DESCOBERTA DO CHIBI</span>
                 <strong>{primaryReviewSignal
                   ? (primaryReviewSignal.subjectId
-                    ? traitName({name:primaryReviewSignal.subjectId,numUnits:0,style:0},staticData)+" · "+primaryReviewSignal.title
+                    ? (staticEntry(staticData?.traits,primaryReviewSignal.subjectId)?.name||fallbackTraitName(primaryReviewSignal.subjectId))+" · "+primaryReviewSignal.title
                     : primaryReviewSignal.title)
                   : "Ainda analisando sua amostra"}</strong>
                 <small>{primaryReviewSignal
