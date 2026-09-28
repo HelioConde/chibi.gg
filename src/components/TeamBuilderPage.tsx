@@ -7,6 +7,12 @@ import {
 } from "../tftStatic";
 import HexBoard, { HexBoardUnit } from "./HexBoard";
 import DDragonArt from "./DDragonArt";
+import {
+  BuilderPreset,
+  deleteBuilderPreset,
+  getBuilderPresets,
+  saveBuilderPreset,
+} from "../builderPresets";
 
 type Props={
   staticData:TftStaticData|null;
@@ -80,6 +86,8 @@ export default function TeamBuilderPage({
   const [units,setUnits]=useState<HexBoardUnit[]>([]);
   const [targetLevel,setTargetLevel]=useState(8);
   const [variantA,setVariantA]=useState<HexBoardUnit[]|null>(null);
+  const [savedPresets,setSavedPresets]=useState<BuilderPreset[]>(()=>getBuilderPresets());
+  const [copied,setCopied]=useState(false);
 
   useEffect(()=>{
     if(!initialChampionIds.length)return;
@@ -321,6 +329,60 @@ export default function TeamBuilderPage({
     setUnits(current=>current.map(unit=>unit.hex===hex?{...unit,tier}:unit));
   }
 
+  function saveCurrentBoard(){
+    if(!units.length)return;
+    const topTraits=traitCounts
+      .slice(0,2)
+      .map(([trait])=>staticEntry(staticData?.traits,trait)?.name||clean(trait))
+      .filter(Boolean);
+    const name=topTraits.length
+      ?topTraits.join(" · ")
+      :"Board "+new Date().toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
+    setSavedPresets(saveBuilderPreset({
+      name,
+      targetLevel,
+      units,
+    }));
+  }
+
+  function restorePreset(preset:BuilderPreset){
+    setUnits(preset.units.map(unit=>({...unit})));
+    setTargetLevel(preset.targetLevel);
+    setSelectedId(null);
+  }
+
+  async function copyBoardSummary(){
+    const names=units
+      .slice()
+      .sort((a,b)=>a.hex-b.hex)
+      .map(unit=>{
+        const entry=staticEntry(staticData?.champions,unit.id);
+        return (entry?.name||clean(unit.id))+" "+("★".repeat(Math.max(1,Math.min(3,unit.tier||1))));
+      });
+
+    const traits=traitCounts
+      .slice(0,6)
+      .map(([trait,count])=>{
+        const name=staticEntry(staticData?.traits,trait)?.name||clean(trait);
+        return name+" "+count;
+      });
+
+    const summary=[
+      "chibi.gg · Team Builder",
+      "Nível "+targetLevel+" · "+units.length+" unidades · "+boardValue+"G",
+      names.join(" · "),
+      traits.length?"Traits: "+traits.join(" · "):"",
+    ].filter(Boolean).join("\n");
+
+    try{
+      await navigator.clipboard.writeText(summary);
+      setCopied(true);
+      window.setTimeout(()=>setCopied(false),1600);
+    }catch{
+      setCopied(false);
+    }
+  }
+
   return <main className="builder-page builder-v2">
     <section className="builder-hero">
       <div>
@@ -356,6 +418,10 @@ export default function TeamBuilderPage({
           </div>
         </div>
         <div className="builder-summary-actions">
+          <button onClick={saveCurrentBoard} disabled={!units.length}>Salvar board</button>
+          <button className="secondary" onClick={copyBoardSummary} disabled={!units.length}>
+            {copied?"Resumo copiado ✓":"Copiar resumo"}
+          </button>
           <button onClick={()=>setVariantA(units.map(unit=>({...unit})))} disabled={!units.length}>
             {variantA?"Atualizar versão A":"Salvar como versão A"}
           </button>
@@ -428,6 +494,35 @@ export default function TeamBuilderPage({
               :"sem alteração estrutural"}</p>
           </div>
         </article>
+      </div>
+    </section>}
+
+    {savedPresets.length>0&&<section className="builder-saved-strip">
+      <div className="builder-saved-head">
+        <div>
+          <span>BOARDS SALVOS NESTE NAVEGADOR</span>
+          <strong>{savedPresets.length}/8</strong>
+        </div>
+        <small>local · sem conta</small>
+      </div>
+
+      <div className="builder-saved-list">
+        {savedPresets.map(preset=>(
+          <article key={preset.id}>
+            <button className="builder-saved-open" onClick={()=>restorePreset(preset)}>
+              <span>{preset.targetLevel}</span>
+              <div>
+                <strong>{preset.name}</strong>
+                <small>{preset.units.length} unidades · {new Date(preset.createdAt).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})}</small>
+              </div>
+            </button>
+            <button
+              className="builder-saved-delete"
+              onClick={()=>setSavedPresets(deleteBuilderPreset(preset.id))}
+              aria-label={"Excluir "+preset.name}
+            >×</button>
+          </article>
+        ))}
       </div>
     </section>}
 
