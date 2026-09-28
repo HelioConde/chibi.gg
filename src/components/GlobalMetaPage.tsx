@@ -6,6 +6,9 @@ type Props={
   staticData:TftStaticData|null;
   hasProfile:boolean;
   onBack:()=>void;
+  onOpenComps?:()=>void;
+  onOpenStats?:()=>void;
+  onOpenTier?:()=>void;
 };
 
 function clean(value:string){
@@ -37,7 +40,14 @@ function score(row:TftGlobalTraitStat){
   return placement*.45+top4*.35+sample*.2;
 }
 
-export default function GlobalMetaPage({staticData,hasProfile,onBack}:Props){
+export default function GlobalMetaPage({
+  staticData,
+  hasProfile,
+  onBack,
+  onOpenComps,
+  onOpenStats,
+  onOpenTier,
+}:Props){
   const [queueId,setQueueId]=useState<number|null>(1100);
   const [meta,setMeta]=useState<TftGlobalMeta|null>(null);
   const [loading,setLoading]=useState(true);
@@ -92,8 +102,8 @@ export default function GlobalMetaPage({staticData,hasProfile,onBack}:Props){
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>← Voltar ao perfil</button>}
         <span className="eyebrow">CHIBI DATASET</span>
-        <h1>Meta com contexto,<br/><em>não só tier list.</em></h1>
-        <p>Veja o que aparece nas partidas observadas pelo Chibi, sempre com tamanho da amostra e confiança visíveis.</p>
+        <h1>Seu ponto de entrada<br/><em>para o meta do TFT.</em></h1>
+        <p>Comps, statistics, tier list e traits observadas em um único lugar, sempre com tamanho da amostra e confiança visíveis.</p>
       </div>
 
       <div className={"meta-dataset-card "+maturity}>
@@ -103,6 +113,29 @@ export default function GlobalMetaPage({staticData,hasProfile,onBack}:Props){
         <b>{maturity}</b>
       </div>
     </div>
+
+    <section className="meta-hub-links">
+      <button className="active">
+        <span>VISÃO GERAL</span>
+        <strong>Meta agora</strong>
+        <small>sinais do Chibi Dataset</small>
+      </button>
+      <button onClick={onOpenComps}>
+        <span>COMPS</span>
+        <strong>Boards observados</strong>
+        <small>desempenho + compatibilidade pessoal</small>
+      </button>
+      <button onClick={onOpenStats}>
+        <span>STATISTICS</span>
+        <strong>Champions / Traits / Items / Augments</strong>
+        <small>números completos e comparação pessoal</small>
+      </button>
+      <button onClick={onOpenTier}>
+        <span>TIER LIST</span>
+        <strong>S / A / B / C</strong>
+        <small>visualização do sinal composto</small>
+      </button>
+    </section>
 
     <div className="meta-toolbar">
       <div>
