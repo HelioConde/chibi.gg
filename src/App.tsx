@@ -23,6 +23,7 @@ import { buildActionPlan } from "./analysis/actionPlan";
 import ChibiInnovations from "./components/ChibiInnovations";
 import ChibiReview from "./components/ChibiReview";
 import ChibiLearningLab from "./components/ChibiLearningLab";
+import ChibiStudyShare, { studyFocusById } from "./components/ChibiStudyShare";
 import MatchJournal from "./components/MatchJournal";
 import PatchAdaptation from "./components/PatchAdaptation";
 import BoardCounterfactual from "./components/BoardCounterfactual";
@@ -231,6 +232,23 @@ function AugmentVisual({id,staticData}:{id:string;staticData:TftStaticData|null}
   </span>;
 }
 
+type StudyRequest={
+  matchId:string;
+  focusId:string;
+  note:string;
+};
+
+function readStudyRequest():StudyRequest|null{
+  const params=new URLSearchParams(window.location.search);
+  const matchId=params.get("study")?.trim()||"";
+  if(!matchId)return null;
+  return {
+    matchId,
+    focusId:params.get("focus")?.trim()||"lost",
+    note:params.get("note")?.trim().slice(0,220)||"",
+  };
+}
+
 type ProfileTab = "overview"|"coach"|"matches"|"share";
 
 function parseProfileTab(value:string|null):ProfileTab{
@@ -285,6 +303,8 @@ function App() {
   const [builderPreset,setBuilderPreset]=useState<string[]>([]);
   const [recentPlayers,setRecentPlayers]=useState<RecentPlayer[]>(()=>getRecentPlayers());
   const [copiedAnalysisLink,setCopiedAnalysisLink]=useState(false);
+  const [studyRequest,setStudyRequest]=useState<StudyRequest|null>(()=>readStudyRequest());
+  const [studyOpenedMatchId,setStudyOpenedMatchId]=useState("");
   const [statsTarget,setStatsTarget]=useState<{
     category:StatisticsCategory;
     query:string;
@@ -335,6 +355,8 @@ function App() {
       setProfileTab(parseProfileTab(nextParams.get("tab")));
       const raw=Number(nextParams.get("queue"));
       setSelectedQueue(Number.isFinite(raw)&&raw>0?raw:null);
+      setStudyRequest(readStudyRequest());
+      setStudyOpenedMatchId("");
     };
 
     const onHashChange=()=>{
@@ -398,6 +420,19 @@ function App() {
     const filtered=currentSetMatches.filter((m)=>Number(m.queueId)===Number(selectedQueue));
     return filtered.length ? filtered : currentSetMatches;
   },[currentSetMatches,selectedQueue]);
+
+  useEffect(()=>{
+    if(!profile||!studyRequest||studyOpenedMatchId===studyRequest.matchId)return;
+    const target=analysisMatches.find(match=>match.id===studyRequest.matchId);
+    if(!target)return;
+
+    const focus=studyFocusById(studyRequest.focusId);
+    setStudyOpenedMatchId(studyRequest.matchId);
+    setEvidenceIds([studyRequest.matchId]);
+    setEvidenceLabel("Chibi Study · "+focus.label);
+    setProfileTab("matches");
+    void openMatch(target);
+  },[profile,analysisMatches,studyRequest,studyOpenedMatchId]);
 
   const staticCurrentSet=useMemo(()=>latestTftSetNumber(staticData),[staticData]);
   const isHistoricalSet=Boolean(currentSet&&staticCurrentSet&&currentSet<staticCurrentSet);
@@ -1283,13 +1318,19 @@ function App() {
             </div>
           </>}
 
-          {profileTab==="share"&&<ChibiShareCard
-            profile={profile}
-            dna={dna}
-            matches={analysisMatches}
-            staticData={staticData}
-            shareUrl={window.location.href}
-          />}
+          {profileTab==="share"&&<>
+            <ChibiShareCard
+              profile={profile}
+              dna={dna}
+              matches={analysisMatches}
+              staticData={staticData}
+              shareUrl={window.location.href}
+            />
+            <ChibiStudyShare
+              profile={profile}
+              matches={analysisMatches}
+            />
+          </>}
 
           {profileTab==="matches"&&<>
             <section className="matches-priority-bar">
@@ -1544,6 +1585,17 @@ function App() {
             {matchError && <div className="match-state error">{matchError}</div>}
 
             {selectedMatch && <>
+              {openedMatch&&studyRequest?.matchId===openedMatch.id&&(()=>{
+                const focus=studyFocusById(studyRequest.focusId);
+                return <div className="study-match-banner">
+                  <div>
+                    <span>CHIBI STUDY</span>
+                    <strong>{focus.question}</strong>
+                    <small>{focus.hint}</small>
+                  </div>
+                  {studyRequest.note&&<blockquote>{studyRequest.note}</blockquote>}
+                </div>;
+              })()}
               <div className="match-modal-head">
                 <div>
                   <span>REVIEW DA PARTIDA</span>
