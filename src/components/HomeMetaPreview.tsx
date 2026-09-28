@@ -77,80 +77,70 @@ export default function HomeMetaPreview({
     return ()=>{cancelled=true;};
   },[]);
 
-  const topChampions=stats?.champions.slice(0,6)||[];
-  const topTraits=stats?.traits.slice(0,4)||[];
-  const topComps=comps?.comps.slice(0,4)||[];
+  const topTraits=stats?.traits.slice(0,3)||[];
+  const topComps=comps?.comps.slice(0,3)||[];
 
-  return <section className="home-meta-preview">
-    <div className="home-meta-head">
+  return <section className="home-meta-preview home-meta-preview-v2">
+    <div className="home-meta-intro-v2">
       <div>
-        <span>TFT AGORA</span>
-        <h2>{stats?.context.setNumber?"Set "+stats.context.setNumber:"Meta observado no Chibi"}</h2>
-        <p>Uma prévia rápida do dataset antes mesmo de abrir um perfil.</p>
+        <span>DADOS EM TEMPO REAL</span>
+        <h2>O que está funcionando agora.</h2>
+        <p>Uma leitura curta do dataset observado pelo Chibi. Entre no Meta quando quiser aprofundar.</p>
       </div>
-      <div className="home-meta-head-actions">
-        <span>{staticData?.version?"Data Dragon "+staticData.version:"dados TFT"}</span>
-        <button onClick={onOpenMeta}>Abrir Meta →</button>
-      </div>
+      <button onClick={onOpenMeta}>Ver Meta completo →</button>
     </div>
 
-    <div className="home-meta-grid">
-      <article className="home-meta-card comps-card">
-        <div className="home-meta-card-head">
-          <div><span>COMPS</span><strong>Boards observados</strong></div>
-          <button onClick={onOpenComps}>Ver todas</button>
+    <div className="home-meta-grid-v2">
+      <article className="home-meta-simple-card">
+        <div className="home-meta-simple-head">
+          <div>
+            <span>TOP COMPS</span>
+            <strong>Boards observados</strong>
+          </div>
+          <button onClick={onOpenComps}>Ver todas →</button>
         </div>
-        <div className="home-comp-list">
+        <div className="home-meta-simple-list">
           {topComps.length?topComps.map((comp,index)=>(
             <button onClick={onOpenComps} key={comp.id}>
               <b>{index+1}</b>
               <span>
                 <strong>{comp.traits.slice(0,2).map(row=>label("traits",row.id,staticData)).join(" · ")||"Comp observada"}</strong>
-                <small>{comp.games} jogos · média {comp.averagePlacement} · Top 4 {comp.top4Rate}%</small>
+                <small>{comp.games} jogos · média {comp.averagePlacement}</small>
               </span>
-              <em>{comp.confidence}</em>
+              <em>{comp.top4Rate}%</em>
             </button>
           )):<div className="home-meta-loading">Construindo comps observadas...</div>}
         </div>
       </article>
 
-      <article className="home-meta-card champions-card">
-        <div className="home-meta-card-head">
-          <div><span>CHAMPIONS</span><strong>Destaques da base</strong></div>
-          <button onClick={()=>onOpenStats("champions")}>Statistics</button>
+      <article className="home-meta-simple-card">
+        <div className="home-meta-simple-head">
+          <div>
+            <span>TRAITS FORTES</span>
+            <strong>Synergies observadas</strong>
+          </div>
+          <button onClick={()=>onOpenStats("traits")}>Ver todas →</button>
         </div>
-        <div className="home-champion-grid">
-          {topChampions.length?topChampions.map(row=>{
-            const name=label("champions",row.id,staticData);
-            const src=image("champions",row.id,staticData);
-            return <button onClick={()=>onOpenStats("champions",name)} key={row.id}>
-              <span>{src&&<img src={src} alt=""/>}</span>
-              <strong>{name}</strong>
-              <small>{row.averagePlacement} avg · {row.top4Rate}% Top 4</small>
-            </button>;
-          }):<div className="home-meta-loading">Carregando champions...</div>}
-        </div>
-      </article>
-
-      <article className="home-meta-card traits-card">
-        <div className="home-meta-card-head">
-          <div><span>TRAITS</span><strong>Synergies observadas</strong></div>
-          <button onClick={()=>onOpenStats("traits")}>Statistics</button>
-        </div>
-        <div className="home-trait-list">
-          {topTraits.length?topTraits.map(row=>{
+        <div className="home-meta-simple-list traits">
+          {topTraits.length?topTraits.map((row,index)=>{
             const name=label("traits",row.id,staticData);
             const src=image("traits",row.id,staticData);
             return <button onClick={()=>onOpenStats("traits",name)} key={row.id}>
-              <span>{src&&<img src={src} alt=""/>}</span>
-              <div><strong>{name}</strong><small>{row.games} jogos · média {row.averagePlacement}</small></div>
-              <b>{row.top4Rate}%</b>
+              <b>{index+1}</b>
+              <span className="home-meta-trait-copy">
+                <i>{src&&<img src={src} alt=""/>}</i>
+                <span>
+                  <strong>{name}</strong>
+                  <small>{row.games} jogos · média {row.averagePlacement}</small>
+                </span>
+              </span>
+              <em>{row.top4Rate}%</em>
             </button>;
           }):<div className="home-meta-loading">Carregando traits...</div>}
         </div>
       </article>
     </div>
 
-    <p className="home-meta-disclaimer">Prévia baseada no Chibi Dataset observado. Não representa toda a população de TFT.</p>
+    <small className="home-meta-disclaimer-v2">Dataset observado pelo Chibi; não representa toda a população de TFT.</small>
   </section>;
 }
