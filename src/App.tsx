@@ -31,6 +31,7 @@ import StyleShift from "./components/StyleShift";
 import GlobalMetaPage from "./components/GlobalMetaPage";
 import CompsPage from "./components/CompsPage";
 import AskChibi from "./components/AskChibi";
+import ChibiMemory from "./components/ChibiMemory";
 
 function cleanName(value:string){
   return value
@@ -682,6 +683,12 @@ function App() {
               journalVersion={journalVersion}
               onEvidence={showEvidence}
             />
+
+            <ChibiMemory
+              playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
+              matches={analysisMatches}
+            />
+
             <details className="secondary-analysis">
               <summary><span><b>Ver mudança de estilo recente</b><small>Compare blocos recentes sem tratar variação como evolução de habilidade</small></span><em>Style Shift</em></summary>
               <StyleShift matches={analysisMatches}/>
