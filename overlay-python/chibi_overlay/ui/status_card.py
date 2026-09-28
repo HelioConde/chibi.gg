@@ -41,3 +41,6 @@ class GameStatusCard(QFrame):
         self.style().unpolish(self)
         self.style().polish(self)
 
+    def set_message(self, title: str, description: str) -> None:
+        self.title.setText(title)
+        self.description.setText(description)

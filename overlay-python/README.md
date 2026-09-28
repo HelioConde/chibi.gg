@@ -1,8 +1,30 @@
-# Chibi Companion — Python Overlay v1
+# Chibi Session Companion — Python Overlay V3
 
 Primeira versão desktop em Python do Companion do **chibi.gg**.
 
-O objetivo desta base é ter uma janela leve, sempre no topo e independente do navegador, preparada para receber snapshots locais do Chibi e servir como ferramenta de **captura/revisão**.
+O objetivo desta base é acompanhar a intenção antes da partida, o estado confiável durante a sessão e a revisão depois dela — sem inventar um HUD de TFT.
+
+## Sessões, foco e fontes
+
+Ao entrar em `MATCHMAKING`, o Companion cria uma `ChibiSession` local com Riot ID, PUUID, fila, tipo ranqueado, participantes e foco selecionado. A sessão acompanha ready check, início de jogo, pós-partida e consulta de resultado em intervalos graduais. Registros ficam em `%APPDATA%\ChibiOverlay\sessions\` e são retidos nas últimas 30 sessões.
+
+No lobby, selecione um foco: Economia, Posicionamento, Flexibilidade, Itens, Tempo de decisão ou Personalizado. O foco aparece no game mode compacto durante a partida.
+
+As fontes continuam separadas:
+
+- `RIOT LIVE`: estado, Riot ID, queue, modo, ranked e participantes fornecidos pelo cliente local;
+- `REVIEW SNAPSHOT`: contexto de revisão somente em lobby/pós-partida;
+- `CHIBI PROFILE`: reservado para a futura API Chibi.
+
+Não existe fonte local verificada para stage, HP, gold, level, streak, board, bench, shop, itens, traits, augments, oponente ou resultado de combate. Nenhum desses dados é mostrado em estados live.
+
+## Presets
+
+- `REVIEW`: lobby e pós-partida;
+- `SESSION`: fila, preparação e partida;
+- `MINIMAL`: ready check, aceite e recusa.
+
+Com `auto_compact_in_game` ativo, o conteúdo e tamanho mudam sem alterar a posição X/Y escolhida pelo jogador.
 
 ## O que já funciona
 
@@ -66,7 +88,7 @@ O click-through deve ser alternado pela hotkey porque, quando ativo, o mouse pas
 
 Por padrão o app usa `%APPDATA%\ChibiOverlay\snapshot.json`.
 
-Na primeira execução ele cria automaticamente um snapshot de demonstração.
+Na execução normal ele cria um snapshot de revisão vazio. Valores de demonstração existem apenas com `--demo`.
 
 Também é possível iniciar apontando para outro arquivo:
 
@@ -97,11 +119,12 @@ O Companion apenas lê a LCU local: ele nunca aceita partidas, envia requests de
 
 A integração futura deve preferir dados do próprio Chibi e snapshots explicitamente registrados, mantendo o Companion útil para contexto e revisão.
 
-## Próximas etapas
+## API Chibi e build
 
-1. conectar perfil/sessão do site ao snapshot local;
-2. substituir letras do board por assets reais do Data Dragon;
-3. adicionar tray icon;
-4. criar presets Compacto / Coach / Completo;
-5. empacotar `.exe` com PyInstaller;
-6. adicionar atualização automática do aplicativo.
+`ChibiApiClient` separa a UI de uma futura API do chibi.gg. A implementação atual é local/mock e não inventa URLs, endpoints nem resultados. Quando houver contrato HTTP real, ela poderá fornecer perfil e resultado de sessão sem alterar o GameflowMonitor.
+
+Para gerar o executável Windows:
+
+    python -m PyInstaller --noconfirm --clean --noconsole --name ChibiCompanion app.py
+
+O workflow `build-python-overlay.yml` valida testes e envia o artifact `ChibiCompanion-Windows`; não há release automática.

@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
     QFrame,
     QGridLayout,
     QHBoxLayout,
+    QInputDialog,
     QLabel,
     QMainWindow,
     QPushButton,
@@ -23,6 +24,7 @@ from .hotkeys import HotkeyManager
 from .models import OverlaySnapshot, fields_for_overlay
 from .riot.gameflow import DemoGameflowMonitor, GameflowMonitor
 from .riot.models import FieldSource, GameState, GameStateSnapshot
+from .session import SESSION_FOCUSES, ChibiSession, SessionFocus, SessionManager
 from .storage import LocalStore
 from .ui.status_card import GameStatusCard
 from .ui.tray import TrayController
@@ -39,7 +41,8 @@ class HotkeySignals(QObject):
 
 class OverlayWindow(QMainWindow):
     EXPANDED_SIZE = (540, 610)
-    COMPACT_SIZE = (370, 190)
+    MINIMAL_SIZE = (320, 135)
+    SESSION_SIZE = (350, 180)
     LIVE_SESSION_STATES = {
         GameState.MATCHMAKING,
         GameState.READY_CHECK,
@@ -53,19 +56,23 @@ class OverlayWindow(QMainWindow):
         super().__init__()
         self.store = store
         self.riot_state = GameStateSnapshot(state=GameState.CLIENT_OFFLINE)
+        self.chibi_session: ChibiSession | None = None
         self.monitor = DemoGameflowMonitor(self) if demo else GameflowMonitor(parent=self)
         self.demo = demo
         self._quitting = False
         self.settings = store.load_settings()
         self.snapshot = OverlaySnapshot()
         self.compact = bool(self.settings.get("compact", False))
+        self.preset = str(self.settings.get("preset", "review")).lower()
         self.auto_compact_in_game = bool(
             self.settings.get("auto_compact_in_game", True)
         )
         self.auto_compacted = False
         self.user_mode_before_game = self.compact
         self.locked = bool(self.settings.get("locked", False))
-        self.clickthrough = bool(self.settings.get("clickthrough", False))
+        self.clickthrough = bool(
+            self.settings.get("clickthrough", self.settings.get("click_through", False))
+        )
         self.drag_origin: QPoint | None = None
         self.drag_window_origin: QPoint | None = None
 
@@ -85,16 +92,22 @@ class OverlayWindow(QMainWindow):
         self._apply_mode()
         self._setup_hotkeys()
         self._setup_snapshot_watch()
+        self.session_manager = SessionManager(store, parent=self)
         self.refresh_snapshot(force=True)
         self.tray = TrayController(
             show_overlay=self.show_overlay,
-            toggle_visibility=self.toggle_visibility,
+            hide_overlay=self.hide_overlay,
             toggle_compact=self.toggle_compact,
+            set_session_mode=self.set_session_mode,
             toggle_clickthrough=self.toggle_clickthrough,
             data_dir=self.store.settings_path.parent,
             quit_app=self.request_exit,
         )
-        self.monitor.state_changed.connect(self._on_riot_state)
+        self.monitor.state_changed.connect(self.session_manager.on_gameflow)
+        self.session_manager.updated.connect(self._on_session_update)
+        self.session_timer = QTimer(self)
+        self.session_timer.timeout.connect(self._poll_session_result)
+        self.session_timer.start(1000)
         self.monitor.start()
         if self.clickthrough:
             QTimer.singleShot(0, lambda: self._set_windows_clickthrough(True))
@@ -158,6 +171,11 @@ class OverlayWindow(QMainWindow):
         self.status_card = GameStatusCard()
         layout.addWidget(self.status_card)
 
+        self.retry_result_button = QPushButton("TENTAR RESULTADO NOVAMENTE")
+        self.retry_result_button.setToolTip("Consultar novamente quando o histórico Riot estiver disponível")
+        self.retry_result_button.clicked.connect(self._retry_session_result)
+        layout.addWidget(self.retry_result_button)
+
         self.rank_label = QLabel("Perfil ainda não conectado")
         self.rank_label.setObjectName("rankLabel")
         layout.addWidget(self.rank_label)
@@ -200,17 +218,37 @@ class OverlayWindow(QMainWindow):
         focus_layout = QVBoxLayout(self.focus_card)
         focus_layout.setContentsMargins(11, 9, 11, 9)
         focus_layout.setSpacing(4)
-        focus_caption = QLabel("FOCO DA SESSÃO · REVIEW")
-        focus_caption.setObjectName("sectionCaption")
+        self.focus_caption = QLabel("FOCO DA PRÓXIMA SESSÃO")
+        self.focus_caption.setObjectName("sectionCaption")
         self.focus_title = QLabel("Revise uma decisão por vez")
         self.focus_title.setObjectName("focusTitle")
         self.focus_title.setWordWrap(True)
         self.avoid_label = QLabel("")
         self.avoid_label.setObjectName("muted")
         self.avoid_label.setWordWrap(True)
-        focus_layout.addWidget(focus_caption)
+        focus_layout.addWidget(self.focus_caption)
         focus_layout.addWidget(self.focus_title)
         focus_layout.addWidget(self.avoid_label)
+
+        self.focus_selector = QWidget()
+        focus_buttons = QGridLayout(self.focus_selector)
+        focus_buttons.setContentsMargins(0, 3, 0, 0)
+        focus_buttons.setHorizontalSpacing(4)
+        focus_buttons.setVerticalSpacing(4)
+        self.focus_buttons: dict[str, QPushButton] = {}
+        for index, focus in enumerate(SESSION_FOCUSES):
+            button = QPushButton(focus.label)
+            button.setObjectName("focusButton")
+            button.setToolTip(focus.description)
+            button.clicked.connect(lambda _checked=False, item=focus: self._select_focus(item))
+            focus_buttons.addWidget(button, index // 2, index % 2)
+            self.focus_buttons[focus.id] = button
+        custom_button = QPushButton("Personalizado")
+        custom_button.setObjectName("focusButton")
+        custom_button.clicked.connect(self._select_custom_focus)
+        focus_buttons.addWidget(custom_button, 3, 0, 1, 2)
+        self.focus_buttons["custom"] = custom_button
+        focus_layout.addWidget(self.focus_selector)
         layout.addWidget(self.focus_card)
 
         self.detail_wrap = QWidget()
@@ -412,6 +450,17 @@ class OverlayWindow(QMainWindow):
             font-size: 13px;
             font-weight: 900;
         }
+        #focusButton {
+            min-width: 0;
+            min-height: 22px;
+            padding: 2px 5px;
+            font-size: 9px;
+        }
+        #focusButton[selected="true"] {
+            border-color: #8d78f6;
+            color: #f2efff;
+            background: #29234b;
+        }
         #score {
             color: #a995ff;
             font-size: 12px;
@@ -466,9 +515,35 @@ class OverlayWindow(QMainWindow):
         self.snapshot_timer.timeout.connect(self.refresh_snapshot)
         self.snapshot_timer.start(1000)
 
-    def _on_riot_state(self, snapshot: GameStateSnapshot) -> None:
+    def _on_session_update(
+        self, snapshot: GameStateSnapshot, session: ChibiSession | None
+    ) -> None:
         self.riot_state = snapshot
+        self.chibi_session = session
         self.render_snapshot()
+
+    def _poll_session_result(self) -> None:
+        self.session_manager.poll_result()
+        if self.riot_state.state is GameState.POST_GAME:
+            self.chibi_session = self.session_manager.current
+            self.render_snapshot()
+
+    def _retry_session_result(self) -> None:
+        self.session_manager.retry_result()
+        self.chibi_session = self.session_manager.current
+        self.render_snapshot()
+
+    def _select_focus(self, focus: SessionFocus) -> None:
+        self.session_manager.set_focus(focus)
+        self.render_snapshot()
+
+    def _select_custom_focus(self) -> None:
+        description, accepted = QInputDialog.getText(
+            self, "Foco personalizado", "Qual foco você quer levar para a próxima sessão?"
+        )
+        if accepted and description.strip():
+            self.session_manager.set_custom_focus(description)
+            self.render_snapshot()
 
     def refresh_snapshot(self, force: bool = False) -> None:
         if not force and not self.store.snapshot_changed():
@@ -494,8 +569,35 @@ class OverlayWindow(QMainWindow):
         self.live_label.setText("REVIEW SNAPSHOT" if is_review_context else "RIOT LIVE")
         self.connection_badge.setText("RIOT CONECTADO" if riot.connected else "RIOT OFFLINE")
         self.status_card.set_snapshot(riot)
-        self.focus_title.setText(snap.focus or "Revise uma decisão por vez")
-        self.avoid_label.setText(f"Evitar: {snap.avoid}" if snap.avoid else "")
+        if riot.state is GameState.POST_GAME and self.chibi_session:
+            if self.chibi_session.result:
+                placement = self.chibi_session.result.placement
+                title = f"{placement}º LUGAR" if placement else "PARTIDA PROCESSADA"
+                self.status_card.set_message(title, "Partida processada.")
+            elif self.chibi_session.result_unavailable:
+                self.status_card.set_message(
+                    "RESULTADO AINDA NÃO DISPONÍVEL", "Aguardando histórico Riot..."
+                )
+        self.retry_result_button.setVisible(
+            riot.state is GameState.POST_GAME
+            and bool(self.chibi_session and self.chibi_session.result_unavailable)
+        )
+        focus = self.session_manager.selected_focus
+        if self.chibi_session and self.chibi_session.focus_description:
+            focus = SessionFocus(
+                self.chibi_session.focus_id or "custom",
+                self.chibi_session.focus_label or "Foco",
+                self.chibi_session.focus_description,
+            )
+        self.focus_title.setText(focus.description)
+        self.focus_caption.setText(
+            "FOCO" if riot.state is GameState.IN_GAME else "FOCO DA PRÓXIMA SESSÃO"
+        )
+        self.avoid_label.setText("")
+        for focus_id, button in self.focus_buttons.items():
+            button.setProperty("selected", focus_id == focus.id)
+            button.style().unpolish(button)
+            button.style().polish(button)
         self.stat_labels["stage"].setText(self._field_text(fields.stage))
         self.stat_labels["hp"].setText(self._field_text(fields.hp))
         self.stat_labels["gold"].setText(self._field_text(fields.gold))
@@ -579,7 +681,11 @@ class OverlayWindow(QMainWindow):
             is FieldSource.REVIEW
         )
 
-        self.rank_label.setVisible(is_review_context or state in self.LIVE_SESSION_STATES)
+        active_preset = self._active_preset()
+        self.rank_label.setVisible(
+            is_review_context
+            or state in {GameState.MATCHMAKING, GameState.CHAMP_SELECT, GameState.IN_GAME}
+        )
         self.live_label.setVisible(
             is_review_context
             or (state in self.LIVE_SESSION_STATES and state is not GameState.IN_GAME)
@@ -587,28 +693,62 @@ class OverlayWindow(QMainWindow):
         self.stats_wrap.setVisible(
             is_review_context and not self._is_compact() and has_review_stats
         )
-        self.focus_card.setVisible(is_review_context and not self._is_compact())
+        self.focus_card.setVisible(
+            (is_review_context and not self._is_compact())
+            or (state is GameState.IN_GAME and active_preset == "session")
+        )
+        self.focus_selector.setVisible(
+            state is GameState.LOBBY and active_preset == "review"
+        )
         self.detail_wrap.setVisible(is_review_context and not self._is_compact())
         self.board_card.setVisible(
             is_review_context and not self._is_compact() and has_review_board
         )
         self.review_card.setVisible(is_review_context and not self._is_compact())
-        self.footer_wrap.setVisible(not self.auto_compacted)
+        self.footer_wrap.setVisible(active_preset == "review")
 
     def _is_compact(self) -> bool:
-        return self.compact or self.auto_compacted
+        return self._active_preset() != "review"
+
+    def _active_preset(self) -> str:
+        state = self.riot_state.state
+        if self.auto_compact_in_game:
+            if state in {
+                GameState.READY_CHECK,
+                GameState.READY_CHECK_ACCEPTED,
+                GameState.READY_CHECK_DECLINED,
+            }:
+                return "minimal"
+            if state in {GameState.MATCHMAKING, GameState.CHAMP_SELECT, GameState.IN_GAME}:
+                return "session"
+            if state is GameState.POST_GAME:
+                return "review"
+        return "minimal" if self.compact else self.preset
 
     def _apply_mode(self) -> None:
-        compact = self._is_compact()
+        preset = self._active_preset()
+        compact = preset != "review"
         self.detail_wrap.setVisible(not compact)
         self.stats_wrap.setVisible(not compact)
         self.focus_card.setVisible(not compact)
-        width, height = self.COMPACT_SIZE if compact else self.EXPANDED_SIZE
+        if preset == "minimal":
+            width, height = self.MINIMAL_SIZE
+        elif preset == "session":
+            width, height = self.SESSION_SIZE
+        else:
+            width, height = self.EXPANDED_SIZE
         self.resize(width, height)
         self.compact_button.setText("↗" if compact else "↕")
 
     def toggle_compact(self) -> None:
         self.compact = not self.compact
+        self.preset = "minimal" if self.compact else "review"
+        self.render_snapshot()
+        self._save_settings()
+
+    def set_session_mode(self) -> None:
+        self.compact = False
+        self.preset = "session"
         self.render_snapshot()
         self._save_settings()
 
@@ -698,19 +838,25 @@ class OverlayWindow(QMainWindow):
             self.move(area.right() - self.EXPANDED_SIZE[0] - 24, area.top() + 64)
 
     def _save_settings(self) -> None:
-        self.store.save_settings(
+        settings = self.store.load_settings()
+        settings.update(
             {
                 "x": self.x(),
                 "y": self.y(),
                 "opacity": round(self.windowOpacity(), 2),
                 "compact": self.compact,
+                "preset": self.preset,
+                "auto_compact_in_game": self.auto_compact_in_game,
                 "locked": self.locked,
                 "clickthrough": self.clickthrough,
+                "click_through": self.clickthrough,
+                "start_with_windows": bool(settings.get("start_with_windows", False)),
                 "monitor": QApplication.screenAt(self.frameGeometry().center()).name()
                 if QApplication.screenAt(self.frameGeometry().center())
                 else "",
             }
         )
+        self.store.save_settings(settings)
 
     def _setup_hotkeys(self) -> None:
         self.hotkey_signals = HotkeySignals()
@@ -735,6 +881,9 @@ class OverlayWindow(QMainWindow):
         self.show()
         self.raise_()
         self.activateWindow()
+
+    def hide_overlay(self) -> None:
+        self.hide()
 
     def request_exit(self) -> None:
         self._quitting = True

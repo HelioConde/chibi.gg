@@ -13,8 +13,9 @@ class TrayController:
         self,
         *,
         show_overlay: Callable[[], None],
-        toggle_visibility: Callable[[], None],
+        hide_overlay: Callable[[], None],
         toggle_compact: Callable[[], None],
+        set_session_mode: Callable[[], None],
         toggle_clickthrough: Callable[[], None],
         data_dir: Path,
         quit_app: Callable[[], None],
@@ -27,8 +28,10 @@ class TrayController:
         tray.setToolTip("Chibi Companion")
         menu = QMenu()
         self._action(menu, "Abrir Chibi", show_overlay)
-        self._action(menu, "Mostrar/Ocultar Overlay", toggle_visibility)
-        self._action(menu, "Compacto/Expandido", toggle_compact)
+        self._action(menu, "Mostrar Overlay", show_overlay)
+        self._action(menu, "Ocultar Overlay", hide_overlay)
+        self._action(menu, "Modo compacto", toggle_compact)
+        self._action(menu, "Modo sessão", set_session_mode)
         self._action(menu, "Ativar Click-through", toggle_clickthrough)
         self._action(menu, "Abrir pasta de dados", lambda: QDesktopServices.openUrl(QUrl.fromLocalFile(str(data_dir))))
         menu.addSeparator()
