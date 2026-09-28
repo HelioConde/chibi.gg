@@ -12013,3 +12013,62 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
   .pool-line-stats,.pool-line-actions{grid-column:1/-1;grid-row:auto}
   .pool-line-actions{display:grid;grid-template-columns:1fr 1fr}
 }
+
+
+/* Board Reading Drill — learn from similar personal boards */
+.chibi-board-drill{padding:2px}
+.board-drill-empty{padding:16px;border:1px dashed #2a3245;border-radius:11px;background:#0c1119}
+.board-drill-empty span,.drill-head>div:first-child>span{display:block;color:#8f7cff;font-size:7px;font-weight:900;letter-spacing:.9px}
+.board-drill-empty strong{display:block;margin-top:4px;font-size:11px}
+.board-drill-empty p{margin:4px 0 0;color:#727d92;font-size:8px;line-height:1.45}
+
+.drill-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.drill-head h3{margin:5px 0 4px;font-size:16px;letter-spacing:-.3px}
+.drill-head p{margin:0;color:#7e899d;font-size:8px;line-height:1.5}
+.drill-score{min-width:78px;border:1px solid rgba(117,99,231,.24);background:rgba(117,99,231,.06);border-radius:10px;padding:8px 10px;text-align:center}
+.drill-score small{display:block;color:#6e7890;font-size:6px;font-weight:900;letter-spacing:.7px}
+.drill-score strong{display:block;margin:2px 0;color:#cabfff;font-size:18px}
+.drill-score span{display:block;color:#687287;font-size:6px}
+
+.drill-versus{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:center;margin-top:12px}
+.drill-versus>b{color:#5f687e;font-size:9px}
+.drill-board{border:1px solid #252e41;background:#0d131c;color:#dbe1ef;border-radius:11px;padding:10px;text-align:left}
+.drill-board:hover,.drill-board.chosen{border-color:#6d5ada;background:#111725}
+.drill-board.chosen{box-shadow:inset 0 0 0 1px rgba(117,99,231,.12)}
+.drill-board-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.drill-board-head span{color:#8f7cff;font-size:7px;font-weight:900;letter-spacing:.8px}
+.drill-board-head strong{font-size:8px}
+.drill-units{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.drill-unit{position:relative;width:34px;height:34px;display:grid;place-items:center;border:1px solid #30384b;background:#151c28;border-radius:8px;overflow:hidden;color:#8893a7;font-size:7px;font-weight:900}
+.drill-unit img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.drill-unit b{position:absolute;left:2px;right:2px;bottom:1px;z-index:2;padding:1px 2px;border-radius:4px;background:rgba(4,7,12,.72);color:#f0d478;font-size:5px;text-align:center}
+.drill-board-meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px;padding-top:8px;border-top:1px solid #20283a}
+.drill-board-meta span{border:1px solid #283145;border-radius:999px;padding:3px 6px;color:#7e899e;font-size:6px}
+
+.drill-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;padding:9px 10px;border:1px solid #222a3c;background:#0c1119;border-radius:9px}
+.drill-actions span{color:#707b90;font-size:8px}
+.drill-actions button,.drill-result button{border:1px solid #343c54;background:#141a27;color:#dce2f0;border-radius:8px;padding:8px 9px;font-size:7px;font-weight:900}
+.drill-actions button:disabled{opacity:.4}
+
+.drill-result{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:10px;padding:11px 12px;border:1px solid #293146;background:#0d131c;border-radius:10px}
+.drill-result.correct{border-color:rgba(71,208,154,.22);background:rgba(34,117,84,.04)}
+.drill-result.wrong{border-color:rgba(237,155,98,.2);background:rgba(120,68,31,.04)}
+.drill-result>div:first-child>span{display:block;color:#8f7cff;font-size:7px;font-weight:900;letter-spacing:.8px}
+.drill-result.correct>div:first-child>span{color:#78d7b0}
+.drill-result.wrong>div:first-child>span{color:#e3a071}
+.drill-result h4{margin:4px 0;font-size:11px}
+.drill-result p{margin:0;color:#7f899d;font-size:8px;line-height:1.45}
+.drill-result small{display:block;margin-top:5px;color:#626d82;font-size:7px}
+.drill-result>div:last-child{display:flex;gap:6px;flex:none}
+.drill-result button.primary{border-color:#6b58db;background:rgba(117,99,231,.13);color:#c9c0ff}
+
+@media(max-width:700px){
+  .drill-head,.drill-result{flex-direction:column;align-items:stretch}
+  .drill-score{width:100%;text-align:left}
+  .drill-versus{grid-template-columns:1fr}
+  .drill-versus>b{text-align:center}
+  .drill-result>div:last-child{display:grid;grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){
+  .drill-result>div:last-child{grid-template-columns:1fr}
+}
