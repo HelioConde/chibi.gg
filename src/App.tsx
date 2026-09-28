@@ -30,6 +30,7 @@ import ChibiActionCenter from "./components/ChibiActionCenter";
 import StyleShift from "./components/StyleShift";
 import GlobalMetaPage from "./components/GlobalMetaPage";
 import CompsPage from "./components/CompsPage";
+import OverlayPage from "./components/OverlayPage";
 import AskChibi from "./components/AskChibi";
 import ChibiMemory from "./components/ChibiMemory";
 import ReviewQueue from "./components/ReviewQueue";
@@ -203,8 +204,14 @@ function App() {
   const [profileTab,setProfileTab]=useState<ProfileTab>("matches");
   const [recentPlayers,setRecentPlayers]=useState<RecentPlayer[]>(()=>getRecentPlayers());
   const [copiedAnalysisLink,setCopiedAnalysisLink]=useState(false);
-  const [sitePage,setSitePage]=useState<"main"|"meta"|"comps">(
-    window.location.hash==="#meta"?"meta":window.location.hash==="#comps"?"comps":"main"
+  const [sitePage,setSitePage]=useState<"main"|"meta"|"comps"|"overlay">(
+    window.location.hash==="#meta"
+      ?"meta"
+      :window.location.hash==="#comps"
+        ?"comps"
+        :window.location.hash==="#overlay"
+          ?"overlay"
+          :"main"
   );
 
   useEffect(()=>{
@@ -240,7 +247,9 @@ function App() {
           ?"meta"
           :window.location.hash==="#comps"
             ?"comps"
-            :"main"
+            :window.location.hash==="#overlay"
+              ?"overlay"
+              :"main"
       );
     };
 
@@ -593,6 +602,13 @@ function App() {
     }
   }
 
+  function openOverlay(){
+    setSitePage("overlay");
+    if(window.location.hash!=="#overlay"){
+      window.history.pushState({},"",window.location.pathname+window.location.search+"#overlay");
+    }
+  }
+
   function closeExplorePage(){
     setSitePage("main");
     if(window.location.hash){
@@ -632,6 +648,7 @@ function App() {
         <nav>
           <button className={sitePage==="meta"?"active":""} onClick={openMeta}>Meta</button>
           <button className={sitePage==="comps"?"active":""} onClick={openComps}>Comps</button>
+          <button className={sitePage==="overlay"?"active":""} onClick={openOverlay}>Overlay</button>
           <a href="#leaderboard">Leaderboard</a>
         </nav>
         <button className="ghost-button">Entrar</button>
@@ -650,6 +667,12 @@ function App() {
           hasProfile={Boolean(profile)}
           onBack={closeExplorePage}
           onEvidence={showCompEvidence}
+        />
+      ) : sitePage==="overlay" ? (
+        <OverlayPage
+          hasProfile={Boolean(profile)}
+          playerName={profile?.player.gameName||""}
+          onBack={closeExplorePage}
         />
       ) : !profile ? (
         <main className="landing">
