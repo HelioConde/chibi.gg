@@ -23,6 +23,7 @@ import { buildActionPlan } from "./analysis/actionPlan";
 import { buildRankedReviewSignals } from "./analysis/chibiReviewRanking";
 import ChibiInnovations from "./components/ChibiInnovations";
 import ChibiReview from "./components/ChibiReview";
+import ChibiSessionPlan from "./components/ChibiSessionPlan";
 import ChibiLearningLab from "./components/ChibiLearningLab";
 import ChibiLearningPath from "./components/ChibiLearningPath";
 import ChibiCoachMode from "./components/ChibiCoachMode";
@@ -1293,6 +1294,14 @@ function App() {
               staticData={staticData}
               journalVersion={journalVersion}
               onEvidence={showEvidence}
+            />
+
+            <ChibiSessionPlan
+              playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
+              matches={analysisMatches}
+              staticData={staticData}
+              onEvidence={showEvidence}
+              onOpenBuilder={openBuilder}
             />
 
             <ChibiLearningPath
