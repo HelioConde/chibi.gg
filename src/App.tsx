@@ -459,7 +459,7 @@ function App() {
       .slice()
       .sort((a,b)=>(b.playedAt||0)-(a.playedAt||0));
 
-    const sessions:Array<{matches:TftMatch[];start:number;end:number}>=[];
+    const sessions:Array<{matches:TftMatch[];start:number;end:number}> = [];
 
     for(const match of sorted){
       const playedAt=Number(match.playedAt)||0;
