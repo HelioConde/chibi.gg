@@ -39,6 +39,7 @@ import ChibiShareCard from "./components/ChibiShareCard";
 import PersonalVsGlobalMeta from "./components/PersonalVsGlobalMeta";
 import ChibiFlex from "./components/ChibiFlex";
 import ChibiIdentity from "./components/ChibiIdentity";
+import ChibiPool from "./components/ChibiPool";
 import ChibiActionCenter from "./components/ChibiActionCenter";
 import ChibiSessionMode from "./components/ChibiSessionMode";
 import StyleShift from "./components/StyleShift";
@@ -1292,6 +1293,12 @@ function App() {
                 <em>Ver detalhes</em>
               </summary>
               <div className="overview-deep-dive-content">
+                <ChibiPool
+                  matches={analysisMatches}
+                  staticData={staticData}
+                  onEvidence={showEvidence}
+                  onOpenBuilder={openBuilder}
+                />
                 <ChibiIdentity matches={analysisMatches}/>
                 <ChibiInnovations
                   matches={analysisMatches}
