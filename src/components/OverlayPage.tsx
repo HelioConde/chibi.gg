@@ -174,9 +174,9 @@ export default function OverlayPage({
 
       <div className="overlay-beta-card">
         <span>FASE ATUAL</span>
-        <strong>Review Companion v1</strong>
-        <small>captura + análise pós-jogo</small>
-        <b>GM1.2 EM ANDAMENTO</b>
+        <strong>Python Desktop v1</strong>
+        <small>janela local + snapshots</small>
+        <b>PYTHON FOUNDATION PRONTA</b>
       </div>
     </section>
 
@@ -322,8 +322,8 @@ export default function OverlayPage({
       <div className="overlay-companion-title">
         <div>
           <span>CHIBI COMPANION · GM1.2</span>
-          <h2>O companion está sendo redesenhado para revisão segura</h2>
-          <p>A primeira versão roda separada do site e usa snapshots locais de demonstração. O objetivo é facilitar marcação e revisão pós-jogo sem transformar o companion em um assistente de decisões ao vivo.</p>
+          <h2>A fundação desktop em Python já está pronta</h2>
+          <p>A primeira versão desktop roda separada do site com PySide6, janela always-on-top, hotkeys, click-through no Windows e snapshots JSON locais. A integração com o perfil do Chibi vem na próxima etapa.</p>
         </div>
         <b>DESKTOP FOUNDATION</b>
       </div>
@@ -393,7 +393,7 @@ export default function OverlayPage({
         <article className="active">
           <b>2</b>
           <div><strong>Companion desktop</strong><span>Janela transparente, hotkeys, presets e monitor</span></div>
-          <em>EM ANDAMENTO</em>
+          <em>PYTHON V1</em>
         </article>
         <article>
           <b>3</b>
