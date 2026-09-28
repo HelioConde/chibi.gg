@@ -43,6 +43,8 @@ import ChibiMemory from "./components/ChibiMemory";
 import ReviewQueue from "./components/ReviewQueue";
 import PlayerEvolution from "./components/PlayerEvolution";
 import DDragonArt from "./components/DDragonArt";
+import MatchBoardMap from "./components/MatchBoardMap";
+import { SITE_IMAGES } from "./siteAssets";
 import { markMatchReviewed } from "./reviewProgress";
 import { recordRankSnapshot } from "./rankHistory";
 import {
@@ -776,7 +778,7 @@ function App() {
     <div className="app-shell">
       <header className="topbar">
         <button className="brand brand-button" onClick={resetSearch}>
-          <span className="brand-mark">c</span>
+          <span className="brand-mark brand-mark-image"><img src={SITE_IMAGES.icon} alt=""/></span>
           <span>chibi<span>.gg</span></span>
         </button>
         <nav>
@@ -852,7 +854,9 @@ function App() {
         />
       ) : !profile ? (
         <main className="landing">
-          <section className="hero hero-with-ddragon">
+          <section className="hero hero-with-ddragon hero-with-uploaded-art">
+            <img className="uploaded-hero-art" src={SITE_IMAGES.art} alt="" aria-hidden="true"/>
+            <img className="uploaded-icons-art" src={SITE_IMAGES.icons} alt="" aria-hidden="true"/>
             <DDragonArt staticData={staticData} variant="hero" label="Riot Data Dragon"/>
             <div className="eyebrow">TFT FIRST. DATA THAT HELPS YOU CLIMB.</div>
             <h1>Entenda suas partidas.<br /><span>Suba com intenção.</span></h1>
@@ -1259,7 +1263,8 @@ function App() {
 
       {(matchLoading || selectedMatch || matchError) && (
         <div className="match-overlay" onClick={closeMatchReview}>
-          <section className="match-modal" onClick={(e)=>e.stopPropagation()}>
+          <section className="match-modal match-modal-with-hud" onClick={(e)=>e.stopPropagation()}>
+            <img className="match-modal-hud-art" src={SITE_IMAGES.hud} alt="" aria-hidden="true"/>
             <button className="match-close" onClick={closeMatchReview}>×</button>
             {matchLoading && <div className="match-state">Carregando detalhes da partida...</div>}
             {matchError && <div className="match-state error">{matchError}</div>}
@@ -1296,6 +1301,11 @@ function App() {
               {openedMatch&&<MatchStory
                 target={openedMatch}
                 detail={selectedMatch}
+              />}
+
+              {openedMatch&&<MatchBoardMap
+                match={openedMatch}
+                staticData={staticData}
               />}
 
               {openedMatch&&<LobbyAutopsy
