@@ -37,6 +37,7 @@ import MatchJournal from "./components/MatchJournal";
 import PatchAdaptation from "./components/PatchAdaptation";
 import BoardCounterfactual from "./components/BoardCounterfactual";
 import LobbyAutopsy from "./components/LobbyAutopsy";
+import MatchScorecard from "./components/MatchScorecard";
 import MatchStory from "./components/MatchStory";
 import ChibiShareCard from "./components/ChibiShareCard";
 import PersonalVsGlobalMeta from "./components/PersonalVsGlobalMeta";
@@ -1832,6 +1833,11 @@ function App() {
                 target={openedMatch}
                 detail={selectedMatch}
                 staticData={staticData}
+              />}
+
+              {openedMatch&&<MatchScorecard
+                target={openedMatch}
+                detail={selectedMatch}
               />}
 
               {openedMatch&&<details className="match-detail-layer counter-layer">
