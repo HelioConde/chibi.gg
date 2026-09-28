@@ -8,6 +8,7 @@ from PySide6.QtWidgets import QApplication
 
 from chibi_overlay.storage import LocalStore
 from chibi_overlay.window import OverlayWindow
+from chibi_overlay.live_bridge import LiveBridgeServer
 from chibi_overlay.riot.connection import LcuUnavailableError
 from chibi_overlay.riot.debug import write_gameflow_schema, write_sanitized_gameflow_session
 
@@ -60,6 +61,9 @@ def main() -> int:
     app.setOrganizationName("chibi.gg")
 
     store = LocalStore(snapshot_path=args.snapshot, demo=args.demo)
+    live_bridge = LiveBridgeServer()
+    live_bridge.start()
+    app.aboutToQuit.connect(live_bridge.stop)
     window = OverlayWindow(store, demo=args.demo)
     window.show()
 
