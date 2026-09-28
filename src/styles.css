@@ -9645,3 +9645,96 @@ a { color: inherit; text-decoration: none; }
     grid-template-columns:repeat(2,minmax(0,1fr));
   }
 }
+
+
+/* Chibi Learning Path — five-game improvement cycles */
+.learning-path-card{margin:14px 0;padding:22px;overflow:hidden}
+.learning-path-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:17px}
+.learning-path-head>div:first-child>span{display:block;color:#8f7cff;font-size:10px;font-weight:900;letter-spacing:1.55px}
+.learning-path-head h2{margin:5px 0 6px;font-size:22px;letter-spacing:-.55px}
+.learning-path-head p{margin:0;max-width:690px;color:#828ba0;font-size:11px;line-height:1.55}
+.learning-path-level{min-width:150px;border:1px solid rgba(125,92,255,.28);background:rgba(125,92,255,.08);border-radius:12px;padding:11px 13px}
+.learning-path-level small{display:block;color:#797f99;font-size:8px;font-weight:900;letter-spacing:.9px}
+.learning-path-level strong{display:block;margin:4px 0 2px;color:#c8bdff;font-size:14px}
+.learning-path-level span{color:#7e879c;font-size:9px}
+
+.learning-skill-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.learning-skill-grid article{border:1px solid #222a3c;background:#0d121b;border-radius:11px;padding:11px}
+.learning-skill-grid article.weakest{border-color:rgba(255,164,92,.3);background:rgba(137,74,27,.07)}
+.learning-skill-grid article>div:first-child{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.learning-skill-grid span{color:#8a93a8;font-size:9px;font-weight:800}
+.learning-skill-grid strong{font-size:14px;color:#d7ddeb}
+.learning-skill-grid article.weakest strong{color:#f0bd7b}
+.learning-skill-track{height:5px;border-radius:999px;background:#1a2130;overflow:hidden;margin:8px 0}
+.learning-skill-track i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#6d5aec,#9b7cff)}
+.learning-skill-grid article.weakest .learning-skill-track i{background:linear-gradient(90deg,#ba7547,#e4a05c)}
+.learning-skill-grid small{display:block;color:#687287;font-size:8px;line-height:1.4}
+
+.learning-cycle{border:1px solid #20283a;background:#0b1018;border-radius:14px;padding:15px}
+.learning-cycle-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px}
+.learning-cycle-steps>div{display:flex;align-items:center;gap:7px;border:1px solid #232b3e;background:#101620;border-radius:10px;padding:8px 9px;color:#687287}
+.learning-cycle-steps>div>span{width:22px;height:22px;display:grid;place-items:center;border-radius:999px;background:#171e2b;font-size:9px;font-weight:900}
+.learning-cycle-steps>div b{font-size:9px}
+.learning-cycle-steps>div.active{border-color:rgba(117,99,231,.32);color:#bbb1fb}
+.learning-cycle-steps>div.active>span{background:rgba(117,99,231,.17);color:#c9c0ff}
+.learning-cycle-steps>div.done{border-color:rgba(71,208,154,.2);color:#82d4b3}
+.learning-cycle-steps>div.done>span{background:rgba(40,137,99,.14);color:#7adeb5}
+
+.learning-mission{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(250px,.75fr);gap:11px}
+.learning-mission-main,.learning-before-after{border:1px solid #232b3e;background:#0f151f;border-radius:12px;padding:14px}
+.learning-mission-main>span,.learning-before-after>span,.learning-path-empty span{display:block;color:#8f7cff;font-size:8px;font-weight:900;letter-spacing:1px}
+.learning-mission-main h3,.learning-path-empty h3{margin:6px 0;font-size:18px;letter-spacing:-.35px}
+.learning-mission-main p,.learning-path-empty p{margin:0;color:#858ea3;font-size:10px;line-height:1.55}
+.learning-mission-progress{display:flex;align-items:center;gap:9px;margin:14px 0 7px}
+.learning-mission-progress>div{height:7px;flex:1;border-radius:999px;background:#1c2432;overflow:hidden}
+.learning-mission-progress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#6551dc,#8d73ff)}
+.learning-mission-progress>span{color:#8f98ac;font-size:9px;white-space:nowrap}
+.learning-mission-main>small{color:#697287;font-size:9px}
+
+.learning-before-after>div{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin:12px 0}
+.learning-before-after article{border:1px solid #252d40;background:#0b1018;border-radius:10px;padding:10px;text-align:center}
+.learning-before-after article small{display:block;color:#657087;font-size:7px;font-weight:900;letter-spacing:.8px}
+.learning-before-after article strong{display:block;margin-top:4px;font-size:22px}
+.learning-before-after article.better{border-color:rgba(71,208,154,.24);background:rgba(34,117,84,.06)}
+.learning-before-after article.better strong{color:#77deb4}
+.learning-before-after article.worse{border-color:rgba(255,116,116,.22);background:rgba(137,48,48,.05)}
+.learning-before-after article.worse strong{color:#ee8f8f}
+.learning-before-after>div>b{color:#596278;font-size:13px}
+.learning-before-after>em{display:block;color:#758096;font-size:9px;font-style:normal;text-align:center}
+
+.learning-path-empty{display:flex;align-items:center;justify-content:space-between;gap:16px;border:1px dashed #2c3447;border-radius:12px;padding:15px}
+.learning-path-empty>div{min-width:0}
+.learning-path-empty button,.learning-cycle-actions button{border:1px solid #343c54;background:#141a27;color:#dce2f0;border-radius:9px;padding:9px 11px;font-size:9px;font-weight:900}
+.learning-path-empty button{flex:none;border-color:#6b58db;background:linear-gradient(135deg,#5b48cf,#8168ef);color:white}
+.learning-cycle-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+.learning-cycle-actions button.primary{border-color:#6b58db;background:linear-gradient(135deg,#5b48cf,#8168ef);color:white}
+
+.learning-path-history{margin-top:12px;border:1px solid #20283a;border-radius:11px;background:#0d121b}
+.learning-path-history summary{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;cursor:pointer;list-style:none}
+.learning-path-history summary::-webkit-details-marker{display:none}
+.learning-path-history summary span b{display:block;font-size:10px}
+.learning-path-history summary span small{display:block;margin-top:2px;color:#687287;font-size:8px}
+.learning-path-history summary em{font-style:normal;color:#8e7df3;font-size:10px}
+.learning-path-history>div{display:flex;flex-direction:column;gap:6px;padding:0 10px 10px}
+.learning-path-history article{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:9px;align-items:center;border:1px solid #20283a;background:#0a0f17;border-radius:9px;padding:9px}
+.learning-path-history article>span{border:1px solid #2d3548;border-radius:999px;padding:3px 6px;color:#818ba0;font-size:7px;text-transform:uppercase}
+.learning-path-history article>span.success{border-color:rgba(71,208,154,.22);color:#78d7b0}
+.learning-path-history article div strong{display:block;font-size:9px}
+.learning-path-history article div small{display:block;margin-top:2px;color:#657086;font-size:8px}
+.learning-path-history article>b{font-size:10px;color:#aab2c4}
+.learning-path-note{margin:10px 0 0;color:#606a80;font-size:8px;line-height:1.45}
+
+@media (max-width:980px){
+  .learning-skill-grid{grid-template-columns:repeat(2,1fr)}
+  .learning-mission{grid-template-columns:1fr}
+}
+@media (max-width:650px){
+  .learning-path-head{flex-direction:column}
+  .learning-path-level{width:100%;min-width:0}
+  .learning-skill-grid{grid-template-columns:1fr}
+  .learning-cycle-steps{grid-template-columns:1fr}
+  .learning-path-empty{align-items:stretch;flex-direction:column}
+  .learning-path-empty button{width:100%}
+  .learning-cycle-actions{flex-direction:column}
+  .learning-cycle-actions button{width:100%}
+}
