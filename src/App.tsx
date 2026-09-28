@@ -1126,7 +1126,7 @@ function App() {
                 <span>Resultado em segundos</span>
               </div>
 
-              {error && <div className="lookup-error">{error}</div>
+              {error && <div className="lookup-error">{error}</div>}
 
               {recentPlayers[0]&&<button className="home-last-player" onClick={()=>void openRecentPlayer(recentPlayers[0])}>
                 <span className="home-last-player-avatar">
