@@ -665,6 +665,42 @@ function App() {
 
             {error && <div className="lookup-error">{error}</div>}
 
+            {recentPlayers.length>0&&<section className="recent-players">
+              <div className="recent-players-head">
+                <div>
+                  <span>HISTÓRICO</span>
+                  <strong>Jogadores pesquisados recentemente</strong>
+                </div>
+                <small>{recentPlayers.length} salvo{recentPlayers.length===1?"":"s"} neste navegador</small>
+              </div>
+
+              <div className="recent-player-list">
+                {recentPlayers
+                  .filter(player=>{
+                    const query=riotId.trim().toLowerCase();
+                    if(!query) return true;
+                    return (player.gameName+"#"+player.tagLine).toLowerCase().includes(query);
+                  })
+                  .slice(0,5)
+                  .map(player=>(
+                    <article className="recent-player-card" key={player.platform+":"+player.gameName+"#"+player.tagLine}>
+                      <button className="recent-player-open" onClick={()=>void openRecentPlayer(player)}>
+                        <span className="recent-player-avatar">{player.gameName.slice(0,1).toUpperCase()}</span>
+                        <span className="recent-player-copy">
+                          <strong>{player.gameName}<small>#{player.tagLine}</small></strong>
+                          <em>{player.platform.toUpperCase()} · {player.rankLabel}{player.leaguePoints!=null?" · "+player.leaguePoints+" LP":""}</em>
+                        </span>
+                        <span className="recent-player-stats">
+                          <b>{player.averagePlacement??"—"}</b>
+                          <small>média</small>
+                        </span>
+                      </button>
+                      <button className="recent-player-remove" onClick={()=>forgetRecentPlayer(player)} aria-label={"Remover "+player.gameName+" do histórico"}>×</button>
+                    </article>
+                  ))}
+              </div>
+            </section>}
+
             <div className="quick-stats">
               <div><strong>Sem cadastro</strong><span>perfil TFT instantâneo</span></div>
               <div><strong>Dados Riot</strong><span>rank + partidas oficiais</span></div>
@@ -682,26 +718,48 @@ function App() {
         <main className="profile-page">
           <button className="back-search" onClick={resetSearch}>← Nova busca</button>
 
-          <section className="player-header">
-            <div className="avatar">{profile.player.gameName.slice(0,1).toUpperCase()}</div>
-            <div>
-              <div className="eyebrow">PERFIL TFT · {profile.player.platform}</div>
-              <h1>{profile.player.gameName}<span className="player-tag">#{profile.player.tagLine}</span></h1>
-              <div className="rank-line">
-                {rank ? rank.tier+" "+rank.rank+" · "+rank.leaguePoints+" LP" : "Sem rank atual"}
-                <span>{matches.length} partidas carregadas</span>
+          <section className="player-summary-shell">
+            <div className="player-summary-main">
+              <div className="player-avatar-wrap">
+                <div className="avatar">{profile.player.gameName.slice(0,1).toUpperCase()}</div>
+                <span>{profile.player.level}</span>
+              </div>
+
+              <div className="player-summary-copy">
+                <div className="eyebrow">{profile.player.platform.toUpperCase()} · {currentSet?"SET "+currentSet:"TFT"}</div>
+                <h1>{profile.player.gameName}<span className="player-tag">#{profile.player.tagLine}</span></h1>
+                <div className="player-rank-line">
+                  <strong>{rank ? rank.tier+" "+rank.rank : "Sem rank atual"}</strong>
+                  {rank&&<span>{rank.leaguePoints} LP · {rank.wins}V / {rank.losses}D</span>}
+                  <span className={"player-trend "+trendStats.tone}>{trendStats.label}</span>
+                </div>
               </div>
             </div>
-            <button className="refresh-button" onClick={searchPlayer} disabled={loading}>{loading ? "Atualizando..." : "Atualizar"}</button>
-          </section>
 
-          <section className="context-bar">
-            <div className="context-copy">
-              <span>CONTEXTO ANALISADO</span>
-              <strong>{currentSet ? "Set "+currentSet : "Set atual"}</strong>
-              <small>{analysisMatches.length} partidas nesta amostra</small>
+            <div className="player-summary-kpis">
+              <article>
+                <span>Média</span>
+                <strong>{dna.avgPlacement??"—"}</strong>
+                <small>{headlineStats.avgLabel}</small>
+              </article>
+              <article>
+                <span>Top 4</span>
+                <strong>{dna.top4Rate}%</strong>
+                <small>{headlineStats.top4}/{headlineStats.total}</small>
+              </article>
+              <article>
+                <span>Última</span>
+                <strong>{latestPlayedAt?formatWhen(latestPlayedAt):"—"}</strong>
+                <small>{freshnessDays!=null&&freshnessDays>14?"amostra antiga":"partida mais recente"}</small>
+              </article>
             </div>
 
+            <div className="player-summary-actions">
+              <button className="refresh-button" onClick={searchPlayer} disabled={loading}>{loading?"Atualizando...":"Atualizar"}</button>
+            </div>
+          </section>
+
+          <section className="profile-context-strip">
             <div className="queue-tabs">
               {availableQueues.length<=1 ? (
                 availableQueues.map((queueId)=>(
@@ -716,39 +774,16 @@ function App() {
                 ))}
               </>}
             </div>
-
-            <div className={"freshness "+(freshnessDays!=null&&freshnessDays>14?"stale":"")}>
-              <span>ÚLTIMA PARTIDA</span>
-              <strong>{latestPlayedAt ? formatWhen(latestPlayedAt) : "—"}</strong>
-              {freshnessDays!=null&&freshnessDays>14&&<small>Amostra antiga</small>}
-            </div>
-          </section>
-
-          <section className="stat-grid stat-grid-readable profile-kpis">
-            <article className={dna.avgPlacement!=null&&dna.avgPlacement>4.75?"signal-warning":dna.avgPlacement!=null&&dna.avgPlacement<=4?"signal-good":""}>
-              <span>Colocação média</span>
-              <strong>{dna.avgPlacement ?? "—"}</strong>
-              <small>{headlineStats.avgLabel}</small>
-            </article>
-            <article className={dna.top4Rate>=50?"signal-good":dna.top4Rate<35?"signal-warning":""}>
-              <span>Top 4</span>
-              <strong>{dna.top4Rate}%</strong>
-              <small>{headlineStats.top4} de {headlineStats.total} partidas</small>
-            </article>
-            <article className={trendStats.tone==="good"?"signal-good":trendStats.tone==="warning"?"signal-warning":""}>
-              <span>Tendência recente</span>
-              <strong className="trend-label">{trendStats.label}</strong>
-              <small>{trendStats.detail}</small>
-            </article>
+            <span>{analysisMatches.length} partidas no contexto</span>
           </section>
 
           {error && <div className="profile-error">{error}</div>}
 
           <nav className="profile-tabs simplified-tabs" aria-label="Seções do perfil">
             <div className="profile-tab-list">
+              <button className={profileTab==="matches"?"active":""} onClick={()=>changeProfileTab("matches")}>Partidas</button>
               <button className={profileTab==="overview"?"active":""} onClick={()=>changeProfileTab("overview")}>Agora</button>
               <button className={profileTab==="review"?"active":""} onClick={()=>changeProfileTab("review")}>Por quê?</button>
-              <button className={profileTab==="matches"?"active":""} onClick={()=>changeProfileTab("matches")}>Partidas</button>
               <button className={profileTab==="meta"?"active":""} onClick={()=>changeProfileTab("meta")}>Comparar</button>
             </div>
             <div className="profile-tab-actions">
