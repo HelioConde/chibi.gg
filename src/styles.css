@@ -12974,3 +12974,22 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
   .study-shelf-open{grid-template-columns:auto minmax(0,1fr)}
   .study-shelf-open>b{grid-column:2}
 }
+
+
+/* Journal Quick Review Checklist — concrete prompts for post-game review */
+.journal-review-checklist{margin:0 0 12px;border:1px solid #222b3d;background:#0c121b;border-radius:10px}
+.journal-review-checklist summary{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 11px;cursor:pointer;list-style:none}
+.journal-review-checklist summary::-webkit-details-marker{display:none}
+.journal-review-checklist summary span b{display:block;font-size:9px}
+.journal-review-checklist summary span small{display:block;margin-top:2px;color:#687287;font-size:7px}
+.journal-review-checklist summary em{font-style:normal;color:#8f7cff;font-size:7px}
+.journal-checklist-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:0 9px 9px}
+.journal-checklist-grid article{border:1px solid #20283a;background:#101620;border-radius:9px;padding:9px}
+.journal-checklist-grid article.answered{border-color:rgba(117,99,231,.22);background:rgba(117,99,231,.035)}
+.journal-checklist-grid article>span{display:block;color:#6b7690;font-size:6px;font-weight:900;letter-spacing:.75px}
+.journal-checklist-grid article>strong{display:block;margin:4px 0 7px;color:#cbd2e2;font-size:8px;line-height:1.4}
+.journal-checklist-grid article>div{display:flex;flex-wrap:wrap;gap:5px}
+.journal-checklist-grid button{border:1px solid #30384a;background:#141a27;color:#818ba0;border-radius:999px;padding:5px 7px;font-size:7px;font-weight:800}
+.journal-checklist-grid button.active{border-color:#6d5ada;background:rgba(117,99,231,.12);color:#c9c0ff}
+.journal-checklist-grid button.clear.active{border-color:#2c3547;background:#111722;color:#6f7990}
+@media(max-width:650px){.journal-checklist-grid{grid-template-columns:1fr}}
