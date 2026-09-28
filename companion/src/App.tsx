@@ -3,6 +3,7 @@ import { LogicalPosition, LogicalSize } from "@tauri-apps/api/dpi";
 import { availableMonitors, getCurrentWindow, Monitor } from "@tauri-apps/api/window";
 import { DEMO_FRAMES, demoFrame } from "./live/demoProvider";
 import { OverlayStateId } from "./live/types";
+import { addSessionMarker, getSessionMarkers } from "./sessionStore";
 
 type PresetId="compact"|"coach"|"full";
 type CornerId="top-left"|"top-right";
@@ -28,6 +29,7 @@ export default function App(){
   const [locked,setLocked]=useState(false);
   const [alwaysOnTop,setAlwaysOnTopState]=useState(true);
   const [notice,setNotice]=useState("Ctrl+Shift+Space mostra/oculta · Ctrl+Shift+L libera o mouse");
+  const [markerCount,setMarkerCount]=useState(()=>getSessionMarkers().length);
 
   const frame=useMemo(()=>demoFrame(stateId),[stateId]);
   const snapshot=frame.snapshot;
@@ -95,6 +97,12 @@ export default function App(){
     const y=workPosition.y+margin;
 
     await appWindow.setPosition(new LogicalPosition(Math.max(workPosition.x,x),Math.max(workPosition.y,y)));
+  }
+
+  function markSnapshot(){
+    const next=addSessionMarker(frame);
+    setMarkerCount(next.length);
+    setNotice("Snapshot marcado para revisão · "+(snapshot.stage||"stage desconhecido"));
   }
 
   async function enableClickThrough(){
@@ -193,6 +201,7 @@ export default function App(){
         </div>}
 
         <div className="window-actions">
+          <button className="marker-button" onClick={markSnapshot}>Marcar snapshot <b>{markerCount}</b></button>
           <button className={alwaysOnTop?"active":""} onClick={()=>void toggleAlwaysOnTop()}>Always on top</button>
           <button onClick={()=>void enableClickThrough()}>Liberar mouse</button>
         </div>
