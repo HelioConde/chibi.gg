@@ -341,6 +341,12 @@ export default function ChibiLearningLab({matches,staticData,onEvidence}:Props){
     [selectedLoss,baseline],
   );
   const confidence=confidenceLabel(matches.length,top4.length,signals);
+  const strongestSignal=Math.max(0,...signals.map(signal=>signal.strength));
+  const confidenceReasons=[
+    {label:"Amostra",value:matches.length+" jogos",good:matches.length>=10},
+    {label:"Referência",value:top4.length+" Top 4",good:top4.length>=3},
+    {label:"Sinal",value:strongestSignal+"%",good:strongestSignal>=50},
+  ];
   const packages=useMemo(()=>buildPackages(matches),[matches]);
   const focus=useMemo(()=>focusPlan(matches),[matches]);
 
@@ -355,6 +361,14 @@ export default function ChibiLearningLab({matches,staticData,onEvidence}:Props){
         <small>CONFIANÇA DOS DADOS</small>
         <strong>{confidence.label}</strong>
         <span>{confidence.score}%</span>
+        <div className="confidence-reasons">
+          {confidenceReasons.map(reason=>(
+            <i className={reason.good?"ready":""} key={reason.label}>
+              <b>{reason.label}</b>
+              <em>{reason.value}</em>
+            </i>
+          ))}
+        </div>
       </div>
     </div>
 
