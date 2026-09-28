@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
 import { SITE_IMAGES } from "../siteAssets";
+import { TftMatch } from "../api/tft";
+import { getActiveSession, sessionProgress } from "../sessionMode";
 
 type OverlayStateId="stable"|"weak"|"contested"|"spike";
 
@@ -133,10 +135,14 @@ const DEMO_UNITS=["V","A","M","S","K","T","N","R"];
 export default function OverlayPage({
   hasProfile=false,
   playerName="",
+  playerKey="",
+  matches=[],
   onBack,
 }:{
   hasProfile?:boolean;
   playerName?:string;
+  playerKey?:string;
+  matches?:TftMatch[];
   onBack:()=>void;
 }){
   const [scenarioId,setScenarioId]=useState<OverlayStateId>("weak");
@@ -145,6 +151,15 @@ export default function OverlayPage({
   const scenario=useMemo(
     ()=>SCENARIOS.find(item=>item.id===scenarioId)||SCENARIOS[0],
     [scenarioId],
+  );
+
+  const activeSession=useMemo(
+    ()=>playerKey?getActiveSession(playerKey):null,
+    [playerKey],
+  );
+  const activeSessionProgress=useMemo(
+    ()=>activeSession?sessionProgress(activeSession,matches):null,
+    [activeSession,matches],
   );
 
   return <main className="overlay-page">
@@ -164,6 +179,38 @@ export default function OverlayPage({
         <b>GM1.2 EM ANDAMENTO</b>
       </div>
     </section>
+
+    {activeSession&&<section className="panel overlay-session-focus">
+      <div className="overlay-session-focus-head">
+        <div>
+          <span>FOCO FIXADO ANTES DA FILA</span>
+          <h2>{activeSession.focusTitle}</h2>
+          <p>Este lembrete foi definido antes da sessão e não muda com o estado da partida.</p>
+        </div>
+        <div className="overlay-session-progress">
+          <small>CHIBI SESSION</small>
+          <strong>{activeSessionProgress?.played||0}/{activeSession.targetGames}</strong>
+          <span>partidas</span>
+        </div>
+      </div>
+
+      <div className="overlay-session-rule">
+        <div>
+          <span>LEMBRETE</span>
+          <ol>
+            {activeSession.focusSteps.slice(0,2).map((step,index)=>(
+              <li key={index}><b>{index+1}</b><p>{step}</p></li>
+            ))}
+          </ol>
+        </div>
+        <aside>
+          <span>EVITAR</span>
+          <p>{activeSession.avoid}</p>
+        </aside>
+      </div>
+
+      <small className="overlay-session-safety">O Companion não usa HP, shop, board adversário ou estágio atual para alterar este foco durante a partida.</small>
+    </section>}
 
     <section className="overlay-demo-shell">
       <div className="overlay-demo-toolbar">
