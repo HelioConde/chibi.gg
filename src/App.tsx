@@ -730,7 +730,7 @@ function App() {
           <button className={sitePage==="meta"?"active":""} onClick={openMeta}>Meta</button>
           <button className={sitePage==="comps"?"active":""} onClick={openComps}>Comps</button>
           <button className={sitePage==="stats"?"active":""} onClick={()=>openStats()}>Statistics</button>
-          <button className={sitePage==="builder"?"active":""} onClick={openBuilder}>Builder</button>
+          <button className={"builder-nav-button "+(sitePage==="builder"?"active":"")} onClick={openBuilder}>Builder</button>
           <button className={sitePage==="leaderboard"?"active":""} onClick={openLeaderboard}>Leaderboard</button>
           <button className={sitePage==="overlay"?"active":""} onClick={openOverlay}>Overlay</button>
         </nav>
