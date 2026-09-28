@@ -100,6 +100,13 @@ function itemSimilarity(boardUnits:HexBoardUnit[],match:TftMatch){
   return total?matched/total:null;
 }
 
+function augmentSimilarity(configured:string[],match:TftMatch){
+  if(!configured.length)return null;
+  const matchAugments=new Set(match.augments||[]);
+  const matched=configured.filter(id=>matchAugments.has(id)).length;
+  return matched/configured.length;
+}
+
 export default function TeamBuilderPage({
   staticData,
   matches,
@@ -118,6 +125,9 @@ export default function TeamBuilderPage({
   const [costFilter,setCostFilter]=useState<number>(0);
   const [selectedItemHex,setSelectedItemHex]=useState<number|null>(null);
   const [itemQuery,setItemQuery]=useState("");
+  const [selectedAugments,setSelectedAugments]=useState<string[]>([]);
+  const [augmentQuery,setAugmentQuery]=useState("");
+  const [variantAAugments,setVariantAAugments]=useState<string[]>([]);
 
   useEffect(()=>{
     if(!initialChampionIds.length)return;
@@ -132,6 +142,8 @@ export default function TeamBuilderPage({
     setTargetLevel(Math.max(6,Math.min(10,initialChampionIds.length||8)));
     setSelectedId(null);
     setSelectedItemHex(null);
+    setSelectedAugments([]);
+    setAugmentQuery("");
   },[initialChampionIds]);
 
   const champions=useMemo(()=>{
@@ -279,6 +291,59 @@ export default function TeamBuilderPage({
     [units]
   );
 
+  const augments=useMemo(()=>{
+    const normalized=augmentQuery.trim().toLowerCase();
+    return Object.entries(staticData?.augments||{})
+      .map(([id,entry])=>({
+        id,
+        name:String(entry.name||clean(id)),
+        image:staticData?tftAssetUrl(staticData.version,"augment",entry):"",
+      }))
+      .filter(row=>
+        Boolean(row.name&&row.image)
+        && (!normalized||row.name.toLowerCase().includes(normalized)||row.id.toLowerCase().includes(normalized))
+      )
+      .sort((a,b)=>a.name.localeCompare(b.name))
+      .slice(0,180);
+  },[staticData,augmentQuery]);
+
+  const augmentHistory=useMemo(()=>{
+    const stats=new Map<string,{games:number;placement:number}>();
+    for(const match of matches){
+      for(const augmentId of match.augments||[]){
+        const current=stats.get(augmentId)||{games:0,placement:0};
+        current.games++;
+        current.placement+=match.placement;
+        stats.set(augmentId,current);
+      }
+    }
+
+    return [...stats.entries()]
+      .map(([id,value])=>({
+        id,
+        games:value.games,
+        avgPlacement:value.games?value.placement/value.games:0,
+      }))
+      .sort((a,b)=>b.games-a.games||a.avgPlacement-b.avgPlacement)
+      .slice(0,10);
+  },[matches]);
+
+  const contextOverlap=useMemo(()=>{
+    if(!similar.length)return {item:null as number|null,augment:null as number|null,withAugment:0};
+    const itemValues=similar
+      .map(({match})=>itemSimilarity(units,match))
+      .filter((value):value is number=>value!=null);
+    const augmentValues=similar
+      .map(({match})=>augmentSimilarity(selectedAugments,match))
+      .filter((value):value is number=>value!=null);
+
+    return {
+      item:itemValues.length?itemValues.reduce((sum,value)=>sum+value,0)/itemValues.length:null,
+      augment:augmentValues.length?augmentValues.reduce((sum,value)=>sum+value,0)/augmentValues.length:null,
+      withAugment:augmentValues.filter(value=>value>0).length,
+    };
+  },[similar,units,selectedAugments]);
+
   const bridgeCandidate=useMemo(
     ()=>candidateUnits.slice().sort((a,b)=>a.cost-b.cost||b.sharedScore-a.sharedScore)[0]||null,
     [candidateUnits]
@@ -363,8 +428,13 @@ export default function TeamBuilderPage({
       .filter(id=>(beforeById.get(id)||"")!==(afterById.get(id)||""))
       .slice(0,6);
 
-    return {added,removed,changedTraits,itemChanges};
-  },[variantA,variantAEvaluation,units,traitCounts]);
+    const augmentChanges={
+      before:variantAAugments.filter(id=>!selectedAugments.includes(id)),
+      after:selectedAugments.filter(id=>!variantAAugments.includes(id)),
+    };
+
+    return {added,removed,changedTraits,itemChanges,augmentChanges};
+  },[variantA,variantAEvaluation,units,traitCounts,variantAAugments,selectedAugments]);
 
   const similar=useMemo(()=>{
     if(boardIds.size<3)return [];
@@ -501,6 +571,21 @@ export default function TeamBuilderPage({
     setUnits(current=>current.map(unit=>unit.hex===hex?{...unit,items:[]}:unit));
   }
 
+  function addAugment(augmentId:string){
+    setSelectedAugments(current=>{
+      if(current.includes(augmentId)||current.length>=3)return current;
+      return [...current,augmentId].slice(0,3);
+    });
+  }
+
+  function removeAugment(index:number){
+    setSelectedAugments(current=>{
+      const next=[...current];
+      next.splice(index,1);
+      return next;
+    });
+  }
+
   function saveCurrentBoard(){
     if(!units.length)return;
     const topTraits=traitCounts
@@ -514,12 +599,14 @@ export default function TeamBuilderPage({
       name,
       targetLevel,
       units,
+      augments:selectedAugments,
     }));
   }
 
   function restorePreset(preset:BuilderPreset){
     setUnits(preset.units.map(unit=>({...unit,items:[...(unit.items||[])]})));
     setTargetLevel(preset.targetLevel);
+    setSelectedAugments([...(preset.augments||[])].slice(0,3));
     setSelectedId(null);
     setSelectedItemHex(null);
   }
@@ -549,6 +636,9 @@ export default function TeamBuilderPage({
       "Nível "+targetLevel+" · "+units.length+" unidades · "+boardValue+"G",
       names.join(" · "),
       traits.length?"Traits: "+traits.join(" · "):"",
+      selectedAugments.length
+        ?"Augments: "+selectedAugments.map(id=>staticEntry(staticData?.augments,id)?.name||clean(id)).join(" · ")
+        :"",
     ].filter(Boolean).join("\n");
 
     try{
@@ -560,11 +650,11 @@ export default function TeamBuilderPage({
     }
   }
 
-  return <main className="builder-page builder-v2 builder-v3 builder-v4">
+  return <main className="builder-page builder-v2 builder-v3 builder-v4 builder-v5">
     <section className="builder-hero">
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>← Voltar ao perfil</button>}
-        <span className="eyebrow">CHIBI LAB · TEAM BUILDER V4</span>
+        <span className="eyebrow">CHIBI LAB · TEAM BUILDER V5</span>
         <h1>Monte o board.<br/><em>Teste uma decisão por vez.</em></h1>
         <p>{initialChampionIds.length
           ?"Comp carregada. Mova, remova ou substitua peças e compare variantes com o seu histórico."
@@ -599,14 +689,18 @@ export default function TeamBuilderPage({
           <button className="secondary" onClick={copyBoardSummary} disabled={!units.length}>
             {copied?"Resumo copiado ✓":"Copiar resumo"}
           </button>
-          <button onClick={()=>setVariantA(units.map(unit=>({...unit,items:[...(unit.items||[])]})))} disabled={!units.length}>
+          <button onClick={()=>{
+            setVariantA(units.map(unit=>({...unit,items:[...(unit.items||[])]})));
+            setVariantAAugments([...selectedAugments]);
+          }} disabled={!units.length}>
             {variantA?"Atualizar versão A":"Salvar como versão A"}
           </button>
           {variantA&&<button className="secondary" onClick={()=>{
             setUnits(variantA.map(unit=>({...unit,items:[...(unit.items||[])]})));
+            setSelectedAugments([...variantAAugments]);
             setSelectedId(null);
           }}>Restaurar A</button>}
-          <button className="secondary" onClick={()=>{setUnits([]);setSelectedId(null);setSelectedItemHex(null);}}>Limpar board</button>
+          <button className="secondary" onClick={()=>{setUnits([]);setSelectedAugments([]);setSelectedId(null);setSelectedItemHex(null);}}>Limpar board</button>
         </div>
       </div>
     </section>
@@ -622,6 +716,7 @@ export default function TeamBuilderPage({
         <article><span>2★ OU MAIS</span><strong>{twoStars}/{units.length||0}</strong></article>
         <article><span>3★</span><strong>{threeStars}</strong></article>
         <article><span>ITENS</span><strong>{itemAssignments}</strong></article>
+        <article><span>AUGMENTS</span><strong>{selectedAugments.length}/3</strong></article>
         <article><span>TRAITS VISÍVEIS</span><strong>{traitCounts.length}</strong></article>
         <article><span>COMPARÁVEIS</span><strong>{similar.length}</strong></article>
       </div>
@@ -703,13 +798,13 @@ export default function TeamBuilderPage({
           <h2>Veja exatamente o que mudou</h2>
           <p>A é o snapshot salvo. “Agora” é o board atual. As métricas pessoais usam apenas partidas comparáveis do seu histórico carregado.</p>
         </div>
-        <button onClick={()=>setVariantA(null)}>Descartar A</button>
+        <button onClick={()=>{setVariantA(null);setVariantAAugments([]);}}>Descartar A</button>
       </div>
 
       <div className="builder-ab-grid">
         <article className="builder-ab-card">
           <span>VERSÃO A</span>
-          <strong>{variantA.length} unidades · {variantAEvaluation.value}G</strong>
+          <strong>{variantA.length} unidades · {variantAEvaluation.value}G · {variantAAugments.length} aug.</strong>
           <small>{variantAEvaluation.average!=null
             ?"Histórico: média "+variantAEvaluation.average.toFixed(2)+" · Top 4 "+variantAEvaluation.top4Rate+"%"
             :"Histórico: amostra insuficiente"}</small>
@@ -717,7 +812,7 @@ export default function TeamBuilderPage({
 
         <article className="builder-ab-card current">
           <span>AGORA</span>
-          <strong>{units.length} unidades · {boardValue}G</strong>
+          <strong>{units.length} unidades · {boardValue}G · {selectedAugments.length} aug.</strong>
           <small>{average!=null
             ?"Histórico: média "+average.toFixed(2)+" · Top 4 "+top4Rate+"%"
             :"Histórico: amostra insuficiente"}</small>
@@ -742,6 +837,12 @@ export default function TeamBuilderPage({
             <p><b>Itens</b>{variantDiff.itemChanges.length
               ?variantDiff.itemChanges.map(id=>staticEntry(staticData?.champions,id)?.name||clean(id)).join(" · ")
               :"sem alteração de itemização"}</p>
+            <p><b>Augments</b>{variantDiff.augmentChanges.before.length||variantDiff.augmentChanges.after.length
+              ?[
+                ...variantDiff.augmentChanges.before.map(id=>"− "+(staticEntry(staticData?.augments,id)?.name||clean(id))),
+                ...variantDiff.augmentChanges.after.map(id=>"+ "+(staticEntry(staticData?.augments,id)?.name||clean(id))),
+              ].join(" · ")
+              :"sem alteração de augments"}</p>
           </div>
         </article>
       </div>
@@ -763,7 +864,7 @@ export default function TeamBuilderPage({
               <span>{preset.targetLevel}</span>
               <div>
                 <strong>{preset.name}</strong>
-                <small>{preset.units.length} unidades · {new Date(preset.createdAt).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})}</small>
+                <small>{preset.units.length} unidades · {preset.augments?.length||0} aug. · {new Date(preset.createdAt).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})}</small>
               </div>
             </button>
             <button
@@ -1014,7 +1115,10 @@ export default function TeamBuilderPage({
             <span>BOARDS PARECIDOS</span>
             <strong>{similar.length}</strong>
             <small>{average!=null
-              ?"média "+average.toFixed(2)+(top4Rate!=null?" · Top 4 "+top4Rate+"%":"")+(itemAssignments?" · "+itemAssignments+" itens configurados":"")
+              ?"média "+average.toFixed(2)
+                +(top4Rate!=null?" · Top 4 "+top4Rate+"%":"")
+                +(itemAssignments?" · itens "+(contextOverlap.item!=null?Math.round(contextOverlap.item*100)+"%":"configurados"):"")
+                +(selectedAugments.length?" · aug. "+(contextOverlap.augment!=null?Math.round(contextOverlap.augment*100)+"%":"configurados"):"")
               :"nenhum comparável forte ainda"}</small>
           </div>
 
@@ -1025,7 +1129,7 @@ export default function TeamBuilderPage({
                 <b>{match.placement}º</b>
                 <span>
                   <strong>{Math.round(score*100)}% semelhante</strong>
-                  <small>nível {match.level} · {match.goldLeft}g final · {match.units.filter(unit=>unit.tier>=3).length} 3★{itemFit!=null?" · itens "+Math.round(itemFit*100)+"%":""}</small>
+                  <small>nível {match.level} · {match.goldLeft}g final · {match.units.filter(unit=>unit.tier>=3).length} 3★{itemFit!=null?" · itens "+Math.round(itemFit*100)+"%":""}{augmentSimilarity(selectedAugments,match)!=null?" · aug. "+Math.round((augmentSimilarity(selectedAugments,match)||0)*100)+"%":""}</small>
                 </span>
               </article>;
             })}
@@ -1038,6 +1142,6 @@ export default function TeamBuilderPage({
       </aside>
     </section>
 
-    <p className="builder-disclaimer">O Builder compara estrutura final, traits, itens configurados e boards do histórico. A biblioteca de itens vem do Data Dragon; o histórico pessoal mostra apenas o que apareceu nas partidas carregadas. Ele não conhece sua loja, ouro por rodada, scouting completo ou posição futura e não trata similaridade como causalidade.</p>
+    <p className="builder-disclaimer">O Builder compara estrutura final, traits, itens e augments configurados com o histórico carregado. Itens e augments do histórico são evidência pessoal, não uma tier list. Ele não conhece sua loja, ouro por rodada, scouting completo ou posição futura e não trata similaridade como causalidade.</p>
   </main>;
 }
