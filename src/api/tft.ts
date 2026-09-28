@@ -69,6 +69,9 @@ export type TftGlobalComp = {
   confidence:"alta"|"média"|"inicial";
   traits:Array<{id:string;rate:number}>;
   units:Array<{id:string;rate:number}>;
+  augments:Array<{id:string;rate:number}>;
+  items:Array<{id:string;rate:number}>;
+  unitItems:Array<{unitId:string;items:Array<{id:string;rate:number}>}>;
 };
 
 export type TftGlobalComps = {
