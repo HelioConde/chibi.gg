@@ -31,7 +31,8 @@ import StyleShift from "./components/StyleShift";
 import GlobalMetaPage from "./components/GlobalMetaPage";
 import CompsPage from "./components/CompsPage";
 import OverlayPage from "./components/OverlayPage";
-import StatisticsPage from "./components/StatisticsPage";
+import StatisticsPage, { StatisticsCategory } from "./components/StatisticsPage";
+import GlobalSearch from "./components/GlobalSearch";
 import AskChibi from "./components/AskChibi";
 import ChibiMemory from "./components/ChibiMemory";
 import ReviewQueue from "./components/ReviewQueue";
@@ -207,6 +208,10 @@ function App() {
   const [profileTab,setProfileTab]=useState<ProfileTab>("matches");
   const [recentPlayers,setRecentPlayers]=useState<RecentPlayer[]>(()=>getRecentPlayers());
   const [copiedAnalysisLink,setCopiedAnalysisLink]=useState(false);
+  const [statsTarget,setStatsTarget]=useState<{category:StatisticsCategory;query:string}>({
+    category:"champions",
+    query:"",
+  });
   const [sitePage,setSitePage]=useState<"main"|"meta"|"comps"|"stats"|"overlay">(
     window.location.hash==="#meta"
       ?"meta"
@@ -612,11 +617,31 @@ function App() {
     }
   }
 
-  function openStats(){
+  function openStats(category:StatisticsCategory="champions",query=""){
+    setStatsTarget({category,query});
     setSitePage("stats");
     if(window.location.hash!=="#stats"){
       window.history.pushState({},"",window.location.pathname+window.location.search+"#stats");
     }
+  }
+
+  function openExplorePage(page:"meta"|"comps"|"stats"|"overlay"){
+    if(page==="meta") return openMeta();
+    if(page==="comps") return openComps();
+    if(page==="stats") return openStats();
+    return openOverlay();
+  }
+
+  async function searchFromGlobal(riotIdValue:string){
+    const parsed=splitRiotId(riotIdValue);
+    if(!parsed){
+      setError("Use o formato Nome#TAG.");
+      setSitePage("main");
+      return;
+    }
+    setRiotId(riotIdValue);
+    setSitePage("main");
+    await loadPlayer(parsed.gameName,parsed.tagLine,platform,true,"matches");
   }
 
   function openOverlay(){
@@ -665,10 +690,18 @@ function App() {
         <nav>
           <button className={sitePage==="meta"?"active":""} onClick={openMeta}>Meta</button>
           <button className={sitePage==="comps"?"active":""} onClick={openComps}>Comps</button>
-          <button className={sitePage==="stats"?"active":""} onClick={openStats}>Statistics</button>
+          <button className={sitePage==="stats"?"active":""} onClick={()=>openStats()}>Statistics</button>
           <button className={sitePage==="overlay"?"active":""} onClick={openOverlay}>Overlay</button>
           <a href="#leaderboard">Leaderboard</a>
         </nav>
+        <GlobalSearch
+          staticData={staticData}
+          recentPlayers={recentPlayers}
+          onOpenRecent={(player)=>{void openRecentPlayer(player);}}
+          onOpenStats={openStats}
+          onSearchPlayer={(value)=>{void searchFromGlobal(value);}}
+          onOpenPage={openExplorePage}
+        />
         <button className="ghost-button">Entrar</button>
       </header>
 
@@ -693,6 +726,8 @@ function App() {
           hasProfile={Boolean(profile)}
           onBack={closeExplorePage}
           onEvidence={showCompEvidence}
+          initialCategory={statsTarget.category}
+          initialQuery={statsTarget.query}
         />
       ) : sitePage==="overlay" ? (
         <OverlayPage
