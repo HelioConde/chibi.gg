@@ -4,10 +4,12 @@ import {
   TftLeaderboard,
   TftLeaderboardPlayer,
 } from "../api/tft";
+import { profileIconUrl, TftStaticData } from "../tftStatic";
 
 type Tier="challenger"|"grandmaster"|"master";
 
 type Props={
+  staticData:TftStaticData|null;
   onOpenPlayer:(player:TftLeaderboardPlayer,platform:string)=>void;
 };
 
@@ -22,12 +24,7 @@ const REGIONS=[
   ["la2","LAS"],
 ] as const;
 
-function profileIconUrl(id:number){
-  if(!id)return "";
-  return "https://ddragon.leagueoflegends.com/cdn/16.17.1/img/profileicon/"+id+".png";
-}
-
-export default function LeaderboardPage({onOpenPlayer}:Props){
+export default function LeaderboardPage({staticData,onOpenPlayer}:Props){
   const [platform,setPlatform]=useState("br1");
   const [tier,setTier]=useState<Tier>("challenger");
   const [data,setData]=useState<TftLeaderboard|null>(null);
@@ -97,17 +94,17 @@ export default function LeaderboardPage({onOpenPlayer}:Props){
         <article className="panel">
           <span>#1 LP</span>
           <strong>{data.players[0]?.leaguePoints??"—"}</strong>
-          <small>{data.players[0]?.gameName||"Jogador"}</small>
+          <small>{data.players[0]?.gameName||"Ranqueado #1"}</small>
         </article>
         <article className="panel">
           <span>MAIOR WIN RATE</span>
           <strong>{bestWinRate?bestWinRate.winRate+"%":"—"}</strong>
-          <small>{bestWinRate?.gameName||"sem amostra"}</small>
+          <small>{bestWinRate?.gameName||"jogador não identificado"}</small>
         </article>
         <article className="panel">
           <span>MAIS PARTIDAS</span>
           <strong>{mostGames?.games??"—"}</strong>
-          <small>{mostGames?.gameName||"sem amostra"}</small>
+          <small>{mostGames?.gameName||"jogador não identificado"}</small>
         </article>
       </section>
 
@@ -124,15 +121,20 @@ export default function LeaderboardPage({onOpenPlayer}:Props){
 
         <div className="leaderboard-table">
           {data.players.map((player,index)=>{
-            const icon=profileIconUrl(player.profileIconId);
+            const icon=staticData&&player.profileIconId
+              ?profileIconUrl(staticData.version,player.profileIconId)
+              :"";
             const canOpen=Boolean(player.gameName&&player.tagLine);
-            return <article key={player.summonerId||index}>
+            const displayName=player.gameName||"Ranqueado #"+(index+1);
+            return <article className={canOpen?"resolved":"unresolved"} key={player.summonerId||index}>
               <b>{index+1}</b>
               <div className="leaderboard-player">
-                <span>{icon&&<img src={icon} alt=""/>}</span>
+                <span>{icon?<img src={icon} alt=""/>:<b>{index+1}</b>}</span>
                 <div>
-                  <strong>{player.gameName||"Jogador"}</strong>
-                  <small>{player.tagLine?"#"+player.tagLine:"Riot ID não resolvido"}{player.hotStreak?" · hot streak":""}</small>
+                  <strong>{displayName}</strong>
+                  <small>{player.tagLine
+                    ?"#"+player.tagLine
+                    :"Riot ID pendente"}{player.hotStreak?" · hot streak":player.veteran?" · veterano":player.freshBlood?" · novo no tier":""}</small>
                 </div>
               </div>
               <strong>{player.leaguePoints}</strong>
@@ -140,7 +142,7 @@ export default function LeaderboardPage({onOpenPlayer}:Props){
               <span>{player.wins} / {player.losses}</span>
               <span>{player.winRate}%</span>
               <button disabled={!canOpen} onClick={()=>canOpen&&onOpenPlayer(player,data.platform)}>
-                {canOpen?"Abrir perfil":"Indisponível"}
+                {canOpen?"Abrir perfil":"ID pendente"}
               </button>
             </article>;
           })}

@@ -8465,3 +8465,89 @@ a { color: inherit; text-decoration: none; }
     align-self:flex-start;
   }
 }
+
+
+/* UX polish v5 — navigation, leaderboard identity and compact Ask Chibi */
+.leaderboard-player>span{
+  display:grid;
+  place-items:center;
+}
+.leaderboard-player>span>b{
+  color:#7569d8;
+  font-size:9px;
+}
+.leaderboard-table article.unresolved{
+  background:linear-gradient(90deg,rgba(117,99,231,.025),transparent 28%);
+}
+.leaderboard-table article.unresolved .leaderboard-player small{
+  color:#776e99;
+}
+.leaderboard-table article.resolved>button{
+  border-color:#5b50b8;
+  background:rgba(117,99,231,.08);
+  color:#c5beff;
+}
+.leaderboard-table article.resolved>button:hover{
+  border-color:#7768df;
+  background:rgba(117,99,231,.14);
+}
+.builder-page,
+.leaderboard-page,
+.comps-page,
+.statistics-page,
+.overlay-page{
+  scroll-margin-top:82px;
+}
+
+/* Closed Ask Chibi stays out of the data. It expands only when the user asks for it. */
+.ask-chibi-fab{
+  width:50px;
+  min-width:50px;
+  height:50px;
+  padding:6px;
+  overflow:hidden;
+  justify-content:flex-start;
+  transition:width .18s ease,border-color .18s ease,background .18s ease;
+}
+.ask-chibi-fab .ask-chibi-orb{
+  width:36px;
+  height:36px;
+}
+.ask-chibi-fab>span:last-child{
+  width:0;
+  min-width:0;
+  opacity:0;
+  overflow:hidden;
+  white-space:nowrap;
+  transition:opacity .12s ease,width .18s ease;
+}
+.ask-chibi-fab:hover,
+.ask-chibi-fab:focus-visible,
+.ask-chibi-fab.open{
+  width:178px;
+}
+.ask-chibi-fab:hover>span:last-child,
+.ask-chibi-fab:focus-visible>span:last-child,
+.ask-chibi-fab.open>span:last-child{
+  width:116px;
+  opacity:1;
+}
+
+@media(max-width:700px){
+  .ask-chibi-fab,
+  .ask-chibi-fab:hover,
+  .ask-chibi-fab:focus-visible{
+    width:48px;
+    min-width:48px;
+    height:48px;
+  }
+  .ask-chibi-fab.open{
+    width:48px;
+  }
+  .ask-chibi-fab>span:last-child,
+  .ask-chibi-fab:hover>span:last-child,
+  .ask-chibi-fab:focus-visible>span:last-child,
+  .ask-chibi-fab.open>span:last-child{
+    display:none;
+  }
+}
