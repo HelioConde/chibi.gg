@@ -1,7 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { TftMatch } from "../api/tft";
 import { buildChibiSessionPlan } from "../analysis/chibiSessionPlan";
-import { clearGoal, ChibiGoal, getGoal, goalProgress, saveGoal, suggestGoal } from "../goals";
+import {
+  clearGoal,
+  ChibiGoal,
+  completeGoal,
+  getGoal,
+  getGoalHistory,
+  goalOutcome,
+  goalProgress,
+  saveGoal,
+  suggestGoal,
+} from "../goals";
 import { staticEntry, tftAssetUrl, TftStaticData } from "../tftStatic";
 
 type Props={
@@ -33,6 +43,10 @@ function unitName(id:string,staticData:TftStaticData|null){
   return staticEntry(staticData?.champions,id)?.name||clean(id);
 }
 
+function shortDate(value:number){
+  return new Date(value).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"});
+}
+
 export default function ChibiSessionPlan({
   playerKey,
   matches,
@@ -42,6 +56,7 @@ export default function ChibiSessionPlan({
 }:Props){
   const plan=useMemo(()=>buildChibiSessionPlan(matches),[matches]);
   const [goal,setGoal]=useState<ChibiGoal|null>(()=>getGoal(playerKey));
+  const [historyVersion,setHistoryVersion]=useState(0);
 
   useEffect(()=>{
     setGoal(getGoal(playerKey));
@@ -51,6 +66,14 @@ export default function ChibiSessionPlan({
     ()=>goal?goalProgress(goal,matches):null,
     [goal,matches],
   );
+  const outcome=useMemo(
+    ()=>goal?goalOutcome(goal,matches):null,
+    [goal,matches],
+  );
+  const history=useMemo(()=>{
+    void historyVersion;
+    return getGoalHistory(playerKey);
+  },[playerKey,historyVersion]);
 
   function startGoal(){
     const next=suggestGoal(playerKey,matches);
@@ -61,6 +84,13 @@ export default function ChibiSessionPlan({
   function stopGoal(){
     clearGoal(playerKey);
     setGoal(null);
+  }
+
+  function finishGoal(){
+    const record=completeGoal(playerKey,matches);
+    if(!record)return;
+    setGoal(null);
+    setHistoryVersion(value=>value+1);
   }
 
   const lineCard=(line:typeof plan.primary,kind:"primary"|"alternative")=>{
@@ -135,7 +165,53 @@ export default function ChibiSessionPlan({
       <span>{plan.rule}</span>
     </div>
 
-    <div className={"session-goal-inline "+(goal?"active":"idle")}>
+    {outcome&&<section className={"session-outcome "+outcome.verdict}>
+      <div className="session-outcome-head">
+        <div>
+          <span>RESULTADO DO EXPERIMENTO</span>
+          <h3>{outcome.title}</h3>
+          <p>{outcome.summary}</p>
+        </div>
+        <em>{outcome.achieved?"meta atingida":"meta não atingida"}</em>
+      </div>
+
+      <div className="session-outcome-metrics">
+        <article>
+          <span>COLOCAÇÃO MÉDIA</span>
+          <strong>{outcome.before.avgPlacement??"—"} <i>→</i> {outcome.after.avgPlacement??"—"}</strong>
+          <small>{outcome.before.sample} antes · {outcome.after.sample} depois</small>
+        </article>
+        <article>
+          <span>TOP 4</span>
+          <strong>{outcome.before.top4Rate}% <i>→</i> {outcome.after.top4Rate}%</strong>
+          <small>mudança de {outcome.after.top4Rate-outcome.before.top4Rate>0?"+":""}{outcome.after.top4Rate-outcome.before.top4Rate}%</small>
+        </article>
+        <article>
+          <span>BOTTOM 2</span>
+          <strong>{outcome.before.bottom2Rate}% <i>→</i> {outcome.after.bottom2Rate}%</strong>
+          <small>mudança de {outcome.after.bottom2Rate-outcome.before.bottom2Rate>0?"+":""}{outcome.after.bottom2Rate-outcome.before.bottom2Rate}%</small>
+        </article>
+        <article className="focus">
+          <span>{outcome.metricLabel}</span>
+          <strong>{outcome.metricBefore} <i>→</i> {outcome.metricAfter}</strong>
+          <small>Δ {outcome.metricDelta}</small>
+        </article>
+      </div>
+
+      <div className="session-outcome-next">
+        <div>
+          <span>O QUE FAZER COM ESTE RESULTADO</span>
+          <strong>{outcome.nextFocus}</strong>
+          <small>É um sinal de 5 partidas, não prova de causa. Repita antes de transformar em regra permanente.</small>
+        </div>
+        <div>
+          <button onClick={()=>onEvidence(outcome.matchIds,"Experimento · "+(goal?.title||"sessão"))}>Rever 5 partidas</button>
+          <button className="primary" onClick={finishGoal}>Concluir e salvar</button>
+        </div>
+      </div>
+    </section>}
+
+    {!outcome&&<div className={"session-goal-inline "+(goal?"active":"idle")}>
       {!goal?<>
         <div>
           <span>ACOMPANHAMENTO</span>
@@ -161,6 +237,25 @@ export default function ChibiSessionPlan({
           <button className="secondary" onClick={stopGoal}>Encerrar</button>
         </div>
       </>}
-    </div>
+    </div>}
+
+    {history.length>0&&<details className="session-experiment-history">
+      <summary>
+        <span><b>Experimentos anteriores</b><small>{history.length} resultado(s) salvo(s) neste navegador</small></span>
+        <em>Histórico</em>
+      </summary>
+      <div className="session-history-list">
+        {history.slice(0,5).map(record=>(
+          <article className={record.outcome.verdict} key={record.id}>
+            <div>
+              <span>{shortDate(record.completedAt)} · {record.title}</span>
+              <strong>{record.outcome.title}</strong>
+              <small>{record.outcome.metricLabel}: {record.outcome.metricBefore} → {record.outcome.metricAfter}</small>
+            </div>
+            <button onClick={()=>onEvidence(record.outcome.matchIds,"Experimento salvo · "+record.title)}>Ver partidas</button>
+          </article>
+        ))}
+      </div>
+    </details>}
   </section>;
 }
