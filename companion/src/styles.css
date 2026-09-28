@@ -51,3 +51,13 @@ body{overflow:hidden}
 .compact .do-now h1{font-size:13px}
 .compact .companion-card{max-width:420px}
 @media(max-width:400px){.secondary-grid{grid-template-columns:1fr}.state-strip{grid-template-columns:repeat(3,1fr)}}
+
+.preset-actions,.layout-actions{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.preset-actions button,.layout-actions button,.layout-actions select{border:1px solid #283247;border-radius:7px;background:#111824;color:#7c899e;padding:6px 7px;font-size:7px;font-weight:900;cursor:pointer}
+.preset-actions button.active,.layout-actions button.active{border-color:#6254c6;background:rgba(117,99,231,.13);color:#c9c2ff}
+.layout-actions select{min-width:120px;outline:none}
+.preset-full .do-now h1{font-size:17px}
+.preset-full .do-now li p{font-size:9px}
+.preset-full .secondary-grid article{padding:12px}
+.preset-compact .companion-controls{padding-top:6px}
+.preset-compact .layout-actions{display:none}
