@@ -16,6 +16,7 @@ import {
   TftStaticData,
   queueLabel,
   profileIconUrl,
+  latestTftSetNumber,
 } from "./tftStatic";
 import { buildChibiDNA } from "./analysis/chibiInsights";
 import ChibiInnovations from "./components/ChibiInnovations";
@@ -383,6 +384,9 @@ function App() {
     const filtered=currentSetMatches.filter((m)=>Number(m.queueId)===Number(selectedQueue));
     return filtered.length ? filtered : currentSetMatches;
   },[currentSetMatches,selectedQueue]);
+
+  const staticCurrentSet=useMemo(()=>latestTftSetNumber(staticData),[staticData]);
+  const isHistoricalSet=Boolean(currentSet&&staticCurrentSet&&currentSet<staticCurrentSet);
 
   const metaQueueId=useMemo(
     ()=>selectedQueue ?? (availableQueues.length===1 ? availableQueues[0] : null),
@@ -1026,6 +1030,9 @@ function App() {
 
               <div className="player-summary-copy">
                 <div className="eyebrow">{profile.player.platform.toUpperCase()} · {currentSet?"SET "+currentSet:"TFT"}</div>
+                {isHistoricalSet&&<div className="historical-set-warning">
+                  Histórico do Set {currentSet} · Set atual {staticCurrentSet}
+                </div>}
                 <h1>{profile.player.gameName}<span className="player-tag">#{profile.player.tagLine}</span></h1>
                 <div className="player-rank-line">
                   <strong>{rank ? rank.tier+" "+rank.rank : "Sem rank atual"}</strong>
