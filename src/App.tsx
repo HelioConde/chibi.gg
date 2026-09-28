@@ -33,6 +33,7 @@ import CompsPage from "./components/CompsPage";
 import OverlayPage from "./components/OverlayPage";
 import StatisticsPage, { StatisticsCategory } from "./components/StatisticsPage";
 import GlobalSearch from "./components/GlobalSearch";
+import HomeMetaPreview from "./components/HomeMetaPreview";
 import AskChibi from "./components/AskChibi";
 import ChibiMemory from "./components/ChibiMemory";
 import ReviewQueue from "./components/ReviewQueue";
@@ -809,6 +810,13 @@ function App() {
               <div><strong>Insights</strong><span>o que melhorar, não só números</span></div>
             </div>
           </section>
+
+          <HomeMetaPreview
+            staticData={staticData}
+            onOpenMeta={openMeta}
+            onOpenComps={openComps}
+            onOpenStats={(category,query="")=>openStats(category,query)}
+          />
 
           <section className="feature-grid">
             <article><span>01</span><h3>Seu jogo, não só o meta</h3><p>Descubra quais estilos, traits e ritmos realmente funcionam para você.</p></article>
