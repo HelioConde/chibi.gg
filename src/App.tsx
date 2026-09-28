@@ -34,6 +34,12 @@ import AskChibi from "./components/AskChibi";
 import ChibiMemory from "./components/ChibiMemory";
 import ReviewQueue from "./components/ReviewQueue";
 import { markMatchReviewed } from "./reviewProgress";
+import {
+  getRecentPlayers,
+  removeRecentPlayer,
+  saveRecentPlayer,
+  RecentPlayer,
+} from "./recentPlayers";
 
 function cleanName(value:string){
   return value
@@ -149,9 +155,24 @@ function AugmentVisual({id,staticData}:{id:string;staticData:TftStaticData|null}
 type ProfileTab = "overview"|"review"|"meta"|"matches"|"share";
 
 function parseProfileTab(value:string|null):ProfileTab{
-  return value==="review"||value==="meta"||value==="matches"||value==="share"
+  return value==="review"||value==="meta"||value==="overview"||value==="share"
     ? value
-    : "overview";
+    : "matches";
+}
+
+function unitShopCost(unit:TftUnit,staticData:TftStaticData|null){
+  const entry=staticEntry(staticData?.champions,unit.characterId);
+  const cost=Math.max(1,Math.min(5,Number(entry?.tier||unit.rarity+1||1)));
+  const copies=unit.tier>=3?9:unit.tier===2?3:1;
+  return cost*copies;
+}
+
+function boardValue(match:TftMatch,staticData:TftStaticData|null){
+  return match.units.reduce((sum,unit)=>sum+unitShopCost(unit,staticData),0);
+}
+
+function matchRoundLabel(match:TftMatch){
+  return match.lastRound&&match.lastRound>0?"Round "+match.lastRound:"";
 }
 
 function App() {
@@ -174,7 +195,8 @@ function App() {
   const [evidenceIds,setEvidenceIds]=useState<string[]|null>(null);
   const [evidenceLabel,setEvidenceLabel]=useState("");
   const [journalVersion,setJournalVersion]=useState(0);
-  const [profileTab,setProfileTab]=useState<ProfileTab>("overview");
+  const [profileTab,setProfileTab]=useState<ProfileTab>("matches");
+  const [recentPlayers,setRecentPlayers]=useState<RecentPlayer[]>(()=>getRecentPlayers());
   const [copiedAnalysisLink,setCopiedAnalysisLink]=useState(false);
   const [sitePage,setSitePage]=useState<"main"|"meta"|"comps">(
     window.location.hash==="#meta"?"meta":window.location.hash==="#comps"?"comps":"main"
@@ -182,6 +204,9 @@ function App() {
 
   useEffect(()=>{
     loadTftStaticData().then(setStaticData).catch(()=>{});
+
+    const refreshRecentPlayers=()=>setRecentPlayers(getRecentPlayers());
+    window.addEventListener("chibi:recent-players",refreshRecentPlayers);
 
     const params=new URLSearchParams(window.location.search);
     const player=params.get("player")?.trim();
@@ -219,6 +244,7 @@ function App() {
     return ()=>{
       window.removeEventListener("popstate",onPopState);
       window.removeEventListener("hashchange",onHashChange);
+      window.removeEventListener("chibi:recent-players",refreshRecentPlayers);
     };
   },[]);
 
@@ -384,7 +410,7 @@ function App() {
     tagLine:string,
     region:string,
     updateUrl=true,
-    initialTab:ProfileTab="overview",
+    initialTab:ProfileTab="matches",
     initialQueue:number|null=null,
   ){
     setLoading(true);
@@ -403,6 +429,24 @@ function App() {
       setProfile(data);
       setMatches(data.matches || []);
       setHasMore((data.matches?.length || 0) >= 12);
+
+      const recentRank=data.ranked?.find((row)=>String(row.queueType).toUpperCase()==="RANKED_TFT")
+        || data.ranked?.find((row)=>String(row.queueType).toUpperCase().includes("RANKED_TFT"))
+        || data.ranked?.[0]
+        || null;
+
+      saveRecentPlayer({
+        gameName:data.player.gameName||gameName,
+        tagLine:data.player.tagLine||tagLine,
+        platform:region,
+        level:data.player.level||0,
+        rankLabel:recentRank?recentRank.tier+" "+recentRank.rank:"Sem rank atual",
+        leaguePoints:recentRank?recentRank.leaguePoints:null,
+        averagePlacement:data.summary?.averagePlacement??null,
+        top4Rate:data.summary?.top4Rate??0,
+        matches:data.matches?.length||0,
+        lastSeen:Date.now(),
+      });
 
       if(updateUrl){
         const url=new URL(window.location.href);
@@ -434,6 +478,16 @@ function App() {
   async function handleSubmit(event:FormEvent){
     event.preventDefault();
     await searchPlayer();
+  }
+
+  async function openRecentPlayer(player:RecentPlayer){
+    setRiotId(player.gameName+"#"+player.tagLine);
+    setPlatform(player.platform);
+    await loadPlayer(player.gameName,player.tagLine,player.platform,true,"matches");
+  }
+
+  function forgetRecentPlayer(player:RecentPlayer){
+    setRecentPlayers(removeRecentPlayer(player));
   }
 
   async function loadMore(){
@@ -554,7 +608,7 @@ function App() {
     setSelectedMatch(null);
     setOpenedMatch(null);
     setMatchError("");
-    setProfileTab("overview");
+    setProfileTab("matches");
     clearEvidence();
 
     const url=new URL(window.location.href);
