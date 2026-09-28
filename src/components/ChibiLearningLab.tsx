@@ -451,6 +451,35 @@ export default function ChibiLearningLab({matches,staticData,onEvidence,onOpenBu
     return routes.sort((a,b)=>b.score-a.score).slice(0,3);
   },[packages]);
 
+  const starterPackage=useMemo(()=>{
+    if(packages.length||!globalComps?.comps.length)return null;
+
+    const personalCounts=new Map<string,number>();
+    for(const match of matches){
+      for(const id of new Set(match.units.map(unit=>unit.characterId).filter(Boolean))){
+        personalCounts.set(id,(personalCounts.get(id)||0)+1);
+      }
+    }
+
+    const ranked=globalComps.comps
+      .map(comp=>{
+        const units=comp.units.slice().sort((a,b)=>b.rate-a.rate);
+        const core=units.filter(unit=>unit.rate>=.5).slice(0,4).map(unit=>unit.id);
+        const fallbackCore=core.length>=3?core:units.slice(0,3).map(unit=>unit.id);
+        const overlap=units
+          .filter(unit=>personalCounts.has(unit.id))
+          .reduce((sum,unit)=>sum+(personalCounts.get(unit.id)||0)*unit.rate,0);
+        const personalHits=units.filter(unit=>personalCounts.has(unit.id)&&unit.rate>=.3).length;
+        const contextScore=overlap*18+comp.top4Rate*.45+Math.min(25,comp.games/5)-comp.averagePlacement*2;
+
+        return {comp,core:fallbackCore,overlap,personalHits,contextScore};
+      })
+      .filter(row=>row.core.length>=3&&row.comp.games>=3)
+      .sort((a,b)=>b.contextScore-a.contextScore);
+
+    return ranked[0]||null;
+  },[packages,globalComps,matches]);
+
   const focus=useMemo(()=>focusPlan(matches),[matches]);
 
   return <section className="learning-lab">
@@ -615,9 +644,31 @@ export default function ChibiLearningLab({matches,staticData,onEvidence,onOpenBu
             </article>
           ))}
         </div>
+      ):starterPackage?(
+        <div className="starter-package">
+          <div className="starter-package-copy">
+            <span>DATASET FALLBACK · AINDA NÃO É SEU PACKAGE</span>
+            <h4>Núcleo para explorar enquanto sua amostra cresce</h4>
+            <p>{starterPackage.personalHits>0
+              ? "Este board global compartilha "+starterPackage.personalHits+" unidade(s) com campeões que já apareceram no seu histórico."
+              : "Seu histórico ainda não repetiu um core. O Chibi usa o dataset apenas como ponto de exploração temporário."}</p>
+            <div className="starter-package-core">
+              {starterPackage.core.map(id=><Champion id={id} staticData={staticData} key={id}/>)}
+            </div>
+            <strong>{starterPackage.core.map(id=>championName(id,staticData)).join(" + ")}</strong>
+          </div>
+          <aside>
+            <small>CONTEXTO GLOBAL</small>
+            <div><span>Jogos</span><b>{starterPackage.comp.games}</b></div>
+            <div><span>Média</span><b>{starterPackage.comp.averagePlacement}</b></div>
+            <div><span>Top 4</span><b>{starterPackage.comp.top4Rate}%</b></div>
+            <em>confiança {starterPackage.comp.confidence}</em>
+            {onOpenBuilder&&<button onClick={()=>onOpenBuilder(starterPackage.core)}>Explorar no Builder</button>}
+          </aside>
+        </div>
       ):(
         <div className="learning-empty">
-          Carregue mais partidas para o Chibi detectar núcleos repetidos. Packages só aparecem depois de pelo menos duas ocorrências.
+          Carregue mais partidas para o Chibi detectar núcleos repetidos. Packages pessoais só aparecem depois de pelo menos duas ocorrências.
         </div>
       )}
 
