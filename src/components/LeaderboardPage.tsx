@@ -129,7 +129,7 @@ export default function LeaderboardPage({staticData,onOpenPlayer}:Props){
             return <article className={canOpen?"resolved":"unresolved"} key={player.summonerId||index}>
               <b>{index+1}</b>
               <div className="leaderboard-player">
-                <span>{icon&&<img src={icon} alt=""/>}</span>
+                <span>{icon?<img src={icon} alt=""/>:<b>{index+1}</b>}</span>
                 <div>
                   <strong>{displayName}</strong>
                   <small>{player.tagLine
