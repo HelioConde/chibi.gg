@@ -99,7 +99,7 @@ export function buildJournalBehaviorSignal(matches:TftMatch[]):JournalBehaviorSi
     journaledMatches.filter(match=>match.placement>=5).length/journaledMatches.length*100
   );
 
-  const candidates:JOURNAL_TAGS[number][]=[];
+  const candidates:(typeof JOURNAL_TAGS)[number][]=[];
   for(const meta of JOURNAL_TAGS){
     const mentions=entries.filter(entry=>entry.tags.includes(meta.id)).length;
     if(mentions>=2)candidates.push(meta);
