@@ -7598,3 +7598,89 @@ a { color: inherit; text-decoration: none; }
     text-align:left;
   }
 }
+
+/* -----------------------------------------------------------------------
+   Match history v3 — session timeline
+   ----------------------------------------------------------------------- */
+.match-session-list{
+  gap:12px;
+}
+.history-session-group{
+  display:grid;
+  gap:7px;
+}
+.history-session-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:8px 10px;
+  border:1px solid #20293a;
+  border-radius:10px;
+  background:#0c131c;
+}
+.history-session-head>div:first-child{
+  min-width:0;
+  display:grid;
+  gap:2px;
+}
+.history-session-head>div:first-child>span{
+  color:#7567df;
+  font-size:7px;
+  font-weight:950;
+  letter-spacing:.75px;
+}
+.history-session-head>div:first-child>strong{
+  color:#d6ddea;
+  font-size:9px;
+}
+.history-session-head>div:first-child>small{
+  color:#5f6d82;
+  font-size:7px;
+}
+.history-session-stats{
+  display:flex;
+  gap:5px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.history-session-stats>span{
+  min-width:58px;
+  display:grid;
+  gap:2px;
+  padding:6px 8px;
+  border-radius:7px;
+  background:#111823;
+  text-align:right;
+}
+.history-session-stats small{
+  color:#5f6d82;
+  font-size:6px;
+  font-weight:900;
+}
+.history-session-stats b{
+  color:#d9dfeb;
+  font-size:9px;
+}
+.history-session-stats>span.warning b{
+  color:#e68c8c;
+}
+.history-session-games{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+@media(max-width:760px){
+  .history-session-head{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .history-session-stats{
+    width:100%;
+    justify-content:stretch;
+  }
+  .history-session-stats>span{
+    flex:1;
+    text-align:left;
+  }
+}
