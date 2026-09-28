@@ -15,6 +15,7 @@ import {
   tftAssetUrl,
   TftStaticData,
   queueLabel,
+  profileIconUrl,
 } from "./tftStatic";
 import { buildChibiDNA } from "./analysis/chibiInsights";
 import ChibiInnovations from "./components/ChibiInnovations";
@@ -41,6 +42,7 @@ import AskChibi from "./components/AskChibi";
 import ChibiMemory from "./components/ChibiMemory";
 import ReviewQueue from "./components/ReviewQueue";
 import PlayerEvolution from "./components/PlayerEvolution";
+import DDragonArt from "./components/DDragonArt";
 import { markMatchReviewed } from "./reviewProgress";
 import { recordRankSnapshot } from "./rankHistory";
 import {
@@ -486,6 +488,7 @@ function App() {
         tagLine:data.player.tagLine||tagLine,
         platform:region,
         level:data.player.level||0,
+        profileIconId:data.player.profileIconId||0,
         rankLabel:recentRank?recentRank.tier+" "+recentRank.rank:"Sem rank atual",
         leaguePoints:recentRank?recentRank.leaguePoints:null,
         averagePlacement:data.summary?.averagePlacement??null,
@@ -795,7 +798,8 @@ function App() {
         />
       ) : !profile ? (
         <main className="landing">
-          <section className="hero">
+          <section className="hero hero-with-ddragon">
+            <DDragonArt staticData={staticData} variant="hero" label="Riot Data Dragon"/>
             <div className="eyebrow">TFT FIRST. DATA THAT HELPS YOU CLIMB.</div>
             <h1>Entenda suas partidas.<br /><span>Suba com intenção.</span></h1>
             <p>Busque qualquer Riot ID e veja rank, histórico, comps, padrões e insights pensados especificamente para Teamfight Tactics.</p>
@@ -832,7 +836,11 @@ function App() {
                   .map(player=>(
                     <article className="recent-player-card" key={player.platform+":"+player.gameName+"#"+player.tagLine}>
                       <button className="recent-player-open" onClick={()=>void openRecentPlayer(player)}>
-                        <span className="recent-player-avatar">{player.gameName.slice(0,1).toUpperCase()}</span>
+                        <span className="recent-player-avatar">
+                          {staticData&&player.profileIconId
+                            ?<img src={profileIconUrl(staticData.version,player.profileIconId)} alt="" onError={(e)=>{e.currentTarget.style.display="none";}}/>
+                            :player.gameName.slice(0,1).toUpperCase()}
+                        </span>
                         <span className="recent-player-copy">
                           <strong>{player.gameName}<small>#{player.tagLine}</small></strong>
                           <em>{player.platform.toUpperCase()} · {player.rankLabel}{player.leaguePoints!=null?" · "+player.leaguePoints+" LP":""}</em>
@@ -872,10 +880,21 @@ function App() {
         <main className="profile-page">
           <button className="back-search" onClick={resetSearch}>← Nova busca</button>
 
-          <section className="player-summary-shell">
+          <section className="player-summary-shell player-summary-visual">
+            <div className="player-summary-board-art" aria-hidden="true">
+              {analysisMatches[0]?.units.slice(0,5).map((unit,index)=>{
+                const entry=staticEntry(staticData?.champions,unit.characterId);
+                const src=staticData?tftAssetUrl(staticData.version,"champion",entry):"";
+                return src?<img src={src} alt="" key={unit.characterId+index}/>:null;
+              })}
+            </div>
             <div className="player-summary-main">
               <div className="player-avatar-wrap">
-                <div className="avatar">{profile.player.gameName.slice(0,1).toUpperCase()}</div>
+                <div className="avatar">
+                  {staticData&&profile.player.profileIconId
+                    ?<img src={profileIconUrl(staticData.version,profile.player.profileIconId)} alt="" onError={(e)=>{e.currentTarget.style.display="none";}}/>
+                    :profile.player.gameName.slice(0,1).toUpperCase()}
+                </div>
                 <span>{profile.player.level}</span>
               </div>
 
