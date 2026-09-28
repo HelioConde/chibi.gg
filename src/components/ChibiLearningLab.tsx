@@ -8,6 +8,7 @@ type Props={
   matches:TftMatch[];
   staticData:TftStaticData|null;
   onEvidence:(ids:string[],label:string)=>void;
+  onOpenBuilder?:(championIds:string[])=>void;
 };
 
 type LossSignal={
@@ -320,7 +321,7 @@ function Champion({id,staticData}:{id:string;staticData:TftStaticData|null}){
   </span>;
 }
 
-export default function ChibiLearningLab({matches,staticData,onEvidence}:Props){
+export default function ChibiLearningLab({matches,staticData,onEvidence,onOpenBuilder}:Props){
   const [globalComps,setGlobalComps]=useState<TftGlobalComps|null>(null);
   const [globalLoading,setGlobalLoading]=useState(false);
   const losses=useMemo(
@@ -566,9 +567,14 @@ export default function ChibiLearningLab({matches,staticData,onEvidence}:Props){
                 ):<p>Sem conectores recorrentes suficientes.</p>}
               </div>
 
-              <button onClick={()=>onEvidence(pack.games.map(game=>game.id),"Flex Package · "+pack.units.map(id=>championName(id,staticData)).join(" + "))}>
-                Ver boards que usaram esse núcleo
-              </button>
+              <div className="flex-package-actions">
+                <button onClick={()=>onEvidence(pack.games.map(game=>game.id),"Flex Package · "+pack.units.map(id=>championName(id,staticData)).join(" + "))}>
+                  Ver evidências
+                </button>
+                {onOpenBuilder&&<button className="primary" onClick={()=>onOpenBuilder(pack.units)}>
+                  Testar no Builder
+                </button>}
+              </div>
             </article>
           ))}
         </div>
