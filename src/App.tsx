@@ -1024,11 +1024,8 @@ function App() {
         </button>
         <nav>
           <button className={sitePage==="meta"?"active":""} onClick={openMeta}>Meta</button>
-          <button className={sitePage==="comps"?"active":""} onClick={openComps}>Comps</button>
-          <button className={sitePage==="stats"?"active":""} onClick={()=>openStats()}>Statistics</button>
           <button className={"builder-nav-button "+(sitePage==="builder"?"active":"")} onClick={()=>openBuilder([])}>Builder</button>
           <button className={sitePage==="leaderboard"?"active":""} onClick={openLeaderboard}>Leaderboard</button>
-          <button className={sitePage==="overlay"?"active":""} onClick={openOverlay}>Companion</button>
         </nav>
         <GlobalSearch
           staticData={staticData}
@@ -1099,99 +1096,76 @@ function App() {
           onBack={closeExplorePage}
         />
       ) : !profile ? (
-        <main className="landing">
-          <section className="hero hero-with-ddragon hero-with-uploaded-art">
-            <img className="uploaded-hero-art" src={SITE_IMAGES.art} alt="" aria-hidden="true"/>
-            <img className="uploaded-icons-art" src={SITE_IMAGES.icons} alt="" aria-hidden="true"/>
-            <DDragonArt staticData={staticData} variant="hero" label="Riot Data Dragon"/>
-            <div className="eyebrow">TFT FIRST · PERSONAL COACHING FROM YOUR MATCHES</div>
-            <h1>Descubra por que você está<br /><span>subindo — ou caindo.</span></h1>
-            <p>Digite seu Riot ID. O Chibi analisa suas próprias partidas, encontra padrões que você pode não ter percebido e mostra a evidência por trás de cada leitura.</p>
+        <main className="landing landing-v2">
+          <section className="home-hero-v2">
+            <div className="home-hero-copy">
+              <div className="eyebrow">TFT DE VERDADE · DADOS QUE AJUDAM VOCÊ A SUBIR</div>
+              <h1>Entenda suas partidas.<br/><span>Suba com intenção.</span></h1>
+              <p>Busque seu Riot ID para ver evolução, partidas, padrões e caminhos práticos para melhorar no TFT.</p>
 
-            <form className="search-box" onSubmit={handleSubmit}>
-              <select aria-label="Região" value={platform} onChange={(e)=>setPlatform(e.target.value)}>
-                <option value="br1">BR</option><option value="na1">NA</option><option value="euw1">EUW</option>
-                <option value="eun1">EUNE</option><option value="kr">KR</option><option value="jp1">JP</option>
-                <option value="la1">LAN</option><option value="la2">LAS</option><option value="oc1">OCE</option>
-              </select>
-              <input value={riotId} onChange={(e)=>setRiotId(e.target.value)} placeholder="Nome#TAG" aria-label="Riot ID"/>
-              <button type="submit" disabled={loading}>{loading ? "Analisando..." : "Analisar meu TFT"}</button>
-            </form>
+              <form className="search-box home-search-v2" onSubmit={handleSubmit}>
+                <select aria-label="Região" value={platform} onChange={(e)=>setPlatform(e.target.value)}>
+                  <option value="br1">BR</option><option value="na1">NA</option><option value="euw1">EUW</option>
+                  <option value="eun1">EUNE</option><option value="kr">KR</option><option value="jp1">JP</option>
+                  <option value="la1">LAN</option><option value="la2">LAS</option><option value="oc1">OCE</option>
+                </select>
+                <input id="home-riot-id" value={riotId} onChange={(e)=>setRiotId(e.target.value)} placeholder="Nome#TAG" aria-label="Riot ID"/>
+                <button type="submit" disabled={loading}>{loading ? "Analisando..." : "Buscar jogador →"}</button>
+              </form>
 
-            {error && <div className="lookup-error">{error}</div>}
+              {error && <div className="lookup-error">{error}</div>}
 
-            <section className="hero-insight-preview" aria-label="Exemplo do Chibi Review">
-              <div className="hero-insight-kicker">
-                <span>CHIBI INSIGHT</span>
-                <em>exemplo</em>
-              </div>
-              <div className="hero-insight-main">
-                <strong>Seus Top 4 continuam estáveis, mas seus jogos ruins estão terminando mais baixo.</strong>
-                <p>O Chibi não entrega só uma nota: ele mostra quais partidas sustentam a leitura, o tamanho da amostra e a confiança do sinal.</p>
-              </div>
-              <div className="hero-insight-proof">
-                <span><b>10</b><small>partidas recentes</small></span>
-                <span><b>3</b><small>descobertas principais</small></span>
-                <span><b>1 clique</b><small>para abrir evidências</small></span>
-              </div>
-            </section>
-
-            <HomeSessionResume
-              recentPlayers={recentPlayers}
-              onOpenSession={(player)=>{void openRecentSession(player);}}
-              onOpenLesson={(player)=>{void openRecentLesson(player);}}
-            />
-
-            <HomeStudyShelf
-              onOpenBuilder={openBuilder}
-              onOpenStats={(category,query)=>openStats(category,query,"stats")}
-            />
-
-            {recentPlayers.length>0&&<section className="recent-players">
-              <div className="recent-players-head">
-                <div>
-                  <span>HISTÓRICO</span>
-                  <strong>Jogadores pesquisados recentemente</strong>
-                </div>
-                <small>{recentPlayers.length} salvo{recentPlayers.length===1?"":"s"} neste navegador</small>
-              </div>
-
-              <div className="recent-player-list">
-                {recentPlayers
-                  .filter(player=>{
-                    const query=riotId.trim().toLowerCase();
-                    if(!query) return true;
-                    return (player.gameName+"#"+player.tagLine).toLowerCase().includes(query);
-                  })
-                  .slice(0,5)
-                  .map(player=>(
-                    <article className="recent-player-card" key={player.platform+":"+player.gameName+"#"+player.tagLine}>
-                      <button className="recent-player-open" onClick={()=>void openRecentPlayer(player)}>
-                        <span className="recent-player-avatar">
-                          {staticData&&player.profileIconId
-                            ?<img src={profileIconUrl(staticData.version,player.profileIconId)} alt="" onError={(e)=>{e.currentTarget.style.display="none";}}/>
-                            :player.gameName.slice(0,1).toUpperCase()}
-                        </span>
-                        <span className="recent-player-copy">
-                          <strong>{player.gameName}<small>#{player.tagLine}</small></strong>
-                          <em>{player.platform.toUpperCase()} · {player.rankLabel}{player.leaguePoints!=null?" · "+player.leaguePoints+" LP":""}</em>
-                        </span>
-                        <span className="recent-player-stats">
-                          <b>{player.averagePlacement??"—"}</b>
-                          <small>média</small>
-                        </span>
-                      </button>
-                      <button className="recent-player-remove" onClick={()=>forgetRecentPlayer(player)} aria-label={"Remover "+player.gameName+" do histórico"}>×</button>
-                    </article>
-                  ))}
-              </div>
-            </section>}
-
-            <div className="quick-stats">
-              <div><strong>Sem cadastro</strong><span>valor antes de pedir uma conta</span></div>
-              <div><strong>Evidência aberta</strong><span>cada insight leva às partidas</span></div>
-              <div><strong>Seu jogo primeiro</strong><span>meta global entra como contexto</span></div>
+              {recentPlayers[0]&&<button className="home-last-player" onClick={()=>void openRecentPlayer(recentPlayers[0])}>
+                <span className="home-last-player-avatar">
+                  {staticData&&recentPlayers[0].profileIconId
+                    ?<img src={profileIconUrl(staticData.version,recentPlayers[0].profileIconId)} alt=""/>
+                    :recentPlayers[0].gameName.slice(0,1).toUpperCase()}
+                </span>
+                <span>
+                  <small>ÚLTIMA BUSCA</small>
+                  <strong>{recentPlayers[0].gameName}<em>#{recentPlayers[0].tagLine}</em></strong>
+                </span>
+                <b>{recentPlayers[0].averagePlacement??"—"} <small>média</small></b>
+              </button>}
             </div>
+
+            <div className="home-hero-visual" aria-hidden="true">
+              <div className="home-hero-glow"></div>
+              <img src={SITE_IMAGES.art} alt=""/>
+              <DDragonArt staticData={staticData} variant="compact" label="Riot Data Dragon"/>
+            </div>
+          </section>
+
+          <section className="home-paths-v2" aria-label="Principais caminhos do Chibi">
+            <button onClick={openMeta}>
+              <span className="home-path-icon meta">✦</span>
+              <div>
+                <small>META</small>
+                <h2>O que está funcionando agora</h2>
+                <p>Comps e traits observados no patch atual.</p>
+              </div>
+              <b>→</b>
+            </button>
+
+            <button onClick={()=>document.getElementById("home-riot-id")?.focus()}>
+              <span className="home-path-icon profile">◎</span>
+              <div>
+                <small>SEU JOGO</small>
+                <h2>Entenda suas próprias partidas</h2>
+                <p>Perfil, histórico e Coach a partir do seu Riot ID.</p>
+              </div>
+              <b>→</b>
+            </button>
+
+            <button onClick={()=>openBuilder([])}>
+              <span className="home-path-icon builder">◇</span>
+              <div>
+                <small>BUILDER</small>
+                <h2>Planeje antes de jogar</h2>
+                <p>Monte boards, itens, Augments e transições.</p>
+              </div>
+              <b>→</b>
+            </button>
           </section>
 
           <HomeMetaPreview
@@ -1201,10 +1175,29 @@ function App() {
             onOpenStats={(category,query="")=>openStats(category,query)}
           />
 
-          <section className="feature-grid">
-            <article><span>01</span><h3>3 descobertas, não 30 cards</h3><p>O Chibi prioriza os sinais pessoais mais importantes e deixa a estatística detalhada como evidência.</p></article>
-            <article><span>02</span><h3>Veja o que mudou</h3><p>Compare sessões, patches e blocos recentes para descobrir se você realmente está evoluindo.</p></article>
-            <article><span>03</span><h3>Seu meta pessoal</h3><p>Compare o que é forte globalmente com as linhas que de fato estão funcionando no seu histórico.</p></article>
+          <section className="home-builder-v2">
+            <div className="home-builder-copy">
+              <span>MONTE · TESTE · EVOLUA</span>
+              <h2>Builder mais inteligente.</h2>
+              <p>Monte sua composição, organize itens e Augments, compare versões e planeje como chegar no board final sem transformar a tela em uma planilha.</p>
+              <button onClick={()=>openBuilder([])}>Explorar o Builder →</button>
+            </div>
+
+            <div className="home-builder-demo" aria-hidden="true">
+              <div className="home-builder-demo-head">
+                <span>BOARD</span>
+                <small>planejamento rápido</small>
+              </div>
+              <div className="home-builder-board">
+                {Array.from({length:14}).map((_,index)=><i className={index===3||index===5||index===8||index===10?"filled":""} key={index}></i>)}
+              </div>
+              <DDragonArt staticData={staticData} variant="compact" label="Champions do set"/>
+              <div className="home-builder-demo-footer">
+                <span><b>8</b><small>Nível</small></span>
+                <span><b>32G</b><small>Planejado</small></span>
+                <span><b>3/3</b><small>Augments</small></span>
+              </div>
+            </div>
           </section>
         </main>
       ) : (
