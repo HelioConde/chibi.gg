@@ -9907,3 +9907,17 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
   .study-reply-footer>div{display:grid;grid-template-columns:1fr}
   .study-reply-footer button{width:100%}
 }
+
+
+/* CHIBI PRIMARY INSIGHT ON MATCHES */
+.matches-priority-bar.tone-positive{
+  border-color:rgba(72,209,153,.26);
+  background:linear-gradient(110deg,rgba(72,209,153,.045),rgba(117,99,231,.035) 52%,#0b1119);
+}
+.matches-priority-bar.tone-warning{
+  border-color:rgba(255,167,92,.28);
+  background:linear-gradient(110deg,rgba(255,167,92,.05),rgba(117,99,231,.025) 52%,#0b1119);
+}
+.matches-priority-bar.tone-neutral{
+  border-color:rgba(117,99,231,.25);
+}
