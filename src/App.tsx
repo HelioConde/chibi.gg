@@ -35,7 +35,9 @@ import StatisticsPage from "./components/StatisticsPage";
 import AskChibi from "./components/AskChibi";
 import ChibiMemory from "./components/ChibiMemory";
 import ReviewQueue from "./components/ReviewQueue";
+import PlayerEvolution from "./components/PlayerEvolution";
 import { markMatchReviewed } from "./reviewProgress";
+import { recordRankSnapshot } from "./rankHistory";
 import {
   getRecentPlayers,
   removeRecentPlayer,
@@ -453,6 +455,9 @@ function App() {
         || data.ranked?.find((row)=>String(row.queueType).toUpperCase().includes("RANKED_TFT"))
         || data.ranked?.[0]
         || null;
+
+      const playerKey=region+":"+(data.player.gameName||gameName)+"#"+(data.player.tagLine||tagLine);
+      recordRankSnapshot(playerKey,data.ranked||[]);
 
       saveRecentPlayer({
         gameName:data.player.gameName||gameName,
@@ -1053,6 +1058,13 @@ function App() {
               </details>
             </aside>
           </div>
+
+          {!evidenceIds?.length&&<PlayerEvolution
+            playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
+            matches={analysisMatches}
+            staticData={staticData}
+            onEvidence={showEvidence}
+          />}
 
           {!evidenceIds?.length&&<ReviewQueue
             playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
