@@ -121,7 +121,7 @@ export default function CompsPage({staticData,matches,hasProfile,onBack,onEviden
     return (data?.comps||[]).map(comp=>{
       const fit=personalFit(comp,matches);
       const global=performanceScore(comp);
-      const confidence=comp.confidence==="alta"?1:comp.confidence==="média"?.8:.55;
+      const confidence=comp.confidence==="alta"?1:comp.confidence==="média"?0.8:0.55;
       const personalized=hasProfile
         ? fit.score*.62+global*100*.23+confidence*15
         : global*100;
