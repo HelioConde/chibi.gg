@@ -11,6 +11,7 @@ import {
   TftStaticData,
 } from "../tftStatic";
 import DDragonArt from "./DDragonArt";
+import { saveStudyShelfItem } from "../studyShelf";
 
 export type StatisticsCategory="champions"|"traits"|"items"|"augments";
 type Category=StatisticsCategory;
@@ -179,6 +180,7 @@ export default function StatisticsPage({
   const [error,setError]=useState("");
   const [query,setQuery]=useState(initialQuery);
   const [selectedEntityId,setSelectedEntityId]=useState<string|null>(null);
+  const [shelfSavedId,setShelfSavedId]=useState<string>("");
 
   useEffect(()=>{
     setCategory(initialCategory);
@@ -316,6 +318,17 @@ export default function StatisticsPage({
     augments:"Augments",
   }[category];
 
+  function saveStatToShelf(row:typeof rows[number]){
+    saveStudyShelfItem({
+      type:"stat",
+      label:labelFor(category,row.id,staticData),
+      subtitle:categoryLabel+" · "+row.games+" jogos · média "+row.averagePlacement,
+      category,
+      entityId:row.id,
+    });
+    setShelfSavedId(category+":"+row.id);
+  }
+
   return <main className="statistics-page">
     <section className="statistics-hero">
       <div>
@@ -452,6 +465,9 @@ export default function StatisticsPage({
             selectedRow.personal!.matchIds,
             categoryLabel+" · "+labelFor(category,selectedRow.id,staticData),
           )}>Abrir suas evidências</button>}
+          <button className="statistics-shelf-button" onClick={()=>saveStatToShelf(selectedRow)}>
+            {shelfSavedId===category+":"+selectedRow.id?"Salvo no Shelf ✓":"Salvar no Study Shelf"}
+          </button>
         </article>
       </div>
     </section>}
