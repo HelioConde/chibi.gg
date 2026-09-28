@@ -147,6 +147,12 @@ class OverlayWindow(QMainWindow):
         self.click_button.clicked.connect(self.toggle_clickthrough)
         header.addWidget(self.click_button)
 
+        self.close_button = QPushButton("×")
+        self.close_button.setObjectName("closeButton")
+        self.close_button.setToolTip("Encerrar Chibi Companion")
+        self.close_button.clicked.connect(self.request_exit)
+        header.addWidget(self.close_button)
+
         layout.addLayout(header)
 
         self.rank_label = QLabel("Perfil ainda não conectado")
@@ -325,6 +331,11 @@ class OverlayWindow(QMainWindow):
             border-color: #6758bf;
             color: #ded8ff;
             background: #151d2b;
+        }
+        #closeButton:hover {
+            border-color: #d36171;
+            color: #ffffff;
+            background: #6a2532;
         }
         #brandIcon {
             min-width: 30px;
