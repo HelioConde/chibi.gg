@@ -96,6 +96,29 @@ export type TftGlobalStats = {
   augments:TftGlobalEntityStat[];
 };
 
+export type TftLeaderboardPlayer = {
+  gameName:string;
+  tagLine:string;
+  summonerId:string;
+  leaguePoints:number;
+  wins:number;
+  losses:number;
+  games:number;
+  winRate:number;
+  level:number;
+  profileIconId:number;
+  hotStreak:boolean;
+  veteran:boolean;
+  freshBlood:boolean;
+};
+
+export type TftLeaderboard = {
+  platform:string;
+  tier:"challenger"|"grandmaster"|"master";
+  name:string;
+  players:TftLeaderboardPlayer[];
+};
+
 export type TftMatchDetail = {
   match: {
     id: string;
@@ -179,6 +202,19 @@ export function fetchTftStats(setNumber:number,queueId?:number|null,minGames=2,l
     setNumber,
     queueId:queueId||0,
     minGames,
+    limit,
+  });
+}
+
+
+export function fetchTftLeaderboard(
+  platform:string,
+  tier:"challenger"|"grandmaster"|"master"="challenger",
+  limit=20,
+){
+  return invoke<TftLeaderboard>("public-tft-leaderboard",{
+    platform,
+    tier,
     limit,
   });
 }
