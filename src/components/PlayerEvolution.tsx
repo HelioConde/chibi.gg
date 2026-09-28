@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { TftMatch } from "../api/tft";
-import { staticEntry, tftAssetUrl, TftStaticData } from "../tftStatic";
+import { queueLabel, staticEntry, tftAssetUrl, TftStaticData } from "../tftStatic";
 import { getRankHistory, RankSnapshot } from "../rankHistory";
 
 type Props={
@@ -105,6 +105,26 @@ export default function PlayerEvolution({playerKey,matches,staticData,onEvidence
 
   const recentPlacements=matches.slice(0,10).map(match=>match.placement);
 
+  const modes=useMemo(()=>{
+    const map=new Map<number,TftMatch[]>();
+    for(const match of matches){
+      const queue=Number(match.queueId)||0;
+      if(!queue) continue;
+      const list=map.get(queue)||[];
+      list.push(match);
+      map.set(queue,list);
+    }
+    return [...map.entries()]
+      .map(([queueId,games])=>({
+        queueId,
+        games:games.length,
+        averagePlacement:+(games.reduce((sum,match)=>sum+match.placement,0)/games.length).toFixed(2),
+        top4Rate:Math.round(games.filter(match=>match.placement<=4).length/games.length*100),
+        matchIds:games.map(match=>match.id),
+      }))
+      .sort((a,b)=>b.games-a.games);
+  },[matches]);
+
   return <section className="profile-depth-grid">
     <article className="panel player-depth-card rank-history-card">
       <div className="depth-card-head">
@@ -180,6 +200,25 @@ export default function PlayerEvolution({playerKey,matches,staticData,onEvidence
             <b>{row.top4Rate}%</b>
           </button>;
         }):<p className="depth-empty">Ainda não há champions repetidos o suficiente.</p>}
+      </div>
+    </article>
+
+    <article className="panel player-depth-card">
+      <div className="depth-card-head">
+        <div>
+          <span>OTHER MODES</span>
+          <h3>Filas carregadas</h3>
+        </div>
+      </div>
+
+      <div className="depth-list">
+        {modes.length?modes.map(mode=>(
+          <button onClick={()=>onEvidence(mode.matchIds,"Fila · "+queueLabel(staticData,mode.queueId))} key={mode.queueId}>
+            <span className="depth-mode-icon">{queueLabel(staticData,mode.queueId).slice(0,2).toUpperCase()}</span>
+            <span><strong>{queueLabel(staticData,mode.queueId)}</strong><small>{mode.games} jogos · média {mode.averagePlacement}</small></span>
+            <b>{mode.top4Rate}%</b>
+          </button>
+        )):<p className="depth-empty">Nenhuma fila identificada na amostra.</p>}
       </div>
     </article>
 
