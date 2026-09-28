@@ -210,7 +210,7 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
     <div className="review-head coach-review-head">
       <div className="coach-review-copy">
         <span>CHIBI REVIEW</span>
-        <h2>3 descobertas sobre o seu jogo</h2>
+        <h2>Até 3 descobertas sobre o seu jogo</h2>
         <p>O Chibi compara vários sinais do seu histórico e mostra apenas os 3 mais relevantes agora, sempre com evidência e confiança.</p>
         <DDragonArt
           staticData={staticData}
@@ -221,6 +221,11 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
       </div>
       <small>{matches.length} partidas</small>
     </div>
+
+    {rankedSignals.length===0&&<div className="coach-review-empty">
+      <strong>Ainda não há partidas suficientes para priorizar sinais.</strong>
+      <span>Assim que o histórico carregar, o Chibi compara os padrões e escolhe o que merece aparecer primeiro.</span>
+    </div>}
 
     <div className="coach-signal-row ranked-review-signals">
       {rankedSignals.map((signal,index)=>(
