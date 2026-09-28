@@ -452,6 +452,16 @@ function App() {
     return session;
   },[analysisMatches]);
 
+  const openedMatchNavigation=useMemo(()=>{
+    if(!openedMatch)return {newer:null as TftMatch|null,older:null as TftMatch|null,index:-1};
+    const index=analysisMatches.findIndex(match=>match.id===openedMatch.id);
+    return {
+      index,
+      newer:index>0?analysisMatches[index-1]:null,
+      older:index>=0&&index<analysisMatches.length-1?analysisMatches[index+1]:null,
+    };
+  },[openedMatch,analysisMatches]);
+
   const latestPlayedAt=useMemo(
     ()=>Math.max(0,...analysisMatches.map((m)=>Number(m.playedAt)||0)),
     [analysisMatches]
@@ -1325,7 +1335,20 @@ function App() {
                   <h2>{openedMatch ? matchReviewCue(openedMatch).title : displaySetName(selectedMatch.match.setName,selectedMatch.match.setNumber)}</h2>
                   <p>{displaySetName(selectedMatch.match.setName,selectedMatch.match.setNumber)} · {queueLabel(staticData,selectedMatch.match.queueId)} · {formatWhen(selectedMatch.match.playedAt)}</p>
                 </div>
-                {openedMatch&&<div className={"modal-placement "+placementClass(openedMatch.placement)}>{openedMatch.placement}º</div>}
+                {openedMatch&&<div className="match-modal-head-actions">
+                  <div className="match-modal-nav">
+                    <button
+                      disabled={!openedMatchNavigation.newer||matchLoading}
+                      onClick={()=>openedMatchNavigation.newer&&void openMatch(openedMatchNavigation.newer)}
+                    >← Mais recente</button>
+                    <span>{openedMatchNavigation.index>=0?openedMatchNavigation.index+1:"—"} / {analysisMatches.length}</span>
+                    <button
+                      disabled={!openedMatchNavigation.older||matchLoading}
+                      onClick={()=>openedMatchNavigation.older&&void openMatch(openedMatchNavigation.older)}
+                    >Mais antiga →</button>
+                  </div>
+                  <div className={"modal-placement "+placementClass(openedMatch.placement)}>{openedMatch.placement}º</div>
+                </div>}
               </div>
 
               {openedMatch&&<section className="match-summary-card">
