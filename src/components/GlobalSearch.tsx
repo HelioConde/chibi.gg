@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { RecentPlayer } from "../recentPlayers";
-import { TftStaticData, TftStaticEntry } from "../tftStatic";
+import { profileIconUrl, TftStaticData, TftStaticEntry } from "../tftStatic";
 
 type Category="champions"|"traits"|"items"|"augments";
 
@@ -10,7 +10,7 @@ type Props={
   onOpenRecent:(player:RecentPlayer)=>void;
   onOpenStats:(category:Category,query:string)=>void;
   onSearchPlayer:(riotId:string)=>void;
-  onOpenPage:(page:"meta"|"comps"|"stats"|"overlay")=>void;
+  onOpenPage:(page:"meta"|"comps"|"stats"|"builder"|"overlay")=>void;
 };
 
 type StaticResult={
@@ -142,6 +142,7 @@ export default function GlobalSearch({
           <button onClick={()=>{onOpenPage("meta");close();}}><span>Meta</span><small>visão geral do dataset</small></button>
           <button onClick={()=>{onOpenPage("comps");close();}}><span>Comps</span><small>boards observados</small></button>
           <button onClick={()=>{onOpenPage("stats");close();}}><span>Statistics</span><small>champions, traits, items e augments</small></button>
+          <button onClick={()=>{onOpenPage("builder");close();}}><span>Builder</span><small>monte e compare boards</small></button>
           <button onClick={()=>{onOpenPage("overlay");close();}}><span>Overlay</span><small>Grande mudança 1</small></button>
         </div>}
 
@@ -149,7 +150,11 @@ export default function GlobalSearch({
           <div className="global-search-section-head"><span>PERFIS</span><small>recentes neste navegador</small></div>
           {recentResults.map(player=>(
             <button className="global-search-result profile-result" onClick={()=>{onOpenRecent(player);close();}} key={player.platform+":"+player.gameName+"#"+player.tagLine}>
-              <span className="search-result-avatar">{player.gameName.slice(0,1).toUpperCase()}</span>
+              <span className="search-result-avatar">
+                {staticData&&player.profileIconId
+                  ?<img src={profileIconUrl(staticData.version,player.profileIconId)} alt="" onError={(e)=>{e.currentTarget.style.display="none";}}/>
+                  :player.gameName.slice(0,1).toUpperCase()}
+              </span>
               <span><strong>{player.gameName}<em>#{player.tagLine}</em></strong><small>{player.platform.toUpperCase()} · {player.rankLabel}</small></span>
               <b>{player.averagePlacement??"—"}</b>
             </button>
