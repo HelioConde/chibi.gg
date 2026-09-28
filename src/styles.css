@@ -12420,3 +12420,16 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
     min-height:36px;
   }
 }
+
+
+/* Session Journal Question — behavioral reflection from self-reported patterns */
+.session-journal-question{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:10px;padding:10px 12px;border:1px solid rgba(89,181,225,.2);background:rgba(45,111,151,.045);border-radius:10px}
+.session-journal-question>div{min-width:0}
+.session-journal-question>div>span{display:block;color:#7fcff3;font-size:7px;font-weight:900;letter-spacing:.85px}
+.session-journal-question strong{display:block;margin:4px 0;color:#d6deec;font-size:10px;line-height:1.4}
+.session-journal-question small{display:block;color:#6f7c91;font-size:7px}
+.session-journal-question>em{flex:none;max-width:190px;color:#647086;font-size:7px;font-style:normal;line-height:1.4;text-align:right}
+@media(max-width:650px){
+  .session-journal-question{align-items:flex-start;flex-direction:column}
+  .session-journal-question>em{max-width:none;text-align:left}
+}
