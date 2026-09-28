@@ -3,6 +3,7 @@ export type RecentPlayer={
   tagLine:string;
   platform:string;
   level:number;
+  profileIconId?:number;
   rankLabel:string;
   leaguePoints:number|null;
   averagePlacement:number|null;
