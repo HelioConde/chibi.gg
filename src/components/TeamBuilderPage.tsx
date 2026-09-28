@@ -328,22 +328,6 @@ export default function TeamBuilderPage({
       .slice(0,10);
   },[matches]);
 
-  const contextOverlap=useMemo(()=>{
-    if(!similar.length)return {item:null as number|null,augment:null as number|null,withAugment:0};
-    const itemValues=similar
-      .map(({match})=>itemSimilarity(units,match))
-      .filter((value):value is number=>value!=null);
-    const augmentValues=similar
-      .map(({match})=>augmentSimilarity(selectedAugments,match))
-      .filter((value):value is number=>value!=null);
-
-    return {
-      item:itemValues.length?itemValues.reduce((sum,value)=>sum+value,0)/itemValues.length:null,
-      augment:augmentValues.length?augmentValues.reduce((sum,value)=>sum+value,0)/augmentValues.length:null,
-      withAugment:augmentValues.filter(value=>value>0).length,
-    };
-  },[similar,units,selectedAugments]);
-
   const bridgeCandidate=useMemo(
     ()=>candidateUnits.slice().sort((a,b)=>a.cost-b.cost||b.sharedScore-a.sharedScore)[0]||null,
     [candidateUnits]
@@ -452,6 +436,22 @@ export default function TeamBuilderPage({
   const top4Rate=similar.length
     ? Math.round(similar.filter(row=>row.match.placement<=4).length/similar.length*100)
     : null;
+
+  const contextOverlap=useMemo(()=>{
+    if(!similar.length)return {item:null as number|null,augment:null as number|null,withAugment:0};
+    const itemValues=similar
+      .map(({match})=>itemSimilarity(units,match))
+      .filter((value):value is number=>value!=null);
+    const augmentValues=similar
+      .map(({match})=>augmentSimilarity(selectedAugments,match))
+      .filter((value):value is number=>value!=null);
+
+    return {
+      item:itemValues.length?itemValues.reduce((sum,value)=>sum+value,0)/itemValues.length:null,
+      augment:augmentValues.length?augmentValues.reduce((sum,value)=>sum+value,0)/augmentValues.length:null,
+      withAugment:augmentValues.filter(value=>value>0).length,
+    };
+  },[similar,units,selectedAugments]);
 
   const boardValue=units.reduce(
     (sum,unit)=>sum+costFor(unit.id,staticData)*copiesFor(unit.tier||1),
@@ -789,6 +789,94 @@ export default function TeamBuilderPage({
         <b>Clique em um hex vazio para adicionar ou em uma unidade para substituir.</b>
         <button onClick={()=>setSelectedId(null)}>Cancelar</button>
       </div>}
+    </section>
+
+    <section className="builder-augment-lab">
+      <div className="builder-augment-head">
+        <div>
+          <span>CONTEXTO DA PARTIDA</span>
+          <h2>Augments</h2>
+          <p>Monte até 3 Augments. O Chibi compara essa escolha com o seu histórico, mas mantém o board como eixo principal da análise.</p>
+        </div>
+        <div className="builder-context-overlap">
+          <small>OVERLAP NAS PARTIDAS PARECIDAS</small>
+          <strong>{selectedAugments.length&&contextOverlap.augment!=null?Math.round(contextOverlap.augment*100)+"%":"—"}</strong>
+          <span>{selectedAugments.length
+            ?contextOverlap.withAugment+"/"+similar.length+" partidas com ao menos 1 escolhido"
+            :"escolha Augments para comparar"}</span>
+        </div>
+      </div>
+
+      <div className="builder-augment-layout">
+        <div className="builder-augment-selected">
+          <div className="builder-subhead">
+            <span>SEUS 3 SLOTS</span>
+            <small>Clique em um Augment equipado para remover.</small>
+          </div>
+          <div className="builder-augment-slots">
+            {[0,1,2].map(index=>{
+              const augmentId=selectedAugments[index];
+              const entry=staticEntry(staticData?.augments,augmentId);
+              const src=augmentId&&staticData?tftAssetUrl(staticData.version,"augment",entry):"";
+              const name=entry?.name||"Slot "+(index+1);
+              return <button
+                className={augmentId?"filled":"empty"}
+                onClick={()=>augmentId&&removeAugment(index)}
+                title={augmentId?"Remover "+name:"Escolha um Augment"}
+                key={index}
+              >
+                <span>{src&&<img src={src} alt=""/>}</span>
+                <div>
+                  <small>AUGMENT {index+1}</small>
+                  <strong>{name}</strong>
+                </div>
+              </button>;
+            })}
+          </div>
+
+          <div className="builder-augment-history">
+            <div className="builder-subhead">
+              <span>MAIS PRESENTES NO SEU HISTÓRICO</span>
+              <small>{matches.length} partidas carregadas</small>
+            </div>
+            {augmentHistory.length
+              ?<div className="builder-history-augments">
+                {augmentHistory.map(row=>{
+                  const entry=staticEntry(staticData?.augments,row.id);
+                  const src=staticData?tftAssetUrl(staticData.version,"augment",entry):"";
+                  const name=entry?.name||clean(row.id);
+                  const disabled=selectedAugments.length>=3||selectedAugments.includes(row.id);
+                  return <button disabled={disabled} onClick={()=>addAugment(row.id)} key={row.id}>
+                    <span>{src&&<img src={src} alt=""/>}</span>
+                    <div>
+                      <strong>{name}</strong>
+                      <small>{row.games}x · média {row.avgPlacement.toFixed(2)}</small>
+                    </div>
+                  </button>;
+                })}
+              </div>
+              :<p className="builder-empty-check">Nenhum Augment encontrado no histórico carregado.</p>}
+          </div>
+        </div>
+
+        <div className="builder-augment-library">
+          <div className="builder-subhead">
+            <span>BIBLIOTECA DE AUGMENTS</span>
+            <small>Data Dragon atual · máximo de 3</small>
+          </div>
+          <input value={augmentQuery} onChange={event=>setAugmentQuery(event.target.value)} placeholder="Pesquisar Augment..."/>
+          <div className="builder-augment-grid">
+            {augments.map(augment=>{
+              const selected=selectedAugments.includes(augment.id);
+              const disabled=selected||selectedAugments.length>=3;
+              return <button className={selected?"selected":""} disabled={disabled} onClick={()=>addAugment(augment.id)} title={augment.name} key={augment.id}>
+                <span>{augment.image&&<img src={augment.image} alt=""/>}</span>
+                <strong>{augment.name}</strong>
+              </button>;
+            })}
+          </div>
+        </div>
+      </div>
     </section>
 
     {variantA&&variantAEvaluation&&variantDiff&&<section className="builder-ab-compare">
