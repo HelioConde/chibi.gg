@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchTftComps, TftGlobalComp, TftGlobalComps, TftMatch } from "../api/tft";
 import { staticEntry, tftAssetUrl, TftStaticData } from "../tftStatic";
+import DDragonArt from "./DDragonArt";
 
 type Props={
   staticData:TftStaticData|null;
@@ -180,6 +181,13 @@ export default function CompsPage({staticData,matches,hasProfile,onBack,onEviden
         <p>{hasProfile
           ?"O Chibi cruza o que aparece no dataset com o que você já jogou. A primeira resposta é compatibilidade, não tier."
           :"Veja identidades de board observadas com desempenho, estabilidade e confiança da amostra."}</p>
+        <DDragonArt
+          staticData={staticData}
+          setNumber={data?.context.setNumber}
+          championIds={hero?.units.map(unit=>unit.id)||[]}
+          variant="ribbon"
+          label="Champions · Data Dragon"
+        />
       </div>
 
       <div className={"meta-dataset-card "+maturity}>
