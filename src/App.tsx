@@ -1729,6 +1729,8 @@ function App() {
                 <MatchJournal
                   matchId={openedMatch.id}
                   placement={openedMatch.placement}
+                  target={openedMatch}
+                  detail={selectedMatch}
                   onSaved={()=>setJournalVersion((value)=>value+1)}
                 />
               </details>}
