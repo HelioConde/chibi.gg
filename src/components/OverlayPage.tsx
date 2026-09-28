@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { SITE_IMAGES } from "../siteAssets";
 
 type OverlayStateId="stable"|"weak"|"contested"|"spike";
 
@@ -147,7 +148,8 @@ export default function OverlayPage({
   );
 
   return <main className="overlay-page">
-    <section className="overlay-page-hero">
+    <section className="overlay-page-hero overlay-page-hero-art">
+      <img className="overlay-page-art" src={SITE_IMAGES.art} alt="" aria-hidden="true"/>
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>← Voltar ao perfil</button>}
         <span className="eyebrow">GRANDE MUDANÇA 1 · CHIBI OVERLAY</span>
@@ -181,9 +183,10 @@ export default function OverlayPage({
       </div>
 
       <div className={"overlay-live-demo "+(compact?"compact":"")+" tone-"+scenario.tone}>
+        <img className="overlay-hud-art" src={SITE_IMAGES.hud} alt="" aria-hidden="true"/>
         <header className="overlay-live-head">
           <div className="overlay-live-brand">
-            <span>c</span>
+            <span className="overlay-brand-image"><img src={SITE_IMAGES.icon} alt=""/></span>
             <div>
               <strong>Chibi Overlay</strong>
               <small>{hasProfile&&playerName?playerName:"demo local"} · leitura assistiva</small>
