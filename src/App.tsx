@@ -35,6 +35,7 @@ import StatisticsPage, { StatisticsCategory } from "./components/StatisticsPage"
 import GlobalSearch from "./components/GlobalSearch";
 import HomeMetaPreview from "./components/HomeMetaPreview";
 import TeamBuilderPage from "./components/TeamBuilderPage";
+import LeaderboardPage from "./components/LeaderboardPage";
 import AskChibi from "./components/AskChibi";
 import ChibiMemory from "./components/ChibiMemory";
 import ReviewQueue from "./components/ReviewQueue";
@@ -219,7 +220,7 @@ function App() {
     query:"",
     view:"stats",
   });
-  const [sitePage,setSitePage]=useState<"main"|"meta"|"comps"|"stats"|"builder"|"overlay">(
+  const [sitePage,setSitePage]=useState<"main"|"meta"|"comps"|"stats"|"builder"|"leaderboard"|"overlay">(
     window.location.hash==="#meta"
       ?"meta"
       :window.location.hash==="#comps"
@@ -228,9 +229,11 @@ function App() {
           ?"stats"
           :window.location.hash==="#builder"
             ?"builder"
-            :window.location.hash==="#overlay"
-              ?"overlay"
-              :"main"
+            :window.location.hash==="#leaderboard"
+              ?"leaderboard"
+              :window.location.hash==="#overlay"
+                ?"overlay"
+                :"main"
   );
 
   useEffect(()=>{
@@ -270,9 +273,11 @@ function App() {
               ?"stats"
               :window.location.hash==="#builder"
                 ?"builder"
-                :window.location.hash==="#overlay"
-                  ?"overlay"
-                  :"main"
+                :window.location.hash==="#leaderboard"
+                  ?"leaderboard"
+                  :window.location.hash==="#overlay"
+                    ?"overlay"
+                    :"main"
       );
     };
 
@@ -666,6 +671,13 @@ function App() {
     }
   }
 
+  function openLeaderboard(){
+    setSitePage("leaderboard");
+    if(window.location.hash!=="#leaderboard"){
+      window.history.pushState({},"",window.location.pathname+window.location.search+"#leaderboard");
+    }
+  }
+
   function openOverlay(){
     setSitePage("overlay");
     if(window.location.hash!=="#overlay"){
@@ -714,8 +726,8 @@ function App() {
           <button className={sitePage==="comps"?"active":""} onClick={openComps}>Comps</button>
           <button className={sitePage==="stats"?"active":""} onClick={()=>openStats()}>Statistics</button>
           <button className={sitePage==="builder"?"active":""} onClick={openBuilder}>Builder</button>
+          <button className={sitePage==="leaderboard"?"active":""} onClick={openLeaderboard}>Leaderboard</button>
           <button className={sitePage==="overlay"?"active":""} onClick={openOverlay}>Overlay</button>
-          <a href="#leaderboard">Leaderboard</a>
         </nav>
         <GlobalSearch
           staticData={staticData}
@@ -763,6 +775,16 @@ function App() {
           hasProfile={Boolean(profile)}
           onBack={closeExplorePage}
           onEvidence={showCompEvidence}
+        />
+      ) : sitePage==="leaderboard" ? (
+        <LeaderboardPage
+          onOpenPlayer={(player,region)=>{
+            if(!player.gameName||!player.tagLine)return;
+            setRiotId(player.gameName+"#"+player.tagLine);
+            setPlatform(region);
+            setSitePage("main");
+            void loadPlayer(player.gameName,player.tagLine,region,true,"matches");
+          }}
         />
       ) : sitePage==="overlay" ? (
         <OverlayPage
