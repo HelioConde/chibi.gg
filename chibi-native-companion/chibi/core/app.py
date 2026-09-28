@@ -2,7 +2,6 @@ from __future__ import annotations
 import argparse
 import sys
 from time import time
-from urllib.parse import urlencode
 from PySide6.QtCore import QUrl
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QApplication
@@ -18,6 +17,7 @@ from chibi.riot.lcu.connection import LcuUnavailableError
 from chibi.session.manager import SessionManager
 from chibi.session.models import SessionState
 from chibi.session.postgame import PostGameController
+from chibi.navigation import build_analysis_url
 from chibi.telemetry.manager import TelemetryManager
 from chibi.ui.tray import create_tray
 from chibi.ui.window import CompanionWindow
@@ -38,8 +38,10 @@ def main() -> int:
     def show_analysis(session: object, result: object) -> None:
         riot_id = getattr(session, "riot_id", "")
         game_name, _, tag_line = riot_id.partition("#")
-        query = urlencode({"player": game_name, "tag": tag_line, "region": "br1", "tab": "matches"})
-        QDesktopServices.openUrl(QUrl(f"https://chibi.gg/?{query}"))
+        QDesktopServices.openUrl(QUrl(build_analysis_url(
+            game_name, tag_line, getattr(session, "platform", "br1"),
+            getattr(session, "match_id", ""), getattr(session, "focus_id", ""),
+        )))
     postgame.completed.connect(lambda _session, result: window.show_result(result))
     window.open_analysis.clicked.connect(lambda: show_analysis(sessions.current, None) if sessions.current else None)
     def update(snapshot: object) -> None:

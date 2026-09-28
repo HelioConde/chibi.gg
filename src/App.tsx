@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   fetchTftHistory,
   fetchTftMatch,
@@ -250,6 +250,8 @@ function AugmentVisual({id,staticData}:{id:string;staticData:TftStaticData|null}
 type StudyRequest={
   matchId:string;
   focusId:string;
+  sessionFocus:string;
+  source:string;
   note:string;
   reply:string;
   reviewer:string;
@@ -262,10 +264,16 @@ function readStudyRequest():StudyRequest|null{
   return {
     matchId,
     focusId:params.get("focus")?.trim()||"lost",
+    sessionFocus:params.get("sessionFocus")?.trim().slice(0,32)||"",
+    source:params.get("source")?.trim().slice(0,32)||"",
     note:params.get("note")?.trim().slice(0,220)||"",
     reply:params.get("reply")?.trim().slice(0,320)||"",
     reviewer:params.get("reviewer")?.trim().slice(0,32)||"",
   };
+}
+
+function sessionFocusLabel(value:string){
+  return ({economy:"Economia",positioning:"Posicionamento",flexibility:"Flexibilidade",items:"Itens",tempo:"Tempo",custom:"Personalizado"} as Record<string,string>)[value]||value;
 }
 
 type ProfileTab = "overview"|"coach"|"matches"|"share";
@@ -324,6 +332,8 @@ function App() {
   const [copiedAnalysisLink,setCopiedAnalysisLink]=useState(false);
   const [studyRequest,setStudyRequest]=useState<StudyRequest|null>(()=>readStudyRequest());
   const [studyOpenedMatchId,setStudyOpenedMatchId]=useState("");
+  const [studyLookup,setStudyLookup]=useState<"idle"|"searching"|"unavailable">("idle");
+  const studyAttempts=useRef(0);
   const [statsTarget,setStatsTarget]=useState<{
     category:StatisticsCategory;
     query:string;
@@ -368,6 +378,7 @@ function App() {
       setPlatform(region);
       void loadPlayer(player,tag,region,false,tab,queue);
     }
+    if(params.get("source")==="native") localStorage.setItem("chibi:opened_from_native","true");
 
     const onPopState=()=>{
       const nextParams=new URLSearchParams(window.location.search);
@@ -442,8 +453,31 @@ function App() {
 
   useEffect(()=>{
     if(!profile||!studyRequest||studyOpenedMatchId===studyRequest.matchId)return;
-    const target=analysisMatches.find(match=>match.id===studyRequest.matchId);
-    if(!target)return;
+    const target=matches.find(match=>match.id===studyRequest.matchId);
+    if(!target){
+      if(studyLookup==="unavailable") return;
+      const attempt=studyAttempts.current;
+      if(attempt>=3){ setStudyLookup("unavailable"); return; }
+      const delay=[0,2000,5000][attempt]||5000;
+      setStudyLookup("searching");
+      const timer=window.setTimeout(()=>{
+        const parsed=splitRiotId(riotId);
+        if(!parsed){ setStudyLookup("unavailable"); return; }
+        studyAttempts.current+=1;
+        fetchTftHistory(parsed.gameName,parsed.tagLine,platform,matches.length,20)
+          .then(result=>{
+            const next=result.matches||[];
+            setMatches(current=>{
+              const seen=new Set(current.map(match=>match.id));
+              return [...current,...next.filter(match=>!seen.has(match.id))];
+            });
+            setHasMore(next.length>=20);
+            setStudyLookup(next.length?"idle":"searching");
+          })
+          .catch(()=>setStudyLookup(studyAttempts.current>=3?"unavailable":"idle"));
+      },delay);
+      return ()=>window.clearTimeout(timer);
+    }
 
     const focus=studyFocusById(studyRequest.focusId);
     setStudyOpenedMatchId(studyRequest.matchId);
@@ -451,7 +485,7 @@ function App() {
     setEvidenceLabel("Chibi Study · "+focus.label);
     setProfileTab("matches");
     void openMatch(target);
-  },[profile,analysisMatches,studyRequest,studyOpenedMatchId]);
+  },[profile,matches,studyRequest,studyOpenedMatchId,studyLookup,riotId,platform]);
 
   const staticCurrentSet=useMemo(()=>latestTftSetNumber(staticData),[staticData]);
   const isHistoricalSet=Boolean(currentSet&&staticCurrentSet&&currentSet<staticCurrentSet);
@@ -722,6 +756,8 @@ function App() {
     setOpenedMatch(null);
     setSelectedQueue(initialQueue);
     setProfileTab(initialTab);
+    studyAttempts.current=0;
+    setStudyLookup("idle");
     clearEvidence();
 
     try{
@@ -856,6 +892,10 @@ function App() {
     setMatchError("");
     setGuidedReviewIds([]);
     setGuidedReviewIndex(0);
+    if(studyLookup==="unavailable"){
+      setStudyRequest(null);
+      setStudyLookup("idle");
+    }
   }
 
   function openGuidedReview(match:TftMatch,queueIds:string[],index:number){
@@ -878,6 +918,17 @@ function App() {
     }finally{
       setMatchLoading(false);
     }
+  }
+
+  function retryStudy(){
+    studyAttempts.current=0;
+    setStudyLookup("idle");
+  }
+
+  function markStudyReviewed(){
+    if(!profile||!openedMatch)return;
+    const playerKey=profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine;
+    markMatchReviewed(playerKey,openedMatch.id,true);
   }
 
   function scrollPageTop(){
@@ -1098,6 +1149,16 @@ function App() {
           matches={analysisMatches}
           onBack={closeExplorePage}
         />
+      ) : !profile && studyRequest && loading ? (
+        <main className="landing landing-v2 native-review-loading">
+          <section className="home-hero-v2">
+            <div className="home-hero-copy">
+              <div className="eyebrow">CHIBI</div>
+              <h1>Preparando sua revisão...</h1>
+              <p>PARTIDA FINALIZADA · Carregando os dados da partida.</p>
+            </div>
+          </section>
+        </main>
       ) : !profile ? (
         <main className="landing landing-v2">
           <section className="home-hero-v2">
@@ -1861,22 +1922,31 @@ function App() {
         </main>
       )}
 
-      {(matchLoading || selectedMatch || matchError) && (
+      {(matchLoading || selectedMatch || matchError || studyLookup==="unavailable") && (
         <div className="match-overlay" onClick={closeMatchReview}>
           <section className="match-modal match-modal-with-hud" onClick={(e)=>e.stopPropagation()}>
             <img className="match-modal-hud-art" src={SITE_IMAGES.hud} alt="" aria-hidden="true"/>
             <button className="match-close" onClick={closeMatchReview}>×</button>
             {matchLoading && <div className="match-state">Carregando detalhes da partida...</div>}
             {matchError && <div className="match-state error">{matchError}</div>}
+            {studyLookup==="unavailable"&&!selectedMatch&&!matchLoading&&<div className="match-state error">
+              <h2>NÃO CONSEGUIMOS ABRIR ESTA REVISÃO AINDA</h2>
+              <p>Essa partida ainda não apareceu no histórico do perfil. Tente novamente em alguns segundos.</p>
+              <div className="study-retry-actions">
+                <button onClick={retryStudy}>Tentar novamente</button>
+                <button className="secondary" onClick={closeMatchReview}>Ver perfil</button>
+              </div>
+            </div>}
 
             {selectedMatch && <>
               {openedMatch&&studyRequest?.matchId===openedMatch.id&&(()=>{
                 const focus=studyFocusById(studyRequest.focusId);
                 return <div className="study-match-banner">
                   <div>
-                    <span>CHIBI STUDY</span>
+                    <span>{studyRequest.source==="native"?"CHIBI COMPANION":"CHIBI STUDY"}</span>
                     <strong>{focus.question}</strong>
                     <small>{focus.hint}</small>
+                    {studyRequest.sessionFocus&&<small>FOCO DA SESSÃO · {sessionFocusLabel(studyRequest.sessionFocus)}</small>}
                   </div>
                   {studyRequest.note&&<blockquote>{studyRequest.note}</blockquote>}
                   {studyRequest.reply&&<div className="study-reply-inline">
@@ -2023,6 +2093,16 @@ function App() {
                       ?"Marcar revisada e abrir próxima →"
                       :"Marcar revisada e concluir ✓"}
                   </button>
+                </div>
+              </section>}
+              {openedMatch&&studyRequest?.matchId===openedMatch.id&&<section className="guided-review-footer native-review-completion">
+                <div>
+                  <span>PRÓXIMA PARTIDA</span>
+                  <strong>{studyRequest.sessionFocus ? "Foco: "+sessionFocusLabel(studyRequest.sessionFocus) : "Leve uma ação desta review"}</strong>
+                  <small>O foco é contexto da sessão; a Riot API não mede diretamente se ele foi cumprido.</small>
+                </div>
+                <div className="guided-review-actions">
+                  <button onClick={markStudyReviewed}>MARCAR COMO REVISTA</button>
                 </div>
               </section>}
             </>}
