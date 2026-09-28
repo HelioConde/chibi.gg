@@ -463,6 +463,39 @@ function App() {
     };
   },[openedMatch,analysisMatches]);
 
+  useEffect(()=>{
+    if(!openedMatch)return;
+
+    const onKeyDown=(event:KeyboardEvent)=>{
+      const target=event.target as HTMLElement|null;
+      if(target?.tagName==="INPUT"||target?.tagName==="TEXTAREA"||target?.tagName==="SELECT")return;
+
+      if(event.key==="Escape"){
+        event.preventDefault();
+        closeMatchReview();
+        return;
+      }
+
+      if(event.key==="ArrowLeft"&&openedMatchNavigation.newer&&!matchLoading){
+        event.preventDefault();
+        void openMatch(openedMatchNavigation.newer);
+      }
+
+      if(event.key==="ArrowRight"&&openedMatchNavigation.older&&!matchLoading){
+        event.preventDefault();
+        void openMatch(openedMatchNavigation.older);
+      }
+    };
+
+    window.addEventListener("keydown",onKeyDown);
+    return ()=>window.removeEventListener("keydown",onKeyDown);
+  },[
+    openedMatch,
+    openedMatchNavigation.newer?.id,
+    openedMatchNavigation.older?.id,
+    matchLoading,
+  ]);
+
   const latestPlayedAt=useMemo(
     ()=>Math.max(0,...analysisMatches.map((m)=>Number(m.playedAt)||0)),
     [analysisMatches]
@@ -1340,7 +1373,7 @@ function App() {
                   <p>{displaySetName(selectedMatch.match.setName,selectedMatch.match.setNumber)} · {queueLabel(staticData,selectedMatch.match.queueId)} · {formatWhen(selectedMatch.match.playedAt)}</p>
                 </div>
                 {openedMatch&&<div className="match-modal-head-actions">
-                  <div className="match-modal-nav">
+                  <div className="match-modal-nav" title="Use ← e → para navegar entre partidas">
                     <button
                       disabled={!openedMatchNavigation.newer||matchLoading}
                       onClick={()=>openedMatchNavigation.newer&&void openMatch(openedMatchNavigation.newer)}
