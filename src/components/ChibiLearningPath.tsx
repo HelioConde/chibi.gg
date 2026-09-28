@@ -286,7 +286,7 @@ export default function ChibiLearningPath({playerKey,matches,onEvidence}:Props){
       )}
 
       {goal&&<div className="learning-cycle-actions">
-        {progress?.matchIds?.length>0&&<button onClick={()=>onEvidence(progress.matchIds,"Learning Path · partidas do ciclo")}>
+        {progress&&progress.matchIds.length>0&&<button onClick={()=>onEvidence(progress.matchIds,"Learning Path · partidas do ciclo")}>
           Ver partidas deste ciclo
         </button>}
         {goal.baselineIds.length>0&&<button onClick={()=>onEvidence(goal.baselineIds.slice(0,12),"Learning Path · linha de base")}>
