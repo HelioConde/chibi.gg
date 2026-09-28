@@ -48,6 +48,7 @@ import OverlayPage from "./components/OverlayPage";
 import StatisticsPage, { StatisticsCategory } from "./components/StatisticsPage";
 import GlobalSearch from "./components/GlobalSearch";
 import HomeMetaPreview from "./components/HomeMetaPreview";
+import HomeSessionResume from "./components/HomeSessionResume";
 import TeamBuilderPage from "./components/TeamBuilderPage";
 import LeaderboardPage from "./components/LeaderboardPage";
 import AskChibi from "./components/AskChibi";
@@ -784,6 +785,12 @@ function App() {
     await loadPlayer(player.gameName,player.tagLine,player.platform,true,"matches");
   }
 
+  async function openRecentSession(player:RecentPlayer){
+    setRiotId(player.gameName+"#"+player.tagLine);
+    setPlatform(player.platform);
+    await loadPlayer(player.gameName,player.tagLine,player.platform,true,"overview");
+  }
+
   function forgetRecentPlayer(player:RecentPlayer){
     setRecentPlayers(removeRecentPlayer(player));
   }
@@ -1103,6 +1110,11 @@ function App() {
                 <span><b>1 clique</b><small>para abrir evidências</small></span>
               </div>
             </section>
+
+            <HomeSessionResume
+              recentPlayers={recentPlayers}
+              onOpen={(player)=>{void openRecentSession(player);}}
+            />
 
             {recentPlayers.length>0&&<section className="recent-players">
               <div className="recent-players-head">
