@@ -9,6 +9,7 @@ type Props={
   hasProfile:boolean;
   onBack:()=>void;
   onEvidence:(ids:string[],label:string)=>void;
+  onOpenBuilder?:(unitIds:string[])=>void;
 };
 
 function clean(value:string){
@@ -225,6 +226,7 @@ export default function CompsPage({staticData,matches,hasProfile,onBack,onEviden
 
           <div className="comp-answer-actions">
             {hasProfile&&hero.fit.matchIds.length>0&&<button onClick={()=>onEvidence(hero.fit.matchIds,"Comp compatível · "+compName(hero,staticData))}>Ver seu histórico parecido</button>}
+            {onOpenBuilder&&<button className="secondary" onClick={()=>onOpenBuilder(hero.units.slice(0,8).map(unit=>unit.id))}>Abrir no Builder</button>}
             <small>{hero.games} observações · confiança {hero.confidence}</small>
           </div>
         </div>
@@ -321,10 +323,15 @@ export default function CompsPage({staticData,matches,hasProfile,onBack,onEviden
             <strong>Quando você precisar sacrificar economia, upgrades naturais ou uma rota mais forte só para copiar o board final.</strong>
             <p>O dataset descreve como os boards terminaram. Ele não conhece toda a sequência de lojas e decisões que levou até lá.</p>
 
-            {hasProfile&&selectedComp.fit.matchIds.length>0&&<button onClick={()=>onEvidence(
-              selectedComp.fit.matchIds,
-              "Comp Guide · "+compName(selectedComp,staticData),
-            )}>Comparar com minhas partidas</button>}
+            <div className="comp-guide-buttons">
+              {hasProfile&&selectedComp.fit.matchIds.length>0&&<button onClick={()=>onEvidence(
+                selectedComp.fit.matchIds,
+                "Comp Guide · "+compName(selectedComp,staticData),
+              )}>Comparar com minhas partidas</button>}
+              {onOpenBuilder&&<button className="secondary" onClick={()=>onOpenBuilder(selectedComp.units.slice(0,8).map(unit=>unit.id))}>
+                Testar no Builder
+              </button>}
+            </div>
           </article>
         </div>
       </section>}
