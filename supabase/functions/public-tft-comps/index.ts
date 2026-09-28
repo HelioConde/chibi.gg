@@ -25,7 +25,7 @@ function activeTraits(row:any){
 }
 
 function compSignature(row:any){
-  return activeTraits(row).slice().sort().join("|");
+  return activeTraits(row).slice(0,2).sort().join("|");
 }
 
 function avg(values:number[]){
