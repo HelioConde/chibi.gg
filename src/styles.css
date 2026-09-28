@@ -8857,3 +8857,117 @@ a { color: inherit; text-decoration: none; }
     grid-template-columns:repeat(3,1fr);
   }
 }
+
+
+/* Chibi Learning Lab — personal improvement, explainable loss review and flex packages */
+.learning-lab{display:flex;flex-direction:column;gap:14px;margin:14px 0 0}
+.learning-lab-title{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:4px 2px 2px}
+.learning-lab-title>div:first-child{min-width:0}
+.learning-lab-title>div:first-child>span,
+.why-loss-card header span,
+.learn-next-card>span,
+.flex-packages-card header span{display:block;color:#8f7cff;font-size:10px;font-weight:900;letter-spacing:1.7px}
+.learning-lab-title h2{margin:6px 0 7px;font-size:clamp(22px,2.6vw,31px);letter-spacing:-1.1px}
+.learning-lab-title p{margin:0;max-width:720px;color:#858da2;font-size:13px;line-height:1.65}
+.learning-confidence{min-width:154px;border:1px solid #2b3247;background:#0d121c;border-radius:14px;padding:13px 15px;display:grid;grid-template-columns:1fr auto;gap:2px 10px}
+.learning-confidence small{grid-column:1/-1;color:#727b90;font-size:9px;letter-spacing:1.15px;font-weight:900}
+.learning-confidence strong{font-size:17px;letter-spacing:-.3px}
+.learning-confidence span{align-self:center;font-size:11px;color:#8d96ab}
+.learning-confidence.high{border-color:rgba(71,208,154,.28);background:rgba(34,117,84,.09)}
+.learning-confidence.high strong{color:#78dfb5}
+.learning-confidence.medium{border-color:rgba(255,194,83,.24);background:rgba(123,88,26,.08)}
+.learning-confidence.medium strong{color:#f0c96f}
+.learning-confidence.low strong{color:#a9b1c4}
+
+.learning-primary-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,.75fr);gap:14px}
+.why-loss-card,.learn-next-card,.flex-packages-card{overflow:hidden}
+.why-loss-card header,.flex-packages-card header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.why-loss-card header h3,.flex-packages-card header h3{margin:5px 0 0;font-size:19px;letter-spacing:-.45px}
+.why-loss-card header button,
+.learn-next-card>button,
+.flex-package>button{border:1px solid #343c54;background:#151b29;color:#dfe4f2;border-radius:10px;padding:9px 12px;font-size:11px;font-weight:800}
+.why-loss-card header button:hover,
+.learn-next-card>button:hover,
+.flex-package>button:hover{border-color:#7563e7;color:white;background:#191d31}
+
+.loss-selector{display:flex;gap:7px;overflow:auto;margin:18px -2px 15px;padding:2px}
+.loss-selector button{min-width:82px;border:1px solid #272e40;background:#0e131d;color:#8d96aa;border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+.loss-selector button b{font-size:14px;color:#cbd2e2}
+.loss-selector button small{font-size:9px;color:#747d92}
+.loss-selector button.active{border-color:#765ff0;background:rgba(117,95,240,.12);box-shadow:inset 0 0 0 1px rgba(117,95,240,.14)}
+.loss-selector button.active b{color:#b9aaff}
+
+.loss-signal-list{display:flex;flex-direction:column;gap:8px;margin-top:17px}
+.loss-signal{display:grid;grid-template-columns:34px 1fr;gap:11px;border:1px solid #20283a;background:#0c111a;border-radius:12px;padding:13px}
+.loss-signal-rank{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:rgba(255,117,117,.09);color:#ff9999;font-size:12px;font-weight:900}
+.loss-signal-title{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.loss-signal-title strong{font-size:13px;color:#e3e7f2}
+.loss-signal-title em{font-style:normal;color:#9aa3b6;font-size:9px;white-space:nowrap;border:1px solid #2a3245;border-radius:999px;padding:3px 7px}
+.loss-signal p{margin:6px 0 7px;color:#858ea2;font-size:11px;line-height:1.55}
+.loss-signal small{display:block;color:#697287;font-size:10px}
+.why-loss-card footer{display:flex;align-items:flex-start;gap:10px;margin:14px -22px -22px;padding:13px 22px;border-top:1px solid #1e2535;background:rgba(8,12,19,.45)}
+.why-loss-card footer span{flex:none;color:#9585f4;font-size:9px;font-weight:900;letter-spacing:.8px;text-transform:uppercase}
+.why-loss-card footer p{margin:0;color:#727b90;font-size:10px;line-height:1.5}
+.why-loss-card footer b{color:#aeb6c8}
+
+.learn-next-card{position:relative;padding:24px;background:
+ radial-gradient(circle at 100% 0%,rgba(125,92,255,.13),transparent 42%),
+ rgba(17,21,32,.74)}
+.learn-next-card>span{margin-bottom:13px}
+.learn-next-badge{display:inline-flex;border:1px solid rgba(125,92,255,.28);background:rgba(125,92,255,.1);color:#af9eff;border-radius:999px;padding:5px 9px;font-size:9px;font-weight:900;letter-spacing:.7px;text-transform:uppercase}
+.learn-next-card h3{margin:12px 0 8px;font-size:23px;line-height:1.12;letter-spacing:-.8px}
+.learn-next-card>p{margin:0;color:#8a93a8;font-size:12px;line-height:1.65}
+.learn-next-metric{margin:18px 0 13px;border:1px solid #252d40;background:#0c111a;border-radius:11px;padding:12px}
+.learn-next-metric small{display:block;color:#6f7890;font-size:8px;font-weight:900;letter-spacing:1.1px;margin-bottom:5px}
+.learn-next-metric strong{font-size:12px;color:#d6dbea}
+.learn-next-card>button{width:100%;padding:11px 12px;background:linear-gradient(135deg,rgba(113,87,239,.28),rgba(146,118,255,.17));border-color:rgba(139,114,255,.42)}
+.learning-rule{display:flex;gap:8px;align-items:flex-start;margin-top:15px;padding-top:13px;border-top:1px solid #202638}
+.learning-rule b{flex:none;color:#8f7cff;font-size:9px}
+.learning-rule span{color:#727b90;font-size:9px;line-height:1.45}
+
+.flex-packages-card{padding:22px}
+.flex-packages-card header p{margin:6px 0 0;color:#858da2;font-size:12px;line-height:1.55;max-width:760px}
+.flex-packages-card header>small{color:#747d92;font-size:10px;white-space:nowrap}
+.flex-package-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:17px}
+.flex-package{min-width:0;border:1px solid #20283a;background:linear-gradient(180deg,#0d121c,#0a0f17);border-radius:14px;padding:14px}
+.flex-package-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:11px}
+.flex-package-top>span{color:#8d7cf0;font-size:9px;font-weight:900;letter-spacing:1.1px}
+.flex-package-top em{font-style:normal;color:#717a8e;font-size:9px}
+.flex-core{display:flex;gap:7px;margin-bottom:9px}
+.learning-champion{position:relative;width:46px;height:46px;border:2px solid #3b4358;border-radius:11px;overflow:hidden;background:#151a26;display:grid;place-items:center;flex:none}
+.learning-champion>span{font-size:9px;font-weight:900;color:#aab2c4}
+.learning-champion img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.flex-package-names{display:block;min-height:32px;font-size:12px;line-height:1.35;color:#d8ddeb}
+.flex-package-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:12px 0}
+.flex-package-stats span{border:1px solid #202739;background:#101620;border-radius:9px;padding:8px}
+.flex-package-stats small{display:block;color:#697287;font-size:8px;margin-bottom:3px}
+.flex-package-stats b{font-size:12px;color:#cfd5e5}
+.flex-connectors{border-top:1px solid #202638;padding-top:11px;margin-top:2px}
+.flex-connectors>small{display:block;color:#687186;font-size:8px;font-weight:900;letter-spacing:.85px;margin-bottom:8px}
+.flex-connectors>div{display:flex;flex-direction:column;gap:6px}
+.flex-connectors>div>span{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:7px;align-items:center;color:#b9c0d1}
+.flex-connectors .learning-champion{width:28px;height:28px;border-radius:7px;border-width:1px}
+.flex-connectors .learning-champion>span{font-size:7px}
+.flex-connectors b{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.flex-connectors em{font-style:normal;color:#6f7890;font-size:9px}
+.flex-connectors p{color:#6f7890;font-size:10px}
+.flex-package>button{width:100%;margin-top:12px;font-size:10px}
+.flex-package-method{display:flex;gap:9px;align-items:flex-start;margin:16px -22px -22px;padding:13px 22px;border-top:1px solid #1d2433;background:rgba(8,12,19,.42)}
+.flex-package-method b{flex:none;color:#8f7cff;font-size:9px}
+.flex-package-method span{color:#737c90;font-size:9px;line-height:1.5}
+.learning-empty{margin-top:15px;border:1px dashed #2a3245;border-radius:12px;padding:20px;color:#7d8699;font-size:12px;text-align:center}
+
+@media (max-width:980px){
+  .learning-primary-grid{grid-template-columns:1fr}
+  .flex-package-grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:700px){
+  .learning-lab-title{align-items:stretch;flex-direction:column;gap:12px}
+  .learning-confidence{width:100%;min-width:0}
+  .why-loss-card header,.flex-packages-card header{flex-direction:column}
+  .why-loss-card header button{width:100%}
+  .loss-signal-title{align-items:flex-start;flex-direction:column;gap:6px}
+  .flex-package-grid{grid-template-columns:1fr}
+  .flex-packages-card header>small{white-space:normal}
+  .why-loss-card footer,.flex-package-method{flex-direction:column}
+}
