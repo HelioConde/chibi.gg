@@ -7095,3 +7095,71 @@ a { color: inherit; text-decoration: none; }
   .match-modal-hud-art{width:90%;opacity:.04}
   .overlay-page-art{width:80%}
 }
+
+/* -----------------------------------------------------------------------
+   Match history v2 — session + fast filters
+   ----------------------------------------------------------------------- */
+.history-session-strip{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+  padding:9px 10px;
+  border:1px solid #20293a;
+  border-radius:10px;
+  background:#0d141d;
+}
+.history-session-strip>div:first-child{
+  display:flex;
+  align-items:baseline;
+  gap:7px;
+  min-width:0;
+}
+.history-session-strip>div:first-child>span{
+  color:#7567df;
+  font-size:7px;
+  font-weight:950;
+  letter-spacing:.75px;
+}
+.history-session-strip>div:first-child>strong{
+  color:#dce2ec;
+  font-size:9px;
+}
+.history-session-strip>div:first-child>small{
+  color:#647187;
+  font-size:7px;
+}
+.history-filter-tabs{
+  display:flex;
+  gap:4px;
+  flex-wrap:wrap;
+}
+.history-filter-tabs button{
+  border:1px solid transparent;
+  border-radius:7px;
+  background:#121925;
+  color:#69768b;
+  padding:6px 8px;
+  font-size:7px;
+  font-weight:900;
+}
+.history-filter-tabs button.active{
+  border-color:#5d51b4;
+  background:rgba(117,99,231,.1);
+  color:#c8c1ff;
+}
+.history-empty-filter{
+  padding:26px 12px;
+  border:1px dashed #2a3447;
+  border-radius:10px;
+  color:#68758a;
+  font-size:8px;
+  text-align:center;
+}
+@media(max-width:720px){
+  .history-session-strip{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+}
