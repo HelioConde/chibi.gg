@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchTftMeta, TftGlobalMeta, TftGlobalTraitStat } from "../api/tft";
 import { staticEntry, TftStaticData } from "../tftStatic";
+import DDragonArt from "./DDragonArt";
 
 type Props={
   staticData:TftStaticData|null;
@@ -104,6 +105,12 @@ export default function GlobalMetaPage({
         <span className="eyebrow">CHIBI DATASET</span>
         <h1>Seu ponto de entrada<br/><em>para o meta do TFT.</em></h1>
         <p>Comps, statistics, tier list e traits observadas em um único lugar, sempre com tamanho da amostra e confiança visíveis.</p>
+        <DDragonArt
+          staticData={staticData}
+          setNumber={meta?.context.setNumber}
+          variant="ribbon"
+          label="Assets oficiais Riot"
+        />
       </div>
 
       <div className={"meta-dataset-card "+maturity}>
