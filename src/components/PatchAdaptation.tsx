@@ -6,6 +6,14 @@ type Props={
   onEvidence:(ids:string[],label:string)=>void;
 };
 
+type LineStat={
+  id:string;
+  games:number;
+  avg:number;
+  top4:number;
+  ids:string[];
+};
+
 function patchLabel(version:string){
   const match=String(version||"").match(/(\d+)\.(\d+)/);
   return match ? match[1]+"."+match[2] : (version||"desconhecido");
@@ -17,6 +25,46 @@ function avg(values:number[]){
 
 function pct(n:number,d:number){
   return d?Math.round(n/d*100):0;
+}
+
+function clean(value:string){
+  return String(value||"")
+    .replace(/^TFT\d+_/i,"")
+    .replace(/^Set\d+_/i,"")
+    .replace(/_/g," ")
+    .replace(/([a-z])([A-Z])/g,"$1 $2")
+    .replace(/\bUnique Trait\b/gi,"")
+    .replace(/\bTrait\b$/i,"")
+    .replace(/\s{2,}/g," ")
+    .trim();
+}
+
+function primaryTrait(match:TftMatch){
+  return match.traits
+    .filter(trait=>trait.numUnits>0&&(trait.style>0||trait.numUnits>=2))
+    .sort((a,b)=>b.style-a.style||b.numUnits-a.numUnits)[0]?.name||"";
+}
+
+function aggregateLines(games:TftMatch[]):LineStat[]{
+  const map=new Map<string,TftMatch[]>();
+
+  for(const match of games){
+    const id=primaryTrait(match);
+    if(!id)continue;
+    const rows=map.get(id)||[];
+    rows.push(match);
+    map.set(id,rows);
+  }
+
+  return [...map.entries()]
+    .map(([id,rows])=>({
+      id,
+      games:rows.length,
+      avg:+((avg(rows.map(row=>row.placement))??0).toFixed(2)),
+      top4:pct(rows.filter(row=>row.placement<=4).length,rows.length),
+      ids:rows.map(row=>row.id),
+    }))
+    .sort((a,b)=>b.games-a.games||a.avg-b.avg);
 }
 
 export default function PatchAdaptation({matches,onEvidence}:Props){
@@ -48,20 +96,94 @@ export default function PatchAdaptation({matches,onEvidence}:Props){
         adaptation,
         ids:games.map(game=>game.id),
         latest:Math.max(...games.map(game=>Number(game.playedAt)||0)),
+        lines:aggregateLines(games),
       };
     }).sort((a,b)=>b.latest-a.latest);
   },[matches]);
 
   const current=patches[0]||null;
+  const previous=patches[1]||null;
   const freshnessDays=current?.latest
     ? Math.floor((Date.now()-current.latest)/86400000)
     : null;
   const stale=freshnessDays!=null&&freshnessDays>14;
 
-  return <section className="panel patch-adaptation">
+  const personalImpact=useMemo(()=>{
+    if(!current)return [];
+
+    const previousById=new Map((previous?.lines||[]).map(line=>[line.id,line]));
+    const currentById=new Map(current.lines.map(line=>[line.id,line]));
+    const signals:Array<{
+      id:string;
+      tone:"good"|"warning"|"neutral";
+      title:string;
+      body:string;
+      evidence:string;
+      ids:string[];
+      priority:number;
+    }>=[];
+
+    for(const line of current.lines){
+      const before=previousById.get(line.id);
+
+      if(before&&line.games>=2&&before.games>=2){
+        const delta=+(line.avg-before.avg).toFixed(2);
+        if(delta<=-.45){
+          signals.push({
+            id:"improved:"+line.id,
+            tone:"good",
+            title:clean(line.id)+" melhorou no seu histórico",
+            body:"A mesma linha terminou melhor no patch atual do que na amostra anterior.",
+            evidence:"Média "+before.avg+" → "+line.avg+" · "+line.games+" jogos atuais",
+            ids:[...line.ids,...before.ids],
+            priority:Math.abs(delta)*10+line.games,
+          });
+        }else if(delta>=.45){
+          signals.push({
+            id:"worse:"+line.id,
+            tone:"warning",
+            title:clean(line.id)+" está custando mais",
+            body:"Essa linha continua no seu pool, mas sua colocação média piorou na comparação pessoal entre patches.",
+            evidence:"Média "+before.avg+" → "+line.avg+" · "+line.games+" jogos atuais",
+            ids:[...line.ids,...before.ids],
+            priority:Math.abs(delta)*10+line.games+4,
+          });
+        }
+      }else if(!before&&line.games>=2){
+        signals.push({
+          id:"new:"+line.id,
+          tone:"neutral",
+          title:clean(line.id)+" entrou no seu pool",
+          body:"Essa identidade não aparecia na amostra anterior e já se repetiu no patch atual.",
+          evidence:line.games+" jogos · média "+line.avg+" · Top 4 "+line.top4+"%",
+          ids:line.ids,
+          priority:line.games+2,
+        });
+      }
+    }
+
+    if(previous){
+      for(const line of previous.lines){
+        if(line.games<2||currentById.has(line.id))continue;
+        signals.push({
+          id:"missing:"+line.id,
+          tone:"neutral",
+          title:clean(line.id)+" sumiu do seu histórico recente",
+          body:"Era uma linha recorrente na amostra anterior e ainda não apareceu no patch atual.",
+          evidence:line.games+" jogos no patch "+previous.patch+" · média "+line.avg,
+          ids:line.ids,
+          priority:line.games,
+        });
+      }
+    }
+
+    return signals.sort((a,b)=>b.priority-a.priority).slice(0,4);
+  },[current,previous]);
+
+  return <section className="panel patch-adaptation patch-for-you">
     <div className="innovation-head">
       <div>
-        <span>PATCH ADAPTATION</span>
+        <span>PATCH PARA VOCÊ</span>
         <h2>{current
           ? stale
             ? "Amostra histórica deste patch"
@@ -74,6 +196,7 @@ export default function PatchAdaptation({matches,onEvidence}:Props){
               : "Construindo sua curva de adaptação"
           : "Sem dados de patch"}
         </h2>
+        <p className="patch-personal-copy">Quais linhas do seu próprio histórico melhoraram, pioraram, entraram ou saíram do pool.</p>
       </div>
       {current&&<small>Patch {current.patch}{stale&&freshnessDays!=null?" · "+freshnessDays+"d atrás":""}</small>}
     </div>
@@ -93,6 +216,23 @@ export default function PatchAdaptation({matches,onEvidence}:Props){
       </div>
     </div>}
 
+    {personalImpact.length>0&&<div className="patch-personal-impact">
+      <div className="patch-impact-head">
+        <span>MUDANÇAS NO SEU POOL</span>
+        <small>{previous?"Patch "+previous.patch+" → "+current?.patch:"Somente patch atual"}</small>
+      </div>
+      <div className="patch-impact-grid">
+        {personalImpact.map(signal=>(
+          <button className={signal.tone} onClick={()=>onEvidence(signal.ids,"Patch pessoal · "+signal.title)} key={signal.id}>
+            <span>{signal.tone==="good"?"MELHOROU":signal.tone==="warning"?"REVISAR":"MUDANÇA"}</span>
+            <strong>{signal.title}</strong>
+            <p>{signal.body}</p>
+            <small>{signal.evidence}</small>
+          </button>
+        ))}
+      </div>
+    </div>}
+
     <div className="patch-list">
       {patches.slice(0,4).map(row=>(
         <button key={row.patch} onClick={()=>onEvidence(row.ids,"Patch "+row.patch)}>
@@ -109,6 +249,6 @@ export default function PatchAdaptation({matches,onEvidence}:Props){
 
     <p className="innovation-note">{stale
       ? "Esta leitura usa uma amostra histórica. Ela não descreve necessariamente seu desempenho atual."
-      : "A curva compara blocos de partidas dentro do mesmo patch. Ela descreve adaptação observada, não mede aprendizado diretamente."}</p>
+      : "Mudanças entre patches descrevem seu histórico observado. Elas não provam que um buff ou nerf específico causou a diferença."}</p>
   </section>;
 }
