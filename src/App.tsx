@@ -230,10 +230,11 @@ function AugmentVisual({id,staticData}:{id:string;staticData:TftStaticData|null}
   </span>;
 }
 
-type ProfileTab = "overview"|"review"|"meta"|"matches"|"share";
+type ProfileTab = "overview"|"coach"|"matches"|"share";
 
 function parseProfileTab(value:string|null):ProfileTab{
-  return value==="review"||value==="meta"||value==="overview"||value==="share"
+  if(value==="review"||value==="meta"||value==="coach") return "coach";
+  return value==="overview"||value==="share"
     ? value
     : "matches";
 }
@@ -1161,8 +1162,7 @@ function App() {
             <div className="profile-tab-list">
               <button className={profileTab==="matches"?"active":""} onClick={()=>changeProfileTab("matches")}>Partidas</button>
               <button className={profileTab==="overview"?"active":""} onClick={()=>changeProfileTab("overview")}>Agora</button>
-              <button className={profileTab==="review"?"active":""} onClick={()=>changeProfileTab("review")}>Por quê?</button>
-              <button className={profileTab==="meta"?"active":""} onClick={()=>changeProfileTab("meta")}>Comparar</button>
+              <button className={profileTab==="coach"?"active":""} onClick={()=>changeProfileTab("coach")}>Coach</button>
             </div>
             <div className="profile-tab-actions">
               <button className="share-analysis-button" onClick={()=>changeProfileTab("share")}>Compartilhar</button>
@@ -1196,7 +1196,7 @@ function App() {
             </details>
           </>}
 
-          {profileTab==="review"&&<>
+          {profileTab==="coach"&&<>
             <ChibiReview
               matches={analysisMatches}
               staticData={staticData}
@@ -1204,33 +1204,59 @@ function App() {
               onEvidence={showEvidence}
             />
 
-            <ChibiMemory
-              playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
-              matches={analysisMatches}
-            />
+            <div className="coach-secondary-stack">
+              <details className="coach-secondary-panel coach-dataset-layer">
+                <summary>
+                  <span>
+                    <b>Comparar com o Chibi Dataset</b>
+                    <small>Veja onde seu resultado foge da base sem transformar popularidade em regra.</small>
+                  </span>
+                  <em>Meta pessoal</em>
+                </summary>
+                <div className="coach-secondary-content">
+                  <PersonalVsGlobalMeta
+                    matches={analysisMatches}
+                    setNumber={currentSet}
+                    queueId={metaQueueId}
+                    staticData={staticData}
+                    onEvidence={showEvidence}
+                  />
+                </div>
+              </details>
 
-            <details className="secondary-analysis">
-              <summary><span><b>Ver mudança de estilo recente</b><small>Compare blocos recentes sem tratar variação como evolução de habilidade</small></span><em>Style Shift</em></summary>
-              <StyleShift matches={analysisMatches}/>
-            </details>
-          </>}
+              <details className="coach-secondary-panel">
+                <summary>
+                  <span>
+                    <b>Memória do seu jogo</b>
+                    <small>Compare a leitura atual com snapshots anteriores salvos neste navegador.</small>
+                  </span>
+                  <em>Memory</em>
+                </summary>
+                <div className="coach-secondary-content">
+                  <ChibiMemory
+                    playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
+                    matches={analysisMatches}
+                  />
+                </div>
+              </details>
 
-          {profileTab==="meta"&&<>
-            <PersonalVsGlobalMeta
-              matches={analysisMatches}
-              setNumber={currentSet}
-              queueId={metaQueueId}
-              staticData={staticData}
-              onEvidence={showEvidence}
-            />
-
-            <details className="secondary-analysis">
-              <summary><span><b>Ver adaptação ao patch</b><small>Leitura histórica complementar da amostra atual</small></span><em>Patch</em></summary>
-              <PatchAdaptation
-                matches={analysisMatches}
-                onEvidence={showEvidence}
-              />
-            </details>
+              <details className="coach-secondary-panel">
+                <summary>
+                  <span>
+                    <b>Mudança de estilo e adaptação</b>
+                    <small>Use como contexto secundário depois de entender o problema principal.</small>
+                  </span>
+                  <em>Detalhes</em>
+                </summary>
+                <div className="coach-secondary-content coach-secondary-grid">
+                  <StyleShift matches={analysisMatches}/>
+                  <PatchAdaptation
+                    matches={analysisMatches}
+                    onEvidence={showEvidence}
+                  />
+                </div>
+              </details>
+            </div>
           </>}
 
           {profileTab==="share"&&<ChibiShareCard

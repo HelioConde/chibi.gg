@@ -3,6 +3,7 @@ import { TftMatch } from "../api/tft";
 import { buildLeakMap, buildPersonalMeta, buildSessionCoach } from "../analysis/chibiProduct";
 import { getJournalEntries, JOURNAL_TAGS } from "../journal";
 import { staticEntry, TftStaticData } from "../tftStatic";
+import DDragonArt from "./DDragonArt";
 
 type Props={
   matches:TftMatch[];
@@ -35,6 +36,22 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
   const meta=useMemo(()=>buildPersonalMeta(matches),[matches]);
   const leaks=useMemo(()=>buildLeakMap(matches),[matches]);
   const session=useMemo(()=>buildSessionCoach(matches),[matches]);
+
+  const visualChampionIds=useMemo(()=>{
+    const scores=new Map<string,number>();
+    matches.slice(0,10).forEach((match,matchIndex)=>{
+      match.units.forEach(unit=>{
+        const recency=Math.max(1,10-matchIndex);
+        const upgrade=unit.tier>=3?5:unit.tier===2?2:0;
+        const result=match.placement<=4?2:0;
+        scores.set(unit.characterId,(scores.get(unit.characterId)||0)+recency+upgrade+result);
+      });
+    });
+    return [...scores.entries()]
+      .sort((a,b)=>b[1]-a[1])
+      .slice(0,7)
+      .map(([id])=>id);
+  },[matches]);
 
   const journalSignal=useMemo(()=>{
     void journalVersion;
@@ -161,10 +178,16 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
 
   return <section className="panel chibi-review coach-review">
     <div className="review-head coach-review-head">
-      <div>
+      <div className="coach-review-copy">
         <span>CHIBI COACH</span>
         <h2>O que repetir, corrigir e testar</h2>
         <p>Primeiro o que repetir, depois o que corrigir. O resto fica como evidência.</p>
+        <DDragonArt
+          staticData={staticData}
+          championIds={visualChampionIds}
+          variant="compact"
+          label="Seu pool recente · Riot Data Dragon"
+        />
       </div>
       <small>{matches.length} partidas</small>
     </div>
