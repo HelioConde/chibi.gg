@@ -12433,3 +12433,48 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
   .session-journal-question{align-items:flex-start;flex-direction:column}
   .session-journal-question>em{max-width:none;text-align:left}
 }
+
+
+/* Chibi Lessons — keep personal review takeaways alive */
+.journal-footer-actions{display:flex;align-items:center;gap:6px}
+.journal-footer-actions .lesson-button{border-color:rgba(117,99,231,.45);background:rgba(117,99,231,.1);color:#c9c0ff}
+@media(max-width:560px){
+  .journal-footer{align-items:stretch;flex-direction:column}
+  .journal-footer-actions{display:grid;grid-template-columns:1fr}
+  .journal-footer-actions button{width:100%}
+}
+
+.chibi-lessons{padding:2px}
+.lessons-empty{padding:15px;border:1px dashed #2a3245;background:#0c1119;border-radius:10px}
+.lessons-empty>span,.lessons-head>div:first-child>span{display:block;color:#8f7cff;font-size:7px;font-weight:900;letter-spacing:.9px}
+.lessons-empty>strong{display:block;margin:4px 0;font-size:11px}
+.lessons-empty>p{margin:0;color:#737d91;font-size:8px;line-height:1.45}
+
+.lessons-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.lessons-head h3{margin:5px 0 4px;font-size:16px;letter-spacing:-.3px}
+.lessons-head p{margin:0;max-width:650px;color:#7d879b;font-size:8px;line-height:1.5}
+.lessons-count{min-width:108px;border:1px solid rgba(117,99,231,.25);background:rgba(117,99,231,.06);border-radius:10px;padding:9px 10px}
+.lessons-count small{display:block;color:#6f7990;font-size:6px;font-weight:900;letter-spacing:.75px}
+.lessons-count strong{display:block;margin:2px 0;color:#c9c0ff;font-size:18px}
+.lessons-count span{display:block;color:#687287;font-size:7px}
+
+.lessons-list{display:flex;flex-direction:column;gap:7px;margin-top:11px}
+.lessons-list>article{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;border:1px solid #222b3d;background:#0c121b;border-radius:10px;padding:10px}
+.lessons-list>article.due{border-color:rgba(117,99,231,.25);background:rgba(117,99,231,.035)}
+.lesson-copy>span{display:block;color:#6f7990;font-size:6px;font-weight:900;letter-spacing:.75px}
+.lessons-list>article.due .lesson-copy>span{color:#9d8aff}
+.lesson-copy blockquote{margin:5px 0;border-left:2px solid #6f5be0;padding:4px 0 4px 8px;color:#aeb6c8;font-size:9px;line-height:1.5}
+.lesson-copy small{display:block;color:#657086;font-size:7px}
+.lesson-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.lesson-actions button{border:1px solid #343c54;background:#141a27;color:#dce2f0;border-radius:8px;padding:7px 8px;font-size:7px;font-weight:900}
+.lesson-actions button.primary{border-color:#6b58db;background:rgba(117,99,231,.13);color:#c9c0ff}
+.lesson-actions button.ghost{color:#7b8599}
+.lessons-note{margin:9px 0 0;color:#606a80;font-size:7px;line-height:1.45}
+
+@media(max-width:700px){
+  .lessons-head{flex-direction:column}
+  .lessons-count{width:100%;min-width:0}
+  .lessons-list>article{grid-template-columns:1fr}
+  .lesson-actions{justify-content:stretch}
+  .lesson-actions button{flex:1}
+}
