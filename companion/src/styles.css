@@ -61,3 +61,20 @@ body{overflow:hidden}
 .preset-full .secondary-grid article{padding:12px}
 .preset-compact .companion-controls{padding-top:6px}
 .preset-compact .layout-actions{display:none}
+
+.window-actions .marker-button{
+  margin-right:auto;
+  border-color:rgba(83,211,159,.26);
+  background:rgba(83,211,159,.07);
+  color:#8adab9;
+}
+.window-actions .marker-button b{
+  display:inline-grid;
+  min-width:16px;
+  height:16px;
+  margin-left:4px;
+  place-items:center;
+  border-radius:999px;
+  background:rgba(83,211,159,.11);
+  font-size:6px;
+}
