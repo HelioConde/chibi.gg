@@ -938,6 +938,9 @@ export default function TeamBuilderPage({
       selectedAugments.length
         ?"Augments: "+selectedAugments.map(id=>staticEntry(staticData?.augments,id)?.name||clean(id)).join(" · ")
         :"",
+      transitionAnalysis
+        ?"Transição: "+transitionAnalysis.leaving.length+" saem · "+transitionAnalysis.entering.length+" entram · "+transitionAnalysis.copyCost+"G em cópias-alvo"
+        :"",
     ].filter(Boolean).join("\n");
 
     try{
@@ -988,6 +991,9 @@ export default function TeamBuilderPage({
           <button className="secondary" onClick={copyBoardSummary} disabled={!units.length}>
             {copied?"Resumo copiado ✓":"Copiar resumo"}
           </button>
+          <button className={transitionBase?"transition-active":""} onClick={captureTransitionBase} disabled={!units.length}>
+            {transitionBase?"Atualizar board atual":"Marcar board atual"}
+          </button>
           <button onClick={()=>{
             setVariantA(units.map(unit=>({...unit,items:[...(unit.items||[])]})));
             setVariantAAugments([...selectedAugments]);
@@ -999,7 +1005,7 @@ export default function TeamBuilderPage({
             setSelectedAugments([...variantAAugments]);
             setSelectedId(null);
           }}>Restaurar A</button>}
-          <button className="secondary" onClick={()=>{setUnits([]);setSelectedAugments([]);setSelectedId(null);setSelectedItemHex(null);}}>Limpar board</button>
+          <button className="secondary" onClick={()=>{setUnits([]);setSelectedAugments([]);setSelectedId(null);setSelectedItemHex(null);setMovingHex(null);setTransitionBase(null);setTransitionBaseAugments([]);}}>Limpar board</button>
         </div>
       </div>
     </section>
