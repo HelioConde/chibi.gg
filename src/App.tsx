@@ -24,6 +24,7 @@ import ChibiInnovations from "./components/ChibiInnovations";
 import ChibiReview from "./components/ChibiReview";
 import ChibiLearningLab from "./components/ChibiLearningLab";
 import ChibiLearningPath from "./components/ChibiLearningPath";
+import ChibiCoachMode from "./components/ChibiCoachMode";
 import ChibiStudyShare, { studyFocusById } from "./components/ChibiStudyShare";
 import MatchJournal from "./components/MatchJournal";
 import PatchAdaptation from "./components/PatchAdaptation";
@@ -1268,6 +1269,7 @@ function App() {
           </>}
 
           {profileTab==="coach"&&<>
+            <ChibiCoachMode />
             <ChibiReview
               matches={analysisMatches}
               staticData={staticData}
