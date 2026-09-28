@@ -7214,3 +7214,32 @@ a { color: inherit; text-decoration: none; }
     width:100%;
   }
 }
+
+/* -----------------------------------------------------------------------
+   Comps → Builder handoff
+   ----------------------------------------------------------------------- */
+.comp-answer-actions{
+  flex-wrap:wrap;
+}
+.comp-answer-actions button.secondary,
+.comp-guide-buttons button.secondary{
+  border-color:#343e52;
+  background:#111823;
+  color:#9aa6b9;
+}
+.comp-guide-buttons{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:6px;
+}
+.comp-guide-buttons button{
+  width:100%;
+  border:1px solid #5e52bd;
+  border-radius:8px;
+  background:rgba(117,99,231,.1);
+  color:#cac3ff;
+  padding:8px;
+  font-size:8px;
+  font-weight:900;
+  cursor:pointer;
+}
