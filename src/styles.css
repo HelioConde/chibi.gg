@@ -12993,3 +12993,9 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
 .journal-checklist-grid button.active{border-color:#6d5ada;background:rgba(117,99,231,.12);color:#c9c0ff}
 .journal-checklist-grid button.clear.active{border-color:#2c3547;background:#111722;color:#6f7990}
 @media(max-width:650px){.journal-checklist-grid{grid-template-columns:1fr}}
+
+
+.journal-checklist-progress{display:flex;align-items:center;gap:9px;padding:0 9px 8px}
+.journal-checklist-progress>span{flex:none;color:#687287;font-size:7px}
+.journal-checklist-progress>i{height:5px;flex:1;border-radius:999px;background:#1b2331;overflow:hidden}
+.journal-checklist-progress>i>b{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#6452d7,#8f78ff)}
