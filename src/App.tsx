@@ -267,6 +267,7 @@ function App() {
   const [evidenceLabel,setEvidenceLabel]=useState("");
   const [journalVersion,setJournalVersion]=useState(0);
   const [profileTab,setProfileTab]=useState<ProfileTab>("matches");
+  const [historyFilter,setHistoryFilter]=useState<"all"|"top4"|"bottom2"|"review">("all");
   const [recentPlayers,setRecentPlayers]=useState<RecentPlayer[]>(()=>getRecentPlayers());
   const [copiedAnalysisLink,setCopiedAnalysisLink]=useState(false);
   const [statsTarget,setStatsTarget]=useState<{
@@ -421,15 +422,35 @@ function App() {
   },[analysisMatches]);
 
   const visibleMatches=useMemo(()=>{
-    if(!evidenceIds?.length) return analysisMatches;
-    const allowed=new Set(evidenceIds);
-    return analysisMatches.filter((match)=>allowed.has(match.id));
-  },[analysisMatches,evidenceIds]);
+    const evidenceFiltered=evidenceIds?.length
+      ? analysisMatches.filter((match)=>new Set(evidenceIds).has(match.id))
+      : analysisMatches;
+
+    if(historyFilter==="top4") return evidenceFiltered.filter(match=>match.placement<=4);
+    if(historyFilter==="bottom2") return evidenceFiltered.filter(match=>match.placement>=7);
+    if(historyFilter==="review") return evidenceFiltered.filter(match=>
+      match.placement>=7 || (match.placement>=5&&(match.goldLeft>=10||match.level>=8))
+    );
+    return evidenceFiltered;
+  },[analysisMatches,evidenceIds,historyFilter]);
 
   const visibleDna=useMemo(
-    ()=>evidenceIds?.length ? buildChibiDNA(visibleMatches) : dna,
-    [evidenceIds,visibleMatches,dna]
+    ()=>evidenceIds?.length||historyFilter!=="all" ? buildChibiDNA(visibleMatches) : dna,
+    [evidenceIds,historyFilter,visibleMatches,dna]
   );
+
+  const latestSession=useMemo(()=>{
+    if(!analysisMatches.length)return [];
+    const sorted=analysisMatches.slice().sort((a,b)=>(b.playedAt||0)-(a.playedAt||0));
+    const session=[sorted[0]];
+    for(let index=1;index<sorted.length;index++){
+      const previous=session[session.length-1];
+      const gap=Math.abs((previous.playedAt||0)-(sorted[index].playedAt||0));
+      if(gap>2.5*60*60*1000)break;
+      session.push(sorted[index]);
+    }
+    return session;
+  },[analysisMatches]);
 
   const latestPlayedAt=useMemo(
     ()=>Math.max(0,...analysisMatches.map((m)=>Number(m.playedAt)||0)),
@@ -1102,6 +1123,31 @@ function App() {
                 <small>{visibleMatches.length} exibidas</small>
               </div>
 
+              <div className="history-session-strip">
+                <div>
+                  <span>SESSÃO MAIS RECENTE</span>
+                  <strong>{latestSession.length} partida{latestSession.length===1?"":"s"}</strong>
+                  <small>{latestSession.length
+                    ? "média "+(latestSession.reduce((sum,match)=>sum+match.placement,0)/latestSession.length).toFixed(2)
+                    : "sem amostra"}
+                  </small>
+                </div>
+                <div className="history-filter-tabs">
+                  {([
+                    ["all","Todas"],
+                    ["review","Revisar"],
+                    ["top4","Top 4"],
+                    ["bottom2","Bottom 2"],
+                  ] as const).map(([id,label])=>(
+                    <button
+                      className={historyFilter===id?"active":""}
+                      onClick={()=>setHistoryFilter(id)}
+                      key={id}
+                    >{label}</button>
+                  ))}
+                </div>
+              </div>
+
               {evidenceIds?.length&&<div className="evidence-banner">
                 <div>
                   <span>EVIDÊNCIA ATIVA</span>
@@ -1112,6 +1158,9 @@ function App() {
               </div>}
 
               <div className="match-list match-list-v2">
+                {!visibleMatches.length&&<div className="history-empty-filter">
+                  Nenhuma partida encontrada neste filtro.
+                </div>}
                 {visibleMatches.map((match)=>{
                   const cue=matchReviewCue(match);
                   return <button className={"match-row match-button match-row-v2 cue-"+cue.tone} key={match.id} onClick={()=>openMatch(match)}>
