@@ -208,9 +208,14 @@ function App() {
   const [profileTab,setProfileTab]=useState<ProfileTab>("matches");
   const [recentPlayers,setRecentPlayers]=useState<RecentPlayer[]>(()=>getRecentPlayers());
   const [copiedAnalysisLink,setCopiedAnalysisLink]=useState(false);
-  const [statsTarget,setStatsTarget]=useState<{category:StatisticsCategory;query:string}>({
+  const [statsTarget,setStatsTarget]=useState<{
+    category:StatisticsCategory;
+    query:string;
+    view:"stats"|"tier";
+  }>({
     category:"champions",
     query:"",
+    view:"stats",
   });
   const [sitePage,setSitePage]=useState<"main"|"meta"|"comps"|"stats"|"overlay">(
     window.location.hash==="#meta"
@@ -617,8 +622,12 @@ function App() {
     }
   }
 
-  function openStats(category:StatisticsCategory="champions",query=""){
-    setStatsTarget({category,query});
+  function openStats(
+    category:StatisticsCategory="champions",
+    query="",
+    view:"stats"|"tier"="stats",
+  ){
+    setStatsTarget({category,query,view});
     setSitePage("stats");
     if(window.location.hash!=="#stats"){
       window.history.pushState({},"",window.location.pathname+window.location.search+"#stats");
@@ -710,6 +719,9 @@ function App() {
           staticData={staticData}
           hasProfile={Boolean(profile)}
           onBack={closeExplorePage}
+          onOpenComps={openComps}
+          onOpenStats={()=>openStats()}
+          onOpenTier={()=>openStats("champions","","tier")}
         />
       ) : sitePage==="comps" ? (
         <CompsPage
@@ -728,6 +740,7 @@ function App() {
           onEvidence={showCompEvidence}
           initialCategory={statsTarget.category}
           initialQuery={statsTarget.query}
+          initialView={statsTarget.view}
         />
       ) : sitePage==="overlay" ? (
         <OverlayPage
