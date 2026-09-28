@@ -22,6 +22,7 @@ import { buildChibiDNA } from "./analysis/chibiInsights";
 import { buildActionPlan } from "./analysis/actionPlan";
 import ChibiInnovations from "./components/ChibiInnovations";
 import ChibiReview from "./components/ChibiReview";
+import ChibiLearningLab from "./components/ChibiLearningLab";
 import MatchJournal from "./components/MatchJournal";
 import PatchAdaptation from "./components/PatchAdaptation";
 import BoardCounterfactual from "./components/BoardCounterfactual";
@@ -1218,6 +1219,12 @@ function App() {
               matches={analysisMatches}
               staticData={staticData}
               journalVersion={journalVersion}
+              onEvidence={showEvidence}
+            />
+
+            <ChibiLearningLab
+              matches={analysisMatches}
+              staticData={staticData}
               onEvidence={showEvidence}
             />
 
