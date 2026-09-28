@@ -12848,3 +12848,42 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
 @media(max-width:520px){
   .home-session-list>button.lesson-row .home-session-focus{border-left:0;border-top:1px solid rgba(89,181,225,.18)}
 }
+
+
+/* Match Scorecard — transparent per-game lobby comparison */
+.match-scorecard{margin:12px 0 14px;padding:14px;border:1px solid #222b3d;background:#0c121b;border-radius:12px}
+.scorecard-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.scorecard-head>div:first-child>span{display:block;color:#70bee4;font-size:7px;font-weight:900;letter-spacing:.9px}
+.scorecard-head h3{margin:4px 0 4px;font-size:15px;letter-spacing:-.3px}
+.scorecard-head p{margin:0;max-width:620px;color:#7c879b;font-size:8px;line-height:1.45}
+.scorecard-index{min-width:110px;border:1px solid rgba(89,181,225,.22);background:rgba(45,111,151,.04);border-radius:10px;padding:9px 10px;text-align:center}
+.scorecard-index small{display:block;color:#687287;font-size:6px;font-weight:900;letter-spacing:.75px}
+.scorecard-index strong{display:block;margin:2px 0;color:#8edaff;font-size:22px;letter-spacing:-.7px}
+.scorecard-index span{display:block;color:#6f7b91;font-size:7px}
+
+.scorecard-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:11px}
+.scorecard-metrics article{border:1px solid #20283a;background:#101620;border-radius:9px;padding:9px}
+.scorecard-metric-head{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.scorecard-metric-head span{color:#7a8599;font-size:7px;font-weight:800}
+.scorecard-metric-head b{color:#9aa5b8;font-size:7px}
+.scorecard-metrics article>strong{display:block;margin:5px 0 6px;font-size:13px}
+.scorecard-track{height:5px;border-radius:999px;background:#1c2432;overflow:hidden}
+.scorecard-track i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#4e84a1,#72c0e7)}
+.scorecard-metrics article>small{display:block;margin-top:6px;color:#616d82;font-size:6px;line-height:1.4}
+
+.scorecard-read{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:9px}
+.scorecard-read article{border:1px solid #20283a;background:#0d131c;border-radius:9px;padding:8px}
+.scorecard-read span{display:block;color:#667187;font-size:6px;font-weight:900;letter-spacing:.75px}
+.scorecard-read strong{display:block;margin:3px 0;font-size:9px}
+.scorecard-read small{display:block;color:#657086;font-size:7px}
+.scorecard-note{margin:8px 0 0;color:#5f697e;font-size:7px;line-height:1.4}
+
+@media(max-width:900px){
+  .scorecard-metrics{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:650px){
+  .scorecard-head{flex-direction:column}
+  .scorecard-index{width:100%;min-width:0;text-align:left}
+  .scorecard-metrics{grid-template-columns:1fr}
+  .scorecard-read{grid-template-columns:1fr}
+}
