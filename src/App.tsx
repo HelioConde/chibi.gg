@@ -1056,9 +1056,9 @@ function App() {
             <img className="uploaded-hero-art" src={SITE_IMAGES.art} alt="" aria-hidden="true"/>
             <img className="uploaded-icons-art" src={SITE_IMAGES.icons} alt="" aria-hidden="true"/>
             <DDragonArt staticData={staticData} variant="hero" label="Riot Data Dragon"/>
-            <div className="eyebrow">TFT FIRST. DATA THAT HELPS YOU CLIMB.</div>
-            <h1>Entenda suas partidas.<br /><span>Suba com intenção.</span></h1>
-            <p>Busque qualquer Riot ID e veja rank, histórico, comps, padrões e insights pensados especificamente para Teamfight Tactics.</p>
+            <div className="eyebrow">TFT FIRST · PERSONAL COACHING FROM YOUR MATCHES</div>
+            <h1>Descubra por que você está<br /><span>subindo — ou caindo.</span></h1>
+            <p>Digite seu Riot ID. O Chibi analisa suas próprias partidas, encontra padrões que você pode não ter percebido e mostra a evidência por trás de cada leitura.</p>
 
             <form className="search-box" onSubmit={handleSubmit}>
               <select aria-label="Região" value={platform} onChange={(e)=>setPlatform(e.target.value)}>
@@ -1067,10 +1067,26 @@ function App() {
                 <option value="la1">LAN</option><option value="la2">LAS</option><option value="oc1">OCE</option>
               </select>
               <input value={riotId} onChange={(e)=>setRiotId(e.target.value)} placeholder="Nome#TAG" aria-label="Riot ID"/>
-              <button type="submit" disabled={loading}>{loading ? "Buscando..." : "Buscar jogador"}</button>
+              <button type="submit" disabled={loading}>{loading ? "Analisando..." : "Analisar meu TFT"}</button>
             </form>
 
             {error && <div className="lookup-error">{error}</div>}
+
+            <section className="hero-insight-preview" aria-label="Exemplo do Chibi Review">
+              <div className="hero-insight-kicker">
+                <span>CHIBI INSIGHT</span>
+                <em>exemplo</em>
+              </div>
+              <div className="hero-insight-main">
+                <strong>Seus Top 4 continuam estáveis, mas seus jogos ruins estão terminando mais baixo.</strong>
+                <p>O Chibi não entrega só uma nota: ele mostra quais partidas sustentam a leitura, o tamanho da amostra e a confiança do sinal.</p>
+              </div>
+              <div className="hero-insight-proof">
+                <span><b>10</b><small>partidas recentes</small></span>
+                <span><b>3</b><small>descobertas principais</small></span>
+                <span><b>1 clique</b><small>para abrir evidências</small></span>
+              </div>
+            </section>
 
             {recentPlayers.length>0&&<section className="recent-players">
               <div className="recent-players-head">
@@ -1113,9 +1129,9 @@ function App() {
             </section>}
 
             <div className="quick-stats">
-              <div><strong>Sem cadastro</strong><span>perfil TFT instantâneo</span></div>
-              <div><strong>Dados Riot</strong><span>rank + partidas oficiais</span></div>
-              <div><strong>Insights</strong><span>o que melhorar, não só números</span></div>
+              <div><strong>Sem cadastro</strong><span>valor antes de pedir uma conta</span></div>
+              <div><strong>Evidência aberta</strong><span>cada insight leva às partidas</span></div>
+              <div><strong>Seu jogo primeiro</strong><span>meta global entra como contexto</span></div>
             </div>
           </section>
 
@@ -1127,9 +1143,9 @@ function App() {
           />
 
           <section className="feature-grid">
-            <article><span>01</span><h3>Seu jogo, não só o meta</h3><p>Descubra quais estilos, traits e ritmos realmente funcionam para você.</p></article>
-            <article><span>02</span><h3>Partidas explicadas</h3><p>Veja colocação, board, augments, unidades e economia em contexto.</p></article>
-            <article><span>03</span><h3>TFT de verdade</h3><p>Um tracker pensado primeiro para TFT, não como uma aba secundária de LoL.</p></article>
+            <article><span>01</span><h3>3 descobertas, não 30 cards</h3><p>O Chibi prioriza os sinais pessoais mais importantes e deixa a estatística detalhada como evidência.</p></article>
+            <article><span>02</span><h3>Veja o que mudou</h3><p>Compare sessões, patches e blocos recentes para descobrir se você realmente está evoluindo.</p></article>
+            <article><span>03</span><h3>Seu meta pessoal</h3><p>Compare o que é forte globalmente com as linhas que de fato estão funcionando no seu histórico.</p></article>
           </section>
         </main>
       ) : (
@@ -1187,6 +1203,7 @@ function App() {
             </div>
 
             <div className="player-summary-actions">
+              <button className="player-coach-button" onClick={()=>changeProfileTab("coach")}>Ver Chibi Review</button>
               <button className="refresh-button" onClick={searchPlayer} disabled={loading}>{loading?"Atualizando...":"Atualizar"}</button>
             </div>
           </section>
@@ -1257,31 +1274,32 @@ function App() {
               onEvidence={showEvidence}
             />
 
-            <ChibiLearningLab
+            <PersonalVsGlobalMeta
               matches={analysisMatches}
+              setNumber={currentSet}
+              queueId={metaQueueId}
               staticData={staticData}
               onEvidence={showEvidence}
             />
 
+            <details className="coach-secondary-panel coach-learning-layer">
+              <summary>
+                <span>
+                  <b>Laboratório de padrões</b>
+                  <small>Aprofunde unidades, itens, augments e outros sinais depois de entender as três descobertas principais.</small>
+                </span>
+                <em>Explorar</em>
+              </summary>
+              <div className="coach-secondary-content">
+                <ChibiLearningLab
+                  matches={analysisMatches}
+                  staticData={staticData}
+                  onEvidence={showEvidence}
+                />
+              </div>
+            </details>
+
             <div className="coach-secondary-stack">
-              <details className="coach-secondary-panel coach-dataset-layer">
-                <summary>
-                  <span>
-                    <b>Comparar com o Chibi Dataset</b>
-                    <small>Veja onde seu resultado foge da base sem transformar popularidade em regra.</small>
-                  </span>
-                  <em>Meta pessoal</em>
-                </summary>
-                <div className="coach-secondary-content">
-                  <PersonalVsGlobalMeta
-                    matches={analysisMatches}
-                    setNumber={currentSet}
-                    queueId={metaQueueId}
-                    staticData={staticData}
-                    onEvidence={showEvidence}
-                  />
-                </div>
-              </details>
 
               <details className="coach-secondary-panel">
                 <summary>
@@ -1335,12 +1353,12 @@ function App() {
           {profileTab==="matches"&&<>
             <section className="matches-priority-bar">
               <div className="matches-priority-problem">
-                <span>O QUE ESTÁ TE PUNINDO</span>
+                <span>CHIBI LEU SUAS PARTIDAS</span>
                 <strong>{quickPlan.problem.title}</strong>
                 <small>{quickPlan.problem.evidence} · confiança {quickPlan.problem.confidence}</small>
               </div>
               <div className="matches-priority-action">
-                <span>FAÇA AGORA</span>
+                <span>PRÓXIMO TESTE</span>
                 <strong>{quickPlan.action.title}</strong>
                 <small>{quickPlan.action.steps[0]}</small>
               </div>
@@ -1349,7 +1367,7 @@ function App() {
                   quickPlan.problem.matchIds,
                   "Prioridade atual · "+quickPlan.problem.title,
                 )}>Ver evidências</button>}
-                <button className="secondary" onClick={()=>changeProfileTab("overview")}>Abrir plano completo</button>
+                <button className="secondary" onClick={()=>changeProfileTab("coach")}>Ver 3 descobertas</button>
               </div>
             </section>
 
