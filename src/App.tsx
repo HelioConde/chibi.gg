@@ -359,6 +359,14 @@ function App() {
     setEvidenceLabel("");
   }
 
+  function openReviewQueue(){
+    clearEvidence();
+    changeProfileTab("matches");
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      document.getElementById("review-queue")?.scrollIntoView({behavior:"smooth",block:"start"});
+    }));
+  }
+
   function showCounterEvidence(ids:string[],label:string){
     setSelectedMatch(null);
     setOpenedMatch(null);
@@ -659,6 +667,7 @@ function App() {
               playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
               matches={analysisMatches}
               onEvidence={showEvidence}
+              onReviewQueue={openReviewQueue}
             />
 
             <details className="overview-deep-dive">
