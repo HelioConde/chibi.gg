@@ -118,17 +118,48 @@ Deno.serve(async(req)=>{
       const placements=games.map(row=>num(row?.placement)).filter(Boolean);
       const traitCounts=new Map<string,number>();
       const unitCounts=new Map<string,number>();
+      const augmentCounts=new Map<string,number>();
+      const itemCounts=new Map<string,number>();
+      const unitItemCounts=new Map<string,Map<string,number>>();
 
       for(const row of games){
         for(const trait of activeTraits(row)){
           traitCounts.set(trait,(traitCounts.get(trait)||0)+1);
         }
+        const seenAugments=new Set<string>();
+        for(const augment of Array.isArray(row?.augments)?row.augments:[]){
+          const id=String(augment||"");
+          if(!id||seenAugments.has(id)) continue;
+          seenAugments.add(id);
+          augmentCounts.set(id,(augmentCounts.get(id)||0)+1);
+        }
+
         const seen=new Set<string>();
+        const seenItems=new Set<string>();
         for(const unit of Array.isArray(row?.units)?row.units:[]){
           const id=String(unit?.characterId||"");
-          if(!id||seen.has(id)) continue;
-          seen.add(id);
-          unitCounts.set(id,(unitCounts.get(id)||0)+1);
+          if(!id) continue;
+
+          if(!seen.has(id)){
+            seen.add(id);
+            unitCounts.set(id,(unitCounts.get(id)||0)+1);
+          }
+
+          let perUnit=unitItemCounts.get(id);
+          if(!perUnit){
+            perUnit=new Map<string,number>();
+            unitItemCounts.set(id,perUnit);
+          }
+
+          for(const itemRaw of Array.isArray(unit?.itemNames)?unit.itemNames:[]){
+            const item=String(itemRaw||"");
+            if(!item) continue;
+            perUnit.set(item,(perUnit.get(item)||0)+1);
+            if(!seenItems.has(item)){
+              seenItems.add(item);
+              itemCounts.set(item,(itemCounts.get(item)||0)+1);
+            }
+          }
         }
       }
 
@@ -142,6 +173,28 @@ Deno.serve(async(req)=>{
         .slice(0,8)
         .map(([id,count])=>({id,rate:round(count/games.length*100,1)}));
 
+      const augments=[...augmentCounts.entries()]
+        .sort((a,b)=>b[1]-a[1])
+        .slice(0,6)
+        .map(([id,count])=>({id,rate:round(count/games.length*100,1)}));
+
+      const items=[...itemCounts.entries()]
+        .sort((a,b)=>b[1]-a[1])
+        .slice(0,8)
+        .map(([id,count])=>({id,rate:round(count/games.length*100,1)}));
+
+      const unitItems=units.map(unit=>{
+        const appearances=Math.max(1,unitCounts.get(unit.id)||1);
+        const perUnit=unitItemCounts.get(unit.id)||new Map<string,number>();
+        return {
+          unitId:unit.id,
+          items:[...perUnit.entries()]
+            .sort((a,b)=>b[1]-a[1])
+            .slice(0,3)
+            .map(([id,count])=>({id,rate:round(count/appearances*100,1)})),
+        };
+      });
+
       return {
         id:signature,
         games:games.length,
@@ -154,6 +207,9 @@ Deno.serve(async(req)=>{
         confidence:confidence(games.length),
         traits,
         units,
+        augments,
+        items,
+        unitItems,
       };
     })
     .filter(comp=>comp.games>=minGames)
