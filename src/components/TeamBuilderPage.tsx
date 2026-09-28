@@ -79,6 +79,7 @@ export default function TeamBuilderPage({
   const [selectedId,setSelectedId]=useState<string|null>(null);
   const [units,setUnits]=useState<HexBoardUnit[]>([]);
   const [targetLevel,setTargetLevel]=useState(8);
+  const [variantA,setVariantA]=useState<HexBoardUnit[]|null>(null);
 
   useEffect(()=>{
     if(!initialChampionIds.length)return;
@@ -148,6 +149,72 @@ export default function TeamBuilderPage({
       .sort((a,b)=>b.sharedScore-a.sharedScore||b.shared.length-a.shared.length||a.cost-b.cost)
       .slice(0,8);
   },[staticData,units.length,boardIds,traitCounts]);
+
+  const variantAEvaluation=useMemo(()=>{
+    if(!variantA)return null;
+
+    const ids=new Set(variantA.map(unit=>unit.id));
+    const traitMap=new Map<string,number>();
+    for(const unit of variantA){
+      for(const trait of unitTraitIds(unit.id,staticData)){
+        traitMap.set(trait,(traitMap.get(trait)||0)+1);
+      }
+    }
+    const traits=new Set(traitMap.keys());
+    const comparable=ids.size<3
+      ?[]
+      :matches
+        .map(match=>({match,score:similarity(ids,traits,match)}))
+        .filter(row=>row.score>=.22)
+        .sort((a,b)=>b.score-a.score||a.match.placement-b.match.placement)
+        .slice(0,6);
+
+    const average=comparable.length
+      ?comparable.reduce((sum,row)=>sum+row.match.placement,0)/comparable.length
+      :null;
+    const top4Rate=comparable.length
+      ?Math.round(comparable.filter(row=>row.match.placement<=4).length/comparable.length*100)
+      :null;
+    const value=variantA.reduce(
+      (sum,unit)=>sum+costFor(unit.id,staticData)*copiesFor(unit.tier||1),
+      0
+    );
+
+    return {
+      ids,
+      traitMap,
+      comparable,
+      average,
+      top4Rate,
+      value,
+    };
+  },[variantA,matches,staticData]);
+
+  const variantDiff=useMemo(()=>{
+    if(!variantA||!variantAEvaluation)return null;
+
+    const currentIds=new Set(units.map(unit=>unit.id));
+    const added=[...currentIds].filter(id=>!variantAEvaluation.ids.has(id));
+    const removed=[...variantAEvaluation.ids].filter(id=>!currentIds.has(id));
+
+    const currentTraits=new Map(traitCounts);
+    const allTraits=new Set([
+      ...variantAEvaluation.traitMap.keys(),
+      ...currentTraits.keys(),
+    ]);
+
+    const changedTraits=[...allTraits]
+      .map(id=>({
+        id,
+        before:variantAEvaluation.traitMap.get(id)||0,
+        after:currentTraits.get(id)||0,
+      }))
+      .filter(row=>row.before!==row.after)
+      .sort((a,b)=>Math.abs(b.after-b.before)-Math.abs(a.after-a.before))
+      .slice(0,6);
+
+    return {added,removed,changedTraits};
+  },[variantA,variantAEvaluation,units,traitCounts]);
 
   const similar=useMemo(()=>{
     if(boardIds.size<3)return [];
@@ -288,7 +355,16 @@ export default function TeamBuilderPage({
             ))}
           </div>
         </div>
-        <button onClick={()=>{setUnits([]);setSelectedId(null);}}>Limpar board</button>
+        <div className="builder-summary-actions">
+          <button onClick={()=>setVariantA(units.map(unit=>({...unit})))} disabled={!units.length}>
+            {variantA?"Atualizar versão A":"Salvar como versão A"}
+          </button>
+          {variantA&&<button className="secondary" onClick={()=>{
+            setUnits(variantA.map(unit=>({...unit})));
+            setSelectedId(null);
+          }}>Restaurar A</button>}
+          <button className="secondary" onClick={()=>{setUnits([]);setSelectedId(null);}}>Limpar board</button>
+        </div>
       </div>
     </section>
 
@@ -306,6 +382,54 @@ export default function TeamBuilderPage({
         <article><span>COMPARÁVEIS</span><strong>{similar.length}</strong></article>
       </div>
     </section>
+
+    {variantA&&variantAEvaluation&&variantDiff&&<section className="builder-ab-compare">
+      <div className="builder-ab-head">
+        <div>
+          <span>COMPARAÇÃO A/B</span>
+          <h2>Veja exatamente o que mudou</h2>
+          <p>A é o snapshot salvo. “Agora” é o board atual. As métricas pessoais usam apenas partidas comparáveis do seu histórico carregado.</p>
+        </div>
+        <button onClick={()=>setVariantA(null)}>Descartar A</button>
+      </div>
+
+      <div className="builder-ab-grid">
+        <article className="builder-ab-card">
+          <span>VERSÃO A</span>
+          <strong>{variantA.length} unidades · {variantAEvaluation.value}G</strong>
+          <small>{variantAEvaluation.average!=null
+            ?"Histórico: média "+variantAEvaluation.average.toFixed(2)+" · Top 4 "+variantAEvaluation.top4Rate+"%"
+            :"Histórico: amostra insuficiente"}</small>
+        </article>
+
+        <article className="builder-ab-card current">
+          <span>AGORA</span>
+          <strong>{units.length} unidades · {boardValue}G</strong>
+          <small>{average!=null
+            ?"Histórico: média "+average.toFixed(2)+" · Top 4 "+top4Rate+"%"
+            :"Histórico: amostra insuficiente"}</small>
+        </article>
+
+        <article className="builder-ab-diff">
+          <span>MUDANÇAS</span>
+          <div>
+            <p><b>Entraram</b>{variantDiff.added.length
+              ?variantDiff.added.map(id=>staticEntry(staticData?.champions,id)?.name||clean(id)).join(" · ")
+              :"nenhuma peça"}</p>
+            <p><b>Saíram</b>{variantDiff.removed.length
+              ?variantDiff.removed.map(id=>staticEntry(staticData?.champions,id)?.name||clean(id)).join(" · ")
+              :"nenhuma peça"}</p>
+            <p><b>Traits</b>{variantDiff.changedTraits.length
+              ?variantDiff.changedTraits.map(row=>{
+                const name=staticEntry(staticData?.traits,row.id)?.name||clean(row.id);
+                const delta=row.after-row.before;
+                return name+" "+(delta>0?"+":"")+delta;
+              }).join(" · ")
+              :"sem alteração estrutural"}</p>
+          </div>
+        </article>
+      </div>
+    </section>}
 
     <section className="builder-workspace">
       <div className="panel builder-board-panel">
