@@ -73,6 +73,25 @@ export function tftAssetUrl(version:string, kind:"champion"|"item"|"trait"|"augm
   return "https://ddragon.leagueoflegends.com/cdn/"+version+"/img/tft-"+kind+"/"+encodeURIComponent(full);
 }
 
+export function profileIconUrl(version:string,profileIconId?:number){
+  const id=Number(profileIconId)||0;
+  if(!id) return "";
+  return "https://ddragon.leagueoflegends.com/cdn/"+version+"/img/profileicon/"+id+".png";
+}
+
+export function latestTftSetNumber(data:TftStaticData|null){
+  if(!data) return null;
+  let latest=0;
+  for(const [key,entry] of Object.entries(data.champions)){
+    const source=key+" "+String(entry.id||"")+" "+String(entry.image?.full||"");
+    const matches=[...source.matchAll(/TFT(?:Set)?(\d+)[_\.]/gi)];
+    for(const match of matches){
+      latest=Math.max(latest,Number(match[1])||0);
+    }
+  }
+  return latest||null;
+}
+
 
 export function queueLabel(data:TftStaticData|null, queueId?:number){
   if(queueId==null) return "Todas";
