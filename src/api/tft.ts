@@ -36,7 +36,7 @@ export type TftMatch = {
 };
 
 export type TftProfile = {
-  player: { gameName:string; tagLine:string; platform:string; level:number };
+  player: { gameName:string; tagLine:string; platform:string; level:number; profileIconId:number };
   ranked: Array<{ queueType:string; tier:string; rank:string; leaguePoints:number; wins:number; losses:number }>;
   summary: { matches:number; averagePlacement:number|null; top4Rate:number; winRate:number; firsts:number; eighths:number };
   matches: TftMatch[];
