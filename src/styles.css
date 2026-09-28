@@ -2643,3 +2643,23 @@ a { color: inherit; text-decoration: none; }
     top:58px;
   }
 }
+
+.action-evidence-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.action-evidence-actions button:last-child{
+  border-color:rgba(117,99,231,.36);
+  background:rgba(117,99,231,.09);
+  color:#c8c0ff;
+}
+@media(max-width:720px){
+  .action-evidence-actions{
+    width:100%;
+  }
+  .action-evidence-actions button{
+    flex:1;
+  }
+}
