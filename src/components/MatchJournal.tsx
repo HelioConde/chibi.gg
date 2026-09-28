@@ -13,6 +13,66 @@ type Props={
   onSaved?:()=>void;
 };
 
+const REVIEW_CHECKLIST:Array<{
+  id:string;
+  label:string;
+  question:string;
+  tags:MatchJournalEntry["tags"];
+  options:Array<{tag:MatchJournalEntry["tags"][number];label:string}>;
+}>=[
+  {
+    id:"direction",
+    label:"DIREÇÃO",
+    question:"Você entrou preso em uma linha antes de ter sinal suficiente?",
+    tags:["forced"],
+    options:[{tag:"forced",label:"Forcei uma linha"}],
+  },
+  {
+    id:"roll",
+    label:"ROLLDOWN",
+    question:"O timing do gasto de ouro pareceu errado?",
+    tags:["early-roll","late-roll"],
+    options:[
+      {tag:"early-roll",label:"Rolei cedo"},
+      {tag:"late-roll",label:"Rolei tarde"},
+    ],
+  },
+  {
+    id:"items",
+    label:"ITENS",
+    question:"Os componentes viraram força no momento certo?",
+    tags:["greeded-items","awkward-items"],
+    options:[
+      {tag:"greeded-items",label:"Segurei componentes"},
+      {tag:"awkward-items",label:"Itens desconfortáveis"},
+    ],
+  },
+  {
+    id:"scout",
+    label:"SCOUT",
+    question:"Sua leitura da lobby realmente mudou decisões?",
+    tags:["good-scout","missed-scout"],
+    options:[
+      {tag:"good-scout",label:"Boa leitura"},
+      {tag:"missed-scout",label:"Não scoutei"},
+    ],
+  },
+  {
+    id:"position",
+    label:"POSICIONAMENTO",
+    question:"Uma luta importante parece ter sido perdida por posicionamento?",
+    tags:["bad-position"],
+    options:[{tag:"bad-position",label:"Posicionamento ruim"}],
+  },
+  {
+    id:"flex",
+    label:"FLEX",
+    question:"Você mudou de plano de forma relevante durante a partida?",
+    tags:["pivoted"],
+    options:[{tag:"pivoted",label:"Fiz pivot"}],
+  },
+];
+
 function reviewGuide(target?:TftMatch,detail?:TftMatchDetail){
   if(!target||!detail)return null;
   const autopsy=buildLobbyAutopsy(target,detail);
@@ -104,6 +164,21 @@ export default function MatchJournal({matchId,placement,playerKey="",target,deta
     setSaved(false);
   }
 
+  function setChecklistTag(
+    selected:MatchJournalEntry["tags"][number]|null,
+    group:MatchJournalEntry["tags"],
+  ){
+    setEntry(current=>{
+      const remaining=current.tags.filter(tag=>!group.includes(tag));
+      return {
+        ...current,
+        tags:selected?[...remaining,selected]:remaining,
+      };
+    });
+    setSaved(false);
+    setLessonSaved(false);
+  }
+
   function save(){
     saveJournalEntry(entry);
     setSaved(true);
@@ -147,6 +222,44 @@ export default function MatchJournal({matchId,placement,playerKey="",target,deta
       </div>
       <button type="button" onClick={usePrompt}>Responder no Journal</button>
     </article>}
+
+    <details className="journal-review-checklist">
+      <summary>
+        <span><b>Quick Review Checklist</b><small>6 perguntas para revisar sem precisar saber de antemão qual foi o erro.</small></span>
+        <em>{entry.tags.length} marcado{entry.tags.length===1?"":"s"}</em>
+      </summary>
+      <div className="journal-checklist-grid">
+        {REVIEW_CHECKLIST.map(item=>{
+          const selected=item.tags.find(tag=>entry.tags.includes(tag))||null;
+          return <article className={selected?"answered":""} key={item.id}>
+            <span>{item.label}</span>
+            <strong>{item.question}</strong>
+            <div>
+              {item.options.map(option=>(
+                <button
+                  type="button"
+                  className={entry.tags.includes(option.tag)?"active":""}
+                  onClick={()=>setChecklistTag(
+                    entry.tags.includes(option.tag)?null:option.tag,
+                    item.tags,
+                  )}
+                  key={option.tag}
+                >
+                  {option.label}
+                </button>
+              ))}
+              <button
+                type="button"
+                className={!selected?"clear active": "clear"}
+                onClick={()=>setChecklistTag(null,item.tags)}
+              >
+                Sem sinal
+              </button>
+            </div>
+          </article>;
+        })}
+      </div>
+    </details>
 
     <div className="journal-tags">
       {JOURNAL_TAGS.map(tag=>(
