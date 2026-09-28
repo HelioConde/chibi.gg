@@ -29,6 +29,7 @@ import ChibiIdentity from "./components/ChibiIdentity";
 import ChibiActionCenter from "./components/ChibiActionCenter";
 import StyleShift from "./components/StyleShift";
 import GlobalMetaPage from "./components/GlobalMetaPage";
+import CompsPage from "./components/CompsPage";
 
 function cleanName(value:string){
   return value
@@ -169,8 +170,8 @@ function App() {
   const [journalVersion,setJournalVersion]=useState(0);
   const [profileTab,setProfileTab]=useState<ProfileTab>("overview");
   const [copiedAnalysisLink,setCopiedAnalysisLink]=useState(false);
-  const [sitePage,setSitePage]=useState<"main"|"meta">(
-    window.location.hash==="#meta"?"meta":"main"
+  const [sitePage,setSitePage]=useState<"main"|"meta"|"comps">(
+    window.location.hash==="#meta"?"meta":window.location.hash==="#comps"?"comps":"main"
   );
 
   useEffect(()=>{
@@ -198,7 +199,13 @@ function App() {
     };
 
     const onHashChange=()=>{
-      setSitePage(window.location.hash==="#meta"?"meta":"main");
+      setSitePage(
+        window.location.hash==="#meta"
+          ?"meta"
+          :window.location.hash==="#comps"
+            ?"comps"
+            :"main"
+      );
     };
 
     window.addEventListener("popstate",onPopState);
@@ -466,11 +473,23 @@ function App() {
     }
   }
 
-  function closeMeta(){
+  function openComps(){
+    setSitePage("comps");
+    if(window.location.hash!=="#comps"){
+      window.history.pushState({},"",window.location.pathname+window.location.search+"#comps");
+    }
+  }
+
+  function closeExplorePage(){
     setSitePage("main");
     if(window.location.hash){
       window.history.replaceState({},"",window.location.pathname+window.location.search);
     }
+  }
+
+  function showCompEvidence(ids:string[],label:string){
+    closeExplorePage();
+    requestAnimationFrame(()=>showEvidence(ids,label));
   }
 
   function resetSearch(){
@@ -499,7 +518,7 @@ function App() {
         </button>
         <nav>
           <button className={sitePage==="meta"?"active":""} onClick={openMeta}>Meta</button>
-          <a href="#comps">Comps</a>
+          <button className={sitePage==="comps"?"active":""} onClick={openComps}>Comps</button>
           <a href="#leaderboard">Leaderboard</a>
         </nav>
         <button className="ghost-button">Entrar</button>
@@ -509,7 +528,15 @@ function App() {
         <GlobalMetaPage
           staticData={staticData}
           hasProfile={Boolean(profile)}
-          onBack={closeMeta}
+          onBack={closeExplorePage}
+        />
+      ) : sitePage==="comps" ? (
+        <CompsPage
+          staticData={staticData}
+          matches={analysisMatches}
+          hasProfile={Boolean(profile)}
+          onBack={closeExplorePage}
+          onEvidence={showCompEvidence}
         />
       ) : !profile ? (
         <main className="landing">
