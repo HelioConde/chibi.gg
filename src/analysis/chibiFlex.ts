@@ -105,7 +105,7 @@ export function buildChibiFlexOptions(
     .map(comp=>{
       const fit=personalFit(comp,matches);
       const quality=globalQuality(comp);
-      const confidence=comp.confidence==="alta"?1:comp.confidence==="média"?.82:.58;
+      const confidence=comp.confidence==="alta"?1:comp.confidence==="média" ? .82 : .58;
       return {
         comp,
         fit,
