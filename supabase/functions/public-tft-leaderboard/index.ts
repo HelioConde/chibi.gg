@@ -18,28 +18,32 @@ async function resolveEntry(
   region:string,
   row:any,
 ){
-  const fallbackName=String(row?.summonerName||"");
+  const fallbackName=String(row?.riotIdGameName||row?.summonerName||"");
+  const fallbackTag=String(row?.riotIdTagLine||"");
   const summonerId=String(row?.summonerId||"");
 
-  let puuid="";
+  let puuid=String(row?.puuid||"");
   let level=0;
   let profileIconId=0;
 
-  if(summonerId){
-    const summonerRes=await fetch(
-      "https://"+platform+".api.riotgames.com/tft/summoner/v1/summoners/"+encodeURIComponent(summonerId),
-      {headers:riotHeaders(apiKey)},
-    );
+  const summonerUrl=puuid
+    ?"https://"+platform+".api.riotgames.com/lol/summoner/v4/summoners/by-puuid/"+encodeURIComponent(puuid)
+    :summonerId
+      ?"https://"+platform+".api.riotgames.com/lol/summoner/v4/summoners/"+encodeURIComponent(summonerId)
+      :"";
+
+  if(summonerUrl){
+    const summonerRes=await fetch(summonerUrl,{headers:riotHeaders(apiKey)});
     if(summonerRes.ok){
       const summoner=await summonerRes.json();
-      puuid=String(summoner?.puuid||"");
+      puuid=String(summoner?.puuid||puuid);
       level=num(summoner?.summonerLevel);
       profileIconId=num(summoner?.profileIconId);
     }
   }
 
   let gameName=fallbackName;
-  let tagLine="";
+  let tagLine=fallbackTag;
 
   if(puuid){
     const accountRes=await fetch(
@@ -49,7 +53,7 @@ async function resolveEntry(
     if(accountRes.ok){
       const account=await accountRes.json();
       gameName=String(account?.gameName||gameName);
-      tagLine=String(account?.tagLine||"");
+      tagLine=String(account?.tagLine||tagLine);
     }
   }
 
