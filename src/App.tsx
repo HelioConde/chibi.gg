@@ -77,6 +77,16 @@ function activeTraits(match:TftMatch){
     .sort((a,b)=>b.style-a.style || b.numUnits-a.numUnits);
 }
 
+function formatClock(timestamp?:number){
+  if(!timestamp) return "";
+  return new Date(timestamp).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+}
+
+function formatDay(timestamp?:number){
+  if(!timestamp) return "";
+  return new Date(timestamp).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"});
+}
+
 function formatWhen(timestamp?:number){
   if(!timestamp) return "";
   const date=new Date(timestamp);
@@ -443,6 +453,54 @@ function App() {
     ()=>evidenceIds?.length||historyFilter!=="all" ? buildChibiDNA(visibleMatches) : dna,
     [evidenceIds,historyFilter,visibleMatches,dna]
   );
+
+  const historySessions=useMemo(()=>{
+    const sorted=visibleMatches
+      .slice()
+      .sort((a,b)=>(b.playedAt||0)-(a.playedAt||0));
+
+    const sessions:Array<{matches:TftMatch[];start:number;end:number}>=[];
+
+    for(const match of sorted){
+      const playedAt=Number(match.playedAt)||0;
+      const current=sessions[sessions.length-1];
+
+      if(!current){
+        sessions.push({matches:[match],start:playedAt,end:playedAt});
+        continue;
+      }
+
+      const previous=current.matches[current.matches.length-1];
+      const gap=Math.abs((previous.playedAt||0)-playedAt);
+
+      if(gap>2.5*60*60*1000){
+        sessions.push({matches:[match],start:playedAt,end:playedAt});
+        continue;
+      }
+
+      current.matches.push(match);
+      current.start=Math.min(current.start||playedAt,playedAt);
+      current.end=Math.max(current.end||playedAt,playedAt);
+    }
+
+    return sessions.map((session,index)=>{
+      const games=session.matches.length;
+      const average=session.matches.reduce((sum,match)=>sum+match.placement,0)/Math.max(1,games);
+      const top4=session.matches.filter(match=>match.placement<=4).length;
+      const bottom2=session.matches.filter(match=>match.placement>=7).length;
+      const wins=session.matches.filter(match=>match.placement===1).length;
+
+      return {
+        ...session,
+        index,
+        games,
+        average,
+        top4Rate:Math.round(top4/Math.max(1,games)*100),
+        bottom2,
+        wins,
+      };
+    });
+  },[visibleMatches]);
 
   const latestSession=useMemo(()=>{
     if(!analysisMatches.length)return [];
@@ -1211,63 +1269,85 @@ function App() {
                 <button onClick={clearEvidence}>Mostrar contexto completo</button>
               </div>}
 
-              <div className="match-list match-list-v2">
+              <div className="match-list match-list-v2 match-session-list">
                 {!visibleMatches.length&&<div className="history-empty-filter">
                   Nenhuma partida encontrada neste filtro.
                 </div>}
-                {visibleMatches.map((match)=>{
-                  const cue=matchReviewCue(match);
-                  return <button className={"match-row match-button match-row-v2 cue-"+cue.tone} key={match.id} onClick={()=>openMatch(match)}>
-                    <div className={"placement "+placementClass(match.placement)}>{match.placement}º</div>
 
-                    <div className="match-main">
-                      <div className="match-context-line">
-                        <span>{queueLabel(staticData,match.queueId||0)}</span>
-                        {matchRoundLabel(match)&&<span>{matchRoundLabel(match)}</span>}
-                        {match.duration&&<span>{formatDuration(match.duration)}</span>}
-                        <span>{formatWhen(match.playedAt)}</span>
+                {historySessions.map((session)=>(
+                  <section className="history-session-group" key={(session.end||session.index)+":"+session.index}>
+                    <header className="history-session-head">
+                      <div>
+                        <span>SESSÃO {historySessions.length>1?historySessions.length-session.index:"ATUAL"}</span>
+                        <strong>{formatDay(session.end)} · {formatClock(session.start)}–{formatClock(session.end)}</strong>
+                        <small>{session.games} jogo{session.games===1?"":"s"}</small>
                       </div>
 
-                      <div className="match-row-title">
-                        <div>
-                          <strong>{activeTraits(match).slice(0,2).map((t)=>traitLabel(t,staticData)).filter(Boolean).join(" · ") || "Board TFT"}</strong>
-                          <span className={"match-review-label "+cue.tone}>{cue.label}</span>
-                        </div>
+                      <div className="history-session-stats">
+                        <span><small>MÉDIA</small><b>{session.average.toFixed(2)}</b></span>
+                        <span><small>TOP 4</small><b>{session.top4Rate}%</b></span>
+                        <span><small>1º</small><b>{session.wins}</b></span>
+                        <span className={session.bottom2>0?"warning":""}><small>BOTTOM 2</small><b>{session.bottom2}</b></span>
                       </div>
+                    </header>
 
-                      <div className={"match-fast-read "+cue.tone}>
-                        <span>LEITURA RÁPIDA</span>
-                        <b>{cue.title}</b>
-                      </div>
+                    <div className="history-session-games">
+                      {session.matches.map((match)=>{
+                        const cue=matchReviewCue(match);
+                        return <button className={"match-row match-button match-row-v2 cue-"+cue.tone} key={match.id} onClick={()=>openMatch(match)}>
+                          <div className={"placement "+placementClass(match.placement)}>{match.placement}º</div>
 
-                      <div className="trait-row compact-traits">
-                        {activeTraits(match).slice(0,3).map((trait)=>{
-                          const entry=staticEntry(staticData?.traits,trait.name);
-                          const image=staticData?tftAssetUrl(staticData.version,"trait",entry):"";
-                          return <span className={"trait-chip style-"+Math.max(0,trait.style)} key={trait.name}>
-                            {image&&<img src={image} alt=""/>}
-                            {traitLabel(trait,staticData)} {trait.numUnits}
-                          </span>;
-                        })}
-                      </div>
+                          <div className="match-main">
+                            <div className="match-context-line">
+                              <span>{queueLabel(staticData,match.queueId||0)}</span>
+                              {matchRoundLabel(match)&&<span>{matchRoundLabel(match)}</span>}
+                              {match.duration&&<span>{formatDuration(match.duration)}</span>}
+                              <span>{formatClock(match.playedAt)}</span>
+                            </div>
 
-                      <div className="board-row compact-board">
-                        {match.units.slice(0,8).map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact key={unit.characterId+index}/>)}
-                      </div>
+                            <div className="match-row-title">
+                              <div>
+                                <strong>{activeTraits(match).slice(0,2).map((t)=>traitLabel(t,staticData)).filter(Boolean).join(" · ") || "Board TFT"}</strong>
+                                <span className={"match-review-label "+cue.tone}>{cue.label}</span>
+                              </div>
+                            </div>
+
+                            <div className={"match-fast-read "+cue.tone}>
+                              <span>LEITURA RÁPIDA</span>
+                              <b>{cue.title}</b>
+                            </div>
+
+                            <div className="trait-row compact-traits">
+                              {activeTraits(match).slice(0,3).map((trait)=>{
+                                const entry=staticEntry(staticData?.traits,trait.name);
+                                const image=staticData?tftAssetUrl(staticData.version,"trait",entry):"";
+                                return <span className={"trait-chip style-"+Math.max(0,trait.style)} key={trait.name}>
+                                  {image&&<img src={image} alt=""/>}
+                                  {traitLabel(trait,staticData)} {trait.numUnits}
+                                </span>;
+                              })}
+                            </div>
+
+                            <div className="board-row compact-board">
+                              {match.units.slice(0,8).map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact key={unit.characterId+index}/>)}
+                            </div>
+                          </div>
+
+                          <div className="match-meta match-meta-rich">
+                            <div className="match-value-grid">
+                              <span><b>{boardValue(match,staticData)}G</b><small>board</small></span>
+                              <span><b>{match.goldLeft}G</b><small>ouro</small></span>
+                              <span><b>{match.level}</b><small>nível</small></span>
+                              <span><b>{match.playersEliminated||0}</b><small>elim.</small></span>
+                            </div>
+                            <strong>{match.damageToPlayers} dano</strong>
+                            <small>abrir análise →</small>
+                          </div>
+                        </button>;
+                      })}
                     </div>
-
-                    <div className="match-meta match-meta-rich">
-                      <div className="match-value-grid">
-                        <span><b>{boardValue(match,staticData)}G</b><small>board</small></span>
-                        <span><b>{match.goldLeft}G</b><small>ouro</small></span>
-                        <span><b>{match.level}</b><small>nível</small></span>
-                        <span><b>{match.playersEliminated||0}</b><small>elim.</small></span>
-                      </div>
-                      <strong>{match.damageToPlayers} dano</strong>
-                      <small>abrir análise →</small>
-                    </div>
-                  </button>;
-                })}
+                  </section>
+                ))}
               </div>
 
               {!evidenceIds?.length&&hasMore && <button className="load-more" onClick={loadMore} disabled={loadingMore}>{loadingMore ? "Carregando..." : "Carregar mais partidas"}</button>}
