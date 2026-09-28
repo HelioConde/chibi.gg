@@ -19,6 +19,7 @@ import {
   latestTftSetNumber,
 } from "./tftStatic";
 import { buildChibiDNA } from "./analysis/chibiInsights";
+import { buildActionPlan } from "./analysis/actionPlan";
 import ChibiInnovations from "./components/ChibiInnovations";
 import ChibiReview from "./components/ChibiReview";
 import MatchJournal from "./components/MatchJournal";
@@ -404,6 +405,7 @@ function App() {
   );
 
   const dna=useMemo(()=>buildChibiDNA(analysisMatches),[analysisMatches]);
+  const quickPlan=useMemo(()=>buildActionPlan(analysisMatches),[analysisMatches]);
 
   const headlineStats=useMemo(()=>{
     const total=analysisMatches.length;
@@ -1228,6 +1230,26 @@ function App() {
           />}
 
           {profileTab==="matches"&&<>
+            <section className="matches-priority-bar">
+              <div className="matches-priority-problem">
+                <span>O QUE ESTÁ TE PUNINDO</span>
+                <strong>{quickPlan.problem.title}</strong>
+                <small>{quickPlan.problem.evidence} · confiança {quickPlan.problem.confidence}</small>
+              </div>
+              <div className="matches-priority-action">
+                <span>FAÇA AGORA</span>
+                <strong>{quickPlan.action.title}</strong>
+                <small>{quickPlan.action.steps[0]}</small>
+              </div>
+              <div className="matches-priority-cta">
+                {quickPlan.problem.matchIds.length>0&&<button onClick={()=>showEvidence(
+                  quickPlan.problem.matchIds,
+                  "Prioridade atual · "+quickPlan.problem.title,
+                )}>Ver evidências</button>}
+                <button className="secondary" onClick={()=>changeProfileTab("overview")}>Abrir plano completo</button>
+              </div>
+            </section>
+
             <div className="content-grid">
             <section className="panel history" id="match-history">
               <div className="panel-title">
