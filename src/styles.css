@@ -12134,3 +12134,289 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
   .journal-pattern-stats{grid-column:auto;grid-row:auto}
   .journal-pattern-row>button{width:100%}
 }
+
+
+/* CHIBI EXPERIMENT OUTCOME 2026-09-28 */
+.session-outcome{
+  margin-top:10px;
+  padding:14px;
+  border:1px solid #2b3548;
+  border-radius:12px;
+  background:#0d141d;
+}
+.session-outcome.improved{
+  border-color:rgba(72,209,153,.28);
+  background:linear-gradient(120deg,rgba(72,209,153,.05),#0d141d 46%);
+}
+.session-outcome.mixed{
+  border-color:rgba(117,99,231,.28);
+  background:linear-gradient(120deg,rgba(117,99,231,.055),#0d141d 46%);
+}
+.session-outcome.worse{
+  border-color:rgba(255,126,126,.27);
+  background:linear-gradient(120deg,rgba(255,126,126,.045),#0d141d 46%);
+}
+.session-outcome-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+}
+.session-outcome-head>div{
+  min-width:0;
+}
+.session-outcome-head span{
+  color:#8576eb;
+  font-size:7px;
+  font-weight:950;
+  letter-spacing:.75px;
+}
+.session-outcome-head h3{
+  margin:5px 0 4px;
+  font-size:18px;
+}
+.session-outcome-head p{
+  margin:0;
+  color:#8190a4;
+  font-size:9px;
+  line-height:1.55;
+}
+.session-outcome-head em{
+  flex:0 0 auto;
+  padding:5px 7px;
+  border:1px solid #354056;
+  border-radius:999px;
+  color:#8d9bb0;
+  font-size:7px;
+  font-style:normal;
+  font-weight:900;
+  text-transform:uppercase;
+}
+.session-outcome.improved .session-outcome-head em{
+  border-color:rgba(72,209,153,.28);
+  color:#75d7b0;
+}
+.session-outcome.worse .session-outcome-head em{
+  border-color:rgba(255,126,126,.26);
+  color:#e49a9a;
+}
+.session-outcome-metrics{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:6px;
+  margin-top:12px;
+}
+.session-outcome-metrics article{
+  min-width:0;
+  padding:10px;
+  border:1px solid #232e40;
+  border-radius:9px;
+  background:#101720;
+}
+.session-outcome-metrics article.focus{
+  border-color:rgba(117,99,231,.3);
+  background:rgba(117,99,231,.055);
+}
+.session-outcome-metrics span,
+.session-outcome-metrics strong,
+.session-outcome-metrics small{
+  display:block;
+}
+.session-outcome-metrics span{
+  color:#647289;
+  font-size:6px;
+  font-weight:950;
+  letter-spacing:.45px;
+}
+.session-outcome-metrics strong{
+  margin-top:4px;
+  color:#dce3ee;
+  font-size:13px;
+  white-space:nowrap;
+}
+.session-outcome-metrics strong i{
+  margin:0 4px;
+  color:#606d82;
+  font-size:9px;
+  font-style:normal;
+}
+.session-outcome-metrics small{
+  margin-top:3px;
+  color:#68758a;
+  font-size:7px;
+}
+.session-outcome-next{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin-top:11px;
+  padding-top:11px;
+  border-top:1px solid #222c3d;
+}
+.session-outcome-next>div:first-child{
+  min-width:0;
+}
+.session-outcome-next span,
+.session-outcome-next strong,
+.session-outcome-next small{
+  display:block;
+}
+.session-outcome-next span{
+  color:#7d6fe2;
+  font-size:7px;
+  font-weight:950;
+  letter-spacing:.65px;
+}
+.session-outcome-next strong{
+  margin-top:3px;
+  color:#cfd6e2;
+  font-size:10px;
+  line-height:1.45;
+}
+.session-outcome-next small{
+  margin-top:3px;
+  color:#657287;
+  font-size:7px;
+  line-height:1.45;
+}
+.session-outcome-next>div:last-child{
+  flex:0 0 auto;
+  display:flex;
+  gap:5px;
+}
+.session-outcome-next button,
+.session-history-list button{
+  border:1px solid #38445a;
+  border-radius:7px;
+  background:#111923;
+  color:#9ca9bc;
+  padding:7px 9px;
+  font-size:7px;
+  font-weight:900;
+  cursor:pointer;
+}
+.session-outcome-next button.primary{
+  border-color:#6256ca;
+  background:rgba(117,99,231,.13);
+  color:#d0c9ff;
+}
+.session-experiment-history{
+  margin-top:10px;
+  overflow:hidden;
+  border:1px solid #263144;
+  border-radius:10px;
+  background:#0c131c;
+}
+.session-experiment-history>summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:11px 12px;
+  cursor:pointer;
+  list-style:none;
+}
+.session-experiment-history>summary::-webkit-details-marker{
+  display:none;
+}
+.session-experiment-history>summary span{
+  min-width:0;
+}
+.session-experiment-history>summary b,
+.session-experiment-history>summary small{
+  display:block;
+}
+.session-experiment-history>summary b{
+  color:#cbd3df;
+  font-size:9px;
+}
+.session-experiment-history>summary small{
+  margin-top:2px;
+  color:#68758a;
+  font-size:7px;
+}
+.session-experiment-history>summary em{
+  color:#8174e5;
+  font-size:7px;
+  font-style:normal;
+  font-weight:900;
+}
+.session-history-list{
+  display:grid;
+  gap:5px;
+  padding:0 10px 10px;
+}
+.session-history-list article{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:9px 10px;
+  border:1px solid #222d3e;
+  border-radius:8px;
+  background:#0f1721;
+}
+.session-history-list article.improved{
+  border-color:rgba(72,209,153,.2);
+}
+.session-history-list article.worse{
+  border-color:rgba(255,126,126,.2);
+}
+.session-history-list article>div{
+  min-width:0;
+}
+.session-history-list span,
+.session-history-list strong,
+.session-history-list small{
+  display:block;
+}
+.session-history-list span{
+  color:#68758b;
+  font-size:6px;
+  font-weight:900;
+}
+.session-history-list strong{
+  margin-top:2px;
+  color:#cbd3df;
+  font-size:9px;
+}
+.session-history-list small{
+  margin-top:2px;
+  color:#6f7c91;
+  font-size:7px;
+}
+
+@media(max-width:760px){
+  .session-outcome-head,
+  .session-outcome-next{
+    align-items:stretch;
+    flex-direction:column;
+  }
+  .session-outcome-head em{
+    align-self:flex-start;
+  }
+  .session-outcome-metrics{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .session-outcome-next>div:last-child{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+  .session-outcome-next button{
+    min-height:38px;
+  }
+}
+@media(max-width:520px){
+  .session-outcome-metrics{
+    grid-template-columns:1fr 1fr;
+  }
+  .session-history-list article{
+    align-items:stretch;
+    flex-direction:column;
+  }
+  .session-history-list button{
+    width:100%;
+    min-height:36px;
+  }
+}
