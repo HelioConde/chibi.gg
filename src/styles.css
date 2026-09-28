@@ -10221,3 +10221,62 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
     grid-template-columns:1fr;
   }
 }
+
+
+/* Lobby Autopsy V2 — ranked full-lobby loss gaps */
+.autopsy-diagnosis{display:grid;grid-template-columns:minmax(0,1fr) 155px;gap:14px;align-items:center;margin:14px 0;padding:14px;border:1px solid #293146;border-radius:13px;background:linear-gradient(135deg,rgba(121,87,48,.08),rgba(12,17,26,.92))}
+.autopsy-diagnosis-copy>span{display:block;color:#e29a66;font-size:8px;font-weight:900;letter-spacing:1.1px}
+.autopsy-diagnosis-copy h4{margin:5px 0 5px;font-size:16px;letter-spacing:-.3px}
+.autopsy-diagnosis-copy p{margin:0;color:#8993a7;font-size:10px;line-height:1.55}
+.autopsy-diagnosis-evidence{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.autopsy-diagnosis-evidence small{border:1px solid #293146;background:#0d131d;border-radius:999px;padding:4px 7px;color:#7b8599;font-size:8px}
+.autopsy-diagnosis aside{border-left:1px solid #293146;padding-left:14px;text-align:right}
+.autopsy-diagnosis aside>small{display:block;color:#6f798e;font-size:7px;font-weight:900;letter-spacing:.9px}
+.autopsy-diagnosis aside>strong{display:block;margin:3px 0;font-size:27px;letter-spacing:-1px}
+.autopsy-diagnosis aside>span{display:block;color:#8a94a8;font-size:8px;text-transform:uppercase}
+.autopsy-diagnosis aside>i{display:block;height:5px;margin-top:8px;border-radius:999px;background:#1c2433;overflow:hidden}
+.autopsy-diagnosis aside>i>b{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#c8794d,#eea66b)}
+.autopsy-diagnosis.confidence-alta{border-color:rgba(238,153,91,.32)}
+.autopsy-diagnosis.confidence-média{border-color:rgba(222,165,87,.24)}
+.autopsy-diagnosis.confidence-inicial{border-color:#293146}
+
+.autopsy-signal-kicker{display:flex;align-items:center;justify-content:space-between;gap:7px}
+.autopsy-signal-kicker>span{display:block;color:#6f7a8e;font-size:7px;font-weight:900;letter-spacing:.9px}
+.autopsy-signal-kicker>em{font-style:normal;color:#657086;font-size:7px;text-transform:uppercase}
+.autopsy-signal.warning .autopsy-signal-kicker>span{color:#d99a6d}
+.autopsy-signal.good .autopsy-signal-kicker>span{color:#74d4aa}
+
+.autopsy-facts-v2{grid-template-columns:repeat(6,1fr)}
+.autopsy-above{margin-top:10px;padding:11px 12px;border:1px solid #222b3d;background:#0c121b;border-radius:11px}
+.autopsy-above>span{display:block;color:#72bde9;font-size:7px;font-weight:900;letter-spacing:1px;margin-bottom:8px}
+.autopsy-above>div{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.autopsy-above article{padding:8px;border:1px solid #20283a;background:#101620;border-radius:8px}
+.autopsy-above small{display:block;color:#69758a;font-size:7px}
+.autopsy-above strong{display:block;margin-top:3px;font-size:11px}
+
+.autopsy-contested-v2>div{align-items:flex-start;gap:8px}
+.autopsy-contested-v2>div>div{display:flex;align-items:center;gap:5px}
+.autopsy-contested-v2 em{font-style:normal;border:1px solid rgba(239,146,96,.25);border-radius:999px;padding:2px 5px;color:#e3a071;font-size:6px;font-weight:900;letter-spacing:.6px}
+.autopsy-contested-v2>div.itemized{border-color:rgba(239,146,96,.18);background:rgba(119,65,33,.04)}
+
+.autopsy-secondary-list{display:flex;flex-direction:column;gap:7px;padding:10px}
+.autopsy-secondary-list article{padding:9px 10px;border:1px solid #20283a;background:#0c121b;border-radius:9px}
+.autopsy-secondary-list article>div{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.autopsy-secondary-list strong{font-size:9px}
+.autopsy-secondary-list span{color:#747f94;font-size:7px;text-transform:uppercase}
+.autopsy-secondary-list p{margin:4px 0;color:#7b869a;font-size:8px;line-height:1.45}
+.autopsy-secondary-list small{display:block;color:#626d82;font-size:7px}
+
+@media(max-width:1050px){
+  .autopsy-facts-v2{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:720px){
+  .autopsy-diagnosis{grid-template-columns:1fr}
+  .autopsy-diagnosis aside{border-left:0;border-top:1px solid #293146;padding:10px 0 0;text-align:left}
+  .autopsy-above>div{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:520px){
+  .autopsy-facts-v2{grid-template-columns:repeat(2,1fr)}
+  .autopsy-diagnosis-evidence{flex-direction:column}
+  .autopsy-diagnosis-evidence small{border-radius:8px}
+}
