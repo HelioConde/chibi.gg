@@ -11957,3 +11957,59 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
   .home-session-focus{grid-column:1/-1;grid-row:2;padding:8px 0 0;border-left:0;border-top:1px solid #222a3b}
   .home-session-open{grid-column:2;grid-row:1}
 }
+
+
+/* Chibi Pool — personal comp repertoire */
+.chibi-pool{margin:0 0 14px;padding:18px}
+.pool-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.pool-head>div:first-child>span{display:block;color:#8f7cff;font-size:8px;font-weight:900;letter-spacing:1px}
+.pool-head h2{margin:5px 0 4px;font-size:18px;letter-spacing:-.35px}
+.pool-head p{margin:0;color:#7d879b;font-size:9px;line-height:1.5}
+.pool-health{min-width:128px;border:1px solid #283044;background:#101620;border-radius:10px;padding:9px 10px}
+.pool-health small{display:block;color:#6e7890;font-size:6px;font-weight:900;letter-spacing:.8px}
+.pool-health strong{display:block;margin:3px 0;color:#cbd2e2;font-size:11px}
+.pool-health span{display:block;color:#6f7990;font-size:7px}
+.pool-health.good{border-color:rgba(71,208,154,.22);background:rgba(34,117,84,.05)}
+.pool-health.good strong{color:#79d7b1}
+.pool-health.warning{border-color:rgba(237,155,98,.2);background:rgba(120,68,31,.04)}
+.pool-health.warning strong{color:#e5a675}
+.pool-summary{display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:9px;align-items:center;margin-top:12px;padding:9px 10px;border:1px solid #222a3c;background:#0d131c;border-radius:10px}
+.pool-summary strong{font-size:10px}
+.pool-summary span{color:#8a94a8;font-size:8px}
+.pool-summary p{margin:0;color:#687287;font-size:8px;text-align:right}
+.pool-lines{display:flex;flex-direction:column;gap:7px;margin-top:10px}
+.pool-lines>article{display:grid;grid-template-columns:34px minmax(0,1fr) minmax(230px,.65fr) auto;gap:10px;align-items:center;border:1px solid #222b3d;background:#0c121b;border-radius:11px;padding:10px}
+.pool-line-rank{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:#141b27;color:#68748a;font-size:8px;font-weight:900}
+.pool-line-main{min-width:0}
+.pool-line-title{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.pool-line-title>div>span{display:block;color:#6c7690;font-size:6px;font-weight:900;letter-spacing:.7px}
+.pool-line-title>div>strong{display:block;margin-top:2px;font-size:10px}
+.pool-confidence{flex:none;border:1px solid #30384a;border-radius:999px;padding:2px 5px;color:#7e889c;font-size:6px;text-transform:uppercase}
+.pool-confidence.alta{border-color:rgba(71,208,154,.22);color:#78d7b0}
+.pool-confidence.média{border-color:rgba(255,194,83,.22);color:#dfba69}
+.pool-line-core{display:flex;align-items:center;gap:5px;margin-top:7px}
+.pool-line-core>small{color:#687287;font-size:7px}
+.pool-champion{position:relative;width:30px;height:30px;display:grid;place-items:center;border:1px solid #30384b;background:#151c28;border-radius:8px;overflow:hidden;color:#8893a7;font-size:7px;font-weight:900}
+.pool-champion img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pool-line-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.pool-line-stats>span{padding:7px;border:1px solid #20283a;background:#101620;border-radius:8px;text-align:center}
+.pool-line-stats small{display:block;color:#657086;font-size:6px}
+.pool-line-stats b{display:block;margin-top:2px;font-size:9px}
+.pool-line-actions{display:flex;flex-direction:column;gap:5px}
+.pool-line-actions button{border:1px solid #343c54;background:#141a27;color:#d8dfed;border-radius:8px;padding:7px 8px;font-size:7px;font-weight:900}
+.pool-line-actions button.primary{border-color:#6b58db;background:rgba(117,99,231,.13);color:#c9c0ff}
+.pool-note{margin:9px 0 0;color:#606a80;font-size:7px;line-height:1.45}
+@media(max-width:980px){
+  .pool-lines>article{grid-template-columns:34px minmax(0,1fr) auto}
+  .pool-line-stats{grid-column:2/4;grid-row:2}
+  .pool-line-actions{grid-column:3;grid-row:1}
+}
+@media(max-width:650px){
+  .pool-head{flex-direction:column}
+  .pool-health{width:100%;min-width:0}
+  .pool-summary{grid-template-columns:1fr}
+  .pool-summary p{text-align:left}
+  .pool-lines>article{grid-template-columns:30px minmax(0,1fr)}
+  .pool-line-stats,.pool-line-actions{grid-column:1/-1;grid-row:auto}
+  .pool-line-actions{display:grid;grid-template-columns:1fr 1fr}
+}
