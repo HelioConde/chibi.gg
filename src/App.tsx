@@ -808,6 +808,12 @@ function App() {
     await loadPlayer(player.gameName,player.tagLine,player.platform,true,"overview");
   }
 
+  async function openRecentLesson(player:RecentPlayer){
+    setRiotId(player.gameName+"#"+player.tagLine);
+    setPlatform(player.platform);
+    await loadPlayer(player.gameName,player.tagLine,player.platform,true,"coach");
+  }
+
   function forgetRecentPlayer(player:RecentPlayer){
     setRecentPlayers(removeRecentPlayer(player));
   }
@@ -1130,7 +1136,8 @@ function App() {
 
             <HomeSessionResume
               recentPlayers={recentPlayers}
-              onOpen={(player)=>{void openRecentSession(player);}}
+              onOpenSession={(player)=>{void openRecentSession(player);}}
+              onOpenLesson={(player)=>{void openRecentLesson(player);}}
             />
 
             {recentPlayers.length>0&&<section className="recent-players">
