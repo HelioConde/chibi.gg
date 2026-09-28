@@ -1,0 +1,27 @@
+{
+  "manifest_version": 1,
+  "type": "WebApp",
+  "meta": {
+    "name": "Chibi Overwolf Companion",
+    "author": "HelioConde",
+    "version": "0.0.1",
+    "minimum-overwolf-version": "0.311.0.6",
+    "minimum-gep-version": "143.0",
+    "description": "Local debug bridge for verified Teamfight Tactics GEP telemetry.",
+    "icon": "assets/icon.png"
+  },
+  "data": {
+    "game_targeting": {
+      "type": "dedicated",
+      "game_ids": [5426]
+    },
+    "game_events": [5426],
+    "start_window": "background",
+    "windows": {
+      "background": {
+        "file": "index.html",
+        "is_background_page": true
+      }
+    }
+  }
+}
