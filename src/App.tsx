@@ -102,10 +102,63 @@ function placementClass(value:number){
 }
 
 function matchReviewCue(match:TftMatch){
-  if(match.placement===1) return {tone:"good",label:"Vitória",title:"Veja o que funcionou e pode ser repetido."};
-  if(match.placement<=4) return {tone:"good",label:"Top 4",title:"Compare o que faltou para converter esta boa partida."};
-  if(match.placement>=7) return {tone:"bad",label:"Revisar primeiro",title:"Bottom 2: esta partida merece prioridade na revisão."};
-  return {tone:"neutral",label:"Meio da lobby",title:"Veja onde este board parou de ganhar força."};
+  const threeStars=match.units.filter(unit=>unit.tier>=3).length;
+
+  if(match.placement===1){
+    return {
+      tone:"good",
+      label:"Board referência",
+      title:threeStars>0
+        ? "Vitória com "+threeStars+" unidade(s) 3★ no board final."
+        : "Vitória: use este board final como referência do que converteu.",
+    };
+  }
+
+  if(match.placement<=4){
+    return {
+      tone:"good",
+      label:"Top 4 sem fechar",
+      title:match.goldLeft>=10
+        ? "Top 4 com "+match.goldLeft+"g finais: investigue se havia uma janela de conversão."
+        : "Boa partida sem 1º: compare o board final com quem terminou acima.",
+    };
+  }
+
+  if(match.placement>=7){
+    if(match.goldLeft>=10){
+      return {
+        tone:"bad",
+        label:"Ouro não convertido",
+        title:"Bottom 2 terminando com "+match.goldLeft+"g: este é o primeiro sinal para revisar.",
+      };
+    }
+    if(match.level>=8){
+      return {
+        tone:"bad",
+        label:"Nível sem conversão",
+        title:"Bottom 2 mesmo terminando nível "+match.level+": chegar ao nível não bastou.",
+      };
+    }
+    return {
+      tone:"bad",
+      label:"Revisar primeiro",
+      title:"Bottom 2: compare força final, upgrades e contestação visível.",
+    };
+  }
+
+  if(match.level>=8){
+    return {
+      tone:"neutral",
+      label:"Nível alto · meio da lobby",
+      title:"Você chegou ao nível "+match.level+", mas o board terminou fora do Top 4.",
+    };
+  }
+
+  return {
+    tone:"neutral",
+    label:"Meio da lobby",
+    title:"Veja onde este board parou de ganhar força antes do Top 4.",
+  };
 }
 
 function formatDuration(seconds?:number){
@@ -1074,6 +1127,11 @@ function App() {
                           <span className={"match-review-label "+cue.tone}>{cue.label}</span>
                         </div>
                         <p>{cue.title}</p>
+                      </div>
+
+                      <div className={"match-fast-read "+cue.tone}>
+                        <span>LEITURA RÁPIDA</span>
+                        <b>{cue.title}</b>
                       </div>
 
                       <div className="trait-row compact-traits">
