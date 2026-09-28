@@ -1,7 +1,18 @@
-import { useMemo, useState } from "react";
-import { getCurrentWindow } from "@tauri-apps/api/window";
+import { useEffect, useMemo, useState } from "react";
+import { LogicalPosition, LogicalSize } from "@tauri-apps/api/dpi";
+import { availableMonitors, getCurrentWindow, Monitor } from "@tauri-apps/api/window";
 
 type StateId="stable"|"weak"|"contested"|"spike";
+type PresetId="compact"|"coach"|"full";
+type CornerId="top-left"|"top-right";
+
+const PRESETS:Record<PresetId,{label:string;width:number;height:number;compact:boolean}>={
+  compact:{label:"Compacto",width:410,height:390,compact:true},
+  coach:{label:"Coach",width:470,height:650,compact:false},
+  full:{label:"Completo",width:620,height:740,compact:false},
+};
+
+const SETTINGS_KEY="chibi-companion:window:v1";
 
 type DemoState={
   id:StateId;
@@ -66,12 +77,32 @@ function isTauri(){
 
 export default function App(){
   const [stateId,setStateId]=useState<StateId>("weak");
-  const [compact,setCompact]=useState(true);
+  const [preset,setPreset]=useState<PresetId>("coach");
+  const [corner,setCorner]=useState<CornerId>("top-left");
+  const [monitors,setMonitors]=useState<Monitor[]>([]);
+  const [monitorIndex,setMonitorIndex]=useState(0);
   const [locked,setLocked]=useState(false);
   const [alwaysOnTop,setAlwaysOnTopState]=useState(true);
   const [notice,setNotice]=useState("Ctrl+Shift+Space mostra/oculta · Ctrl+Shift+L libera o mouse");
 
   const state=useMemo(()=>STATES.find(item=>item.id===stateId)!,[stateId]);
+  const compact=PRESETS[preset].compact;
+
+  useEffect(()=>{
+    try{
+      const raw=localStorage.getItem(SETTINGS_KEY);
+      const saved=raw?JSON.parse(raw):null;
+      if(saved?.preset&&PRESETS[saved.preset as PresetId]) setPreset(saved.preset);
+      if(saved?.corner==="top-left"||saved?.corner==="top-right") setCorner(saved.corner);
+      if(Number.isInteger(saved?.monitorIndex)) setMonitorIndex(Math.max(0,saved.monitorIndex));
+    }catch{}
+
+    if(isTauri()){
+      availableMonitors()
+        .then(list=>setMonitors(list))
+        .catch(()=>setMonitors([]));
+    }
+  },[]);
 
   async function toggleAlwaysOnTop(){
     const next=!alwaysOnTop;
@@ -79,6 +110,45 @@ export default function App(){
     if(isTauri()){
       await getCurrentWindow().setAlwaysOnTop(next);
     }
+  }
+
+  function persistWindow(nextPreset:PresetId,nextCorner:CornerId,nextMonitor:number){
+    localStorage.setItem(SETTINGS_KEY,JSON.stringify({
+      preset:nextPreset,
+      corner:nextCorner,
+      monitorIndex:nextMonitor,
+    }));
+  }
+
+  async function applyWindowLayout(
+    nextPreset:PresetId=preset,
+    nextCorner:CornerId=corner,
+    nextMonitor:number=monitorIndex,
+  ){
+    setPreset(nextPreset);
+    setCorner(nextCorner);
+    setMonitorIndex(nextMonitor);
+    persistWindow(nextPreset,nextCorner,nextMonitor);
+
+    if(!isTauri()) return;
+
+    const appWindow=getCurrentWindow();
+    const config=PRESETS[nextPreset];
+    await appWindow.setSize(new LogicalSize(config.width,config.height));
+
+    const list=monitors.length?monitors:await availableMonitors();
+    const monitor=list[Math.min(nextMonitor,Math.max(0,list.length-1))];
+    if(!monitor) return;
+
+    const workPosition=monitor.workArea.position.toLogical(monitor.scaleFactor);
+    const workSize=monitor.workArea.size.toLogical(monitor.scaleFactor);
+    const margin=18;
+    const x=nextCorner==="top-right"
+      ? workPosition.x+workSize.width-config.width-margin
+      : workPosition.x+margin;
+    const y=workPosition.y+margin;
+
+    await appWindow.setPosition(new LogicalPosition(Math.max(workPosition.x,x),Math.max(workPosition.y,y)));
   }
 
   async function enableClickThrough(){
@@ -93,7 +163,7 @@ export default function App(){
     },1000);
   }
 
-  return <div className={"companion-root "+(compact?"compact ":"")+"tone-"+state.tone}>
+  return <div className={"companion-root preset-"+preset+" "+(compact?"compact ":"")+"tone-"+state.tone}>
     <section className="companion-card">
       <header className="companion-head" data-tauri-drag-region>
         <div className="brand" data-tauri-drag-region>
@@ -152,9 +222,32 @@ export default function App(){
           ))}
         </div>
 
+        <div className="preset-actions">
+          {(Object.keys(PRESETS) as PresetId[]).map(id=>(
+            <button
+              className={preset===id?"active":""}
+              onClick={()=>void applyWindowLayout(id,corner,monitorIndex)}
+              key={id}
+            >{PRESETS[id].label}</button>
+          ))}
+        </div>
+
+        {!compact&&<div className="layout-actions">
+          <select
+            value={monitorIndex}
+            onChange={event=>void applyWindowLayout(preset,corner,Number(event.target.value))}
+            aria-label="Monitor"
+          >
+            {(monitors.length?monitors:[{name:"Monitor principal"} as Monitor]).map((monitor,index)=>(
+              <option value={index} key={index}>{monitor.name||"Monitor "+(index+1)}</option>
+            ))}
+          </select>
+          <button className={corner==="top-left"?"active":""} onClick={()=>void applyWindowLayout(preset,"top-left",monitorIndex)}>↖ Esquerda</button>
+          <button className={corner==="top-right"?"active":""} onClick={()=>void applyWindowLayout(preset,"top-right",monitorIndex)}>Direita ↗</button>
+        </div>}
+
         <div className="window-actions">
-          <button onClick={()=>setCompact(value=>!value)}>{compact?"Expandir":"Compactar"}</button>
-          <button className={alwaysOnTop?"active":""} onClick={()=>void toggleAlwaysOnTop()}>Topo</button>
+          <button className={alwaysOnTop?"active":""} onClick={()=>void toggleAlwaysOnTop()}>Always on top</button>
           <button onClick={()=>void enableClickThrough()}>Liberar mouse</button>
         </div>
 
