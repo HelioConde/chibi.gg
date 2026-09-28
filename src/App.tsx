@@ -28,6 +28,7 @@ import ActiveGoalStrip from "./components/ActiveGoalStrip";
 import ChibiLearningLab from "./components/ChibiLearningLab";
 import ChibiLearningPath from "./components/ChibiLearningPath";
 import ChibiBoardDrill from "./components/ChibiBoardDrill";
+import ChibiJournalPatterns from "./components/ChibiJournalPatterns";
 import ChibiCoachMode from "./components/ChibiCoachMode";
 import ChibiStudyShare, { studyFocusById } from "./components/ChibiStudyShare";
 import ChibiStudyReply from "./components/ChibiStudyReply";
@@ -1382,6 +1383,23 @@ function App() {
             </details>
 
             <div className="coach-secondary-stack">
+
+              <details className="coach-secondary-panel">
+                <summary>
+                  <span>
+                    <b>Padrões que você registrou</b>
+                    <small>Veja se comportamentos anotados no Journal estão se repetindo nas derrotas ou boas partidas.</small>
+                  </span>
+                  <em>Journal</em>
+                </summary>
+                <div className="coach-secondary-content">
+                  <ChibiJournalPatterns
+                    matches={analysisMatches}
+                    journalVersion={journalVersion}
+                    onEvidence={showEvidence}
+                  />
+                </div>
+              </details>
 
               <details className="coach-secondary-panel">
                 <summary>
