@@ -1749,6 +1749,7 @@ function App() {
           </>}
           <AskChibi
             playerName={profile.player.gameName}
+            playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
             matches={analysisMatches}
             onEvidence={showEvidence}
           />
