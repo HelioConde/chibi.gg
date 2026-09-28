@@ -62,7 +62,7 @@ export default function ReviewQueue({playerKey,matches,onOpenMatch}:Props){
 
   if(!queue.length) return null;
 
-  return <section className="panel review-queue">
+  return <section className="panel review-queue" id="review-queue">
     <div className="review-queue-head">
       <div>
         <span>REVIEW QUEUE</span>
