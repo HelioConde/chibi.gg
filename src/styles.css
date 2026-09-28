@@ -12941,3 +12941,36 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
 .evolution-block-note{margin:9px 0 0;color:#606a80;font-size:7px;line-height:1.45}
 @media(max-width:850px){.evolution-block-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:500px){.evolution-block-grid{grid-template-columns:1fr}}
+
+
+/* Study Shelf — saved comps and stats for fast return */
+.home-study-shelf{margin:14px 0;padding:13px;border:1px solid #222b3d;background:#0c121b;border-radius:12px}
+.study-shelf-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px}
+.study-shelf-head>div>span{display:block;color:#70bee4;font-size:7px;font-weight:900;letter-spacing:.9px}
+.study-shelf-head>div>strong{display:block;margin-top:3px;font-size:11px}
+.study-shelf-head>small{color:#687287;font-size:7px}
+.study-shelf-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.study-shelf-list>article{position:relative;border:1px solid #20283a;background:#101620;border-radius:10px;overflow:hidden}
+.study-shelf-open{width:100%;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;border:0;background:transparent;color:#dce2ef;padding:9px 34px 9px 9px;text-align:left}
+.study-shelf-open:hover{background:#121a26}
+.study-shelf-type{width:28px;height:28px;display:grid;place-items:center;border-radius:8px;font-size:8px;font-weight:900}
+.study-shelf-type.comp{background:rgba(117,99,231,.12);color:#c9c0ff}
+.study-shelf-type.stat{background:rgba(72,177,255,.1);color:#8edaff}
+.study-shelf-open>span:nth-child(2){min-width:0}
+.study-shelf-open strong{display:block;font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.study-shelf-open small{display:block;margin-top:2px;color:#687287;font-size:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.study-shelf-open>b{color:#8791a6;font-size:7px;white-space:nowrap}
+.study-shelf-remove{position:absolute;top:50%;right:6px;transform:translateY(-50%);width:22px;height:22px;border:0;background:transparent;color:#667186;border-radius:6px;font-size:12px}
+.study-shelf-remove:hover{background:#1a2230;color:#dce2ef}
+
+.comp-shelf-button,.statistics-shelf-button{border:1px solid rgba(72,177,255,.28)!important;background:rgba(45,111,151,.07)!important;color:#8edaff!important;border-radius:8px!important;padding:7px 8px!important;font-size:7px!important;font-weight:900!important}
+.comp-guide-context .comp-shelf-button{grid-column:1/-1;margin-top:4px}
+.statistics-detail-reading .statistics-shelf-button{margin-left:5px}
+
+@media(max-width:760px){
+  .study-shelf-list{grid-template-columns:1fr}
+}
+@media(max-width:520px){
+  .study-shelf-open{grid-template-columns:auto minmax(0,1fr)}
+  .study-shelf-open>b{grid-column:2}
+}
