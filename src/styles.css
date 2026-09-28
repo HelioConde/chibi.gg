@@ -9032,6 +9032,12 @@ a { color: inherit; text-decoration: none; }
 
 
 /* MARKET POSITIONING 2026-09-28 */
+.hero-with-ddragon>.hero-insight-preview,
+.hero-with-ddragon>.quick-stats{
+  position:relative;
+  z-index:2;
+}
+
 .hero-insight-preview{
   width:min(920px,100%);
   margin:22px auto 4px;
