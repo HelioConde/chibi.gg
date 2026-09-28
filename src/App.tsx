@@ -438,18 +438,20 @@ function App() {
     return {label:"Estável",detail:`${recentAvg.toFixed(2)} vs ${previousAvg.toFixed(2)} antes`,tone:""};
   },[analysisMatches]);
 
-  const visibleMatches=useMemo(()=>{
-    const evidenceFiltered=evidenceIds?.length
-      ? analysisMatches.filter((match)=>new Set(evidenceIds).has(match.id))
-      : analysisMatches;
+  const historyBaseMatches=useMemo(()=>{
+    if(!evidenceIds?.length)return analysisMatches;
+    const allowed=new Set(evidenceIds);
+    return analysisMatches.filter(match=>allowed.has(match.id));
+  },[analysisMatches,evidenceIds]);
 
-    if(historyFilter==="top4") return evidenceFiltered.filter(match=>match.placement<=4);
-    if(historyFilter==="bottom2") return evidenceFiltered.filter(match=>match.placement>=7);
-    if(historyFilter==="review") return evidenceFiltered.filter(match=>
+  const visibleMatches=useMemo(()=>{
+    if(historyFilter==="top4") return historyBaseMatches.filter(match=>match.placement<=4);
+    if(historyFilter==="bottom2") return historyBaseMatches.filter(match=>match.placement>=7);
+    if(historyFilter==="review") return historyBaseMatches.filter(match=>
       match.placement>=7 || (match.placement>=5&&(match.goldLeft>=10||match.level>=8))
     );
-    return evidenceFiltered;
-  },[analysisMatches,evidenceIds,historyFilter]);
+    return historyBaseMatches;
+  },[historyBaseMatches,historyFilter]);
 
   const visibleDna=useMemo(
     ()=>evidenceIds?.length||historyFilter!=="all" ? buildChibiDNA(visibleMatches) : dna,
@@ -457,18 +459,18 @@ function App() {
   );
 
   const historySessions=useMemo(()=>{
-    const sorted=visibleMatches
+    const sorted=historyBaseMatches
       .slice()
       .sort((a,b)=>(b.playedAt||0)-(a.playedAt||0));
 
-    const sessions:Array<{matches:TftMatch[];start:number;end:number}> = [];
+    const rawSessions:Array<{matches:TftMatch[];start:number;end:number}> = [];
 
     for(const match of sorted){
       const playedAt=Number(match.playedAt)||0;
-      const current=sessions[sessions.length-1];
+      const current=rawSessions[rawSessions.length-1];
 
       if(!current){
-        sessions.push({matches:[match],start:playedAt,end:playedAt});
+        rawSessions.push({matches:[match],start:playedAt,end:playedAt});
         continue;
       }
 
@@ -476,7 +478,7 @@ function App() {
       const gap=Math.abs((previous.playedAt||0)-playedAt);
 
       if(gap>2.5*60*60*1000){
-        sessions.push({matches:[match],start:playedAt,end:playedAt});
+        rawSessions.push({matches:[match],start:playedAt,end:playedAt});
         continue;
       }
 
@@ -485,7 +487,9 @@ function App() {
       current.end=Math.max(current.end||playedAt,playedAt);
     }
 
-    return sessions.map((session,index)=>{
+    const visibleIds=new Set(visibleMatches.map(match=>match.id));
+
+    const enriched=rawSessions.map((session,index)=>{
       const games=session.matches.length;
       const average=session.matches.reduce((sum,match)=>sum+match.placement,0)/Math.max(1,games);
       const top4=session.matches.filter(match=>match.placement<=4).length;
@@ -494,15 +498,23 @@ function App() {
 
       return {
         ...session,
+        displayMatches:session.matches.filter(match=>visibleIds.has(match.id)),
         index,
         games,
         average,
         top4Rate:Math.round(top4/Math.max(1,games)*100),
         bottom2,
         wins,
+        delta:null as number|null,
       };
     });
-  },[visibleMatches]);
+
+    for(let index=0;index<enriched.length-1;index++){
+      enriched[index].delta=+(enriched[index].average-enriched[index+1].average).toFixed(2);
+    }
+
+    return enriched.filter(session=>session.displayMatches.length>0);
+  },[historyBaseMatches,visibleMatches]);
 
   const latestSession=useMemo(()=>{
     if(!analysisMatches.length)return [];
@@ -1302,7 +1314,10 @@ function App() {
                       <div>
                         <span>SESSÃO {historySessions.length>1?historySessions.length-session.index:"ATUAL"}</span>
                         <strong>{formatDay(session.end)} · {formatClock(session.start)}–{formatClock(session.end)}</strong>
-                        <small>{session.games} jogo{session.games===1?"":"s"}</small>
+                        <small>{session.games} jogo{session.games===1?"":"s"} no contexto completo</small>
+                        {session.delta!=null&&<em className={session.delta<-.25?"better":session.delta>.25?"worse":"stable"}>
+                          {session.delta<0?"Melhorou ":"Piorou "}{Math.abs(session.delta).toFixed(2)} vs sessão anterior
+                        </em>}
                       </div>
 
                       <div className="history-session-stats">
@@ -1314,7 +1329,7 @@ function App() {
                     </header>
 
                     <div className="history-session-games">
-                      {session.matches.map((match)=>{
+                      {session.displayMatches.map((match)=>{
                         const cue=matchReviewCue(match);
                         return <button className={"match-row match-button match-row-v2 cue-"+cue.tone} key={match.id} onClick={()=>openMatch(match)}>
                           <div className={"placement "+placementClass(match.placement)}>{match.placement}º</div>
