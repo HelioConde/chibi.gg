@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { fetchTftComps, TftGlobalComp, TftGlobalComps, TftMatch } from "../api/tft";
 import { staticEntry, tftAssetUrl, TftStaticData } from "../tftStatic";
 import DDragonArt from "./DDragonArt";
+import { saveStudyShelfItem } from "../studyShelf";
 
 type Props={
   staticData:TftStaticData|null;
@@ -116,6 +117,7 @@ export default function CompsPage({
   const [loading,setLoading]=useState(true);
   const [error,setError]=useState("");
   const [selectedCompId,setSelectedCompId]=useState<string|null>(null);
+  const [shelfSavedId,setShelfSavedId]=useState<string>("");
 
   useEffect(()=>{
     let cancelled=false;
@@ -169,6 +171,16 @@ export default function CompsPage({
       : data.sampleParticipants>=250?"crescendo"
       : "inicial"
     : "inicial";
+
+  function saveCompToShelf(comp:typeof ranked[number]){
+    saveStudyShelfItem({
+      type:"comp",
+      label:compName(comp,staticData),
+      subtitle:comp.games+" jogos · média "+comp.averagePlacement+" · Top 4 "+comp.top4Rate+"%",
+      unitIds:comp.units.slice(0,8).map(unit=>unit.id),
+    });
+    setShelfSavedId(comp.id);
+  }
 
   function coreReason(comp:typeof ranked[number]){
     if(hasProfile&&comp.fit.score>=55){
@@ -272,6 +284,9 @@ export default function CompsPage({
           <div className="comp-guide-context">
             <span>Nível médio</span><strong>{selectedComp.averageLevel}</strong>
             <span>Ouro final</span><strong>{selectedComp.averageGold}g</strong>
+            <button className="comp-shelf-button" onClick={()=>saveCompToShelf(selectedComp)}>
+              {shelfSavedId===selectedComp.id?"Salvo no Shelf ✓":"Salvar no Study Shelf"}
+            </button>
           </div>
         </div>
 
