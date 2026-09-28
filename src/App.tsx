@@ -1126,7 +1126,6 @@ function App() {
                           <strong>{activeTraits(match).slice(0,2).map((t)=>traitLabel(t,staticData)).filter(Boolean).join(" · ") || "Board TFT"}</strong>
                           <span className={"match-review-label "+cue.tone}>{cue.label}</span>
                         </div>
-                        <p>{cue.title}</p>
                       </div>
 
                       <div className={"match-fast-read "+cue.tone}>
