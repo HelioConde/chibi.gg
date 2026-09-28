@@ -145,6 +145,9 @@ export default function TeamBuilderPage({
   const [transitionBase,setTransitionBase]=useState<HexBoardUnit[]|null>(null);
   const [transitionBaseLevel,setTransitionBaseLevel]=useState(8);
   const [transitionBaseAugments,setTransitionBaseAugments]=useState<string[]>([]);
+  const [economyGold,setEconomyGold]=useState("");
+  const [economyReserve,setEconomyReserve]=useState("");
+  const [transitionProgress,setTransitionProgress]=useState<Record<string,number>>({});
 
   useEffect(()=>{
     if(!initialChampionIds.length)return;
@@ -165,6 +168,9 @@ export default function TeamBuilderPage({
     setMovingHex(null);
     setTransitionBase(null);
     setTransitionBaseAugments([]);
+    setTransitionProgress({});
+    setEconomyGold("");
+    setEconomyReserve("");
   },[initialChampionIds]);
 
   const champions=useMemo(()=>{
@@ -648,6 +654,139 @@ export default function TeamBuilderPage({
     targetLevel,
   ]);
 
+  const economyPlan=useMemo(()=>{
+    if(!transitionAnalysis)return null;
+
+    const positiveTraitIds=new Set(
+      transitionAnalysis.traitChanges
+        .filter(row=>row.after>row.before)
+        .map(row=>row.id)
+    );
+
+    const familiarity=new Map<string,{games:number;placement:number}>();
+    for(const match of matches){
+      for(const unit of match.units){
+        const current=familiarity.get(unit.characterId)||{games:0,placement:0};
+        current.games++;
+        current.placement+=match.placement;
+        familiarity.set(unit.characterId,current);
+      }
+    }
+
+    const enteringRows=transitionAnalysis.entering.map(unit=>{
+      const unitCost=costFor(unit.id,staticData);
+      const targetCopies=copiesFor(unit.tier||1);
+      const traits=unitTraitIds(unit.id,staticData);
+      const traitGain=traits.filter(id=>positiveTraitIds.has(id)).length;
+      const itemCount=unit.items?.length||0;
+      const roleScore=unit.role==="carry"?5:unit.role==="tank"?4:unit.role==="utility"?1:0;
+      const score=roleScore+itemCount*2+traitGain*2+(unitCost>=4?1:0);
+      const hist=familiarity.get(unit.id);
+      const label=unit.role==="carry"||itemCount>=2
+        ?"core"
+        :unitCost>=4
+          ?"cap"
+          :traitGain>0
+            ?"ponte"
+            :"peça";
+      return {
+        id:unit.id,
+        unit,
+        kind:"enter" as const,
+        label,
+        unitCost,
+        targetCopies,
+        score,
+        traitGain,
+        personalGames:hist?.games||0,
+        personalAverage:hist?.games?hist.placement/hist.games:null,
+      };
+    });
+
+    const upgradeRows=transitionAnalysis.upgrades.map(row=>{
+      const unitCost=costFor(row.unit.id,staticData);
+      const itemCount=row.unit.items?.length||0;
+      const roleScore=row.unit.role==="carry"?5:row.unit.role==="tank"?4:row.unit.role==="utility"?1:0;
+      const hist=familiarity.get(row.unit.id);
+      return {
+        id:row.unit.id,
+        unit:row.unit,
+        kind:"upgrade" as const,
+        label:"upgrade",
+        unitCost,
+        targetCopies:row.extraCopies,
+        score:roleScore+itemCount*2+1,
+        traitGain:0,
+        personalGames:hist?.games||0,
+        personalAverage:hist?.games?hist.placement/hist.games:null,
+      };
+    });
+
+    const queue=[...enteringRows,...upgradeRows]
+      .sort((a,b)=>b.score-a.score||a.unitCost-b.unitCost||a.id.localeCompare(b.id))
+      .map(row=>{
+        const acquired=Math.max(0,Math.min(row.targetCopies,transitionProgress[row.id]||0));
+        const remainingCopies=Math.max(0,row.targetCopies-acquired);
+        return {
+          ...row,
+          acquired,
+          remainingCopies,
+          remainingCost:remainingCopies*row.unitCost,
+          complete:remainingCopies===0,
+        };
+      });
+
+    const totalRemainingCost=queue.reduce((sum,row)=>sum+row.remainingCost,0);
+    const totalTargetCost=queue.reduce((sum,row)=>sum+row.targetCopies*row.unitCost,0);
+
+    const gold=economyGold.trim()===""?null:Math.max(0,Math.floor(Number(economyGold)||0));
+    const reserve=economyReserve.trim()===""?0:Math.max(0,Math.floor(Number(economyReserve)||0));
+    const spendable=gold==null?null:Math.max(0,gold-reserve);
+    let runway=spendable;
+
+    const queueWithBudget=queue.map(row=>{
+      if(runway==null){
+        return {...row,fundedCopies:null as number|null,budgetStatus:"sem orçamento"};
+      }
+      const fundedCopies=Math.min(row.remainingCopies,Math.floor(runway/row.unitCost));
+      runway-=fundedCopies*row.unitCost;
+      const budgetStatus=row.remainingCopies===0
+        ?"concluído"
+        :fundedCopies>=row.remainingCopies
+          ?"coberto"
+          :fundedCopies>0
+            ?"parcial"
+            :"aguarda";
+      return {...row,fundedCopies,budgetStatus};
+    });
+
+    const firstPending=queueWithBudget.find(row=>!row.complete)||null;
+    const completed=queue.filter(row=>row.complete).length;
+    const coverage=spendable==null||totalRemainingCost===0
+      ?null
+      :Math.min(100,Math.round(spendable/totalRemainingCost*100));
+
+    return {
+      queue:queueWithBudget,
+      totalRemainingCost,
+      totalTargetCost,
+      gold,
+      reserve,
+      spendable,
+      remainingBudget:runway,
+      firstPending,
+      completed,
+      coverage,
+    };
+  },[
+    transitionAnalysis,
+    transitionProgress,
+    economyGold,
+    economyReserve,
+    matches,
+    staticData,
+  ]);
+
   const boardValue=units.reduce(
     (sum,unit)=>sum+costFor(unit.id,staticData)*copiesFor(unit.tier||1),
     0
@@ -855,6 +994,7 @@ export default function TeamBuilderPage({
   function captureTransitionBase(){
     if(!units.length)return;
     setTransitionBase(units.map(unit=>({...unit,items:[...(unit.items||[])]})));
+    setTransitionProgress({});
     setTransitionBaseLevel(targetLevel);
     setTransitionBaseAugments([...selectedAugments]);
     setSelectedId(null);
@@ -877,6 +1017,25 @@ export default function TeamBuilderPage({
   function clearTransition(){
     setTransitionBase(null);
     setTransitionBaseAugments([]);
+    setTransitionProgress({});
+    setEconomyGold("");
+    setEconomyReserve("");
+  }
+
+  function changeTransitionCopies(id:string,delta:number,maxCopies:number){
+    setTransitionProgress(current=>{
+      const next=Math.max(0,Math.min(maxCopies,(current[id]||0)+delta));
+      if(next===0){
+        const copy={...current};
+        delete copy[id];
+        return copy;
+      }
+      return {...current,[id]:next};
+    });
+  }
+
+  function resetTransitionProgress(){
+    setTransitionProgress({});
   }
 
   function saveCurrentBoard(){
@@ -906,6 +1065,9 @@ export default function TeamBuilderPage({
     setMovingHex(null);
     setTransitionBase(null);
     setTransitionBaseAugments([]);
+    setTransitionProgress({});
+    setEconomyGold("");
+    setEconomyReserve("");
   }
 
   async function copyBoardSummary(){
@@ -941,6 +1103,12 @@ export default function TeamBuilderPage({
       transitionAnalysis
         ?"Transição: "+transitionAnalysis.leaving.length+" saem · "+transitionAnalysis.entering.length+" entram · "+transitionAnalysis.copyCost+"G em cópias-alvo"
         :"",
+      economyPlan&&economyPlan.queue.length
+        ?"Progresso: "+economyPlan.completed+"/"+economyPlan.queue.length+" alvos · "+economyPlan.totalRemainingCost+"G restantes"
+        :"",
+      economyPlan?.gold!=null
+        ?"Economia: "+economyPlan.gold+"G atual · "+economyPlan.reserve+"G reserva · "+economyPlan.spendable+"G livres"
+        :"",
     ].filter(Boolean).join("\n");
 
     try{
@@ -952,11 +1120,11 @@ export default function TeamBuilderPage({
     }
   }
 
-  return <main className="builder-page builder-v2 builder-v3 builder-v4 builder-v5 builder-v6 builder-v7">
+  return <main className="builder-page builder-v2 builder-v3 builder-v4 builder-v5 builder-v6 builder-v7 builder-v8">
     <section className="builder-hero">
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>← Voltar ao perfil</button>}
-        <span className="eyebrow">CHIBI LAB · TEAM BUILDER V7</span>
+        <span className="eyebrow">CHIBI LAB · TEAM BUILDER V8</span>
         <h1>Monte o board.<br/><em>Teste uma decisão por vez.</em></h1>
         <p>{initialChampionIds.length
           ?"Comp carregada. Mova, remova ou substitua peças e compare variantes com o seu histórico."
@@ -1005,7 +1173,7 @@ export default function TeamBuilderPage({
             setSelectedAugments([...variantAAugments]);
             setSelectedId(null);
           }}>Restaurar A</button>}
-          <button className="secondary" onClick={()=>{setUnits([]);setSelectedAugments([]);setSelectedId(null);setSelectedItemHex(null);setMovingHex(null);setTransitionBase(null);setTransitionBaseAugments([]);}}>Limpar board</button>
+          <button className="secondary" onClick={()=>{setUnits([]);setSelectedAugments([]);setSelectedId(null);setSelectedItemHex(null);setMovingHex(null);setTransitionBase(null);setTransitionBaseAugments([]);setTransitionProgress({});setEconomyGold("");setEconomyReserve("");}}>Limpar board</button>
         </div>
       </div>
     </section>
@@ -1161,6 +1329,136 @@ export default function TeamBuilderPage({
           <small>{transitionBaseLevel} → {targetLevel}</small>
         </article>
       </div>
+
+      {economyPlan&&<section className="builder-economy-lab">
+        <div className="builder-economy-head">
+          <div>
+            <span>PLANO DE ECONOMIA</span>
+            <h3>O que comprar primeiro?</h3>
+            <p>Defina seu ouro atual e, se quiser, uma reserva. A fila usa apenas o board-alvo e as cópias configuradas; não prevê loja nem reroll.</p>
+          </div>
+          <div className="builder-economy-inputs">
+            <label>
+              <span>OURO ATUAL</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                inputMode="numeric"
+                value={economyGold}
+                onChange={event=>setEconomyGold(event.target.value.replace(/[^0-9]/g,""))}
+                placeholder="ex: 42"
+              />
+            </label>
+            <label>
+              <span>RESERVAR</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                inputMode="numeric"
+                value={economyReserve}
+                onChange={event=>setEconomyReserve(event.target.value.replace(/[^0-9]/g,""))}
+                placeholder="ex: 10"
+              />
+            </label>
+          </div>
+        </div>
+
+        <div className="builder-economy-metrics">
+          <article>
+            <span>ORÇAMENTO LIVRE</span>
+            <strong>{economyPlan.spendable==null?"—":economyPlan.spendable+"G"}</strong>
+            <small>{economyPlan.gold==null?"informe seu ouro":economyPlan.reserve+"G preservados"}</small>
+          </article>
+          <article>
+            <span>CUSTO RESTANTE</span>
+            <strong>{economyPlan.totalRemainingCost}G</strong>
+            <small>somente cópias ainda não marcadas</small>
+          </article>
+          <article>
+            <span>COBERTURA</span>
+            <strong>{economyPlan.coverage==null?"—":economyPlan.coverage+"%"}</strong>
+            <small>{economyPlan.spendable==null?"aguardando orçamento":"do custo restante"}</small>
+          </article>
+          <article>
+            <span>ALVOS CONCLUÍDOS</span>
+            <strong>{economyPlan.completed}/{economyPlan.queue.length}</strong>
+            <small>pela contagem manual de cópias</small>
+          </article>
+        </div>
+
+        <div className="builder-economy-next">
+          <div>
+            <span>PRÓXIMO ALVO</span>
+            {economyPlan.firstPending
+              ?<>
+                <strong>{staticEntry(staticData?.champions,economyPlan.firstPending.id)?.name||clean(economyPlan.firstPending.id)}</strong>
+                <p>Faltam {economyPlan.firstPending.remainingCopies} cópia{economyPlan.firstPending.remainingCopies===1?"":"s"} · {economyPlan.firstPending.remainingCost}G de custo direto.</p>
+              </>
+              :<>
+                <strong>Cópias-alvo concluídas</strong>
+                <p>Revise posição, itens e o momento da troca antes de encerrar a transição.</p>
+              </>}
+          </div>
+          {economyPlan.queue.some(row=>row.acquired>0)&&<button onClick={resetTransitionProgress}>Zerar contagem</button>}
+        </div>
+
+        {economyPlan.queue.length
+          ?<div className="builder-buy-queue">
+            {economyPlan.queue.map((row,index)=>{
+              const entry=staticEntry(staticData?.champions,row.id);
+              const src=staticData?tftAssetUrl(staticData.version,"champion",entry):"";
+              const role=row.unit.role==="carry"?"Carry":row.unit.role==="tank"?"Tank":row.unit.role==="utility"?"Utilidade":"";
+              const reason=[
+                role,
+                row.traitGain>0?row.traitGain+" trait"+(row.traitGain===1?"":"s")+" ganha"+(row.traitGain===1?"":"m"):"",
+                row.personalGames>0?row.personalGames+" partida"+(row.personalGames===1?"":"s")+" no histórico":"",
+              ].filter(Boolean).join(" · ");
+
+              const budgetCopy=row.fundedCopies;
+              const budgetText=row.complete
+                ?"alvo concluído"
+                :budgetCopy==null
+                  ?"informe ouro para simular"
+                  :row.budgetStatus==="coberto"
+                    ?"cabe no orçamento livre"
+                    :row.budgetStatus==="parcial"
+                      ?budgetCopy+"/"+row.remainingCopies+" cópias cabem agora"
+                      :"fora do orçamento livre";
+
+              return <article className={"builder-buy-row "+(row.complete?"complete":"")} key={row.kind+"-"+row.id}>
+                <b className="builder-buy-order">{index+1}</b>
+                <span className={"builder-buy-image cost-"+costFor(row.id,staticData)}>{src&&<img src={src} alt=""/>}</span>
+                <div className="builder-buy-copy">
+                  <div>
+                    <em>{row.label}</em>
+                    <strong>{entry?.name||clean(row.id)}</strong>
+                  </div>
+                  <small>{row.kind==="upgrade"
+                    ?"upgrade · "+row.targetCopies+" cópia"+(row.targetCopies===1?"":"s")+" extra"+(row.targetCopies===1?"":"s")
+                    :"alvo "+(row.unit.tier||1)+"★ · "+row.targetCopies+" cópia"+(row.targetCopies===1?"":"s")}</small>
+                  {reason&&<small>{reason}{row.personalAverage!=null?" · média "+row.personalAverage.toFixed(2):""}</small>}
+                </div>
+                <div className="builder-copy-counter">
+                  <button disabled={row.acquired<=0} onClick={()=>changeTransitionCopies(row.id,-1,row.targetCopies)}>−</button>
+                  <span><strong>{row.acquired}</strong>/{row.targetCopies}</span>
+                  <button disabled={row.acquired>=row.targetCopies} onClick={()=>changeTransitionCopies(row.id,1,row.targetCopies)}>+</button>
+                </div>
+                <div className="builder-buy-cost">
+                  <strong>{row.remainingCost}G</strong>
+                  <small>{budgetText}</small>
+                </div>
+              </article>;
+            })}
+          </div>
+          :<p className="builder-empty-check">Não há novas cópias para comprar: a transição muda apenas itens, posição, Traits ou Augments.</p>}
+
+        <div className="builder-economy-note">
+          <b>Como ler a fila</b>
+          <p>“Core”, “ponte”, “cap” e “upgrade” descrevem o papel da peça dentro do board que você montou. A ordem não garante que trocar imediatamente seja correto; se a unidade ainda não apareceu, apenas siga para o próximo alvo que a loja oferecer.</p>
+        </div>
+      </section>}
 
       <div className="builder-transition-detail-grid">
         <article className="builder-transition-list">
