@@ -7,9 +7,10 @@ type Props={
   playerKey:string;
   matches:TftMatch[];
   onEvidence:(ids:string[],label:string)=>void;
+  onReviewQueue?:()=>void;
 };
 
-export default function ChibiActionCenter({playerKey,matches,onEvidence}:Props){
+export default function ChibiActionCenter({playerKey,matches,onEvidence,onReviewQueue}:Props){
   const plan=useMemo(()=>buildActionPlan(matches),[matches]);
   const [goal,setGoal]=useState<ChibiGoal|null>(()=>getGoal(playerKey));
 
