@@ -10280,3 +10280,293 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
   .autopsy-diagnosis-evidence{flex-direction:column}
   .autopsy-diagnosis-evidence small{border-radius:8px}
 }
+
+
+/* Team Builder v6 — positioning planner */
+.builder-v6 .builder-board-facts{
+  grid-template-columns:repeat(7,minmax(0,1fr));
+}
+.builder-position-lab{
+  margin:0 0 10px;
+  padding:14px;
+  border:1px solid rgba(89,148,128,.28);
+  border-radius:13px;
+  background:
+    radial-gradient(circle at 86% 0%,rgba(70,151,123,.075),transparent 30%),
+    #0c121a;
+}
+.builder-position-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:18px;
+}
+.builder-position-head>div{
+  min-width:0;
+  display:grid;
+  gap:4px;
+}
+.builder-position-head>div>span{
+  color:#75c3a9;
+  font-size:7px;
+  font-weight:950;
+  letter-spacing:.9px;
+}
+.builder-position-head h2{
+  margin:0;
+  font-size:18px;
+}
+.builder-position-head p{
+  max-width:760px;
+  margin:0;
+  color:#718095;
+  font-size:8px;
+  line-height:1.5;
+}
+.builder-position-head>button,
+.builder-board-head-actions button{
+  border:1px solid #334153;
+  border-radius:8px;
+  background:#101822;
+  color:#8795a9;
+  padding:7px 9px;
+  font-size:7px;
+  font-weight:900;
+  cursor:pointer;
+}
+.builder-position-head>button.active,
+.builder-board-head-actions button.active{
+  border-color:#4c9c82;
+  background:rgba(76,156,130,.12);
+  color:#9ce0c9;
+}
+.builder-position-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:7px;
+  margin-top:11px;
+}
+.builder-position-stat{
+  min-width:0;
+  display:grid;
+  gap:3px;
+  min-height:82px;
+  padding:10px;
+  border:1px solid #253143;
+  border-radius:9px;
+  background:#0f1620;
+}
+.builder-position-stat>span{
+  color:#647287;
+  font-size:6px;
+  font-weight:950;
+  letter-spacing:.65px;
+}
+.builder-position-stat>strong{
+  font-size:19px;
+}
+.builder-position-stat>small{
+  color:#67758a;
+  font-size:7px;
+  line-height:1.35;
+}
+.builder-position-stat.warning{
+  border-color:rgba(226,154,93,.32);
+}
+.builder-position-stat.warning>strong{
+  color:#e5aa77;
+}
+.builder-position-reading{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:10px;
+  margin-top:8px;
+  padding:10px;
+  border:1px solid #222c3e;
+  border-radius:9px;
+  background:#0e151f;
+}
+.builder-position-reading>div:first-child{
+  min-width:0;
+  display:grid;
+  gap:3px;
+}
+.builder-position-reading>div:first-child>span{
+  color:#6d7b90;
+  font-size:6px;
+  font-weight:950;
+  letter-spacing:.65px;
+}
+.builder-position-reading strong{
+  font-size:10px;
+}
+.builder-position-reading p{
+  margin:0;
+  color:#68768a;
+  font-size:7px;
+  line-height:1.45;
+}
+.builder-position-spread{
+  min-width:118px;
+  display:grid;
+  gap:3px;
+  align-content:center;
+  text-align:right;
+}
+.builder-position-spread>span{
+  color:#66758a;
+  font-size:6px;
+  font-weight:900;
+}
+.builder-position-spread>b{
+  font-size:8px;
+}
+.builder-position-instruction{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:8px;
+  padding:8px 10px;
+  border:1px solid rgba(76,156,130,.28);
+  border-radius:8px;
+  background:rgba(76,156,130,.055);
+}
+.builder-position-instruction>b{
+  color:#9ac9ba;
+  font-size:7px;
+  line-height:1.4;
+}
+.builder-position-instruction button{
+  border:1px solid #3e685a;
+  border-radius:7px;
+  background:#101923;
+  color:#9ac9ba;
+  padding:5px 7px;
+  font-size:6px;
+  font-weight:900;
+  cursor:pointer;
+}
+.builder-board-head-actions{
+  display:flex;
+  gap:5px;
+}
+.builder-role-control{
+  display:flex!important;
+  gap:3px!important;
+  margin-top:4px;
+}
+.builder-role-control button{
+  border:1px solid #2f394c;
+  border-radius:6px;
+  background:#101822;
+  color:#69778c;
+  padding:4px 6px;
+  font-size:6px;
+  font-weight:900;
+  cursor:pointer;
+}
+.builder-role-control button.active.tank{
+  border-color:#4b91b7;
+  background:rgba(75,145,183,.12);
+  color:#9ed8f2;
+}
+.builder-role-control button.active.carry{
+  border-color:#bf8050;
+  background:rgba(191,128,80,.12);
+  color:#efbd91;
+}
+.builder-role-control button.active.utility{
+  border-color:#7e6bc3;
+  background:rgba(126,107,195,.12);
+  color:#c3b7ef;
+}
+.hex-unit-role{
+  position:absolute;
+  top:-5px;
+  right:-6px;
+  z-index:7;
+  width:15px;
+  height:15px;
+  display:grid;
+  place-items:center;
+  border:1px solid #4d596f;
+  border-radius:50%;
+  background:#0b1119;
+  color:#d8deea;
+  font-size:6px;
+  font-weight:950;
+  box-shadow:0 2px 6px rgba(0,0,0,.35);
+}
+.hex-board-unit.role-tank{
+  border-color:#5797b7;
+}
+.hex-board-unit.role-carry{
+  border-color:#c88451;
+}
+.hex-board-unit.role-utility{
+  border-color:#8774c8;
+}
+.builder-v6 .hex-board-cell.position-front{
+  background:#234238;
+}
+.builder-v6 .hex-board-cell.position-back{
+  background:#293148;
+}
+.builder-v6 .hex-board-cell.position-front::after{
+  background:#101d1a;
+}
+.builder-v6 .hex-board-cell.position-back::after{
+  background:#111725;
+}
+.builder-v6 .hex-board-cell.position-edge{
+  box-shadow:inset 0 0 0 1px rgba(123,139,183,.22);
+}
+.builder-v6 .hex-board-cell.moving-source{
+  background:#d0a654;
+  filter:brightness(1.12);
+}
+.builder-v6 .hex-board-cell.moving-source::after{
+  background:#231e13;
+}
+.builder-v6 .hex-board-cell.moving-source .hex-board-unit{
+  box-shadow:0 0 0 3px rgba(238,190,91,.22),0 5px 18px rgba(0,0,0,.25);
+}
+@media(max-width:1120px){
+  .builder-v6 .builder-board-facts{
+    grid-template-columns:repeat(4,1fr);
+  }
+}
+@media(max-width:780px){
+  .builder-position-head{
+    flex-direction:column;
+  }
+  .builder-position-head>button{
+    width:100%;
+  }
+  .builder-position-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+  .builder-position-reading{
+    grid-template-columns:1fr;
+  }
+  .builder-position-spread{
+    text-align:left;
+  }
+}
+@media(max-width:520px){
+  .builder-v6 .builder-board-facts,
+  .builder-position-grid{
+    grid-template-columns:1fr 1fr;
+  }
+  .builder-position-instruction{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .builder-board-head-actions{
+    width:100%;
+  }
+  .builder-board-head-actions button{
+    flex:1;
+  }
+}
