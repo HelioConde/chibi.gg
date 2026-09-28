@@ -12,6 +12,7 @@ class CurrentPlayer:
     game_name: str
     tag_line: str
     puuid: str
+    profile_icon_id: int | None = None
 
     @property
     def riot_id(self) -> str:
@@ -40,7 +41,13 @@ class LcuClient:
         game_name = str(data.get("gameName") or data.get("displayName") or "").strip()
         if not game_name:
             raise LcuUnavailableError("A API local não retornou o nome do jogador.")
-        return CurrentPlayer(game_name, str(data.get("tagLine") or "").strip(), str(data.get("puuid") or "").strip())
+        icon_id = data.get("profileIconId")
+        return CurrentPlayer(
+            game_name,
+            str(data.get("tagLine") or "").strip(),
+            str(data.get("puuid") or "").strip(),
+            icon_id if isinstance(icon_id, int) else None,
+        )
 
     def gameflow_phase(self) -> str:
         phase = self.connection.get_json("/lol-gameflow/v1/gameflow-phase")

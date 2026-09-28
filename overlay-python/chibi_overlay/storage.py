@@ -61,6 +61,7 @@ def app_data_dir() -> Path:
 class LocalStore:
     def __init__(self, snapshot_path: str | None = None, *, demo: bool = False) -> None:
         self.settings_path = app_data_dir() / "settings.json"
+        self.sessions_path = app_data_dir() / "sessions"
         self.snapshot_path = Path(snapshot_path).expanduser().resolve() if snapshot_path else app_data_dir() / "snapshot.json"
         self._last_snapshot_mtime: float | None = None
         self.demo = demo
@@ -90,6 +91,25 @@ class LocalStore:
                 json.dumps(data, ensure_ascii=False, indent=2),
                 encoding="utf-8",
             )
+        except OSError:
+            pass
+
+    def update_settings(self, updates: dict[str, Any]) -> None:
+        settings = self.load_settings()
+        settings.update(updates)
+        self.save_settings(settings)
+
+    def save_session(self, session: dict[str, Any]) -> None:
+        """Persist an audit-friendly local session record without Riot credentials."""
+        session_id = str(session.get("id") or "session")
+        created = str(session.get("created_at") or "").replace(":", "-")[:19]
+        self.sessions_path.mkdir(parents=True, exist_ok=True)
+        path = self.sessions_path / f"{created or 'session'}_{session_id}.json"
+        try:
+            path.write_text(json.dumps(session, ensure_ascii=False, indent=2), encoding="utf-8")
+            files = sorted(self.sessions_path.glob("*.json"), key=lambda item: item.stat().st_mtime, reverse=True)
+            for stale in files[30:]:
+                stale.unlink(missing_ok=True)
         except OSError:
             pass
 

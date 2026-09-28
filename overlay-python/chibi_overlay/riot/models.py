@@ -74,6 +74,8 @@ class GameStateSnapshot:
     timestamp: float = field(default_factory=time)
     connected: bool = False
     riot_id: str = ""
+    player_puuid: str = ""
+    profile_icon_id: int | None = None
     details: dict[str, Any] = field(default_factory=dict)
     live: RiotLiveState = field(default_factory=RiotLiveState)
 
@@ -87,6 +89,7 @@ class GameStateSnapshot:
             self.queue_name,
             self.connected,
             self.riot_id,
+            self.player_puuid,
         )
 
 
@@ -108,6 +111,6 @@ PRESENTATIONS: dict[GameState, StatePresentation] = {
     GameState.READY_CHECK_DECLINED: StatePresentation("×", "PARTIDA RECUSADA", "Aguardando retorno do cliente.", "danger"),
     GameState.CHAMP_SELECT: StatePresentation("◇", "PREPARANDO A PARTIDA", "Seleção em andamento.", "queue"),
     GameState.IN_GAME: StatePresentation("●", "EM PARTIDA", "Boa partida.", "success"),
-    GameState.POST_GAME: StatePresentation("◇", "PÓS-PARTIDA", "Revise o momento quando estiver pronto.", "neutral"),
+    GameState.POST_GAME: StatePresentation("◇", "PARTIDA FINALIZADA", "Buscando resultado...", "neutral"),
     GameState.UNKNOWN: StatePresentation("?", "ESTADO DESCONHECIDO", "Aguardando uma atualização do cliente.", "neutral"),
 }

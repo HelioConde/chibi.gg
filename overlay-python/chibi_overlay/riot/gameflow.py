@@ -21,6 +21,8 @@ def normalize_gameflow(
     queue_id: int | None = None,
     queue_name: str = "",
     riot_id: str = "",
+    player_puuid: str = "",
+    profile_icon_id: int | None = None,
     details: dict[str, object] | None = None,
 ) -> GameStateSnapshot:
     """Translate raw LCU values to the one state model consumed by the UI."""
@@ -56,6 +58,8 @@ def normalize_gameflow(
         queue_name=queue_name,
         connected=connected,
         riot_id=riot_id,
+        player_puuid=player_puuid,
+        profile_icon_id=profile_icon_id,
         details=details or {},
     )
 
@@ -110,6 +114,8 @@ class _GameflowWorker(QObject):
                 queue_id=session.queue_id if session else None,
                 queue_name=session.queue_name if session else "",
                 riot_id=player.riot_id,
+                player_puuid=player.puuid,
+                profile_icon_id=player.profile_icon_id,
                 details={
                     "game_mode": session.game_mode if session else "",
                     "player_count": session.player_count if session else 0,
@@ -204,6 +210,7 @@ class DemoGameflowMonitor(QObject):
             GameState.READY_CHECK_ACCEPTED,
             GameState.CHAMP_SELECT,
             GameState.IN_GAME,
+            GameState.POST_GAME,
         ]
         self.index = 0
 
@@ -226,6 +233,7 @@ class DemoGameflowMonitor(QObject):
             GameState.READY_CHECK_ACCEPTED: "ReadyCheck",
             GameState.CHAMP_SELECT: "ChampSelect",
             GameState.IN_GAME: "InProgress",
+            GameState.POST_GAME: "EndOfGame",
         }[state]
         response = "Accepted" if state is GameState.READY_CHECK_ACCEPTED else None
         self.state_changed.emit(
@@ -236,6 +244,7 @@ class DemoGameflowMonitor(QObject):
                 queue_id=1100,
                 queue_name="Teamfight Tactics (ranqueada)",
                 riot_id="Demo#CHIBI",
+                player_puuid="demo-puuid",
                 details={"game_mode": "TFT", "player_count": 8, "is_ranked": True},
             )
         )
