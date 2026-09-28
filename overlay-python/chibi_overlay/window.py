@@ -219,7 +219,8 @@ class OverlayWindow(QMainWindow):
         self.board_unavailable_label.setVisible(False)
         board_layout.addWidget(self.board_unavailable_label)
 
-        self.board_grid = QGridLayout()
+        self.board_grid_wrap = QWidget()
+        self.board_grid = QGridLayout(self.board_grid_wrap)
         self.board_grid.setHorizontalSpacing(3)
         self.board_grid.setVerticalSpacing(3)
         self.board_cells: list[QLabel] = []
@@ -231,7 +232,7 @@ class OverlayWindow(QMainWindow):
             cell.setObjectName("hexCell")
             self.board_grid.addWidget(cell, slot // 7, slot % 7)
             self.board_cells.append(cell)
-        board_layout.addLayout(self.board_grid)
+        board_layout.addWidget(self.board_grid_wrap)
         detail_layout.addWidget(board_card)
 
         review_card = QFrame()
@@ -488,7 +489,7 @@ class OverlayWindow(QMainWindow):
             "BOARD AO VIVO" if riot.state is GameState.IN_GAME else "BOARD SNAPSHOT"
         )
         self.board_unavailable_label.setVisible(board_is_unavailable)
-        self.board_grid.setVisible(not board_is_unavailable)
+        self.board_grid_wrap.setVisible(not board_is_unavailable)
         by_slot = {
             unit.slot: unit for unit in (fields.board.value or []) if hasattr(unit, "slot")
         }
