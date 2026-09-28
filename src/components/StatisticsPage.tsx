@@ -11,7 +11,8 @@ import {
   TftStaticData,
 } from "../tftStatic";
 
-type Category="champions"|"traits"|"items"|"augments";
+export type StatisticsCategory="champions"|"traits"|"items"|"augments";
+type Category=StatisticsCategory;
 type ViewMode="stats"|"tier";
 
 type Props={
@@ -20,6 +21,8 @@ type Props={
   hasProfile:boolean;
   onBack:()=>void;
   onEvidence:(ids:string[],label:string)=>void;
+  initialCategory?:Category;
+  initialQuery?:string;
 };
 
 type PersonalStat={
@@ -144,14 +147,21 @@ export default function StatisticsPage({
   hasProfile,
   onBack,
   onEvidence,
+  initialCategory="champions",
+  initialQuery="",
 }:Props){
-  const [category,setCategory]=useState<Category>("champions");
+  const [category,setCategory]=useState<Category>(initialCategory);
   const [view,setView]=useState<ViewMode>("stats");
   const [queueId,setQueueId]=useState<number|null>(1100);
   const [stats,setStats]=useState<TftGlobalStats|null>(null);
   const [loading,setLoading]=useState(true);
   const [error,setError]=useState("");
-  const [query,setQuery]=useState("");
+  const [query,setQuery]=useState(initialQuery);
+
+  useEffect(()=>{
+    setCategory(initialCategory);
+    setQuery(initialQuery);
+  },[initialCategory,initialQuery]);
 
   useEffect(()=>{
     let cancelled=false;
