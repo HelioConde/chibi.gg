@@ -9,7 +9,7 @@ from PySide6.QtWidgets import QApplication
 from chibi_overlay.storage import LocalStore
 from chibi_overlay.window import OverlayWindow
 from chibi_overlay.riot.connection import LcuUnavailableError
-from chibi_overlay.riot.debug import write_sanitized_gameflow_session
+from chibi_overlay.riot.debug import write_gameflow_schema, write_sanitized_gameflow_session
 
 
 def parse_args() -> argparse.Namespace:
@@ -24,6 +24,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Save a sanitized gameflow session payload in the Chibi debug folder and exit.",
     )
+    parser.add_argument(
+        "--debug-lcu-schema",
+        action="store_true",
+        help="Save a value-free schema and schema diff for the known gameflow session endpoint, then exit.",
+    )
     parser.add_argument("--demo", action="store_true", help="Run without Riot Client; Ctrl+Shift+D advances game states.")
     return parser.parse_args()
 
@@ -35,14 +40,19 @@ def main() -> int:
         format="%(message)s",
     )
 
-    if args.debug_lcu:
+    if args.debug_lcu or args.debug_lcu_schema:
         store = LocalStore(snapshot_path=args.snapshot, demo=args.demo)
         try:
-            path = write_sanitized_gameflow_session(store.settings_path.parent / "debug")
+            debug_dir = store.settings_path.parent / "debug"
+            if args.debug_lcu_schema:
+                path, report = write_gameflow_schema(debug_dir)
+                logging.info("[LCU SCHEMA] schema saved: %s | report: %s", path, report)
+            else:
+                path = write_sanitized_gameflow_session(debug_dir)
+                logging.info("[LCU DEBUG] sanitized session saved: %s", path)
         except LcuUnavailableError as error:
             logging.error("[LCU DEBUG] unavailable: %s", error)
             return 1
-        logging.info("[LCU DEBUG] sanitized session saved: %s", path)
         return 0
 
     app = QApplication(sys.argv)
