@@ -272,10 +272,10 @@ export default function CompsPage({staticData,matches,hasProfile,onBack,onEviden
                     <strong>{unitName(unit.id,staticData)}</strong>
                     <small>presente em {Math.round(unit.rate)}%</small>
                     <div className="comp-guide-items">
-                      {unitItems.length?unitItems.map(item=>{
-                        const item=staticEntry(staticData?.items,item.id);
-                        const src=staticData?tftAssetUrl(staticData.version,"item",item):"";
-                        return <span title={itemName(item.id,staticData)+" · "+Math.round(item.rate)+"%"} key={item.id}>
+                      {unitItems.length?unitItems.map(itemStat=>{
+                        const itemEntry=staticEntry(staticData?.items,itemStat.id);
+                        const src=staticData?tftAssetUrl(staticData.version,"item",itemEntry):"";
+                        return <span title={itemName(itemStat.id,staticData)+" · "+Math.round(itemStat.rate)+"%"} key={itemStat.id}>
                           {src&&<img src={src} alt=""/>}
                         </span>;
                       }):<em>sem item recorrente</em>}
