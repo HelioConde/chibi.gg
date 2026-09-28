@@ -20,9 +20,9 @@ from PySide6.QtWidgets import (
 )
 
 from .hotkeys import HotkeyManager
-from .models import OverlaySnapshot
+from .models import OverlaySnapshot, fields_for_overlay
 from .riot.gameflow import DemoGameflowMonitor, GameflowMonitor
-from .riot.models import GameState, GameStateSnapshot
+from .riot.models import FieldSource, GameState, GameStateSnapshot
 from .storage import LocalStore
 from .ui.status_card import GameStatusCard
 from .ui.tray import TrayController
@@ -206,12 +206,18 @@ class OverlayWindow(QMainWindow):
         board_layout.setSpacing(6)
 
         board_title = QHBoxLayout()
-        board_title.addWidget(self._caption("BOARD SNAPSHOT"))
+        self.board_caption = self._caption("BOARD SNAPSHOT")
+        board_title.addWidget(self.board_caption)
         board_title.addStretch(1)
         self.score_label = QLabel("—")
         self.score_label.setObjectName("score")
         board_title.addWidget(self.score_label)
         board_layout.addLayout(board_title)
+
+        self.board_unavailable_label = QLabel("Board ao vivo ainda não disponível")
+        self.board_unavailable_label.setObjectName("muted")
+        self.board_unavailable_label.setVisible(False)
+        board_layout.addWidget(self.board_unavailable_label)
 
         self.board_grid = QGridLayout()
         self.board_grid.setHorizontalSpacing(3)
@@ -452,24 +458,40 @@ class OverlayWindow(QMainWindow):
     def render_snapshot(self) -> None:
         snap = self.snapshot
         riot = self.riot_state
+        fields = fields_for_overlay(
+            riot_state=riot.state, live=riot.live, review=snap
+        )
         self.player_label.setText(riot.riot_id or snap.player or "snapshot local")
         live_context = riot.queue_name.upper()
         if riot.details.get("game_mode") == "TFT" and riot.details.get("player_count"):
             live_context = f"{live_context} · {riot.details['player_count']} JOGADORES"
         self.rank_label.setText(live_context or snap.rank or "Perfil ainda não conectado")
-        self.live_label.setText("LCU LOCAL · SINCRONIZADO" if riot.connected else "LCU LOCAL INDISPONÍVEL")
+        if riot.state is GameState.IN_GAME:
+            self.live_label.setText("RIOT LIVE · STATS INDISPONÍVEIS")
+        elif riot.connected:
+            self.live_label.setText("SNAPSHOT · REVISÃO")
+        else:
+            self.live_label.setText("INDISPONÍVEL")
         self.connection_badge.setText("RIOT CONECTADO" if riot.connected else "RIOT OFFLINE")
         self.status_card.set_snapshot(riot)
         self.focus_title.setText(snap.focus or "Revise uma decisão por vez")
         self.avoid_label.setText(f"Evitar: {snap.avoid}" if snap.avoid else "")
-        self.stat_labels["stage"].setText(snap.stage or "—")
-        self.stat_labels["hp"].setText("—" if snap.hp is None else str(snap.hp))
-        self.stat_labels["gold"].setText("—" if snap.gold is None else str(snap.gold))
-        self.stat_labels["level"].setText("—" if snap.level is None else str(snap.level))
-        self.stat_labels["streak"].setText(snap.streak or "—")
+        self.stat_labels["stage"].setText(self._field_text(fields.stage))
+        self.stat_labels["hp"].setText(self._field_text(fields.hp))
+        self.stat_labels["gold"].setText(self._field_text(fields.gold))
+        self.stat_labels["level"].setText(self._field_text(fields.level))
+        self.stat_labels["streak"].setText(self._field_text(fields.streak))
         self.score_label.setText("—" if snap.score is None else f"{snap.score}/100")
 
-        by_slot = {unit.slot: unit for unit in snap.board}
+        board_is_unavailable = fields.board.source is FieldSource.UNAVAILABLE
+        self.board_caption.setText(
+            "BOARD AO VIVO" if riot.state is GameState.IN_GAME else "BOARD SNAPSHOT"
+        )
+        self.board_unavailable_label.setVisible(board_is_unavailable)
+        self.board_grid.setVisible(not board_is_unavailable)
+        by_slot = {
+            unit.slot: unit for unit in (fields.board.value or []) if hasattr(unit, "slot")
+        }
         for slot, cell in enumerate(self.board_cells):
             unit = by_slot.get(slot)
             cell.setText(unit.label if unit else "")
@@ -482,6 +504,14 @@ class OverlayWindow(QMainWindow):
         for index, label in enumerate(self.review_labels):
             text = questions[index] if index < len(questions) else "—"
             label.setText(f"{index + 1}. {text}")
+
+    @staticmethod
+    def _field_text(field: object) -> str:
+        value = getattr(field, "value", None)
+        source = getattr(field, "source", FieldSource.UNAVAILABLE)
+        if source is FieldSource.UNAVAILABLE or value in (None, ""):
+            return "—"
+        return str(value)
 
     def _apply_mode(self) -> None:
         self.detail_wrap.setVisible(not self.compact)

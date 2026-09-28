@@ -9,10 +9,27 @@ from .models import OverlaySnapshot
 
 
 DEFAULT_SNAPSHOT = {
-    "player": "AlchemyFlames#br1",
-    "rank": "Exemplo local · conecte seu perfil depois",
-    "focus": "Compare o momento capturado com uma partida parecida.",
-    "avoid": "Não use o overlay para perseguir uma decisão automática durante a rodada.",
+    "player": "",
+    "rank": "Perfil Chibi ainda não conectado",
+    "focus": "Revise uma decisão por vez.",
+    "avoid": "",
+    "stage": "—",
+    "hp": None,
+    "gold": None,
+    "level": None,
+    "streak": "—",
+    "status": "SNAPSHOT INDISPONÍVEL",
+    "score": None,
+    "review_questions": [],
+    "board": [],
+    "updated_at": "",
+}
+
+DEMO_SNAPSHOT = {
+    **DEFAULT_SNAPSHOT,
+    "player": "Demo#CHIBI",
+    "rank": "Snapshot de demonstração",
+    "focus": "Compare este momento com uma partida parecida depois da fila.",
     "stage": "3-2",
     "hp": 72,
     "gold": 38,
@@ -20,11 +37,6 @@ DEFAULT_SNAPSHOT = {
     "streak": "W2",
     "status": "REVIEW SNAPSHOT",
     "score": 68,
-    "review_questions": [
-        "O que já estava forte neste board?",
-        "Qual upgrade realmente mudou a estabilidade?",
-        "O que você faria diferente ao rever este momento?",
-    ],
     "board": [
         {"slot": 15, "label": "T", "role": "tank"},
         {"slot": 16, "label": "F", "role": "tank"},
@@ -47,10 +59,11 @@ def app_data_dir() -> Path:
 
 
 class LocalStore:
-    def __init__(self, snapshot_path: str | None = None) -> None:
+    def __init__(self, snapshot_path: str | None = None, *, demo: bool = False) -> None:
         self.settings_path = app_data_dir() / "settings.json"
         self.snapshot_path = Path(snapshot_path).expanduser().resolve() if snapshot_path else app_data_dir() / "snapshot.json"
         self._last_snapshot_mtime: float | None = None
+        self.demo = demo
         self.ensure_snapshot()
 
     def ensure_snapshot(self) -> None:
@@ -58,7 +71,7 @@ class LocalStore:
             return
         self.snapshot_path.parent.mkdir(parents=True, exist_ok=True)
         self.snapshot_path.write_text(
-            json.dumps(DEFAULT_SNAPSHOT, ensure_ascii=False, indent=2),
+            json.dumps(DEMO_SNAPSHOT if self.demo else DEFAULT_SNAPSHOT, ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
 
@@ -103,4 +116,4 @@ class LocalStore:
                 raise ValueError("snapshot root must be an object")
             return OverlaySnapshot.from_dict(raw)
         except (OSError, json.JSONDecodeError, ValueError, TypeError):
-            return OverlaySnapshot.from_dict(DEFAULT_SNAPSHOT)
+            return OverlaySnapshot.from_dict(DEMO_SNAPSHOT if self.demo else DEFAULT_SNAPSHOT)

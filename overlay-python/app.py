@@ -32,7 +32,7 @@ def main() -> int:
     app.setApplicationName("Chibi Companion")
     app.setOrganizationName("chibi.gg")
 
-    store = LocalStore(snapshot_path=args.snapshot)
+    store = LocalStore(snapshot_path=args.snapshot, demo=args.demo)
     window = OverlayWindow(store, demo=args.demo)
     window.show()
 

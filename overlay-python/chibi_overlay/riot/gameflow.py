@@ -133,6 +133,17 @@ class _GameflowWorker(QObject):
             LOGGER.info("[LCU] connected=%s phase %s", snapshot.connected, snapshot.raw_phase or "offline")
         else:
             LOGGER.info("[LCU] %s -> %s", previous.state.value, snapshot.state.value)
+        if snapshot.state is GameState.IN_GAME:
+            live = snapshot.live
+            LOGGER.info(
+                "[LCU] TFT live sources stage=%s hp=%s gold=%s level=%s streak=%s board=%s",
+                live.stage.source.value,
+                live.hp.source.value,
+                live.gold.source.value,
+                live.level.source.value,
+                live.streak.source.value,
+                live.board.source.value,
+            )
         self.snapshot_ready.emit(snapshot)
 
 
