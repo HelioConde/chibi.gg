@@ -21,7 +21,11 @@ from PySide6.QtWidgets import (
 
 from .hotkeys import HotkeyManager
 from .models import OverlaySnapshot
+from .riot.gameflow import DemoGameflowMonitor, GameflowMonitor
+from .riot.models import GameState, GameStateSnapshot
 from .storage import LocalStore
+from .ui.status_card import GameStatusCard
+from .ui.tray import TrayController
 
 
 class HotkeySignals(QObject):
@@ -30,20 +34,25 @@ class HotkeySignals(QObject):
     toggle_clickthrough = Signal()
     opacity_up = Signal()
     opacity_down = Signal()
+    advance_demo = Signal()
 
 
 class OverlayWindow(QMainWindow):
     EXPANDED_SIZE = (540, 610)
     COMPACT_SIZE = (430, 245)
 
-    def __init__(self, store: LocalStore) -> None:
+    def __init__(self, store: LocalStore, *, demo: bool = False) -> None:
         super().__init__()
         self.store = store
+        self.riot_state = GameStateSnapshot(state=GameState.CLIENT_OFFLINE)
+        self.monitor = DemoGameflowMonitor(self) if demo else GameflowMonitor(parent=self)
+        self.demo = demo
+        self._quitting = False
         self.settings = store.load_settings()
         self.snapshot = OverlaySnapshot()
         self.compact = bool(self.settings.get("compact", False))
         self.locked = bool(self.settings.get("locked", False))
-        self.clickthrough = False
+        self.clickthrough = bool(self.settings.get("clickthrough", False))
         self.drag_origin: QPoint | None = None
         self.drag_window_origin: QPoint | None = None
 
@@ -64,6 +73,18 @@ class OverlayWindow(QMainWindow):
         self._setup_hotkeys()
         self._setup_snapshot_watch()
         self.refresh_snapshot(force=True)
+        self.tray = TrayController(
+            show_overlay=self.show_overlay,
+            toggle_visibility=self.toggle_visibility,
+            toggle_compact=self.toggle_compact,
+            toggle_clickthrough=self.toggle_clickthrough,
+            data_dir=self.store.settings_path.parent,
+            quit_app=self.request_exit,
+        )
+        self.monitor.state_changed.connect(self._on_riot_state)
+        self.monitor.start()
+        if self.clickthrough:
+            QTimer.singleShot(0, lambda: self._set_windows_clickthrough(True))
 
     def _build_ui(self) -> None:
         root = QWidget()
@@ -94,9 +115,9 @@ class OverlayWindow(QMainWindow):
         header.addLayout(title_wrap)
         header.addStretch(1)
 
-        self.status_badge = QLabel("REVIEW")
-        self.status_badge.setObjectName("statusBadge")
-        header.addWidget(self.status_badge)
+        self.connection_badge = QLabel("RIOT OFFLINE")
+        self.connection_badge.setObjectName("statusBadge")
+        header.addWidget(self.connection_badge)
 
         self.compact_button = QPushButton("↕")
         self.compact_button.setToolTip("Compactar / expandir (Ctrl+Shift+C)")
@@ -119,7 +140,15 @@ class OverlayWindow(QMainWindow):
         self.rank_label.setObjectName("rankLabel")
         layout.addWidget(self.rank_label)
 
-        stats = QGridLayout()
+        self.live_label = QLabel("Aguardando League Client")
+        self.live_label.setObjectName("liveLabel")
+        layout.addWidget(self.live_label)
+
+        self.status_card = GameStatusCard()
+        layout.addWidget(self.status_card)
+
+        self.stats_wrap = QWidget()
+        stats = QGridLayout(self.stats_wrap)
         stats.setHorizontalSpacing(6)
         stats.setVerticalSpacing(6)
         self.stat_labels: dict[str, QLabel] = {}
@@ -145,7 +174,7 @@ class OverlayWindow(QMainWindow):
             box_layout.addWidget(value)
             stats.addWidget(box, 0, index)
             self.stat_labels[key] = value
-        layout.addLayout(stats)
+        layout.addWidget(self.stats_wrap)
 
         self.focus_card = QFrame()
         self.focus_card.setObjectName("focusCard")
@@ -301,6 +330,11 @@ class OverlayWindow(QMainWindow):
             color: #9ca8ba;
             font-size: 10px;
         }
+        #liveLabel {
+            color: #72819a;
+            font-size: 8px;
+            font-weight: 850;
+        }
         #statusBadge {
             padding: 5px 8px;
             border: 1px solid rgba(78, 171, 126, 110);
@@ -310,6 +344,22 @@ class OverlayWindow(QMainWindow):
             font-size: 8px;
             font-weight: 950;
         }
+        #gameStatusCard {
+            border: 1px solid #303a50;
+            border-radius: 10px;
+            background: #0e1621;
+        }
+        #gameStatusCard[tone="queue"] { border-color: #6f5bd0; background: #15142a; }
+        #gameStatusCard[tone="alert"] { border-color: #d59a3f; background: #2b2113; }
+        #gameStatusCard[tone="success"] { border-color: #4eab7e; background: #10241d; }
+        #gameStatusCard[tone="danger"] { border-color: #bb5e67; background: #29171b; }
+        #gameStatusIcon {
+            min-width: 27px; min-height: 27px; border-radius: 8px;
+            color: #d9d2ff; background: #25203f; font-size: 15px; font-weight: 900;
+        }
+        #gameStatusTitle { color: #f5f7ff; font-size: 11px; font-weight: 950; }
+        #gameStatusDescription { color: #9da9bb; font-size: 9px; }
+        #gameStatusIndicator { color: #7fd0a4; font-size: 11px; }
         #statBox, #panelCard {
             border: 1px solid #263044;
             border-radius: 9px;
@@ -389,6 +439,10 @@ class OverlayWindow(QMainWindow):
         self.snapshot_timer.timeout.connect(self.refresh_snapshot)
         self.snapshot_timer.start(1000)
 
+    def _on_riot_state(self, snapshot: GameStateSnapshot) -> None:
+        self.riot_state = snapshot
+        self.render_snapshot()
+
     def refresh_snapshot(self, force: bool = False) -> None:
         if not force and not self.store.snapshot_changed():
             return
@@ -397,9 +451,15 @@ class OverlayWindow(QMainWindow):
 
     def render_snapshot(self) -> None:
         snap = self.snapshot
-        self.player_label.setText(snap.player or "snapshot local")
-        self.rank_label.setText(snap.rank or "Perfil ainda não conectado")
-        self.status_badge.setText(snap.status or "REVIEW")
+        riot = self.riot_state
+        self.player_label.setText(riot.riot_id or snap.player or "snapshot local")
+        live_context = riot.queue_name.upper()
+        if riot.details.get("game_mode") == "TFT" and riot.details.get("player_count"):
+            live_context = f"{live_context} · {riot.details['player_count']} JOGADORES"
+        self.rank_label.setText(live_context or snap.rank or "Perfil ainda não conectado")
+        self.live_label.setText("LCU LOCAL · SINCRONIZADO" if riot.connected else "LCU LOCAL INDISPONÍVEL")
+        self.connection_badge.setText("RIOT CONECTADO" if riot.connected else "RIOT OFFLINE")
+        self.status_card.set_snapshot(riot)
         self.focus_title.setText(snap.focus or "Revise uma decisão por vez")
         self.avoid_label.setText(f"Evitar: {snap.avoid}" if snap.avoid else "")
         self.stat_labels["stage"].setText(snap.stage or "—")
@@ -425,6 +485,8 @@ class OverlayWindow(QMainWindow):
 
     def _apply_mode(self) -> None:
         self.detail_wrap.setVisible(not self.compact)
+        self.stats_wrap.setVisible(not self.compact)
+        self.focus_card.setVisible(not self.compact)
         width, height = self.COMPACT_SIZE if self.compact else self.EXPANDED_SIZE
         self.resize(width, height)
         self.compact_button.setText("↗" if self.compact else "↕")
@@ -460,14 +522,10 @@ class OverlayWindow(QMainWindow):
 
     def toggle_clickthrough(self) -> None:
         if os.name != "nt":
-            self.status_badge.setText("CLICK-THROUGH: WINDOWS")
             return
         self.clickthrough = not self.clickthrough
         self._set_windows_clickthrough(self.clickthrough)
         self.click_button.setText("●" if self.clickthrough else "◌")
-        self.status_badge.setText(
-            "MOUSE LIVRE" if self.clickthrough else (self.snapshot.status or "REVIEW")
-        )
 
     def _set_windows_clickthrough(self, enabled: bool) -> None:
         if os.name != "nt":
@@ -511,7 +569,10 @@ class OverlayWindow(QMainWindow):
     def _restore_position(self) -> None:
         x = self.settings.get("x")
         y = self.settings.get("y")
-        if isinstance(x, int) and isinstance(y, int):
+        screens = QApplication.screens()
+        if isinstance(x, int) and isinstance(y, int) and any(
+            screen.availableGeometry().contains(x, y) for screen in screens
+        ):
             self.move(x, y)
             return
 
@@ -528,6 +589,10 @@ class OverlayWindow(QMainWindow):
                 "opacity": round(self.windowOpacity(), 2),
                 "compact": self.compact,
                 "locked": self.locked,
+                "clickthrough": self.clickthrough,
+                "monitor": QApplication.screenAt(self.frameGeometry().center()).name()
+                if QApplication.screenAt(self.frameGeometry().center())
+                else "",
             }
         )
 
@@ -538,6 +603,8 @@ class OverlayWindow(QMainWindow):
         self.hotkey_signals.toggle_clickthrough.connect(self.toggle_clickthrough)
         self.hotkey_signals.opacity_up.connect(lambda: self.adjust_opacity(0.05))
         self.hotkey_signals.opacity_down.connect(lambda: self.adjust_opacity(-0.05))
+        if self.demo:
+            self.hotkey_signals.advance_demo.connect(self.monitor.advance_demo)
 
         self.hotkeys = HotkeyManager()
         self.hotkeys.add("ctrl+shift+space", self.hotkey_signals.toggle_visibility.emit)
@@ -545,8 +612,24 @@ class OverlayWindow(QMainWindow):
         self.hotkeys.add("ctrl+shift+l", self.hotkey_signals.toggle_clickthrough.emit)
         self.hotkeys.add("ctrl+shift+up", self.hotkey_signals.opacity_up.emit)
         self.hotkeys.add("ctrl+shift+down", self.hotkey_signals.opacity_down.emit)
+        if self.demo:
+            self.hotkeys.add("ctrl+shift+d", self.hotkey_signals.advance_demo.emit)
+
+    def show_overlay(self) -> None:
+        self.show()
+        self.raise_()
+        self.activateWindow()
+
+    def request_exit(self) -> None:
+        self._quitting = True
+        self.close()
 
     def closeEvent(self, event: QCloseEvent) -> None:
+        if self.tray.tray and not self._quitting:
+            self.hide()
+            event.ignore()
+            return
         self._save_settings()
         self.hotkeys.close()
+        self.monitor.stop()
         super().closeEvent(event)

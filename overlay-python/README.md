@@ -21,6 +21,9 @@ O objetivo desta base é ter uma janela leve, sempre no topo e independente do n
 - papéis visuais de tank / carry / utility;
 - até 3 perguntas de revisão;
 - configuração salva em `%APPDATA%\ChibiOverlay\settings.json`.
+- detecção local, somente leitura, do ciclo Riot: lobby, fila, confirmação, aceite/recusa, seleção e partida;
+- reconexão automática do cliente Riot e status visual compacto;
+- menu na bandeja do sistema quando disponível.
 
 ## Instalação rápida no Windows
 
@@ -36,6 +39,16 @@ Instalação manual:
     .venv\Scripts\activate
     pip install -r requirements.txt
     python app.py
+
+Para depurar transições do cliente:
+
+    python app.py --debug
+
+Para desenvolver sem o Riot Client:
+
+    python app.py --demo
+
+No modo demo, `Ctrl + Shift + D` avança o fluxo simulado.
 
 ## Hotkeys
 
@@ -79,6 +92,8 @@ Esta versão **não**:
 - envia inputs para o jogo;
 - prescreve decisões em tempo real;
 - tenta inferir informações que a Riot API não fornece.
+
+O Companion apenas lê a LCU local: ele nunca aceita partidas, envia requests de aceite ou simula input no cliente Riot. O gameflow ao vivo e o `snapshot.json` de revisão são fontes independentes.
 
 A integração futura deve preferir dados do próprio Chibi e snapshots explicitamente registrados, mantendo o Companion útil para contexto e revisão.
 
