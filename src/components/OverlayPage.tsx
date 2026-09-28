@@ -37,17 +37,17 @@ const SCENARIOS:OverlayScenario[]=[
     streak:"W2",
     boardStatus:"ESTÁVEL PARA O STAGE",
     boardScore:72,
-    nowTitle:"Preserve economia e observe a lobby",
+    nowTitle:"Entenda por que este trecho ficou estável",
     now:[
-      "Não há necessidade clara de rolar agora.",
-      "Complete seu próximo item de frontline se aparecer.",
-      "Scout antes do 3-5 para confirmar se sua linha está livre.",
+      "O board registrado sustentou vida e economia neste ponto.",
+      "Compare este snapshot com um jogo parecido que terminou pior.",
+      "Observe quais upgrades e itens estavam presentes antes da estabilidade.",
     ],
-    problemTitle:"Nenhum problema dominante",
-    problems:["Frontline suficiente","Economia saudável","Carry ainda precisa de 1 upgrade"],
-    nextSpike:"Level 7",
-    nextSpikeDetail:"Janela provável: 4-1 / 4-2",
-    contest:1,
+    problemTitle:"Nenhum vazamento dominante no snapshot",
+    problems:["Frontline suficiente","Economia preservada","Carry ainda tinha espaço de upgrade"],
+    nextSpike:"Pergunta para estudar",
+    nextSpikeDetail:"O que mudou depois deste snapshot?",
+    contest:2,
     missing:["Carry 2★","Trait +1"],
     items:["Tank completo","Carry item 2/3"],
   },
@@ -62,42 +62,42 @@ const SCENARIOS:OverlayScenario[]=[
     streak:"L3",
     boardStatus:"FRACO PARA O STAGE",
     boardScore:39,
-    nowTitle:"Estabilize antes de continuar greedando",
+    nowTitle:"Investigue por que o board não converteu",
     now:[
-      "Prioridade: transforme pares em upgrades.",
-      "Se a próxima luta também for derrota grande, gaste parte do ouro.",
-      "Não faça transição completa sem melhorar a frontline primeiro.",
+      "O snapshot terminou com pares ainda sem upgrade.",
+      "A frontline aparece atrasada em relação ao carry equipado.",
+      "Compare com seus Top 4 de nível semelhante antes de tirar uma conclusão.",
     ],
-    problemTitle:"Frontline abaixo do necessário",
-    problems:["2 pares sem upgrade","HP caindo rápido","Carry equipado, frontline atrasada"],
-    nextSpike:"Estabilização",
-    nextSpikeDetail:"Gastar 10–20g se necessário",
-    contest:1,
+    problemTitle:"Frontline abaixo do restante do board",
+    problems:["2 pares sem upgrade","HP já estava pressionado","Carry equipado, frontline atrasada"],
+    nextSpike:"Pergunta para estudar",
+    nextSpikeDetail:"Qual mudança teria aumentado a estabilidade?",
+    contest:2,
     missing:["Tank 2★","Frontline +1"],
     items:["Tank incompleto","Carry 3/3"],
   },
   {
     id:"contested",
-    label:"Contestado",
+    label:"Transição",
     tone:"warning",
     stage:"4-1",
     hp:54,
     gold:31,
     level:7,
     streak:"L1",
-    boardStatus:"LINHA MUITO CONTESTADA",
+    boardStatus:"TRANSIÇÃO INCOMPLETA",
     boardScore:58,
-    nowTitle:"Pare antes de comprometer todo o ouro",
+    nowTitle:"Revise onde a transição perdeu força",
     now:[
-      "Há 2 jogadores usando várias peças da sua linha.",
-      "Compare sua reserva com a rota alternativa antes de rolar fundo.",
-      "Mantenha duas saídas possíveis para o mesmo conjunto de itens.",
+      "O board registrado mistura duas identidades sem fechar nenhuma delas.",
+      "Itens e unidades finais sugerem uma transição ainda em andamento.",
+      "Compare com suas partidas em que a troca de linha terminou em Top 4.",
     ],
-    problemTitle:"Peças centrais divididas na lobby",
-    problems:["2 rivais na mesma linha","Carry principal disputado","Frontline compartilhada"],
-    nextSpike:"Decisão de pivot",
-    nextSpikeDetail:"Antes do próximo rolldown",
-    contest:2,
+    problemTitle:"Board final sem identidade consolidada",
+    problems:["Sinergias divididas","Carry ainda sem estrutura completa","Frontline sem fechamento claro"],
+    nextSpike:"Pergunta para estudar",
+    nextSpikeDetail:"Qual peça marcou o ponto de não retorno?",
+    contest:1,
     missing:["Alternativa de carry","Trait flex"],
     items:["Itens flexíveis","1 item preso"],
   },
@@ -112,17 +112,17 @@ const SCENARIOS:OverlayScenario[]=[
     streak:"W3",
     boardStatus:"PICO DE FORÇA ATIVO",
     boardScore:86,
-    nowTitle:"Consolide o board — não desmonte o que já funciona",
+    nowTitle:"Use este board como referência pessoal",
     now:[
-      "Seu board está acima da pressão atual da lobby.",
-      "Priorize upgrades de alta qualidade em vez de trocar toda a estrutura.",
-      "Use o próximo scout para ajustar posicionamento e proteger o carry.",
+      "O snapshot mostra um board final claramente mais completo.",
+      "Os upgrades estão concentrados nas peças que sustentam a composição.",
+      "Compare esta estrutura com seus jogos parecidos que não chegaram ao Top 4.",
     ],
-    problemTitle:"Risco principal: over-roll",
-    problems:["Board já estabilizado","Economia baixa após spike","Próximo ganho vem de upgrades específicos"],
-    nextSpike:"Cap de board",
-    nextSpikeDetail:"Upgrades + posicionamento",
-    contest:0,
+    problemTitle:"Pouco espaço para concluir causalidade",
+    problems:["Board já estabilizado","Economia baixa após o pico","Resultado pode depender de contexto não capturado"],
+    nextSpike:"Pergunta para estudar",
+    nextSpikeDetail:"Quais partes deste board se repetem nas suas melhores partidas?",
+    contest:2,
     missing:["Legendária utilitária","1 upgrade 2★"],
     items:["Core completo","Utility aberta"],
   },
@@ -152,15 +152,15 @@ export default function OverlayPage({
       <img className="overlay-page-art" src={SITE_IMAGES.art} alt="" aria-hidden="true"/>
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>← Voltar ao perfil</button>}
-        <span className="eyebrow">GRANDE MUDANÇA 1 · CHIBI OVERLAY</span>
-        <h1>Decisão em tempo real.<br/><em>Sem jogar por você.</em></h1>
-        <p>O overlay do Chibi será uma camada de decisão: entender o estado da partida, destacar o problema principal e mostrar caminhos possíveis sem remover a escolha do jogador.</p>
+        <span className="eyebrow">CHIBI COMPANION · REVIEW FIRST</span>
+        <h1>Capture o momento.<br/><em>Entenda depois.</em></h1>
+        <p>O companion registra snapshots úteis durante sua sessão e transforma esses momentos em revisão pós-jogo. Nada de prescrever jogadas em tempo real: o valor está em aprender com o que aconteceu.</p>
       </div>
 
       <div className="overlay-beta-card">
         <span>FASE ATUAL</span>
-        <strong>Overlay v1</strong>
-        <small>web + companion desktop</small>
+        <strong>Review Companion v1</strong>
+        <small>captura + análise pós-jogo</small>
         <b>GM1.2 EM ANDAMENTO</b>
       </div>
     </section>
@@ -168,7 +168,7 @@ export default function OverlayPage({
     <section className="overlay-demo-shell">
       <div className="overlay-demo-toolbar">
         <div>
-          <span>SIMULAR ESTADO</span>
+          <span>REVER SNAPSHOT</span>
           {SCENARIOS.map(item=>(
             <button
               key={item.id}
@@ -188,13 +188,13 @@ export default function OverlayPage({
           <div className="overlay-live-brand">
             <span className="overlay-brand-image"><img src={SITE_IMAGES.icon} alt=""/></span>
             <div>
-              <strong>Chibi Overlay</strong>
-              <small>{hasProfile&&playerName?playerName:"demo local"} · leitura assistiva</small>
+              <strong>Chibi Review HUD</strong>
+              <small>{hasProfile&&playerName?playerName:"demo local"} · revisão pós-jogo</small>
             </div>
           </div>
           <div className="overlay-live-status">
             <i/>
-            <span>SIMULAÇÃO</span>
+            <span>REVIEW DEMO</span>
           </div>
         </header>
 
@@ -210,14 +210,14 @@ export default function OverlayPage({
           <section className="overlay-primary">
             <div className="overlay-board-status">
               <div>
-                <span>ESTADO DO BOARD</span>
+                <span>LEITURA DO SNAPSHOT</span>
                 <strong>{scenario.boardStatus}</strong>
               </div>
               <b>{scenario.boardScore}/100</b>
             </div>
 
             <article className="overlay-now-card">
-              <span>FAÇA AGORA</span>
+              <span>O QUE REVISAR</span>
               <h2>{scenario.nowTitle}</h2>
               <ol>
                 {scenario.now.map((item,index)=>(
@@ -248,35 +248,35 @@ export default function OverlayPage({
 
           <aside className="overlay-signals">
             <article className="overlay-problem">
-              <span>O QUE ESTÁ DANDO ERRADO</span>
+              <span>PADRÃO A INVESTIGAR</span>
               <h3>{scenario.problemTitle}</h3>
               <ul>{scenario.problems.map(item=><li key={item}>{item}</li>)}</ul>
             </article>
 
             <article className="overlay-spike">
-              <span>PRÓXIMO SPIKE</span>
+              <span>O QUE ESTUDAR</span>
               <h3>{scenario.nextSpike}</h3>
               <p>{scenario.nextSpikeDetail}</p>
             </article>
 
             <article className="overlay-contest">
-              <span>CONTESTAÇÃO</span>
-              <strong>{scenario.contest}</strong>
-              <small>{scenario.contest===0?"nenhum rival direto":scenario.contest===1?"rival direto":"rivais diretos"}</small>
+              <span>CONFIANÇA DO SINAL</span>
+              <strong>{scenario.contest>=2?"Alta":scenario.contest===1?"Média":"Baixa"}</strong>
+              <small>baseada apenas no snapshot demonstrado</small>
             </article>
           </aside>
         </div>
       </div>
 
-      <p className="overlay-demo-note">Esta tela é uma simulação de UX. O companion real só poderá mostrar sinais suportados por dados permitidos/coletados localmente e sempre manterá múltiplas escolhas em vez de automatizar decisões.</p>
+      <p className="overlay-demo-note">Esta tela é uma simulação de revisão pós-jogo. O companion não deve usar o estado atual da partida para prescrever ações, rastrear adversários ou substituir decisões do jogador; snapshots servem para reflexão depois da partida.</p>
     </section>
 
     <section className="panel overlay-companion-status">
       <div className="overlay-companion-title">
         <div>
           <span>CHIBI COMPANION · GM1.2</span>
-          <h2>A janela real do overlay já está sendo preparada</h2>
-          <p>A primeira versão roda separada do site e ainda usa dados simulados. Isso permite validar tamanho, posição e interação sobre o jogo antes de conectar qualquer leitura do TFT.</p>
+          <h2>O companion está sendo redesenhado para revisão segura</h2>
+          <p>A primeira versão roda separada do site e usa snapshots locais de demonstração. O objetivo é facilitar marcação e revisão pós-jogo sem transformar o companion em um assistente de decisões ao vivo.</p>
         </div>
         <b>DESKTOP FOUNDATION</b>
       </div>
@@ -308,23 +308,23 @@ export default function OverlayPage({
     <section className="overlay-principles">
       <article>
         <span>01</span>
-        <h3>Estado atual</h3>
-        <p>Stage, HP, ouro, nível, streak e força relativa em um bloco pequeno.</p>
+        <h3>Snapshot da sessão</h3>
+        <p>Stage, HP, ouro, nível e board podem ser registrados como contexto para uma revisão posterior.</p>
       </article>
       <article>
         <span>02</span>
-        <h3>Faça agora</h3>
-        <p>No máximo três decisões prioritárias. Nada de vinte indicadores disputando atenção.</p>
+        <h3>Revisão guiada</h3>
+        <p>O Chibi destaca até três perguntas de revisão depois da partida, sempre ligadas às evidências registradas.</p>
       </article>
       <article>
         <span>03</span>
-        <h3>Problema principal</h3>
-        <p>O overlay destaca o que merece revisão sem afirmar causalidade que os dados não sustentam.</p>
+        <h3>Padrão principal</h3>
+        <p>O review destaca o que merece investigação sem afirmar causalidade que os dados não sustentam.</p>
       </article>
       <article>
         <span>04</span>
-        <h3>Próximo spike</h3>
-        <p>Mostra a próxima janela de força ou decisão para o jogador saber o que está esperando.</p>
+        <h3>Aprendizado para a próxima</h3>
+        <p>O resultado da análise vira uma pergunta ou experimento para a próxima sessão, não uma ordem durante o jogo.</p>
       </article>
     </section>
 
@@ -332,7 +332,7 @@ export default function OverlayPage({
       <div className="overlay-roadmap-head">
         <div>
           <span>CHIBI COMPANION</span>
-          <h2>Da demo web para o overlay real</h2>
+          <h2>Da demo web para o companion de revisão</h2>
         </div>
         <small>Grande mudança 1</small>
       </div>
@@ -350,12 +350,12 @@ export default function OverlayPage({
         </article>
         <article>
           <b>3</b>
-          <div><strong>Leitura permitida</strong><span>Stage, HUD e snapshots locais com validação</span></div>
+          <div><strong>Captura permitida</strong><span>Snapshots locais para revisão posterior, sem recomendação dinâmica</span></div>
           <em>PLANEJADO</em>
         </article>
         <article>
           <b>4</b>
-          <div><strong>Personalização Chibi</strong><span>Seu histórico influencia quais sinais recebem prioridade</span></div>
+          <div><strong>Personalização pós-jogo</strong><span>Seu histórico ajuda a priorizar quais momentos revisar depois da sessão</span></div>
           <em>PLANEJADO</em>
         </article>
       </div>
