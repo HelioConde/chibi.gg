@@ -648,7 +648,7 @@ export default function TeamBuilderPage({
     targetLevel,
   ]);
 
-  const boardValue=units.reduce
+  const boardValue=units.reduce(
     (sum,unit)=>sum+costFor(unit.id,staticData)*copiesFor(unit.tier||1),
     0
   );
@@ -1218,7 +1218,7 @@ export default function TeamBuilderPage({
                 const targetEntry=staticEntry(staticData?.champions,target.id);
                 const targetSrc=staticData?tftAssetUrl(staticData.version,"champion",targetEntry):"";
                 const holderEntry=hint?staticEntry(staticData?.champions,hint.holder.id):undefined;
-                const holderSrc=hint&&staticData?tftAssetUrl(staticData.version,"champion",holderEntry);
+                const holderSrc=hint&&staticData?tftAssetUrl(staticData.version,"champion",holderEntry):"";
                 const itemNames=(target.items||[]).map(id=>staticEntry(staticData?.items,id)?.name||clean(id));
                 return <div className="builder-holder-row" key={target.id}>
                   <span className="target">{targetSrc&&<img src={targetSrc} alt=""/>}</span>
