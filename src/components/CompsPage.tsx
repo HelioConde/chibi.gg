@@ -194,9 +194,16 @@ export default function CompsPage({staticData,matches,hasProfile,onBack,onEviden
     {!loading&&!error&&data&&<>
       {hero&&<section className="panel comp-answer-card">
         <div className="comp-answer-copy">
-          <span>{hasProfile?"COMECE OLHANDO ESTA":"MAIS OBSERVADA"}</span>
+          <span>{hasProfile
+            ? data.sampleParticipants<250
+              ? "SINAL INICIAL PARA VOCÊ"
+              : "MAIS COMPATÍVEL COM VOCÊ"
+            : "MAIS OBSERVADA"}</span>
           <h2>{compName(hero,staticData)}</h2>
           <p>{coreReason(hero)}</p>
+          {data.sampleParticipants<250&&<div className="comp-sample-warning">
+            Base pequena: use esta comp como direção de revisão, não como ordem para forçar.
+          </div>}
 
           <div className="comp-answer-actions">
             {hasProfile&&hero.fit.matchIds.length>0&&<button onClick={()=>onEvidence(hero.fit.matchIds,"Comp compatível · "+compName(hero,staticData))}>Ver seu histórico parecido</button>}
