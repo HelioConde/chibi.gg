@@ -787,6 +787,19 @@ function App() {
     await loadPlayer(player.gameName,player.tagLine,player.platform,true,"matches");
   }
 
+  async function refreshSessionPlayer(){
+    const parsed=splitRiotId(riotId);
+    if(!parsed)return;
+    await loadPlayer(
+      parsed.gameName,
+      parsed.tagLine,
+      platform,
+      true,
+      "overview",
+      selectedQueue,
+    );
+  }
+
   async function openRecentSession(player:RecentPlayer){
     setRiotId(player.gameName+"#"+player.tagLine);
     setPlatform(player.platform);
@@ -1277,7 +1290,7 @@ function App() {
               playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
               matches={analysisMatches}
               refreshing={loading}
-              onRefresh={searchPlayer}
+              onRefresh={refreshSessionPlayer}
               onEvidence={showEvidence}
             />
 
