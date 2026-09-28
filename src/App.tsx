@@ -352,6 +352,7 @@ function App() {
                     ?"overlay"
                     :"main"
       );
+      requestAnimationFrame(()=>window.scrollTo({top:0,left:0,behavior:"auto"}));
     };
 
     window.addEventListener("popstate",onPopState);
@@ -670,6 +671,7 @@ function App() {
       const data=await fetchTftProfile(gameName,tagLine,region);
       setProfile(data);
       setMatches(data.matches || []);
+      scrollPageTop();
       setHasMore((data.matches?.length || 0) >= 12);
 
       const recentRank=data.ranked?.find((row)=>String(row.queueType).toUpperCase()==="RANKED_TFT")
@@ -796,6 +798,12 @@ function App() {
     }
   }
 
+  function scrollPageTop(){
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      window.scrollTo({top:0,left:0,behavior:"auto"});
+    }));
+  }
+
   function completeGuidedReview(){
     if(!profile||!openedMatch) return;
 
@@ -825,6 +833,7 @@ function App() {
     if(window.location.hash!=="#meta"){
       window.history.pushState({},"",window.location.pathname+window.location.search+"#meta");
     }
+    scrollPageTop();
   }
 
   function openComps(){
@@ -832,6 +841,7 @@ function App() {
     if(window.location.hash!=="#comps"){
       window.history.pushState({},"",window.location.pathname+window.location.search+"#comps");
     }
+    scrollPageTop();
   }
 
   function openStats(
@@ -844,6 +854,7 @@ function App() {
     if(window.location.hash!=="#stats"){
       window.history.pushState({},"",window.location.pathname+window.location.search+"#stats");
     }
+    scrollPageTop();
   }
 
   function openExplorePage(page:"meta"|"comps"|"stats"|"builder"|"overlay"){
@@ -872,6 +883,7 @@ function App() {
     if(window.location.hash!=="#builder"){
       window.history.pushState({},"",window.location.pathname+window.location.search+"#builder");
     }
+    scrollPageTop();
   }
 
   function openLeaderboard(){
@@ -879,6 +891,7 @@ function App() {
     if(window.location.hash!=="#leaderboard"){
       window.history.pushState({},"",window.location.pathname+window.location.search+"#leaderboard");
     }
+    scrollPageTop();
   }
 
   function openOverlay(){
@@ -886,6 +899,7 @@ function App() {
     if(window.location.hash!=="#overlay"){
       window.history.pushState({},"",window.location.pathname+window.location.search+"#overlay");
     }
+    scrollPageTop();
   }
 
   function closeExplorePage(){
@@ -893,6 +907,7 @@ function App() {
     if(window.location.hash){
       window.history.replaceState({},"",window.location.pathname+window.location.search);
     }
+    scrollPageTop();
   }
 
   function showCompEvidence(ids:string[],label:string){
@@ -915,6 +930,7 @@ function App() {
     url.search="";
     url.hash="";
     window.history.replaceState({},"",url.toString());
+    scrollPageTop();
   }
 
   return (
@@ -983,6 +999,7 @@ function App() {
         />
       ) : sitePage==="leaderboard" ? (
         <LeaderboardPage
+          staticData={staticData}
           onOpenPlayer={(player,region)=>{
             if(!player.gameName||!player.tagLine)return;
             setRiotId(player.gameName+"#"+player.tagLine);
