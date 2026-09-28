@@ -70,6 +70,35 @@ function rankLabel(snapshot:RankSnapshot){
   return snapshot.tier+" "+snapshot.rank+" · "+snapshot.leaguePoints+" LP";
 }
 
+function primaryTrait(match:TftMatch){
+  return match.traits
+    .filter(trait=>trait.numUnits>0&&(trait.style>0||trait.numUnits>=2))
+    .sort((a,b)=>b.style-a.style||b.numUnits-a.numUnits)[0]?.name||"";
+}
+
+function blockMetrics(games:TftMatch[]){
+  if(!games.length)return {
+    games:0,
+    average:null as number|null,
+    top4Rate:0,
+    bottom2Rate:0,
+    lines:0,
+    matchIds:[] as string[],
+  };
+
+  const average=games.reduce((sum,match)=>sum+match.placement,0)/games.length;
+  const lines=new Set(games.map(primaryTrait).filter(Boolean));
+
+  return {
+    games:games.length,
+    average:+average.toFixed(2),
+    top4Rate:Math.round(games.filter(match=>match.placement<=4).length/games.length*100),
+    bottom2Rate:Math.round(games.filter(match=>match.placement>=7).length/games.length*100),
+    lines:lines.size,
+    matchIds:games.map(match=>match.id),
+  };
+}
+
 function normalizedLp(snapshot:RankSnapshot){
   const tierBase:Record<string,number>={
     IRON:0,BRONZE:400,SILVER:800,GOLD:1200,PLATINUM:1600,
@@ -105,6 +134,24 @@ export default function PlayerEvolution({playerKey,matches,staticData,onEvidence
 
   const recentPlacements=matches.slice(0,10).map(match=>match.placement);
 
+  const blockComparison=useMemo(()=>{
+    const latest=blockMetrics(matches.slice(0,5));
+    const previous=blockMetrics(matches.slice(5,10));
+
+    const averageDelta=latest.average!=null&&previous.average!=null
+      ? +(latest.average-previous.average).toFixed(2)
+      : null;
+
+    return {
+      latest,
+      previous,
+      averageDelta,
+      top4Delta:latest.top4Rate-previous.top4Rate,
+      bottom2Delta:latest.bottom2Rate-previous.bottom2Rate,
+      linesDelta:latest.lines-previous.lines,
+    };
+  },[matches]);
+
   const modes=useMemo(()=>{
     const map=new Map<number,TftMatch[]>();
     for(const match of matches){
@@ -126,6 +173,53 @@ export default function PlayerEvolution({playerKey,matches,staticData,onEvidence
   },[matches]);
 
   return <section className="profile-depth-grid">
+    {blockComparison.previous.games>=3&&<article className="panel player-depth-card evolution-block-card">
+      <div className="depth-card-head">
+        <div>
+          <span>MUDANÇA RECENTE</span>
+          <h3>Últimas 5 × 5 anteriores</h3>
+        </div>
+        <button onClick={()=>onEvidence(
+          [...blockComparison.latest.matchIds,...blockComparison.previous.matchIds],
+          "Evolução · últimas 5 vs 5 anteriores",
+        )}>Ver 10 partidas</button>
+      </div>
+
+      <div className="evolution-block-grid">
+        <article className={blockComparison.averageDelta==null?"":blockComparison.averageDelta<0?"better":blockComparison.averageDelta>0?"worse":""}>
+          <span>COLOCAÇÃO MÉDIA</span>
+          <div><b>{blockComparison.previous.average??"—"}</b><em>→</em><strong>{blockComparison.latest.average??"—"}</strong></div>
+          <small>{blockComparison.averageDelta==null
+            ?"sem comparação"
+            :blockComparison.averageDelta<0
+              ? Math.abs(blockComparison.averageDelta).toFixed(2)+" melhor"
+              :blockComparison.averageDelta>0
+                ? blockComparison.averageDelta.toFixed(2)+" pior"
+                : "estável"}</small>
+        </article>
+
+        <article className={blockComparison.top4Delta>0?"better":blockComparison.top4Delta<0?"worse":""}>
+          <span>TOP 4</span>
+          <div><b>{blockComparison.previous.top4Rate}%</b><em>→</em><strong>{blockComparison.latest.top4Rate}%</strong></div>
+          <small>{(blockComparison.top4Delta>0?"+":"")+blockComparison.top4Delta} pp</small>
+        </article>
+
+        <article className={blockComparison.bottom2Delta<0?"better":blockComparison.bottom2Delta>0?"worse":""}>
+          <span>BOTTOM 2</span>
+          <div><b>{blockComparison.previous.bottom2Rate}%</b><em>→</em><strong>{blockComparison.latest.bottom2Rate}%</strong></div>
+          <small>{(blockComparison.bottom2Delta>0?"+":"")+blockComparison.bottom2Delta} pp</small>
+        </article>
+
+        <article className={blockComparison.linesDelta>0?"better":blockComparison.linesDelta<0?"worse":""}>
+          <span>LINHAS PRINCIPAIS</span>
+          <div><b>{blockComparison.previous.lines}</b><em>→</em><strong>{blockComparison.latest.lines}</strong></div>
+          <small>{blockComparison.linesDelta===0?"estável":(blockComparison.linesDelta>0?"+":"")+blockComparison.linesDelta+" linha(s)"}</small>
+        </article>
+      </div>
+
+      <p className="evolution-block-note">Blocos de 5 jogos são voláteis. Esta comparação serve para detectar direção recente e escolher partidas para revisar, não para provar melhora permanente.</p>
+    </article>}
+
     <article className="panel player-depth-card rank-history-card">
       <div className="depth-card-head">
         <div>
