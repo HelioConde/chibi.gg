@@ -1312,6 +1312,7 @@ function App() {
                   matches={analysisMatches}
                   staticData={staticData}
                   onEvidence={showEvidence}
+                  onOpenBuilder={openBuilder}
                 />
               </div>
             </details>
