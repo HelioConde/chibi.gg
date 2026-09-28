@@ -28,6 +28,7 @@ Principais áreas já implementadas:
 - Leaderboard;
 - Team Builder;
 - Overlay;
+- Overlay desktop em Python em [`overlay-python/`](overlay-python/);
 - Study / compartilhamento;
 - observações anônimas no Supabase;
 - GitHub Pages com deploy automático.
@@ -59,6 +60,7 @@ Dados avançados não devem competir com a resposta principal.
 - Riot TFT API
 - GitHub Actions
 - GitHub Pages
+- Python + PySide6 para o Companion desktop
 
 ## Desenvolvimento local
 
