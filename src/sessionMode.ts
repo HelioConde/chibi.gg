@@ -35,6 +35,10 @@ export type ChibiSessionRecord={
 const ACTIVE_KEY="chibi.gg:session-mode:active:v1";
 const HISTORY_KEY="chibi.gg:session-mode:history:v1";
 
+function notifySessionChange(){
+  window.dispatchEvent(new CustomEvent("chibi:session-change"));
+}
+
 function readActiveAll():Record<string,ChibiSession>{
   try{
     const raw=localStorage.getItem(ACTIVE_KEY);
@@ -94,6 +98,7 @@ export function startChibiSession(playerKey:string,matches:TftMatch[]){
   const all=readActiveAll();
   all[playerKey]=session;
   writeActiveAll(all);
+  notifySessionChange();
   return session;
 }
 
@@ -170,6 +175,7 @@ export function finishChibiSession(playerKey:string,matches:TftMatch[]){
 
   delete all[playerKey];
   writeActiveAll(all);
+  notifySessionChange();
   return record;
 }
 
@@ -177,6 +183,7 @@ export function cancelChibiSession(playerKey:string){
   const all=readActiveAll();
   delete all[playerKey];
   writeActiveAll(all);
+  notifySessionChange();
 }
 
 export function getSessionHistory(playerKey:string){
