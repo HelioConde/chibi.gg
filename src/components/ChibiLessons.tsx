@@ -85,7 +85,10 @@ export default function ChibiLessons({playerKey,onEvidence}:Props){
           </div>
 
           <div className="lesson-actions">
-            <button onClick={()=>onEvidence([lesson.matchId],"Chibi Lesson · partida de origem")}>Partida</button>
+            <button onClick={()=>onEvidence(
+              lesson.matchIds?.length?lesson.matchIds:[lesson.matchId],
+              lesson.matchIds&&lesson.matchIds.length>1?"Chibi Lesson · experimento":"Chibi Lesson · partida de origem",
+            )}>{lesson.matchIds&&lesson.matchIds.length>1?"Partidas":"Partida"}</button>
             <button className="primary" onClick={()=>review(lesson)}>Ainda faz sentido</button>
             <button className="ghost" onClick={()=>archive(lesson)}>Já aprendi</button>
           </div>
