@@ -30,6 +30,7 @@ import ChibiActionCenter from "./components/ChibiActionCenter";
 import StyleShift from "./components/StyleShift";
 import GlobalMetaPage from "./components/GlobalMetaPage";
 import CompsPage from "./components/CompsPage";
+import AskChibi from "./components/AskChibi";
 
 function cleanName(value:string){
   return value
@@ -841,6 +842,11 @@ function App() {
               </details>
             </aside>
           </div>}
+          <AskChibi
+            playerName={profile.player.gameName}
+            matches={analysisMatches}
+            onEvidence={showEvidence}
+          />
         </main>
       )}
 
