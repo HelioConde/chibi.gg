@@ -1,5 +1,10 @@
 node_modules
 dist
+overlay-python/build/
+overlay-python/dist/
+overlay-python/__pycache__/
+overlay-python/chibi_overlay/__pycache__/
+overlay-python/**/__pycache__/
 .env
 .env.local
 .DS_Store
