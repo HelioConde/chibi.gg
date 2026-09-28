@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { TftMatch, TftUnit } from "../api/tft";
+import { fetchTftComps, TftGlobalComps, TftMatch, TftUnit } from "../api/tft";
 import { buildChibiDNA } from "../analysis/chibiInsights";
 import { buildLeakMap } from "../analysis/chibiProduct";
 import { staticEntry, tftAssetUrl, TftStaticData } from "../tftStatic";
@@ -321,6 +321,8 @@ function Champion({id,staticData}:{id:string;staticData:TftStaticData|null}){
 }
 
 export default function ChibiLearningLab({matches,staticData,onEvidence}:Props){
+  const [globalComps,setGlobalComps]=useState<TftGlobalComps|null>(null);
+  const [globalLoading,setGlobalLoading]=useState(false);
   const losses=useMemo(
     ()=>matches.filter(match=>match.placement>=5).slice(0,5),
     [matches],
@@ -348,6 +350,69 @@ export default function ChibiLearningLab({matches,staticData,onEvidence}:Props){
     {label:"Sinal",value:strongestSignal+"%",good:strongestSignal>=50},
   ];
   const packages=useMemo(()=>buildPackages(matches),[matches]);
+  const setNumber=useMemo(
+    ()=>Number(matches.find(match=>Number(match.setNumber)>0)?.setNumber)||null,
+    [matches],
+  );
+  const queueId=useMemo(()=>{
+    const ids=[...new Set(matches.map(match=>Number(match.queueId)||0).filter(Boolean))];
+    return ids.length===1?ids[0]:null;
+  },[matches]);
+
+  useEffect(()=>{
+    let cancelled=false;
+    if(!setNumber){
+      setGlobalComps(null);
+      return;
+    }
+    setGlobalLoading(true);
+    fetchTftComps(setNumber,queueId,3,24)
+      .then(data=>{if(!cancelled)setGlobalComps(data);})
+      .catch(()=>{if(!cancelled)setGlobalComps(null);})
+      .finally(()=>{if(!cancelled)setGlobalLoading(false);});
+    return ()=>{cancelled=true;};
+  },[setNumber,queueId]);
+
+  const packageGlobalMatches=useMemo(()=>{
+    const result=new Map<string,{
+      comp:TftGlobalComps["comps"][number];
+      overlap:number;
+      coverage:number;
+    }>();
+    if(!globalComps)return result;
+
+    for(const pack of packages){
+      let best:null|{
+        comp:TftGlobalComps["comps"][number];
+        overlap:number;
+        coverage:number;
+        score:number;
+      }=null;
+
+      for(const comp of globalComps.comps){
+        const globalUnits=new Set(
+          comp.units
+            .filter(unit=>unit.rate>=.3)
+            .map(unit=>unit.id)
+        );
+        const overlap=pack.units.filter(unitId=>globalUnits.has(unitId)).length;
+        const coverage=overlap/Math.max(1,pack.units.length);
+        const score=coverage*100+Math.min(25,comp.games/4);
+        if(overlap<2)continue;
+        if(!best||score>best.score)best={comp,overlap,coverage,score};
+      }
+
+      if(best&&best.coverage>=.66){
+        result.set(pack.id,{
+          comp:best.comp,
+          overlap:best.overlap,
+          coverage:best.coverage,
+        });
+      }
+    }
+    return result;
+  },[packages,globalComps]);
+
   const focus=useMemo(()=>focusPlan(matches),[matches]);
 
   return <section className="learning-lab">
@@ -471,6 +536,21 @@ export default function ChibiLearningLab({matches,staticData,onEvidence}:Props){
                 <span><small>Flex</small><b>{pack.flexScore}</b></span>
               </div>
 
+              {(()=>{
+                const global=packageGlobalMatches.get(pack.id);
+                return <div className={"flex-global-signal "+(global?"matched":"")}>
+                  <small>BOARD GLOBAL MAIS PARECIDO</small>
+                  {global?(
+                    <>
+                      <strong>{Math.round(global.coverage*100)}% do core encontrado</strong>
+                      <span>{global.comp.games} jogos · média {global.comp.averagePlacement} · Top 4 {global.comp.top4Rate}% · confiança {global.comp.confidence}</span>
+                    </>
+                  ):(
+                    <span>{globalLoading?"Comparando com o Chibi Dataset...":"Sem paralelo global confiável nesta amostra."}</span>
+                  )}
+                </div>;
+              })()}
+
               <div className="flex-connectors">
                 <small>CONECTORES MAIS USADOS</small>
                 {pack.connectors.length?(
@@ -500,7 +580,7 @@ export default function ChibiLearningLab({matches,staticData,onEvidence}:Props){
 
       <footer className="flex-package-method">
         <b>Como funciona nesta versão</b>
-        <span>O Chibi encontra campeões que reaparecem juntos, mede frequência, resultado e quantas variações existiram ao redor do núcleo. A confiança indica recorrência na sua própria amostra — não força global nem probabilidade de vitória. Futuramente isso pode ser cruzado com o dataset global.</span>
+        <span>O Chibi encontra campeões que reaparecem juntos, mede frequência, resultado e quantas variações existiram ao redor do núcleo. A confiança do package indica recorrência na sua própria amostra — não força global nem probabilidade de vitória. Quando existe um board global suficientemente parecido, ele aparece separadamente como contexto do Chibi Dataset.</span>
       </footer>
     </article>
   </section>;
