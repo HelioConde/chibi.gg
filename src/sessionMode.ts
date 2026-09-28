@@ -1,6 +1,7 @@
 import { TftMatch } from "./api/tft";
 import { buildActionPlan } from "./analysis/actionPlan";
 import { goalProgress, GoalType, suggestGoal } from "./goals";
+import { buildJournalBehaviorSignal } from "./journal";
 
 export type ChibiSession={
   id:string;
@@ -12,6 +13,9 @@ export type ChibiSession={
   focusSteps:string[];
   avoid:string;
   successMetric:string;
+  journalPrompt?:string;
+  journalSignal?:string;
+  journalEvidence?:string;
   createdAt:number;
   baselineIds:string[];
   targetGames:number;
@@ -79,6 +83,7 @@ export function getActiveSession(playerKey:string){
 export function startChibiSession(playerKey:string,matches:TftMatch[]){
   const goal=suggestGoal(playerKey,matches);
   const plan=buildActionPlan(matches);
+  const journalSignal=buildJournalBehaviorSignal(matches);
 
   const session:ChibiSession={
     id:playerKey+":"+Date.now(),
@@ -90,6 +95,9 @@ export function startChibiSession(playerKey:string,matches:TftMatch[]){
     focusSteps:plan.action.steps.slice(0,3),
     avoid:plan.action.avoid,
     successMetric:plan.success.metric,
+    journalPrompt:journalSignal?.question,
+    journalSignal:journalSignal?.label,
+    journalEvidence:journalSignal?.evidence,
     createdAt:Date.now(),
     baselineIds:matches.map(match=>match.id),
     targetGames:3,
