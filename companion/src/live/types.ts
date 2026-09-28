@@ -34,7 +34,7 @@ export type OverlayDecision={
 };
 
 export type OverlayFrame={
-  id:string;
+  id:OverlayStateId;
   label:string;
   snapshot:LiveSnapshot;
   decision:OverlayDecision;
