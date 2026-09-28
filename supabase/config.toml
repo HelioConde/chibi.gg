@@ -13,3 +13,6 @@ verify_jwt = false
 
 [functions.public-tft-meta]
 verify_jwt = false
+
+[functions.public-tft-comps]
+verify_jwt = false
