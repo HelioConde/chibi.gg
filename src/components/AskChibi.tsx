@@ -17,6 +17,7 @@ const QUICK_QUESTIONS=[
   "O que devo fazer agora?",
   "Estou forçando comp?",
   "O que mudou recentemente?",
+  "Qual partida devo revisar?",
   "Qual linha funciona melhor para mim?",
   "Como eu jogo?",
 ];
