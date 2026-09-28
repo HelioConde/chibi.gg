@@ -10,6 +10,7 @@ import {
   tftAssetUrl,
   TftStaticData,
 } from "../tftStatic";
+import DDragonArt from "./DDragonArt";
 
 export type StatisticsCategory="champions"|"traits"|"items"|"augments";
 type Category=StatisticsCategory;
@@ -206,6 +207,19 @@ export default function StatisticsPage({
       .sort((a,b)=>b.score-a.score||b.games-a.games);
   },[stats,category,personal,query,staticData]);
 
+  const augmentCatalogue=useMemo(()=>{
+    const normalized=query.trim().toLowerCase();
+    return Object.entries(staticData?.augments||{})
+      .map(([id,entry])=>({
+        id,
+        name:String(entry?.name||clean(id)),
+        image:staticData?tftAssetUrl(staticData.version,"augment",entry):"",
+      }))
+      .filter(row=>!normalized||row.name.toLowerCase().includes(normalized)||row.id.toLowerCase().includes(normalized))
+      .sort((a,b)=>a.name.localeCompare(b.name))
+      .slice(0,80);
+  },[staticData,query]);
+
   const tiers=useMemo(()=>{
     const map:{S:typeof rows;A:typeof rows;B:typeof rows;C:typeof rows}={
       S:[],A:[],B:[],C:[],
@@ -236,6 +250,13 @@ export default function StatisticsPage({
         <span className="eyebrow">CHIBI STATISTICS</span>
         <h1>Meta global.<br/><em>E o que ele significa para você.</em></h1>
         <p>Champions, traits, items e augments com desempenho observado, amostra explícita e comparação pessoal quando um perfil está aberto.</p>
+        <DDragonArt
+          staticData={staticData}
+          setNumber={stats?.context.setNumber}
+          championIds={stats?.champions.slice(0,6).map(row=>row.id)||[]}
+          variant="ribbon"
+          label="Visual oficial · Data Dragon"
+        />
       </div>
 
       <div className={"meta-dataset-card "+maturity}>
@@ -249,7 +270,10 @@ export default function StatisticsPage({
     <section className="statistics-toolbar">
       <div className="statistics-categories">
         {(["champions","traits","items","augments"] as Category[]).map(id=>(
-          <button className={category===id?"active":""} onClick={()=>setCategory(id)} key={id}>
+          <button className={category===id?"active":""} onClick={()=>{
+            setCategory(id);
+            if(id==="augments")setView("stats");
+          }} key={id}>
             {{champions:"Champions",traits:"Traits",items:"Items",augments:"Augments"}[id]}
           </button>
         ))}
@@ -257,7 +281,12 @@ export default function StatisticsPage({
 
       <div className="statistics-view-switch">
         <button className={view==="stats"?"active":""} onClick={()=>setView("stats")}>Estatísticas</button>
-        <button className={view==="tier"?"active":""} onClick={()=>setView("tier")}>Tier List</button>
+        <button
+          className={view==="tier"?"active":""}
+          onClick={()=>setView("tier")}
+          disabled={category==="augments"}
+          title={category==="augments"?"Augments ficam em catálogo enquanto a amostra de partidas não os expõe.":""}
+        >Tier List</button>
       </div>
     </section>
 
@@ -277,14 +306,36 @@ export default function StatisticsPage({
     {loading&&<section className="panel meta-page-state">Carregando estatísticas...</section>}
     {!loading&&error&&<section className="panel meta-page-state error">Não foi possível carregar as estatísticas agora.</section>}
 
-    {!loading&&!error&&stats&&view==="stats"&&<section className="panel statistics-table-panel">
+    {!loading&&!error&&stats&&view==="stats"&&category==="augments"&&!rows.length&&<section className="panel augment-catalogue-panel">
+      <div className="augment-catalogue-head">
+        <div>
+          <span>CATÁLOGO DATA DRAGON</span>
+          <h2>Augments visuais, sem estatística inventada</h2>
+          <p>Nenhuma observação atual do Chibi Dataset trouxe augments pela Match-v1. Enquanto isso, esta aba usa apenas os assets estáticos oficiais para consulta visual.</p>
+        </div>
+        <strong>{augmentCatalogue.length}</strong>
+      </div>
+
+      <div className="augment-catalogue-grid">
+        {augmentCatalogue.map(augment=>(
+          <article key={augment.id}>
+            <span>{augment.image&&<img src={augment.image} alt=""/>}</span>
+            <div><strong>{augment.name}</strong><small>{augment.id}</small></div>
+          </article>
+        ))}
+      </div>
+
+      {!augmentCatalogue.length&&<div className="meta-page-state">Nenhum augment encontrado no catálogo para esta busca.</div>}
+    </section>}
+
+    {!loading&&!error&&stats&&view==="stats"&&(category!=="augments"||rows.length>0)&&<section className={"panel statistics-table-panel "+(category==="augments"?"no-win":"")}>
       <div className="statistics-table-head">
         <div><span>RANK</span><span>{categoryLabel}</span></div>
         <span>AMOSTRA</span>
         <span>PICK</span>
         <span>MÉDIA</span>
         <span>TOP 4</span>
-        <span>WIN</span>
+        {category!=="augments"&&<span>WIN</span>}
         {hasProfile&&<span>VOCÊ</span>}
       </div>
 
@@ -311,7 +362,7 @@ export default function StatisticsPage({
             <span><b>{row.pickRate}%</b><small>observado</small></span>
             <span><b>{row.averagePlacement}</b><small>colocação</small></span>
             <span><b>{row.top4Rate}%</b><small>Top 4</small></span>
-            <span><b>{row.winRate}%</b><small>vitória</small></span>
+            {category!=="augments"&&<span><b>{row.winRate}%</b><small>vitória</small></span>}
 
             {hasProfile&&<div className="statistics-personal">
               {personalRow?<>
@@ -331,7 +382,7 @@ export default function StatisticsPage({
       <p className="global-meta-disclaimer">Os números representam apenas o Chibi Dataset observado. Quanto menor a amostra, mais experimental deve ser a leitura.</p>
     </section>}
 
-    {!loading&&!error&&stats&&view==="tier"&&<section className="tier-list-shell">
+    {!loading&&!error&&stats&&view==="tier"&&category!=="augments"&&<section className="tier-list-shell">
       {(["S","A","B","C"] as const).map(tier=>(
         <article className={"tier-row tier-"+tier.toLowerCase()} key={tier}>
           <div className="tier-badge">{tier}</div>
