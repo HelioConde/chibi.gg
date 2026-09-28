@@ -172,7 +172,12 @@ function boardValue(match:TftMatch,staticData:TftStaticData|null){
 }
 
 function matchRoundLabel(match:TftMatch){
-  return match.lastRound&&match.lastRound>0?"Round "+match.lastRound:"";
+  const round=Number(match.lastRound)||0;
+  if(round<5) return round>0?"Round "+round:"";
+  const offset=round-5;
+  const stage=2+Math.floor(offset/7);
+  const step=1+(offset%7);
+  return "Stage "+stage+"-"+step;
 }
 
 function App() {
