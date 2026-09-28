@@ -2,14 +2,14 @@
 
 ## Objetivo
 
-O Chibi Overlay deve responder em poucos segundos:
+O Chibi Companion deve transformar momentos marcados da sessão em aprendizado **pós-jogo**:
 
-1. **Qual é o estado atual da partida?**
-2. **O que merece atenção agora?**
-3. **Quais são as opções razoáveis?**
-4. **Qual é o próximo spike ou janela de decisão?**
+1. **Qual era o contexto deste snapshot?**
+2. **Qual padrão vale investigar?**
+3. **Com quais partidas do próprio jogador ele deve ser comparado?**
+4. **Qual pergunta ou experimento levar para a próxima sessão?**
 
-O overlay não deve jogar pelo usuário, automatizar inputs ou remover decisões. O produto deve destacar contexto e oferecer múltiplos caminhos.
+A versão pública não deve prescrever decisões usando o estado atual da partida, rastrear adversários ou automatizar inputs. O valor principal é captura de contexto e revisão posterior.
 
 ## Overlay v1
 
@@ -23,22 +23,22 @@ Quatro blocos obrigatórios:
 - streak
 - força relativa do board
 
-### Faça agora
-- no máximo 3 ações
-- ações ordenadas por prioridade
+### O que revisar
+- no máximo 3 perguntas
+- perguntas ordenadas por relevância
 - linguagem curta
-- nenhuma ação apresentada como certeza quando o sinal for fraco
+- nenhuma causalidade apresentada como certeza quando o sinal for fraco
 
-### O que está dando errado
-- problema principal
+### Padrão a investigar
+- problema ou contraste principal
 - sinais secundários
-- contestação quando observável
+- comparação com o próprio histórico
 - confiança da leitura
 
-### Próximo spike
-- próxima janela de nível/rolldown/transição
-- upgrades relevantes
-- risco de gastar demais ou greedar demais
+### Próximo experimento
+- uma hipótese observável para a próxima sessão
+- métrica simples para validar
+- comparação pós-jogo
 
 ## Estados de UX
 
@@ -198,7 +198,6 @@ Chibi Memory compara evolução
 - leitura do board por snapshot
 - coordenadas reais
 - itens/unidades
-- scouting suportado
 
 ### GM1.5
 - personalização pelo perfil Chibi
