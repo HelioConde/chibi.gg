@@ -2,10 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { TftMatch, TftMatchDetail } from "../api/tft";
 import { buildLobbyAutopsy } from "../analysis/lobbyAutopsy";
 import { getJournalEntry, JOURNAL_TAGS, MatchJournalEntry, saveJournalEntry } from "../journal";
+import { saveLesson } from "../lessons";
 
 type Props={
   matchId:string;
   placement:number;
+  playerKey?:string;
   target?:TftMatch;
   detail?:TftMatchDetail;
   onSaved?:()=>void;
@@ -80,14 +82,16 @@ function reviewGuide(target?:TftMatch,detail?:TftMatchDetail){
   };
 }
 
-export default function MatchJournal({matchId,placement,target,detail,onSaved}:Props){
+export default function MatchJournal({matchId,placement,playerKey="",target,detail,onSaved}:Props){
   const [entry,setEntry]=useState<MatchJournalEntry>(()=>getJournalEntry(matchId));
   const [saved,setSaved]=useState(false);
+  const [lessonSaved,setLessonSaved]=useState(false);
   const guide=useMemo(()=>reviewGuide(target,detail),[target,detail]);
 
   useEffect(()=>{
     setEntry(getJournalEntry(matchId));
     setSaved(false);
+    setLessonSaved(false);
   },[matchId]);
 
   function toggleTag(id:MatchJournalEntry["tags"][number]){
@@ -102,6 +106,15 @@ export default function MatchJournal({matchId,placement,target,detail,onSaved}:P
 
   function save(){
     saveJournalEntry(entry);
+    setSaved(true);
+    onSaved?.();
+  }
+
+  function saveAsLesson(){
+    if(!playerKey||!entry.note.trim())return;
+    saveJournalEntry(entry);
+    const lesson=saveLesson(playerKey,matchId,entry.note);
+    if(lesson)setLessonSaved(true);
     setSaved(true);
     onSaved?.();
   }
@@ -160,7 +173,12 @@ export default function MatchJournal({matchId,placement,target,detail,onSaved}:P
 
     <div className="journal-footer">
       <small>{entry.note.length}/280 · salvo somente neste navegador</small>
-      <button type="button" onClick={save}>{saved?"Salvo ✓":"Salvar contexto"}</button>
+      <div className="journal-footer-actions">
+        {playerKey&&entry.note.trim()&&<button type="button" className="lesson-button" onClick={saveAsLesson}>
+          {lessonSaved?"Lição salva ✓":"Salvar como lição"}
+        </button>}
+        <button type="button" onClick={save}>{saved?"Salvo ✓":"Salvar contexto"}</button>
+      </div>
     </div>
   </section>;
 }
