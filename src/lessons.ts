@@ -2,6 +2,7 @@ export type ChibiLesson={
   id:string;
   playerKey:string;
   matchId:string;
+  matchIds?:string[];
   text:string;
   createdAt:number;
   lastReviewedAt:number;
@@ -33,7 +34,7 @@ export function getLessons(playerKey:string){
     .sort((a,b)=>b.createdAt-a.createdAt);
 }
 
-export function saveLesson(playerKey:string,matchId:string,text:string){
+export function saveLesson(playerKey:string,matchId:string,text:string,matchIds?:string[]){
   const clean=text.trim().slice(0,280);
   if(!clean)return null;
 
@@ -50,6 +51,7 @@ export function saveLesson(playerKey:string,matchId:string,text:string){
     id:playerKey+":"+matchId+":"+Date.now(),
     playerKey,
     matchId,
+    matchIds:matchIds?.filter(Boolean).slice(0,10),
     text:clean,
     createdAt:Date.now(),
     lastReviewedAt:0,
