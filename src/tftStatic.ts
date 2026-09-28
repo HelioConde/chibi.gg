@@ -5,6 +5,7 @@ export type TftStaticEntry = {
   queueId?: string | number;
   queueType?: string;
   image?: { full?: string; group?: string };
+  traits?: string[];
 };
 
 export type TftStaticData = {
