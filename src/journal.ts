@@ -15,6 +15,7 @@ export type JournalTag =
 export type MatchJournalEntry={
   matchId:string;
   tags:JournalTag[];
+  reviewedAreas?:string[];
   note:string;
   updatedAt:number;
 };
@@ -37,7 +38,9 @@ function writeAll(entries:Record<string,MatchJournalEntry>){
 }
 
 export function getJournalEntry(matchId:string):MatchJournalEntry{
-  return readAll()[matchId]||{matchId,tags:[],note:"",updatedAt:0};
+  const stored=readAll()[matchId];
+  if(stored)return {...stored,reviewedAreas:stored.reviewedAreas||[]};
+  return {matchId,tags:[],reviewedAreas:[],note:"",updatedAt:0};
 }
 
 export function saveJournalEntry(entry:MatchJournalEntry){
