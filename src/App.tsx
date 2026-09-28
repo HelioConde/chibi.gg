@@ -20,6 +20,7 @@ import {
 } from "./tftStatic";
 import { buildChibiDNA } from "./analysis/chibiInsights";
 import { buildActionPlan } from "./analysis/actionPlan";
+import { buildRankedReviewSignals } from "./analysis/chibiReviewRanking";
 import ChibiInnovations from "./components/ChibiInnovations";
 import ChibiReview from "./components/ChibiReview";
 import ChibiLearningLab from "./components/ChibiLearningLab";
@@ -451,6 +452,8 @@ function App() {
 
   const dna=useMemo(()=>buildChibiDNA(analysisMatches),[analysisMatches]);
   const quickPlan=useMemo(()=>buildActionPlan(analysisMatches),[analysisMatches]);
+  const reviewSignals=useMemo(()=>buildRankedReviewSignals(analysisMatches),[analysisMatches]);
+  const primaryReviewSignal=reviewSignals[0]||null;
 
   const headlineStats=useMemo(()=>{
     const total=analysisMatches.length;
@@ -1365,11 +1368,17 @@ function App() {
           </>}
 
           {profileTab==="matches"&&<>
-            <section className="matches-priority-bar">
+            <section className={"matches-priority-bar "+(primaryReviewSignal?"tone-"+primaryReviewSignal.tone:"")}>
               <div className="matches-priority-problem">
-                <span>CHIBI LEU SUAS PARTIDAS</span>
-                <strong>{quickPlan.problem.title}</strong>
-                <small>{quickPlan.problem.evidence} · confiança {quickPlan.problem.confidence}</small>
+                <span>PRINCIPAL DESCOBERTA DO CHIBI</span>
+                <strong>{primaryReviewSignal
+                  ? (primaryReviewSignal.subjectId
+                    ? traitName({name:primaryReviewSignal.subjectId,numUnits:0,style:0},staticData)+" · "+primaryReviewSignal.title
+                    : primaryReviewSignal.title)
+                  : "Ainda analisando sua amostra"}</strong>
+                <small>{primaryReviewSignal
+                  ? primaryReviewSignal.evidence+" · confiança "+primaryReviewSignal.confidence
+                  : "Carregue mais partidas para o Chibi priorizar um sinal confiável."}</small>
               </div>
               <div className="matches-priority-action">
                 <span>PRÓXIMO TESTE</span>
@@ -1377,11 +1386,11 @@ function App() {
                 <small>{quickPlan.action.steps[0]}</small>
               </div>
               <div className="matches-priority-cta">
-                {quickPlan.problem.matchIds.length>0&&<button onClick={()=>showEvidence(
-                  quickPlan.problem.matchIds,
-                  "Prioridade atual · "+quickPlan.problem.title,
+                {primaryReviewSignal&&primaryReviewSignal.matchIds.length>0&&<button onClick={()=>showEvidence(
+                  primaryReviewSignal.matchIds,
+                  "Chibi Review · "+primaryReviewSignal.title,
                 )}>Ver evidências</button>}
-                <button className="secondary" onClick={()=>changeProfileTab("coach")}>Ver 3 descobertas</button>
+                <button className="secondary" onClick={()=>changeProfileTab("coach")}>Abrir Chibi Review</button>
               </div>
             </section>
 
