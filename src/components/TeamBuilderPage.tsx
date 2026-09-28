@@ -73,6 +73,33 @@ function similarity(
   return unitScore*.68+traitScore*.32;
 }
 
+function itemSimilarity(boardUnits:HexBoardUnit[],match:TftMatch){
+  let total=0;
+  let matched=0;
+
+  for(const boardUnit of boardUnits){
+    const configured=boardUnit.items||[];
+    if(!configured.length)continue;
+
+    const matchUnit=match.units.find(unit=>unit.characterId===boardUnit.id);
+    const available=new Map<string,number>();
+    for(const itemId of matchUnit?.itemNames||[]){
+      available.set(itemId,(available.get(itemId)||0)+1);
+    }
+
+    for(const itemId of configured){
+      total++;
+      const count=available.get(itemId)||0;
+      if(count>0){
+        matched++;
+        available.set(itemId,count-1);
+      }
+    }
+  }
+
+  return total?matched/total:null;
+}
+
 export default function TeamBuilderPage({
   staticData,
   matches,
@@ -89,6 +116,8 @@ export default function TeamBuilderPage({
   const [savedPresets,setSavedPresets]=useState<BuilderPreset[]>(()=>getBuilderPresets());
   const [copied,setCopied]=useState(false);
   const [costFilter,setCostFilter]=useState<number>(0);
+  const [selectedItemHex,setSelectedItemHex]=useState<number|null>(null);
+  const [itemQuery,setItemQuery]=useState("");
 
   useEffect(()=>{
     if(!initialChampionIds.length)return;
@@ -102,6 +131,7 @@ export default function TeamBuilderPage({
     );
     setTargetLevel(Math.max(6,Math.min(10,initialChampionIds.length||8)));
     setSelectedId(null);
+    setSelectedItemHex(null);
   },[initialChampionIds]);
 
   const champions=useMemo(()=>{
@@ -184,6 +214,71 @@ export default function TeamBuilderPage({
     };
   },[selectedId,staticData]);
 
+  const items=useMemo(()=>{
+    const normalized=itemQuery.trim().toLowerCase();
+    return Object.entries(staticData?.items||{})
+      .map(([id,entry])=>({
+        id,
+        name:String(entry.name||clean(id)),
+        image:staticData?tftAssetUrl(staticData.version,"item",entry):"",
+      }))
+      .filter(row=>
+        Boolean(row.name&&row.image)
+        && (!normalized||row.name.toLowerCase().includes(normalized)||row.id.toLowerCase().includes(normalized))
+      )
+      .sort((a,b)=>a.name.localeCompare(b.name))
+      .slice(0,180);
+  },[staticData,itemQuery]);
+
+  const selectedItemUnit=useMemo(
+    ()=>selectedItemHex==null?null:units.find(unit=>unit.hex===selectedItemHex)||null,
+    [units,selectedItemHex]
+  );
+
+  const selectedItemChampion=useMemo(()=>{
+    if(!selectedItemUnit)return null;
+    const entry=staticEntry(staticData?.champions,selectedItemUnit.id);
+    return {
+      name:String(entry?.name||clean(selectedItemUnit.id)),
+      image:staticData?tftAssetUrl(staticData.version,"champion",entry):"",
+    };
+  },[selectedItemUnit,staticData]);
+
+  const selectedUnitItemHistory=useMemo(()=>{
+    if(!selectedItemUnit)return {games:0,items:[] as Array<{id:string;games:number;avgPlacement:number}>};
+    const itemStats=new Map<string,{games:number;placement:number}>();
+    let games=0;
+
+    for(const match of matches){
+      const unit=match.units.find(row=>row.characterId===selectedItemUnit.id);
+      if(!unit)continue;
+      games++;
+      for(const itemId of unit.itemNames||[]){
+        const current=itemStats.get(itemId)||{games:0,placement:0};
+        current.games++;
+        current.placement+=match.placement;
+        itemStats.set(itemId,current);
+      }
+    }
+
+    return {
+      games,
+      items:[...itemStats.entries()]
+        .map(([id,value])=>({
+          id,
+          games:value.games,
+          avgPlacement:value.games?value.placement/value.games:0,
+        }))
+        .sort((a,b)=>b.games-a.games||a.avgPlacement-b.avgPlacement)
+        .slice(0,8),
+    };
+  },[selectedItemUnit,matches]);
+
+  const itemAssignments=useMemo(
+    ()=>units.reduce((sum,unit)=>sum+(unit.items?.length||0),0),
+    [units]
+  );
+
   const bridgeCandidate=useMemo(
     ()=>candidateUnits.slice().sort((a,b)=>a.cost-b.cost||b.sharedScore-a.sharedScore)[0]||null,
     [candidateUnits]
@@ -262,7 +357,13 @@ export default function TeamBuilderPage({
       .sort((a,b)=>Math.abs(b.after-b.before)-Math.abs(a.after-a.before))
       .slice(0,6);
 
-    return {added,removed,changedTraits};
+    const beforeById=new Map(variantA.map(unit=>[unit.id,(unit.items||[]).slice().sort().join("|")]));
+    const afterById=new Map(units.map(unit=>[unit.id,(unit.items||[]).slice().sort().join("|")]));
+    const itemChanges=[...new Set([...beforeById.keys(),...afterById.keys()])]
+      .filter(id=>(beforeById.get(id)||"")!==(afterById.get(id)||""))
+      .slice(0,6);
+
+    return {added,removed,changedTraits,itemChanges};
   },[variantA,variantAEvaluation,units,traitCounts]);
 
   const similar=useMemo(()=>{
@@ -364,10 +465,40 @@ export default function TeamBuilderPage({
 
   function removeUnit(unit:HexBoardUnit){
     setUnits(current=>current.filter(row=>row.hex!==unit.hex));
+    if(selectedItemHex===unit.hex)setSelectedItemHex(null);
   }
 
   function setUnitTier(hex:number,tier:number){
     setUnits(current=>current.map(unit=>unit.hex===hex?{...unit,tier}:unit));
+  }
+
+  function openItemEditor(hex:number){
+    setSelectedId(null);
+    setSelectedItemHex(hex);
+    setItemQuery("");
+  }
+
+  function addItem(itemId:string){
+    if(selectedItemHex==null)return;
+    setUnits(current=>current.map(unit=>{
+      if(unit.hex!==selectedItemHex)return unit;
+      const currentItems=unit.items||[];
+      if(currentItems.length>=3)return unit;
+      return {...unit,items:[...currentItems,itemId].slice(0,3)};
+    }));
+  }
+
+  function removeItem(hex:number,index:number){
+    setUnits(current=>current.map(unit=>{
+      if(unit.hex!==hex)return unit;
+      const next=[...(unit.items||[])];
+      next.splice(index,1);
+      return {...unit,items:next};
+    }));
+  }
+
+  function clearUnitItems(hex:number){
+    setUnits(current=>current.map(unit=>unit.hex===hex?{...unit,items:[]}:unit));
   }
 
   function saveCurrentBoard(){
@@ -387,9 +518,10 @@ export default function TeamBuilderPage({
   }
 
   function restorePreset(preset:BuilderPreset){
-    setUnits(preset.units.map(unit=>({...unit})));
+    setUnits(preset.units.map(unit=>({...unit,items:[...(unit.items||[])]})));
     setTargetLevel(preset.targetLevel);
     setSelectedId(null);
+    setSelectedItemHex(null);
   }
 
   async function copyBoardSummary(){
@@ -398,7 +530,11 @@ export default function TeamBuilderPage({
       .sort((a,b)=>a.hex-b.hex)
       .map(unit=>{
         const entry=staticEntry(staticData?.champions,unit.id);
-        return (entry?.name||clean(unit.id))+" "+("★".repeat(Math.max(1,Math.min(3,unit.tier||1))));
+        const unitName=(entry?.name||clean(unit.id))+" "+("★".repeat(Math.max(1,Math.min(3,unit.tier||1))));
+        const itemNames=(unit.items||[])
+          .map(itemId=>staticEntry(staticData?.items,itemId)?.name||clean(itemId))
+          .filter(Boolean);
+        return unitName+(itemNames.length?" ["+itemNames.join(" / ")+"]":"");
       });
 
     const traits=traitCounts
@@ -424,11 +560,11 @@ export default function TeamBuilderPage({
     }
   }
 
-  return <main className="builder-page builder-v2 builder-v3">
+  return <main className="builder-page builder-v2 builder-v3 builder-v4">
     <section className="builder-hero">
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>← Voltar ao perfil</button>}
-        <span className="eyebrow">CHIBI LAB · TEAM BUILDER V3</span>
+        <span className="eyebrow">CHIBI LAB · TEAM BUILDER V4</span>
         <h1>Monte o board.<br/><em>Teste uma decisão por vez.</em></h1>
         <p>{initialChampionIds.length
           ?"Comp carregada. Mova, remova ou substitua peças e compare variantes com o seu histórico."
@@ -463,14 +599,14 @@ export default function TeamBuilderPage({
           <button className="secondary" onClick={copyBoardSummary} disabled={!units.length}>
             {copied?"Resumo copiado ✓":"Copiar resumo"}
           </button>
-          <button onClick={()=>setVariantA(units.map(unit=>({...unit})))} disabled={!units.length}>
+          <button onClick={()=>setVariantA(units.map(unit=>({...unit,items:[...(unit.items||[])]})))} disabled={!units.length}>
             {variantA?"Atualizar versão A":"Salvar como versão A"}
           </button>
           {variantA&&<button className="secondary" onClick={()=>{
-            setUnits(variantA.map(unit=>({...unit})));
+            setUnits(variantA.map(unit=>({...unit,items:[...(unit.items||[])]})));
             setSelectedId(null);
           }}>Restaurar A</button>}
-          <button className="secondary" onClick={()=>{setUnits([]);setSelectedId(null);}}>Limpar board</button>
+          <button className="secondary" onClick={()=>{setUnits([]);setSelectedId(null);setSelectedItemHex(null);}}>Limpar board</button>
         </div>
       </div>
     </section>
@@ -485,6 +621,7 @@ export default function TeamBuilderPage({
       <div className="builder-board-facts">
         <article><span>2★ OU MAIS</span><strong>{twoStars}/{units.length||0}</strong></article>
         <article><span>3★</span><strong>{threeStars}</strong></article>
+        <article><span>ITENS</span><strong>{itemAssignments}</strong></article>
         <article><span>TRAITS VISÍVEIS</span><strong>{traitCounts.length}</strong></article>
         <article><span>COMPARÁVEIS</span><strong>{similar.length}</strong></article>
       </div>
@@ -521,7 +658,7 @@ export default function TeamBuilderPage({
           <small>{bridgeCandidate
             ?bridgeCandidate.cost+"g · conecta "+bridgeCandidate.shared.slice(0,2).map(id=>staticEntry(staticData?.traits,id)?.name||clean(id)).join(" + ")
             :"Nenhuma peça de conexão visível."}</small>
-          {bridgeCandidate&&<button onClick={()=>setSelectedId(bridgeCandidate.id)}>Selecionar</button>}
+          {bridgeCandidate&&<button onClick={()=>{setSelectedItemHex(null);setSelectedId(bridgeCandidate.id);}}>Selecionar</button>}
         </article>
 
         <article className="builder-plan-card">
@@ -530,7 +667,7 @@ export default function TeamBuilderPage({
           <small>{capCandidate
             ?capCandidate.cost+"g · compartilha "+capCandidate.shared.length+" trait"+(capCandidate.shared.length===1?"":"s")
             :"Nenhuma peça 4g/5g conectada à estrutura atual."}</small>
-          {capCandidate&&<button onClick={()=>setSelectedId(capCandidate.id)}>Selecionar</button>}
+          {capCandidate&&<button onClick={()=>{setSelectedItemHex(null);setSelectedId(capCandidate.id);}}>Selecionar</button>}
         </article>
 
         <article className="builder-plan-card curve">
@@ -602,6 +739,9 @@ export default function TeamBuilderPage({
                 return name+" "+(delta>0?"+":"")+delta;
               }).join(" · ")
               :"sem alteração estrutural"}</p>
+            <p><b>Itens</b>{variantDiff.itemChanges.length
+              ?variantDiff.itemChanges.map(id=>staticEntry(staticData?.champions,id)?.name||clean(id)).join(" · ")
+              :"sem alteração de itemização"}</p>
           </div>
         </article>
       </div>
@@ -679,12 +819,103 @@ export default function TeamBuilderPage({
                       >{"★".repeat(tier)}</button>
                     ))}
                   </div>
+                  <div className="builder-unit-items">
+                    {[0,1,2].map(index=>{
+                      const itemId=unit.items?.[index];
+                      const item=staticEntry(staticData?.items,itemId);
+                      const itemImage=itemId&&staticData?tftAssetUrl(staticData.version,"item",item):"";
+                      const itemName=item?.name||"Slot de item";
+                      return itemId
+                        ?<button className="filled" onClick={()=>removeItem(unit.hex,index)} title={"Remover "+itemName} key={index}>
+                          {itemImage?<img src={itemImage} alt=""/>:<span>{itemName.slice(0,1)}</span>}
+                        </button>
+                        :<button className="empty" onClick={()=>openItemEditor(unit.hex)} title="Adicionar item" key={index}>+</button>;
+                    })}
+                    <button className={"builder-item-edit "+(selectedItemHex===unit.hex?"active":"")} onClick={()=>openItemEditor(unit.hex)}>
+                      Itens
+                    </button>
+                  </div>
                 </div>
                 <button className="builder-remove-unit" onClick={()=>removeUnit(unit)}>×</button>
               </article>;
             })}
           </div>:<p className="builder-empty-check">O roster aparece aqui conforme você adiciona unidades ao tabuleiro.</p>}
         </div>
+
+        {selectedItemUnit&&selectedItemChampion&&<section className="builder-item-lab">
+          <div className="builder-item-lab-head">
+            <div className="builder-item-target">
+              <span>{selectedItemChampion.image&&<img src={selectedItemChampion.image} alt=""/>}</span>
+              <div>
+                <small>ITEMIZAÇÃO</small>
+                <strong>{selectedItemChampion.name}</strong>
+                <p>{selectedItemUnit.items?.length||0}/3 itens equipados</p>
+              </div>
+            </div>
+            <div className="builder-item-lab-actions">
+              {!!selectedItemUnit.items?.length&&<button onClick={()=>clearUnitItems(selectedItemUnit.hex)}>Limpar itens</button>}
+              <button onClick={()=>setSelectedItemHex(null)}>Fechar</button>
+            </div>
+          </div>
+
+          <div className="builder-equipped-items">
+            {[0,1,2].map(index=>{
+              const itemId=selectedItemUnit.items?.[index];
+              const item=staticEntry(staticData?.items,itemId);
+              const itemImage=itemId&&staticData?tftAssetUrl(staticData.version,"item",item):"";
+              const itemName=item?.name||"Slot vazio";
+              return <button
+                className={itemId?"filled":"empty"}
+                onClick={()=>itemId&&removeItem(selectedItemUnit.hex,index)}
+                title={itemId?"Clique para remover "+itemName:"Escolha um item abaixo"}
+                key={index}
+              >
+                {itemImage&&<img src={itemImage} alt=""/>}
+                <span>{itemId?itemName:"Item "+(index+1)}</span>
+              </button>;
+            })}
+          </div>
+
+          <div className="builder-item-history">
+            <div className="builder-subhead">
+              <span>SEU HISTÓRICO COM ESTE CHAMPION</span>
+              <small>{selectedUnitItemHistory.games
+                ?selectedUnitItemHistory.games+" partida"+(selectedUnitItemHistory.games===1?"":"s")+" encontrada"+(selectedUnitItemHistory.games===1?"":"s")
+                :"Nenhuma partida carregada com esta unidade"}</small>
+            </div>
+            {selectedUnitItemHistory.items.length>0
+              ?<div className="builder-history-items">
+                {selectedUnitItemHistory.items.map(row=>{
+                  const item=staticEntry(staticData?.items,row.id);
+                  const src=staticData?tftAssetUrl(staticData.version,"item",item):"";
+                  const name=item?.name||clean(row.id);
+                  const full=(selectedItemUnit.items?.length||0)>=3;
+                  return <button disabled={full} onClick={()=>addItem(row.id)} title={name} key={row.id}>
+                    <span>{src&&<img src={src} alt=""/>}</span>
+                    <div><strong>{name}</strong><small>{row.games}x · média {row.avgPlacement.toFixed(2)}</small></div>
+                  </button>;
+                })}
+              </div>
+              :<p className="builder-empty-check">Sem itemização pessoal suficiente. Use a biblioteca abaixo sem tratar os itens como recomendação.</p>}
+          </div>
+
+          <div className="builder-item-library">
+            <div className="builder-subhead">
+              <span>BIBLIOTECA DE ITENS</span>
+              <small>Data Dragon · clique para equipar até 3 itens</small>
+            </div>
+            <input value={itemQuery} onChange={event=>setItemQuery(event.target.value)} placeholder="Pesquisar item..."/>
+            <div className="builder-item-grid">
+              {items.map(item=>{
+                const full=(selectedItemUnit.items?.length||0)>=3;
+                return <button disabled={full} onClick={()=>addItem(item.id)} title={item.name} key={item.id}>
+                  <span>{item.image&&<img src={item.image} alt=""/>}</span>
+                  <strong>{item.name}</strong>
+                </button>;
+              })}
+            </div>
+          </div>
+        </section>}
 
         <div className="builder-traits builder-traits-v2">
           <div className="builder-subhead">
@@ -728,7 +959,7 @@ export default function TeamBuilderPage({
             const src=staticData?tftAssetUrl(staticData.version,"champion",entry):"";
             return <button
               className={selectedId===row.id?"selected":""}
-              onClick={()=>setSelectedId(row.id)}
+              onClick={()=>{setSelectedItemHex(null);setSelectedId(row.id);}}
               title={"Adicionar "+row.name}
               key={row.id}
             >
@@ -748,7 +979,7 @@ export default function TeamBuilderPage({
             {candidateUnits.slice(0,6).map(candidate=>{
               const entry=staticEntry(staticData?.champions,candidate.id);
               const src=staticData?tftAssetUrl(staticData.version,"champion",entry):"";
-              return <button onClick={()=>setSelectedId(candidate.id)} key={candidate.id}>
+              return <button onClick={()=>{setSelectedItemHex(null);setSelectedId(candidate.id);}} key={candidate.id}>
                 <span>{src&&<img src={src} alt=""/>}</span>
                 <div>
                   <strong>{candidate.name}</strong>
@@ -783,18 +1014,21 @@ export default function TeamBuilderPage({
             <span>BOARDS PARECIDOS</span>
             <strong>{similar.length}</strong>
             <small>{average!=null
-              ?"média "+average.toFixed(2)+(top4Rate!=null?" · Top 4 "+top4Rate+"%":"")
+              ?"média "+average.toFixed(2)+(top4Rate!=null?" · Top 4 "+top4Rate+"%":"")+(itemAssignments?" · "+itemAssignments+" itens configurados":"")
               :"nenhum comparável forte ainda"}</small>
           </div>
 
           {similar.length>0?<div className="builder-similar-list builder-similar-list-v2">
-            {similar.map(({match,score})=><article key={match.id}>
-              <b>{match.placement}º</b>
-              <span>
-                <strong>{Math.round(score*100)}% semelhante</strong>
-                <small>nível {match.level} · {match.goldLeft}g final · {match.units.filter(unit=>unit.tier>=3).length} 3★</small>
-              </span>
-            </article>)}
+            {similar.map(({match,score})=>{
+              const itemFit=itemSimilarity(units,match);
+              return <article key={match.id}>
+                <b>{match.placement}º</b>
+                <span>
+                  <strong>{Math.round(score*100)}% semelhante</strong>
+                  <small>nível {match.level} · {match.goldLeft}g final · {match.units.filter(unit=>unit.tier>=3).length} 3★{itemFit!=null?" · itens "+Math.round(itemFit*100)+"%":""}</small>
+                </span>
+              </article>;
+            })}
           </div>:<p className="builder-empty-check">Seu histórico carregado ainda não tem boards suficientemente parecidos.</p>}
 
           {similar.length>0&&<button className="builder-evidence-button" onClick={()=>onEvidence(similar.map(row=>row.match.id),"Team Builder · boards parecidos")}>
@@ -804,6 +1038,6 @@ export default function TeamBuilderPage({
       </aside>
     </section>
 
-    <p className="builder-disclaimer">O Builder compara estrutura final, traits e boards do histórico. Ele não conhece sua loja, ouro por rodada, scouting completo ou posição futura e não trata similaridade como causalidade.</p>
+    <p className="builder-disclaimer">O Builder compara estrutura final, traits, itens configurados e boards do histórico. A biblioteca de itens vem do Data Dragon; o histórico pessoal mostra apenas o que apareceu nas partidas carregadas. Ele não conhece sua loja, ouro por rodada, scouting completo ou posição futura e não trata similaridade como causalidade.</p>
   </main>;
 }
