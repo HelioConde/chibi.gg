@@ -30,6 +30,14 @@ function unitName(id:string,staticData:TftStaticData|null){
   return staticEntry(staticData?.champions,id)?.name||clean(id);
 }
 
+function itemName(id:string,staticData:TftStaticData|null){
+  return staticEntry(staticData?.items,id)?.name||clean(id);
+}
+
+function augmentName(id:string,staticData:TftStaticData|null){
+  return staticEntry(staticData?.augments,id)?.name||clean(id);
+}
+
 function activeTraitIds(match:TftMatch){
   return match.traits
     .filter(trait=>trait.numUnits>0&&(trait.style>0||trait.numUnits>=2))
@@ -98,6 +106,7 @@ export default function CompsPage({staticData,matches,hasProfile,onBack,onEviden
   const [data,setData]=useState<TftGlobalComps|null>(null);
   const [loading,setLoading]=useState(true);
   const [error,setError]=useState("");
+  const [selectedCompId,setSelectedCompId]=useState<string|null>(null);
 
   useEffect(()=>{
     let cancelled=false;
@@ -145,6 +154,7 @@ export default function CompsPage({staticData,matches,hasProfile,onBack,onEviden
   );
 
   const hero=bestForYou||mostPopular;
+  const selectedComp=ranked.find(comp=>comp.id===selectedCompId)||hero||ranked[0]||null;
   const maturity=data
     ? data.sampleParticipants>=1000?"robusta"
       : data.sampleParticipants>=250?"crescendo"
@@ -235,6 +245,82 @@ export default function CompsPage({staticData,matches,hasProfile,onBack,onEviden
         </div>
       </section>}
 
+      {selectedComp&&<section className="panel comp-guide-panel">
+        <div className="comp-guide-head">
+          <div>
+            <span>COMP GUIDE · OBSERVADO</span>
+            <h2>{compName(selectedComp,staticData)}</h2>
+            <p>Não é uma receita fixa. É a forma mais recorrente como esta identidade apareceu no Chibi Dataset.</p>
+          </div>
+          <div className="comp-guide-context">
+            <span>Nível médio</span><strong>{selectedComp.averageLevel}</strong>
+            <span>Ouro final</span><strong>{selectedComp.averageGold}g</strong>
+          </div>
+        </div>
+
+        <div className="comp-guide-grid">
+          <article>
+            <span>CORE UNITS + ITENS</span>
+            <div className="comp-guide-units">
+              {selectedComp.units.slice(0,8).map(unit=>{
+                const entry=staticEntry(staticData?.champions,unit.id);
+                const image=staticData?tftAssetUrl(staticData.version,"champion",entry):"";
+                const unitItems=selectedComp.unitItems.find(row=>row.unitId===unit.id)?.items||[];
+                return <div className="comp-guide-unit" key={unit.id}>
+                  <span className="comp-guide-portrait">{image&&<img src={image} alt=""/>}</span>
+                  <div>
+                    <strong>{unitName(unit.id,staticData)}</strong>
+                    <small>presente em {Math.round(unit.rate)}%</small>
+                    <div className="comp-guide-items">
+                      {unitItems.length?unitItems.map(item=>{
+                        const item=staticEntry(staticData?.items,item.id);
+                        const src=staticData?tftAssetUrl(staticData.version,"item",item):"";
+                        return <span title={itemName(item.id,staticData)+" · "+Math.round(item.rate)+"%"} key={item.id}>
+                          {src&&<img src={src} alt=""/>}
+                        </span>;
+                      }):<em>sem item recorrente</em>}
+                    </div>
+                  </div>
+                </div>;
+              })}
+            </div>
+          </article>
+
+          <article>
+            <span>AUGMENTS OBSERVADOS</span>
+            <div className="comp-guide-augments">
+              {selectedComp.augments.length?selectedComp.augments.slice(0,6).map(augment=>{
+                const entry=staticEntry(staticData?.augments,augment.id);
+                const src=staticData?tftAssetUrl(staticData.version,"augment",entry):"";
+                return <div key={augment.id}>
+                  <span>{src&&<img src={src} alt=""/>}</span>
+                  <div><strong>{augmentName(augment.id,staticData)}</strong><small>{Math.round(augment.rate)}% das observações</small></div>
+                </div>;
+              }):<p className="comp-guide-empty">Amostra ainda pequena para augments recorrentes.</p>}
+            </div>
+          </article>
+
+          <article className="comp-guide-decision">
+            <span>QUANDO CONSIDERAR</span>
+            <strong>{hasProfile&&selectedComp.fit.score>=55
+              ?"Seu histórico já tem sinais compatíveis com esta rota."
+              :"Quando seu spot já estiver oferecendo várias peças e itens compatíveis."}</strong>
+            <p>{hasProfile
+              ?"Compatibilidade pessoal: "+selectedComp.fit.score+"/100 · "+selectedComp.fit.matchIds.length+" partidas relacionadas."
+              :"Use a comp como referência de direção, não como compromisso antecipado."}</p>
+
+            <span className="avoid">QUANDO NÃO FORÇAR</span>
+            <strong>Quando você precisar sacrificar economia, upgrades naturais ou uma rota mais forte só para copiar o board final.</strong>
+            <p>O dataset descreve como os boards terminaram. Ele não conhece toda a sequência de lojas e decisões que levou até lá.</p>
+
+            {hasProfile&&selectedComp.fit.matchIds.length>0&&<button onClick={()=>onEvidence(
+              selectedComp.fit.matchIds,
+              "Comp Guide · "+compName(selectedComp,staticData),
+            )}>Comparar com minhas partidas</button>}
+          </article>
+        </div>
+      </section>}
+
       <section className="comp-signal-grid">
         <article className="panel">
           <span>MAIS ESTÁVEL</span>
@@ -275,7 +361,10 @@ export default function CompsPage({staticData,matches,hasProfile,onBack,onEviden
                 <span><small>Jogos</small><b>{comp.games}</b></span>
                 {hasProfile&&<span className="fit"><small>Fit</small><b>{comp.fit.score}</b></span>}
               </div>
-              <div className={"meta-confidence "+(comp.confidence==="alta"?"high":comp.confidence==="média"?"medium":"low")}>{comp.confidence}</div>
+              <div className="comp-row-actions">
+                <div className={"meta-confidence "+(comp.confidence==="alta"?"high":comp.confidence==="média"?"medium":"low")}>{comp.confidence}</div>
+                <button onClick={()=>setSelectedCompId(comp.id)}>Detalhes</button>
+              </div>
             </article>
           ))}
         </div>
