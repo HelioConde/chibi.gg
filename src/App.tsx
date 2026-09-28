@@ -649,10 +649,11 @@ function App() {
     }
   }
 
-  function openExplorePage(page:"meta"|"comps"|"stats"|"overlay"){
+  function openExplorePage(page:"meta"|"comps"|"stats"|"builder"|"overlay"){
     if(page==="meta") return openMeta();
     if(page==="comps") return openComps();
     if(page==="stats") return openStats();
+    if(page==="builder") return openBuilder();
     return openOverlay();
   }
 
