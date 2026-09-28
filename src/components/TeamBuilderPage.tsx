@@ -142,6 +142,9 @@ export default function TeamBuilderPage({
   const [variantAAugments,setVariantAAugments]=useState<string[]>([]);
   const [positioningMode,setPositioningMode]=useState(false);
   const [movingHex,setMovingHex]=useState<number|null>(null);
+  const [transitionBase,setTransitionBase]=useState<HexBoardUnit[]|null>(null);
+  const [transitionBaseLevel,setTransitionBaseLevel]=useState(8);
+  const [transitionBaseAugments,setTransitionBaseAugments]=useState<string[]>([]);
 
   useEffect(()=>{
     if(!initialChampionIds.length)return;
@@ -160,6 +163,8 @@ export default function TeamBuilderPage({
     setAugmentQuery("");
     setPositioningMode(false);
     setMovingHex(null);
+    setTransitionBase(null);
+    setTransitionBaseAugments([]);
   },[initialChampionIds]);
 
   const champions=useMemo(()=>{
@@ -512,7 +517,138 @@ export default function TeamBuilderPage({
     };
   },[units]);
 
-  const boardValue=units.reduce(
+  const transitionAnalysis=useMemo(()=>{
+    if(!transitionBase)return null;
+
+    const baseById=new Map(transitionBase.map(unit=>[unit.id,unit]));
+    const targetById=new Map(units.map(unit=>[unit.id,unit]));
+    const entering=units.filter(unit=>!baseById.has(unit.id));
+    const leaving=transitionBase.filter(unit=>!targetById.has(unit.id));
+    const kept=units.filter(unit=>baseById.has(unit.id));
+
+    const upgrades=kept
+      .map(unit=>{
+        const before=baseById.get(unit.id)!;
+        const beforeCopies=copiesFor(before.tier||1);
+        const afterCopies=copiesFor(unit.tier||1);
+        const extraCopies=Math.max(0,afterCopies-beforeCopies);
+        return {
+          unit,
+          beforeTier:before.tier||1,
+          afterTier:unit.tier||1,
+          extraCopies,
+          cost:extraCopies*costFor(unit.id,staticData),
+        };
+      })
+      .filter(row=>row.extraCopies>0);
+
+    const enteringCost=entering.reduce(
+      (sum,unit)=>sum+costFor(unit.id,staticData)*copiesFor(unit.tier||1),
+      0
+    );
+    const upgradeCost=upgrades.reduce((sum,row)=>sum+row.cost,0);
+    const baseValue=transitionBase.reduce(
+      (sum,unit)=>sum+costFor(unit.id,staticData)*copiesFor(unit.tier||1),
+      0
+    );
+    const targetValue=units.reduce(
+      (sum,unit)=>sum+costFor(unit.id,staticData)*copiesFor(unit.tier||1),
+      0
+    );
+
+    const baseTraits=new Map<string,number>();
+    for(const unit of transitionBase){
+      for(const trait of unitTraitIds(unit.id,staticData)){
+        baseTraits.set(trait,(baseTraits.get(trait)||0)+1);
+      }
+    }
+    const targetTraits=new Map(traitCounts);
+    const traitIds=new Set([...baseTraits.keys(),...targetTraits.keys()]);
+    const traitChanges=[...traitIds]
+      .map(id=>({id,before:baseTraits.get(id)||0,after:targetTraits.get(id)||0}))
+      .filter(row=>row.before!==row.after)
+      .sort((a,b)=>Math.abs(b.after-b.before)-Math.abs(a.after-a.before))
+      .slice(0,6);
+
+    const holderHints=entering
+      .filter(target=>(target.items?.length||0)>0)
+      .map(target=>{
+        const desired=[...new Set(target.items||[])];
+        let best:{
+          holder:HexBoardUnit;
+          matched:number;
+          games:number;
+          average:number|null;
+          direct:boolean;
+        }|null=null;
+
+        for(const holder of leaving){
+          const directMatched=desired.filter(itemId=>(holder.items||[]).includes(itemId)).length;
+          let matched=directMatched;
+          let games=0;
+          let placement=0;
+
+          for(const match of matches){
+            const historical=match.units.find(unit=>unit.characterId===holder.id);
+            if(!historical)continue;
+            const overlap=desired.filter(itemId=>(historical.itemNames||[]).includes(itemId)).length;
+            if(!overlap)continue;
+            matched+=overlap;
+            games++;
+            placement+=match.placement;
+          }
+
+          if(!matched)continue;
+          const candidate={
+            holder,
+            matched,
+            games,
+            average:games?placement/games:null,
+            direct:directMatched>0,
+          };
+          if(!best||candidate.matched>best.matched||(candidate.matched===best.matched&&candidate.games>best.games)){
+            best=candidate;
+          }
+        }
+
+        return {target,hint:best};
+      })
+      .slice(0,5);
+
+    const augmentChanges={
+      leaving:transitionBaseAugments.filter(id=>!selectedAugments.includes(id)),
+      entering:selectedAugments.filter(id=>!transitionBaseAugments.includes(id)),
+    };
+
+    return {
+      entering,
+      leaving,
+      kept,
+      upgrades,
+      enteringCost,
+      upgradeCost,
+      copyCost:enteringCost+upgradeCost,
+      baseValue,
+      targetValue,
+      valueDelta:targetValue-baseValue,
+      traitChanges,
+      holderHints,
+      augmentChanges,
+      levelDelta:targetLevel-transitionBaseLevel,
+    };
+  },[
+    transitionBase,
+    transitionBaseLevel,
+    transitionBaseAugments,
+    units,
+    matches,
+    staticData,
+    traitCounts,
+    selectedAugments,
+    targetLevel,
+  ]);
+
+  const boardValue=units.reduce
     (sum,unit)=>sum+costFor(unit.id,staticData)*copiesFor(unit.tier||1),
     0
   );
@@ -716,6 +852,33 @@ export default function TeamBuilderPage({
     });
   }
 
+  function captureTransitionBase(){
+    if(!units.length)return;
+    setTransitionBase(units.map(unit=>({...unit,items:[...(unit.items||[])]})));
+    setTransitionBaseLevel(targetLevel);
+    setTransitionBaseAugments([...selectedAugments]);
+    setSelectedId(null);
+    setSelectedItemHex(null);
+    setMovingHex(null);
+    setPositioningMode(false);
+  }
+
+  function restoreTransitionBase(){
+    if(!transitionBase)return;
+    setUnits(transitionBase.map(unit=>({...unit,items:[...(unit.items||[])]})));
+    setTargetLevel(transitionBaseLevel);
+    setSelectedAugments([...transitionBaseAugments]);
+    setSelectedId(null);
+    setSelectedItemHex(null);
+    setMovingHex(null);
+    setPositioningMode(false);
+  }
+
+  function clearTransition(){
+    setTransitionBase(null);
+    setTransitionBaseAugments([]);
+  }
+
   function saveCurrentBoard(){
     if(!units.length)return;
     const topTraits=traitCounts
@@ -741,6 +904,8 @@ export default function TeamBuilderPage({
     setSelectedItemHex(null);
     setPositioningMode(false);
     setMovingHex(null);
+    setTransitionBase(null);
+    setTransitionBaseAugments([]);
   }
 
   async function copyBoardSummary(){
@@ -784,11 +949,11 @@ export default function TeamBuilderPage({
     }
   }
 
-  return <main className="builder-page builder-v2 builder-v3 builder-v4 builder-v5 builder-v6">
+  return <main className="builder-page builder-v2 builder-v3 builder-v4 builder-v5 builder-v6 builder-v7">
     <section className="builder-hero">
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>← Voltar ao perfil</button>}
-        <span className="eyebrow">CHIBI LAB · TEAM BUILDER V6</span>
+        <span className="eyebrow">CHIBI LAB · TEAM BUILDER V7</span>
         <h1>Monte o board.<br/><em>Teste uma decisão por vez.</em></h1>
         <p>{initialChampionIds.length
           ?"Comp carregada. Mova, remova ou substitua peças e compare variantes com o seu histórico."
