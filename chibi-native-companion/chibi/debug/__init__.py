@@ -1,0 +1,1 @@
+"""Sanitized native discovery reports."""
