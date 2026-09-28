@@ -143,6 +143,24 @@ function signed(value:number,digits=2){
   return (rounded>0?"+":"")+rounded;
 }
 
+function sampleBand(games:number){
+  if(games>=50)return {
+    label:"mais estável",
+    tone:"high",
+    help:"50+ observações: ainda existe contexto, mas o número tende a ser menos sensível a poucas partidas.",
+  };
+  if(games>=20)return {
+    label:"utilizável",
+    tone:"medium",
+    help:"20–49 observações: bom para levantar hipóteses, não para tratar diferenças pequenas como verdade.",
+  };
+  return {
+    label:"exploratória",
+    tone:"low",
+    help:"Abaixo de 20 observações: use para descobrir o que investigar, não para ordenar força.",
+  };
+}
+
 export default function StatisticsPage({
   staticData,
   matches,
@@ -358,6 +376,35 @@ export default function StatisticsPage({
       <span>{stats?.context.setNumber?"Set "+stats.context.setNumber:"Set atual"}</span>
     </section>
 
+    <details className="statistics-sample-guide">
+      <summary>
+        <span><b>Como o Chibi interpreta tamanho de amostra</b><small>Evite transformar poucos jogos em certeza.</small></span>
+        <em>Guia</em>
+      </summary>
+      <div>
+        <article className="low">
+          <strong>&lt; 20</strong>
+          <span>Exploratória</span>
+          <p>Serve para encontrar perguntas. Diferenças pequenas podem desaparecer rapidamente.</p>
+        </article>
+        <article className="medium">
+          <strong>20–49</strong>
+          <span>Utilizável</span>
+          <p>Já permite comparar sinais maiores, mas ainda exige contexto e cautela.</p>
+        </article>
+        <article className="high">
+          <strong>50+</strong>
+          <span>Mais estável</span>
+          <p>Menos sensível a poucas partidas. Ainda não elimina viés de composição, patch ou elo.</p>
+        </article>
+        {hasProfile&&<article className="personal">
+          <strong>3+</strong>
+          <span>Sua amostra</span>
+          <p>O Chibi só começa a comparar seu resultado com a base depois de pelo menos 3 partidas pessoais.</p>
+        </article>}
+      </div>
+    </details>
+
     {!loading&&!error&&selectedRow&&<section className={"panel statistics-entity-detail "+(selectedInterpretation?.tone||"neutral")}>
       <div className="statistics-detail-head">
         <div className="statistics-detail-identity">
@@ -377,7 +424,7 @@ export default function StatisticsPage({
         <article>
           <span>BASE CHIBI</span>
           <strong>{selectedRow.averagePlacement}</strong>
-          <small>média · {selectedRow.games} jogos</small>
+          <small>média · {selectedRow.games} jogos · {sampleBand(selectedRow.games).label}</small>
           <div><b>Top 4 {selectedRow.top4Rate}%</b><b>Pick {selectedRow.pickRate}%</b><b>Win {selectedRow.winRate}%</b></div>
         </article>
 
@@ -476,7 +523,9 @@ export default function StatisticsPage({
               </div>
             </div>
 
-            <span><b>{row.games}</b><small>jogos</small></span>
+            <span className={"statistics-sample "+sampleBand(row.games).tone} title={sampleBand(row.games).help}>
+              <b>{row.games}</b><small>{sampleBand(row.games).label}</small>
+            </span>
             <span><b>{row.pickRate}%</b><small>observado</small></span>
             <span><b>{row.averagePlacement}</b><small>colocação</small></span>
             <span><b>{row.top4Rate}%</b><small>Top 4</small></span>
