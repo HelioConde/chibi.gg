@@ -9738,3 +9738,23 @@ a { color: inherit; text-decoration: none; }
   .learning-cycle-actions{flex-direction:column}
   .learning-cycle-actions button{width:100%}
 }
+
+
+/* Chibi Coach depth mode — reduce information overload by default */
+.coach-mode-switch{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:14px 0;padding:11px 13px;border:1px solid #20283a;background:rgba(13,18,27,.82);border-radius:12px}
+.coach-mode-switch>div:first-child>span{display:block;color:#7666db;font-size:8px;font-weight:900;letter-spacing:1px}
+.coach-mode-switch>div:first-child>strong{display:inline-block;margin:3px 7px 0 0;font-size:12px}
+.coach-mode-switch>div:first-child>small{color:#70798e;font-size:9px}
+.coach-mode-buttons{display:flex;gap:5px;padding:3px;border:1px solid #272f42;background:#0a0f17;border-radius:9px}
+.coach-mode-buttons button{border:0;background:transparent;color:#737d92;border-radius:6px;padding:7px 10px;font-size:9px;font-weight:900}
+.coach-mode-buttons button.active{background:rgba(117,99,231,.16);color:#c9c0ff;box-shadow:inset 0 0 0 1px rgba(117,99,231,.23)}
+
+body[data-chibi-coach-mode="essential"] .comparison-coach,
+body[data-chibi-coach-mode="essential"] .coach-learning-layer,
+body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!important}
+
+@media (max-width:650px){
+  .coach-mode-switch{align-items:stretch;flex-direction:column}
+  .coach-mode-buttons{display:grid;grid-template-columns:1fr 1fr}
+  .coach-mode-buttons button{width:100%}
+}
