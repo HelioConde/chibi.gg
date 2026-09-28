@@ -122,42 +122,79 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
   },[matches]);
 
   const experiment=useMemo(()=>{
-    const primary=leaks.primary;
+    const focus=rankedSignals.find(signal=>signal.kind==="risk")||rankedSignals[0];
 
+    if(focus?.id==="conversion-low"){
+      return {
+        title:"Converta um Top 4 em vitória",
+        body:"Nas próximas partidas, compare seus Top 4 que viraram 1º com os que pararam em 2º–4º. Observe board final, estrelas, itens e nível antes de mudar sua linha.",
+        metric:"Meta: registrar uma diferença observável entre pelo menos 2 Top 4.",
+        ids:focus.matchIds,
+      };
+    }
+
+    if(focus?.id==="bottom2-risk"){
+      return {
+        title:"Proteja o piso da próxima sessão",
+        body:"Revise primeiro os 7º/8º e procure um padrão repetido no board final. O objetivo não é eliminar toda derrota, mas transformar uma parte dos Bottom 2 em 5º/6º.",
+        metric:"Meta: passar a próxima sessão sem repetir o mesmo padrão em dois Bottom 2.",
+        ids:focus.matchIds,
+      };
+    }
+
+    if(focus?.id==="bottom2-gold-left"){
+      return {
+        title:"Revise onde o ouro deixou de virar força",
+        body:"Abra os Bottom 2 que terminaram com 10g+ e compare com jogos de colocação melhor. O ouro final sozinho não prova erro de economia; ele indica quais partidas revisar primeiro.",
+        metric:"Meta: identificar em 2 partidas se o recurso final tinha uma conversão plausível em board.",
+        ids:focus.matchIds,
+      };
+    }
+
+    if(focus?.id.startsWith("trait-risk:")){
+      const name=focus.subjectId?traitName(focus.subjectId,staticData):"essa linha";
+      return {
+        title:"Faça uma revisão dirigida de "+name,
+        body:"Compare seus melhores e piores boards nessa mesma identidade. Procure uma diferença observável em unidades, estrelas, itens ou nível antes de concluir que a comp não combina com você.",
+        metric:"Meta: encontrar 1 diferença repetida entre resultados bons e ruins dessa linha.",
+        ids:focus.matchIds,
+      };
+    }
+
+    if(focus?.id==="level-split"&&focus.tone==="warning"){
+      return {
+        title:"Pare de usar nível como explicação única",
+        body:"Compare partidas em que você terminou em nível parecido, mas teve colocações diferentes. Procure qualidade de board, estrelas, itens e traits como explicações alternativas.",
+        metric:"Meta: identificar 2 boards de nível semelhante com resultados diferentes e comparar a composição final.",
+        ids:focus.matchIds,
+      };
+    }
+
+    if(focus?.id.startsWith("line-dominance:")){
+      return {
+        title:"Teste uma segunda linha quando o jogo oferecer",
+        body:"Não abandone sua especialidade. Registre uma partida em que itens e unidades naturalmente apontem para outra identidade e compare o resultado depois.",
+        metric:"Meta: concluir 1 partida com uma segunda identidade de board sem forçar a transição.",
+        ids:focus.matchIds,
+      };
+    }
+
+    if(focus?.id==="recent-form"&&focus.tone==="warning"){
+      return {
+        title:"Descubra o que mudou no bloco recente",
+        body:"Compare as partidas recentes com o bloco anterior e procure apenas uma diferença por vez: linha, nível final, presença de 3★ ou frequência de Bottom 2.",
+        metric:"Meta: encontrar 1 mudança objetiva que apareceu mais no bloco recente.",
+        ids:focus.matchIds,
+      };
+    }
+
+    const primary=leaks.primary;
     if(primary?.id==="conversion"){
       return {
         title:"Converta um Top 4 em vitória",
-        body:"Nas próximas 5 partidas, marque quando chegar ao Top 4 e depois compare board final, nível, estrelas e itens. O objetivo é encontrar uma diferença observável antes de mudar toda a sua linha.",
-        metric:"Meta: pelo menos 1 vitória entre seus próximos Top 4.",
+        body:"Compare boards finais dos Top 4 e procure uma diferença observável antes de mudar sua linha.",
+        metric:"Meta: registrar uma diferença entre pelo menos 2 Top 4.",
         ids:top4.map(match=>match.id),
-      };
-    }
-
-    if(primary?.id==="bottom2"){
-      const bottom2=matches.filter(match=>match.placement>=7);
-      return {
-        title:"Proteja o piso da próxima sessão",
-        body:"Revise primeiro os 7º/8º e observe se existe um padrão de board final fraco, nível sem conversão ou linha forçada. O experimento é evitar decisões que repetem esse padrão.",
-        metric:"Meta: reduzir a frequência de Bottom 2 nas próximas 5 partidas.",
-        ids:bottom2.map(match=>match.id),
-      };
-    }
-
-    if(primary?.id==="dominance"){
-      return {
-        title:"Teste uma segunda linha quando o jogo oferecer",
-        body:"Não abandone sua linha forte. Apenas registre uma partida em que o lobby e os itens apontem para uma alternativa viável e compare o resultado.",
-        metric:"Meta: concluir pelo menos 1 partida com uma segunda identidade de board.",
-        ids:primary.matchIds,
-      };
-    }
-
-    if(primary?.id==="level-conversion"){
-      return {
-        title:"Pare de usar nível como explicação única",
-        body:"Compare os boards finais em que nível foi parecido, mas o resultado foi diferente. Procure diferenças de unidades, estrelas, itens e traits.",
-        metric:"Meta: identificar uma diferença observável em pelo menos 2 partidas.",
-        ids:primary.matchIds,
       };
     }
 
@@ -165,9 +202,9 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
       title:session.focus,
       body:session.reason,
       metric:"Use a próxima sessão para testar só uma mudança de cada vez.",
-      ids:session.matchIds,
+      ids:focus?.matchIds.length?focus.matchIds:session.matchIds,
     };
-  },[leaks,session,top4,matches]);
+  },[rankedSignals,leaks,session,top4,staticData]);
 
   return <section className="panel chibi-review coach-review">
     <div className="review-head coach-review-head">
