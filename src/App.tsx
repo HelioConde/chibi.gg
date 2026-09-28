@@ -34,6 +34,7 @@ import OverlayPage from "./components/OverlayPage";
 import StatisticsPage, { StatisticsCategory } from "./components/StatisticsPage";
 import GlobalSearch from "./components/GlobalSearch";
 import HomeMetaPreview from "./components/HomeMetaPreview";
+import TeamBuilderPage from "./components/TeamBuilderPage";
 import AskChibi from "./components/AskChibi";
 import ChibiMemory from "./components/ChibiMemory";
 import ReviewQueue from "./components/ReviewQueue";
@@ -218,16 +219,18 @@ function App() {
     query:"",
     view:"stats",
   });
-  const [sitePage,setSitePage]=useState<"main"|"meta"|"comps"|"stats"|"overlay">(
+  const [sitePage,setSitePage]=useState<"main"|"meta"|"comps"|"stats"|"builder"|"overlay">(
     window.location.hash==="#meta"
       ?"meta"
       :window.location.hash==="#comps"
         ?"comps"
         :window.location.hash==="#stats"
           ?"stats"
-          :window.location.hash==="#overlay"
-            ?"overlay"
-            :"main"
+          :window.location.hash==="#builder"
+            ?"builder"
+            :window.location.hash==="#overlay"
+              ?"overlay"
+              :"main"
   );
 
   useEffect(()=>{
@@ -265,9 +268,11 @@ function App() {
             ?"comps"
             :window.location.hash==="#stats"
               ?"stats"
-              :window.location.hash==="#overlay"
-                ?"overlay"
-                :"main"
+              :window.location.hash==="#builder"
+                ?"builder"
+                :window.location.hash==="#overlay"
+                  ?"overlay"
+                  :"main"
       );
     };
 
@@ -654,6 +659,13 @@ function App() {
     await loadPlayer(parsed.gameName,parsed.tagLine,platform,true,"matches");
   }
 
+  function openBuilder(){
+    setSitePage("builder");
+    if(window.location.hash!=="#builder"){
+      window.history.pushState({},"",window.location.pathname+window.location.search+"#builder");
+    }
+  }
+
   function openOverlay(){
     setSitePage("overlay");
     if(window.location.hash!=="#overlay"){
@@ -701,6 +713,7 @@ function App() {
           <button className={sitePage==="meta"?"active":""} onClick={openMeta}>Meta</button>
           <button className={sitePage==="comps"?"active":""} onClick={openComps}>Comps</button>
           <button className={sitePage==="stats"?"active":""} onClick={()=>openStats()}>Statistics</button>
+          <button className={sitePage==="builder"?"active":""} onClick={openBuilder}>Builder</button>
           <button className={sitePage==="overlay"?"active":""} onClick={openOverlay}>Overlay</button>
           <a href="#leaderboard">Leaderboard</a>
         </nav>
@@ -742,6 +755,14 @@ function App() {
           initialCategory={statsTarget.category}
           initialQuery={statsTarget.query}
           initialView={statsTarget.view}
+        />
+      ) : sitePage==="builder" ? (
+        <TeamBuilderPage
+          staticData={staticData}
+          matches={analysisMatches}
+          hasProfile={Boolean(profile)}
+          onBack={closeExplorePage}
+          onEvidence={showCompEvidence}
         />
       ) : sitePage==="overlay" ? (
         <OverlayPage
