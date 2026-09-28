@@ -158,8 +158,8 @@ export default function OverlayPage({
       <div className="overlay-beta-card">
         <span>FASE ATUAL</span>
         <strong>Overlay v1</strong>
-        <small>protótipo web interativo</small>
-        <b>COMPANION EM PREPARAÇÃO</b>
+        <small>web + companion desktop</small>
+        <b>GM1.2 EM ANDAMENTO</b>
       </div>
     </section>
 
@@ -268,6 +268,40 @@ export default function OverlayPage({
       <p className="overlay-demo-note">Esta tela é uma simulação de UX. O companion real só poderá mostrar sinais suportados por dados permitidos/coletados localmente e sempre manterá múltiplas escolhas em vez de automatizar decisões.</p>
     </section>
 
+    <section className="panel overlay-companion-status">
+      <div className="overlay-companion-title">
+        <div>
+          <span>CHIBI COMPANION · GM1.2</span>
+          <h2>A janela real do overlay já está sendo preparada</h2>
+          <p>A primeira versão roda separada do site e ainda usa dados simulados. Isso permite validar tamanho, posição e interação sobre o jogo antes de conectar qualquer leitura do TFT.</p>
+        </div>
+        <b>DESKTOP FOUNDATION</b>
+      </div>
+
+      <div className="overlay-companion-grid">
+        <article>
+          <span>HOTKEY</span>
+          <strong>Ctrl + Shift + Space</strong>
+          <small>mostrar / ocultar overlay</small>
+        </article>
+        <article>
+          <span>CLICK-THROUGH</span>
+          <strong>Ctrl + Shift + L</strong>
+          <small>liberar / recuperar o mouse</small>
+        </article>
+        <article>
+          <span>PRESETS</span>
+          <strong>Compacto · Coach · Completo</strong>
+          <small>tamanho e densidade persistentes</small>
+        </article>
+        <article>
+          <span>MONITOR</span>
+          <strong>Esquerda ou direita</strong>
+          <small>posição salva por monitor</small>
+        </article>
+      </div>
+    </section>
+
     <section className="overlay-principles">
       <article>
         <span>01</span>
@@ -306,10 +340,10 @@ export default function OverlayPage({
           <div><strong>UX do Overlay</strong><span>Estados, hierarquia e modo compacto</span></div>
           <em>AGORA</em>
         </article>
-        <article>
+        <article className="active">
           <b>2</b>
-          <div><strong>Companion desktop</strong><span>Janela, hotkey, captura local e overlay transparente</span></div>
-          <em>PRÓXIMO</em>
+          <div><strong>Companion desktop</strong><span>Janela transparente, hotkeys, presets e monitor</span></div>
+          <em>EM ANDAMENTO</em>
         </article>
         <article>
           <b>3</b>
