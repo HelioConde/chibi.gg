@@ -864,11 +864,6 @@ function App() {
           />}
 
           {profileTab==="matches"&&<>
-            {!evidenceIds?.length&&<ReviewQueue
-              playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
-              matches={analysisMatches}
-              onOpenMatch={openGuidedReview}
-            />}
             <div className="content-grid">
             <section className="panel history" id="match-history">
               <div className="panel-title">
@@ -892,6 +887,13 @@ function App() {
                     <div className={"placement "+placementClass(match.placement)}>{match.placement}º</div>
 
                     <div className="match-main">
+                      <div className="match-context-line">
+                        <span>{queueLabel(staticData,match.queueId||0)}</span>
+                        {matchRoundLabel(match)&&<span>{matchRoundLabel(match)}</span>}
+                        {match.duration&&<span>{formatDuration(match.duration)}</span>}
+                        <span>{formatWhen(match.playedAt)}</span>
+                      </div>
+
                       <div className="match-row-title">
                         <div>
                           <strong>{activeTraits(match).slice(0,2).map((t)=>traitLabel(t,staticData)).filter(Boolean).join(" · ") || "Board TFT"}</strong>
@@ -912,14 +914,19 @@ function App() {
                       </div>
 
                       <div className="board-row compact-board">
-                        {match.units.slice(0,6).map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact key={unit.characterId+index}/>)}
+                        {match.units.slice(0,8).map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact key={unit.characterId+index}/>)}
                       </div>
                     </div>
 
-                    <div className="match-meta">
-                      <span>{formatWhen(match.playedAt)} · Nível {match.level}</span>
+                    <div className="match-meta match-meta-rich">
+                      <div className="match-value-grid">
+                        <span><b>{boardValue(match,staticData)}G</b><small>board</small></span>
+                        <span><b>{match.goldLeft}G</b><small>ouro</small></span>
+                        <span><b>{match.level}</b><small>nível</small></span>
+                        <span><b>{match.playersEliminated||0}</b><small>elim.</small></span>
+                      </div>
                       <strong>{match.damageToPlayers} dano</strong>
-                      <small>{match.goldLeft}g · abrir análise →</small>
+                      <small>abrir análise →</small>
                     </div>
                   </button>;
                 })}
@@ -997,6 +1004,12 @@ function App() {
               </details>
             </aside>
           </div>
+
+          {!evidenceIds?.length&&<ReviewQueue
+            playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
+            matches={analysisMatches}
+            onOpenMatch={openGuidedReview}
+          />}
           </>}
           <AskChibi
             playerName={profile.player.gameName}
