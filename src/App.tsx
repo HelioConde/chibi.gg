@@ -54,6 +54,7 @@ import StatisticsPage, { StatisticsCategory } from "./components/StatisticsPage"
 import GlobalSearch from "./components/GlobalSearch";
 import HomeMetaPreview from "./components/HomeMetaPreview";
 import HomeSessionResume from "./components/HomeSessionResume";
+import HomeStudyShelf from "./components/HomeStudyShelf";
 import TeamBuilderPage from "./components/TeamBuilderPage";
 import LeaderboardPage from "./components/LeaderboardPage";
 import AskChibi from "./components/AskChibi";
@@ -1139,6 +1140,11 @@ function App() {
               recentPlayers={recentPlayers}
               onOpenSession={(player)=>{void openRecentSession(player);}}
               onOpenLesson={(player)=>{void openRecentLesson(player);}}
+            />
+
+            <HomeStudyShelf
+              onOpenBuilder={openBuilder}
+              onOpenStats={(category,query)=>openStats(category,query,"stats")}
             />
 
             {recentPlayers.length>0&&<section className="recent-players">
