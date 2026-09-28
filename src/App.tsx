@@ -32,6 +32,7 @@ import GlobalMetaPage from "./components/GlobalMetaPage";
 import CompsPage from "./components/CompsPage";
 import AskChibi from "./components/AskChibi";
 import ChibiMemory from "./components/ChibiMemory";
+import ReviewQueue from "./components/ReviewQueue";
 
 function cleanName(value:string){
   return value
@@ -721,7 +722,13 @@ function App() {
             shareUrl={window.location.href}
           />}
 
-          {profileTab==="matches"&&<div className="content-grid">
+          {profileTab==="matches"&&<>
+            {!evidenceIds?.length&&<ReviewQueue
+              playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
+              matches={analysisMatches}
+              onOpenMatch={openMatch}
+            />}
+            <div className="content-grid">
             <section className="panel history" id="match-history">
               <div className="panel-title">
                 <div><span>PARTIDAS RIOT</span><h2>Histórico recente</h2></div>
@@ -848,7 +855,8 @@ function App() {
                 </div>
               </details>
             </aside>
-          </div>}
+          </div>
+          </>}
           <AskChibi
             playerName={profile.player.gameName}
             matches={analysisMatches}
