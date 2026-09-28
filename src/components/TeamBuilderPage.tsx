@@ -5,7 +5,7 @@ import {
   tftAssetUrl,
   TftStaticData,
 } from "../tftStatic";
-import HexBoard, { HexBoardUnit } from "./HexBoard";
+import HexBoard, { HexBoardRole, HexBoardUnit } from "./HexBoard";
 import DDragonArt from "./DDragonArt";
 import {
   BuilderPreset,
@@ -107,6 +107,18 @@ function augmentSimilarity(configured:string[],match:TftMatch){
   return matched/configured.length;
 }
 
+function rowForHex(hex:number){
+  return Math.floor(hex/7);
+}
+
+function colForHex(hex:number){
+  return hex%7;
+}
+
+function positionZone(hex:number){
+  return rowForHex(hex)<=1?"front":"back";
+}
+
 export default function TeamBuilderPage({
   staticData,
   matches,
@@ -128,6 +140,8 @@ export default function TeamBuilderPage({
   const [selectedAugments,setSelectedAugments]=useState<string[]>([]);
   const [augmentQuery,setAugmentQuery]=useState("");
   const [variantAAugments,setVariantAAugments]=useState<string[]>([]);
+  const [positioningMode,setPositioningMode]=useState(false);
+  const [movingHex,setMovingHex]=useState<number|null>(null);
 
   useEffect(()=>{
     if(!initialChampionIds.length)return;
@@ -144,6 +158,8 @@ export default function TeamBuilderPage({
     setSelectedItemHex(null);
     setSelectedAugments([]);
     setAugmentQuery("");
+    setPositioningMode(false);
+    setMovingHex(null);
   },[initialChampionIds]);
 
   const champions=useMemo(()=>{
@@ -412,12 +428,24 @@ export default function TeamBuilderPage({
       .filter(id=>(beforeById.get(id)||"")!==(afterById.get(id)||""))
       .slice(0,6);
 
+    const beforePositions=new Map(variantA.map(unit=>[unit.id,unit.hex]));
+    const afterPositions=new Map(units.map(unit=>[unit.id,unit.hex]));
+    const positionChanges=[...beforePositions.keys()]
+      .filter(id=>afterPositions.has(id)&&beforePositions.get(id)!==afterPositions.get(id))
+      .slice(0,8);
+
+    const beforeRoles=new Map(variantA.map(unit=>[unit.id,unit.role||""]));
+    const afterRoles=new Map(units.map(unit=>[unit.id,unit.role||""]));
+    const roleChanges=[...new Set([...beforeRoles.keys(),...afterRoles.keys()])]
+      .filter(id=>(beforeRoles.get(id)||"")!==(afterRoles.get(id)||""))
+      .slice(0,8);
+
     const augmentChanges={
       before:variantAAugments.filter(id=>!selectedAugments.includes(id)),
       after:selectedAugments.filter(id=>!variantAAugments.includes(id)),
     };
 
-    return {added,removed,changedTraits,itemChanges,augmentChanges};
+    return {added,removed,changedTraits,itemChanges,positionChanges,roleChanges,augmentChanges};
   },[variantA,variantAEvaluation,units,traitCounts,variantAAugments,selectedAugments]);
 
   const similar=useMemo(()=>{
@@ -452,6 +480,37 @@ export default function TeamBuilderPage({
       withAugment:augmentValues.filter(value=>value>0).length,
     };
   },[similar,units,selectedAugments]);
+
+  const positionAnalysis=useMemo(()=>{
+    const front=units.filter(unit=>positionZone(unit.hex)==="front");
+    const back=units.filter(unit=>positionZone(unit.hex)==="back");
+    const carries=units.filter(unit=>unit.role==="carry");
+    const tanks=units.filter(unit=>unit.role==="tank");
+    const utilities=units.filter(unit=>unit.role==="utility");
+    const carryFront=carries.filter(unit=>positionZone(unit.hex)==="front");
+    const tankBack=tanks.filter(unit=>positionZone(unit.hex)==="back");
+    const roleUnits=[...carries,...tanks];
+    const aligned=roleUnits.length-carryFront.length-tankBack.length;
+    const fit=roleUnits.length?Math.round(aligned/roleUnits.length*100):null;
+    const columns=new Set(units.map(unit=>colForHex(unit.hex))).size;
+    const rows=new Set(units.map(unit=>rowForHex(unit.hex))).size;
+    const edgeCarries=carries.filter(unit=>positionZone(unit.hex)==="back"&&(colForHex(unit.hex)===0||colForHex(unit.hex)===6)).length;
+
+    return {
+      front:front.length,
+      back:back.length,
+      carries:carries.length,
+      tanks:tanks.length,
+      utilities:utilities.length,
+      assigned:carries.length+tanks.length+utilities.length,
+      carryFront,
+      tankBack,
+      fit,
+      columns,
+      rows,
+      edgeCarries,
+    };
+  },[units]);
 
   const boardValue=units.reduce(
     (sum,unit)=>sum+costFor(unit.id,staticData)*copiesFor(unit.tier||1),
@@ -536,6 +595,7 @@ export default function TeamBuilderPage({
   function removeUnit(unit:HexBoardUnit){
     setUnits(current=>current.filter(row=>row.hex!==unit.hex));
     if(selectedItemHex===unit.hex)setSelectedItemHex(null);
+    if(movingHex===unit.hex)setMovingHex(null);
   }
 
   function setUnitTier(hex:number,tier:number){
@@ -569,6 +629,76 @@ export default function TeamBuilderPage({
 
   function clearUnitItems(hex:number){
     setUnits(current=>current.map(unit=>unit.hex===hex?{...unit,items:[]}:unit));
+  }
+
+  function setUnitRole(hex:number,role:HexBoardRole){
+    setUnits(current=>current.map(unit=>
+      unit.hex===hex
+        ?{...unit,role:unit.role===role?undefined:role}
+        :unit
+    ));
+  }
+
+  function moveUnitToHex(targetHex:number){
+    if(movingHex==null)return;
+
+    setUnits(current=>{
+      const source=current.find(unit=>unit.hex===movingHex);
+      if(!source)return current;
+      const target=current.find(unit=>unit.hex===targetHex);
+
+      return current.map(unit=>{
+        if(unit.hex===movingHex)return {...unit,hex:targetHex};
+        if(target&&unit.hex===targetHex)return {...unit,hex:movingHex};
+        return unit;
+      });
+    });
+
+    if(selectedItemHex===movingHex)setSelectedItemHex(targetHex);
+    setMovingHex(null);
+  }
+
+  function handleBoardHexClick(hex:number){
+    if(positioningMode&&movingHex!=null){
+      moveUnitToHex(hex);
+      return;
+    }
+    addToHex(hex);
+  }
+
+  function handleBoardUnitClick(unit:HexBoardUnit){
+    if(selectedId){
+      addToHex(unit.hex);
+      return;
+    }
+
+    if(positioningMode){
+      if(movingHex==null){
+        setMovingHex(unit.hex);
+        return;
+      }
+      if(movingHex===unit.hex){
+        setMovingHex(null);
+        return;
+      }
+      moveUnitToHex(unit.hex);
+      return;
+    }
+
+    removeUnit(unit);
+  }
+
+  function togglePositioning(){
+    setPositioningMode(current=>{
+      const next=!current;
+      if(next){
+        setSelectedId(null);
+        setSelectedItemHex(null);
+      }else{
+        setMovingHex(null);
+      }
+      return next;
+    });
   }
 
   function addAugment(augmentId:string){
@@ -609,6 +739,8 @@ export default function TeamBuilderPage({
     setSelectedAugments([...(preset.augments||[])].slice(0,3));
     setSelectedId(null);
     setSelectedItemHex(null);
+    setPositioningMode(false);
+    setMovingHex(null);
   }
 
   async function copyBoardSummary(){
@@ -617,7 +749,9 @@ export default function TeamBuilderPage({
       .sort((a,b)=>a.hex-b.hex)
       .map(unit=>{
         const entry=staticEntry(staticData?.champions,unit.id);
-        const unitName=(entry?.name||clean(unit.id))+" "+("★".repeat(Math.max(1,Math.min(3,unit.tier||1))));
+        const roleLabel=unit.role==="carry"?"Carry":unit.role==="tank"?"Tank":unit.role==="utility"?"Util.":"";
+        const zoneLabel=positionZone(unit.hex)==="front"?"Front":"Back";
+        const unitName=(entry?.name||clean(unit.id))+" "+("★".repeat(Math.max(1,Math.min(3,unit.tier||1))))+(roleLabel?" · "+roleLabel+"/"+zoneLabel:"");
         const itemNames=(unit.items||[])
           .map(itemId=>staticEntry(staticData?.items,itemId)?.name||clean(itemId))
           .filter(Boolean);
@@ -650,11 +784,11 @@ export default function TeamBuilderPage({
     }
   }
 
-  return <main className="builder-page builder-v2 builder-v3 builder-v4 builder-v5">
+  return <main className="builder-page builder-v2 builder-v3 builder-v4 builder-v5 builder-v6">
     <section className="builder-hero">
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>← Voltar ao perfil</button>}
-        <span className="eyebrow">CHIBI LAB · TEAM BUILDER V5</span>
+        <span className="eyebrow">CHIBI LAB · TEAM BUILDER V6</span>
         <h1>Monte o board.<br/><em>Teste uma decisão por vez.</em></h1>
         <p>{initialChampionIds.length
           ?"Comp carregada. Mova, remova ou substitua peças e compare variantes com o seu histórico."
@@ -717,6 +851,7 @@ export default function TeamBuilderPage({
         <article><span>3★</span><strong>{threeStars}</strong></article>
         <article><span>ITENS</span><strong>{itemAssignments}</strong></article>
         <article><span>AUGMENTS</span><strong>{selectedAugments.length}/3</strong></article>
+        <article><span>POSIÇÃO</span><strong>{positionAnalysis.fit==null?"—":positionAnalysis.fit+"%"}</strong></article>
         <article><span>TRAITS VISÍVEIS</span><strong>{traitCounts.length}</strong></article>
         <article><span>COMPARÁVEIS</span><strong>{similar.length}</strong></article>
       </div>
@@ -788,6 +923,70 @@ export default function TeamBuilderPage({
         </div>
         <b>Clique em um hex vazio para adicionar ou em uma unidade para substituir.</b>
         <button onClick={()=>setSelectedId(null)}>Cancelar</button>
+      </div>}
+    </section>
+
+    <section className="builder-position-lab">
+      <div className="builder-position-head">
+        <div>
+          <span>FORMAÇÃO</span>
+          <h2>Posicionamento</h2>
+          <p>Marque papéis e organize as 4 fileiras. O Chibi avalia apenas a formação que você montou; a API de partidas não expõe posições históricas.</p>
+        </div>
+        <button className={positioningMode?"active":""} onClick={togglePositioning}>
+          {positioningMode?"Sair do modo mover":"Mover unidades"}
+        </button>
+      </div>
+
+      <div className="builder-position-grid">
+        <article className="builder-position-stat">
+          <span>FRONTLINE</span>
+          <strong>{positionAnalysis.front}</strong>
+          <small>fileiras 1–2</small>
+        </article>
+        <article className="builder-position-stat">
+          <span>BACKLINE</span>
+          <strong>{positionAnalysis.back}</strong>
+          <small>fileiras 3–4</small>
+        </article>
+        <article className="builder-position-stat">
+          <span>PAPÉIS DEFINIDOS</span>
+          <strong>{positionAnalysis.assigned}/{units.length||0}</strong>
+          <small>{positionAnalysis.tanks} tank · {positionAnalysis.carries} carry · {positionAnalysis.utilities} util.</small>
+        </article>
+        <article className={"builder-position-stat "+(positionAnalysis.fit!=null&&positionAnalysis.fit<70?"warning":"")}>
+          <span>ALINHAMENTO</span>
+          <strong>{positionAnalysis.fit==null?"—":positionAnalysis.fit+"%"}</strong>
+          <small>Tank na frente · Carry atrás</small>
+        </article>
+      </div>
+
+      <div className="builder-position-reading">
+        <div>
+          <span>LEITURA RÁPIDA</span>
+          <strong>{positionAnalysis.assigned===0
+            ?"Defina o papel das peças principais"
+            :positionAnalysis.carryFront.length||positionAnalysis.tankBack.length
+              ?"Há papéis fora da zona esperada"
+              :"Papéis marcados estão coerentes com as zonas"}</strong>
+          <p>{positionAnalysis.assigned===0
+            ?"Use Carry, Tank e Utilidade no roster. Isso não muda as estatísticas; serve para o Chibi entender a intenção da formação."
+            :[
+              positionAnalysis.carryFront.length?positionAnalysis.carryFront.length+" carry na frontline":"",
+              positionAnalysis.tankBack.length?positionAnalysis.tankBack.length+" tank na backline":"",
+              positionAnalysis.edgeCarries?positionAnalysis.edgeCarries+" carry de canto":"",
+            ].filter(Boolean).join(" · ")||"Nenhum conflito básico de papel detectado."}</p>
+        </div>
+        <div className="builder-position-spread">
+          <span>OCUPAÇÃO</span>
+          <b>{positionAnalysis.columns}/7 colunas</b>
+          <b>{positionAnalysis.rows}/4 fileiras</b>
+        </div>
+      </div>
+
+      {positioningMode&&<div className="builder-position-instruction">
+        <b>{movingHex==null?"Clique em uma unidade no tabuleiro para selecionar.":"Unidade selecionada no hex "+(movingHex+1)+". Clique em outro hex para mover ou trocar."}</b>
+        {movingHex!=null&&<button onClick={()=>setMovingHex(null)}>Cancelar movimento</button>}
       </div>}
     </section>
 
@@ -931,6 +1130,12 @@ export default function TeamBuilderPage({
                 ...variantDiff.augmentChanges.after.map(id=>"+ "+(staticEntry(staticData?.augments,id)?.name||clean(id))),
               ].join(" · ")
               :"sem alteração de augments"}</p>
+            <p><b>Posições</b>{variantDiff.positionChanges.length
+              ?variantDiff.positionChanges.map(id=>staticEntry(staticData?.champions,id)?.name||clean(id)).join(" · ")
+              :"sem alteração de posição"}</p>
+            <p><b>Papéis</b>{variantDiff.roleChanges.length
+              ?variantDiff.roleChanges.map(id=>staticEntry(staticData?.champions,id)?.name||clean(id)).join(" · ")
+              :"sem alteração de papel"}</p>
           </div>
         </article>
       </div>
@@ -970,16 +1175,21 @@ export default function TeamBuilderPage({
         <div className="builder-panel-head">
           <div>
             <span>BOARD</span>
-            <h2>{selectedId?"Escolha um hex":"Seu tabuleiro"}</h2>
+            <h2>{selectedId?"Escolha um hex":positioningMode?(movingHex==null?"Selecione uma unidade":"Escolha o destino"):"Seu tabuleiro"}</h2>
           </div>
-          {selectedId&&<button onClick={()=>setSelectedId(null)}>Cancelar seleção</button>}
+          <div className="builder-board-head-actions">
+            <button className={positioningMode?"active":""} onClick={togglePositioning}>{positioningMode?"Modo mover ativo":"Posicionar"}</button>
+            {selectedId&&<button onClick={()=>setSelectedId(null)}>Cancelar seleção</button>}
+          </div>
         </div>
 
         <HexBoard
           units={units}
           staticData={staticData}
-          onHexClick={addToHex}
-          onUnitClick={selectedId?(unit)=>addToHex(unit.hex):removeUnit}
+          onHexClick={handleBoardHexClick}
+          onUnitClick={handleBoardUnitClick}
+          positioning={positioningMode}
+          movingHex={movingHex}
           interactive
           emptyLabel="Selecione um champion na biblioteca e clique no hex desejado."
         />
@@ -987,7 +1197,7 @@ export default function TeamBuilderPage({
         <div className="builder-roster">
           <div className="builder-subhead">
             <span>SEU BOARD</span>
-            <small>Ajuste estrelas aqui. No tabuleiro, clique numa unidade sem seleção para remover; com champion selecionado, clique para substituir.</small>
+            <small>Ajuste estrelas, itens e papéis. Use “Posicionar” para mover ou trocar peças sem removê-las.</small>
           </div>
           {units.length?<div className="builder-roster-grid">
             {units.slice().sort((a,b)=>a.hex-b.hex).map(unit=>{
@@ -1007,6 +1217,11 @@ export default function TeamBuilderPage({
                         key={tier}
                       >{"★".repeat(tier)}</button>
                     ))}
+                  </div>
+                  <div className="builder-role-control">
+                    <button className={unit.role==="tank"?"active tank":""} onClick={()=>setUnitRole(unit.hex,"tank")}>Tank</button>
+                    <button className={unit.role==="carry"?"active carry":""} onClick={()=>setUnitRole(unit.hex,"carry")}>Carry</button>
+                    <button className={unit.role==="utility"?"active utility":""} onClick={()=>setUnitRole(unit.hex,"utility")}>Util.</button>
                   </div>
                   <div className="builder-unit-items">
                     {[0,1,2].map(index=>{
@@ -1230,6 +1445,6 @@ export default function TeamBuilderPage({
       </aside>
     </section>
 
-    <p className="builder-disclaimer">O Builder compara estrutura final, traits, itens e augments configurados com o histórico carregado. Itens e augments do histórico são evidência pessoal, não uma tier list. Ele não conhece sua loja, ouro por rodada, scouting completo ou posição futura e não trata similaridade como causalidade.</p>
+    <p className="builder-disclaimer">O Builder compara estrutura final, traits, itens e augments configurados com o histórico carregado. O posicionamento é analisado apenas no board que você monta, porque a API de partidas não expõe a posição histórica das unidades. Ele não conhece sua loja, ouro por rodada, scouting completo ou posição futura e não trata similaridade como causalidade.</p>
   </main>;
 }
