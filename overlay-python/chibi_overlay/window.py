@@ -199,9 +199,9 @@ class OverlayWindow(QMainWindow):
         detail_layout.setContentsMargins(0, 0, 0, 0)
         detail_layout.setSpacing(8)
 
-        board_card = QFrame()
-        board_card.setObjectName("panelCard")
-        board_layout = QVBoxLayout(board_card)
+        self.board_card = QFrame()
+        self.board_card.setObjectName("panelCard")
+        board_layout = QVBoxLayout(self.board_card)
         board_layout.setContentsMargins(10, 9, 10, 9)
         board_layout.setSpacing(6)
 
@@ -233,7 +233,7 @@ class OverlayWindow(QMainWindow):
             self.board_grid.addWidget(cell, slot // 7, slot % 7)
             self.board_cells.append(cell)
         board_layout.addWidget(self.board_grid_wrap)
-        detail_layout.addWidget(board_card)
+        detail_layout.addWidget(self.board_card)
 
         review_card = QFrame()
         review_card.setObjectName("panelCard")
@@ -482,6 +482,7 @@ class OverlayWindow(QMainWindow):
         self.stat_labels["gold"].setText(self._field_text(fields.gold))
         self.stat_labels["level"].setText(self._field_text(fields.level))
         self.stat_labels["streak"].setText(self._field_text(fields.streak))
+        self.score_label.setVisible(riot.state is not GameState.IN_GAME)
         self.score_label.setText("—" if snap.score is None else f"{snap.score}/100")
 
         board_is_unavailable = fields.board.source is FieldSource.UNAVAILABLE
