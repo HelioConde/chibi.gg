@@ -357,7 +357,13 @@ export default function TeamBuilderPage({
       .sort((a,b)=>Math.abs(b.after-b.before)-Math.abs(a.after-a.before))
       .slice(0,6);
 
-    return {added,removed,changedTraits};
+    const beforeById=new Map(variantA.map(unit=>[unit.id,(unit.items||[]).slice().sort().join("|")]));
+    const afterById=new Map(units.map(unit=>[unit.id,(unit.items||[]).slice().sort().join("|")]));
+    const itemChanges=[...new Set([...beforeById.keys(),...afterById.keys()])]
+      .filter(id=>(beforeById.get(id)||"")!==(afterById.get(id)||""))
+      .slice(0,6);
+
+    return {added,removed,changedTraits,itemChanges};
   },[variantA,variantAEvaluation,units,traitCounts]);
 
   const similar=useMemo(()=>{
@@ -733,6 +739,9 @@ export default function TeamBuilderPage({
                 return name+" "+(delta>0?"+":"")+delta;
               }).join(" · ")
               :"sem alteração estrutural"}</p>
+            <p><b>Itens</b>{variantDiff.itemChanges.length
+              ?variantDiff.itemChanges.map(id=>staticEntry(staticData?.champions,id)?.name||clean(id)).join(" · ")
+              :"sem alteração de itemização"}</p>
           </div>
         </article>
       </div>
