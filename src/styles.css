@@ -7163,3 +7163,54 @@ a { color: inherit; text-decoration: none; }
     flex-direction:column;
   }
 }
+
+/* -----------------------------------------------------------------------
+   Match review navigation
+   ----------------------------------------------------------------------- */
+.match-modal-head-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.match-modal-nav{
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+.match-modal-nav button{
+  border:1px solid #30394d;
+  border-radius:7px;
+  background:#101722;
+  color:#8794a8;
+  padding:6px 8px;
+  font-size:7px;
+  font-weight:850;
+}
+.match-modal-nav button:hover:not(:disabled){
+  border-color:#514875;
+  color:#d0caff;
+}
+.match-modal-nav button:disabled{
+  opacity:.28;
+  cursor:not-allowed;
+}
+.match-modal-nav span{
+  color:#5f6d82;
+  font-size:7px;
+  white-space:nowrap;
+}
+@media(max-width:760px){
+  .match-modal-head{
+    align-items:flex-start;
+    gap:10px;
+  }
+  .match-modal-head-actions{
+    align-items:flex-end;
+    flex-direction:column-reverse;
+  }
+  .match-modal-nav{
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    width:100%;
+  }
+}
