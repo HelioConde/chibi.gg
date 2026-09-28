@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { TftMatch } from "../api/tft";
 import {
   staticEntry,
@@ -14,6 +14,7 @@ type Props={
   hasProfile:boolean;
   onBack:()=>void;
   onEvidence:(ids:string[],label:string)=>void;
+  initialChampionIds?:string[];
 };
 
 function clean(value:string){
@@ -42,10 +43,24 @@ export default function TeamBuilderPage({
   hasProfile,
   onBack,
   onEvidence,
+  initialChampionIds=[],
 }:Props){
   const [query,setQuery]=useState("");
   const [selectedId,setSelectedId]=useState<string|null>(null);
   const [units,setUnits]=useState<HexBoardUnit[]>([]);
+
+  useEffect(()=>{
+    if(!initialChampionIds.length)return;
+    const preferredHexes=[21,22,23,24,15,16,17,18,25,26];
+    setUnits(
+      initialChampionIds.slice(0,10).map((id,index)=>({
+        id,
+        hex:preferredHexes[index]??index,
+        tier:2,
+      }))
+    );
+    setSelectedId(null);
+  },[initialChampionIds]);
 
   const champions=useMemo(()=>{
     const normalized=query.trim().toLowerCase();
@@ -109,7 +124,9 @@ export default function TeamBuilderPage({
         {hasProfile&&<button className="back-search" onClick={onBack}>← Voltar ao perfil</button>}
         <span className="eyebrow">CHIBI LAB · TEAM BUILDER</span>
         <h1>Monte o board.<br/><em>Compare com o seu histórico.</em></h1>
-        <p>Um Team Builder pensado para experimentar rotas e depois perguntar ao Chibi se você já jogou algo parecido.</p>
+        <p>{initialChampionIds.length
+          ?"Comp carregada. Agora mova peças, remova unidades e compare variantes com o seu histórico."
+          :"Um Team Builder pensado para experimentar rotas e depois perguntar ao Chibi se você já jogou algo parecido."}</p>
         <DDragonArt
           staticData={staticData}
           championIds={units.map(unit=>unit.id)}
