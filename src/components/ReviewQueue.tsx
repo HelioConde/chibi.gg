@@ -1,32 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { TftMatch } from "../api/tft";
 import { buildReviewQueue, ReviewQueueItem } from "../analysis/reviewQueue";
+import { getReviewedMatchIds, markMatchReviewed } from "../reviewProgress";
 
 type Props={
   playerKey:string;
   matches:TftMatch[];
-  onOpenMatch:(match:TftMatch)=>void;
+  onOpenMatch:(match:TftMatch,queueIds:string[],index:number)=>void;
 };
-
-const PREFIX="chibi.gg:reviewed:v1:";
-
-function storageKey(playerKey:string){
-  return PREFIX+encodeURIComponent(playerKey.toLowerCase());
-}
-
-function readReviewed(playerKey:string){
-  try{
-    const raw=localStorage.getItem(storageKey(playerKey));
-    const parsed=raw?JSON.parse(raw):[];
-    return new Set(Array.isArray(parsed)?parsed.map(String):[]);
-  }catch{
-    return new Set<string>();
-  }
-}
-
-function writeReviewed(playerKey:string,ids:Set<string>){
-  localStorage.setItem(storageKey(playerKey),JSON.stringify([...ids].slice(-100)));
-}
 
 function kindLabel(item:ReviewQueueItem){
   if(item.kind==="priority") return "PRIORIDADE";
@@ -36,28 +17,27 @@ function kindLabel(item:ReviewQueueItem){
 
 export default function ReviewQueue({playerKey,matches,onOpenMatch}:Props){
   const queue=useMemo(()=>buildReviewQueue(matches),[matches]);
-  const [reviewed,setReviewed]=useState<Set<string>>(()=>readReviewed(playerKey));
+  const [reviewed,setReviewed]=useState<Set<string>>(()=>getReviewedMatchIds(playerKey));
 
   useEffect(()=>{
-    setReviewed(readReviewed(playerKey));
+    const refresh=()=>setReviewed(getReviewedMatchIds(playerKey));
+    refresh();
+    window.addEventListener("chibi:reviewed",refresh);
+    return ()=>window.removeEventListener("chibi:reviewed",refresh);
   },[playerKey]);
 
   const completed=queue.filter(item=>reviewed.has(item.matchId)).length;
   const next=queue.find(item=>!reviewed.has(item.matchId))||queue[0]||null;
 
   function toggleReviewed(matchId:string){
-    setReviewed(current=>{
-      const nextSet=new Set(current);
-      if(nextSet.has(matchId)) nextSet.delete(matchId);
-      else nextSet.add(matchId);
-      writeReviewed(playerKey,nextSet);
-      return nextSet;
-    });
+    const next=markMatchReviewed(playerKey,matchId,!reviewed.has(matchId));
+    setReviewed(new Set(next));
   }
 
   function open(item:ReviewQueueItem){
     const match=matches.find(match=>match.id===item.matchId);
-    if(match) onOpenMatch(match);
+    const index=queue.findIndex(row=>row.matchId===item.matchId);
+    if(match) onOpenMatch(match,queue.map(row=>row.matchId),Math.max(0,index));
   }
 
   if(!queue.length) return null;
