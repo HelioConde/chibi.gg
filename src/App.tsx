@@ -24,6 +24,7 @@ import { buildRankedReviewSignals } from "./analysis/chibiReviewRanking";
 import ChibiInnovations from "./components/ChibiInnovations";
 import ChibiReview from "./components/ChibiReview";
 import ChibiSessionPlan from "./components/ChibiSessionPlan";
+import ActiveGoalStrip from "./components/ActiveGoalStrip";
 import ChibiLearningLab from "./components/ChibiLearningLab";
 import ChibiLearningPath from "./components/ChibiLearningPath";
 import ChibiCoachMode from "./components/ChibiCoachMode";
@@ -1424,6 +1425,13 @@ function App() {
                 <button className="secondary" onClick={()=>changeProfileTab("coach")}>Abrir Chibi Review</button>
               </div>
             </section>
+
+            <ActiveGoalStrip
+              playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
+              matches={analysisMatches}
+              onEvidence={showEvidence}
+              onOpenCoach={()=>changeProfileTab("coach")}
+            />
 
             <div className="content-grid">
             <section className="panel history" id="match-history">
