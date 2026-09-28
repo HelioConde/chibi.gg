@@ -98,7 +98,7 @@ export function buildChibiSessionPlan(matches:TftMatch[]):ChibiSessionPlan{
   const focus=signals.find(signal=>signal.kind==="risk")||signals[0]||null;
   const meta=buildPersonalMeta(valid);
 
-  const lines=meta.map(row=>({
+  const lines:SessionPlanLine[]=meta.map(row=>({
     traitId:row.id,
     label:"Linha recorrente",
     games:row.games,
