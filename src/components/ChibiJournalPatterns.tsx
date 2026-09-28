@@ -40,7 +40,7 @@ export default function ChibiJournalPatterns({matches,journalVersion,onEvidence}
 
     const byId=new Map(matches.map(match=>[match.id,match]));
     const entries=getJournalEntries(matches.map(match=>match.id))
-      .filter(entry=>entry.tags.length>0||entry.note.trim());
+      .filter(entry=>entry.tags.length>0||entry.note.trim()||(entry.reviewedAreas?.length||0)>0);
 
     if(!entries.length)return [] as PatternRow[];
 
@@ -108,13 +108,25 @@ export default function ChibiJournalPatterns({matches,journalVersion,onEvidence}
   const totalJournaled=useMemo(()=>{
     void journalVersion;
     return getJournalEntries(matches.map(match=>match.id))
-      .filter(entry=>entry.tags.length>0||entry.note.trim()).length;
+      .filter(entry=>entry.tags.length>0||entry.note.trim()||(entry.reviewedAreas?.length||0)>0).length;
+  },[matches,journalVersion]);
+
+  const reviewedCoverage=useMemo(()=>{
+    void journalVersion;
+    const entries=getJournalEntries(matches.map(match=>match.id))
+      .filter(entry=>(entry.reviewedAreas?.length||0)>0);
+    const complete=entries.filter(entry=>(entry.reviewedAreas?.length||0)>=6).length;
+    return {entries:entries.length,complete};
   },[matches,journalVersion]);
 
   if(!rows.length)return <section className="journal-patterns-empty">
     <span>PADRÕES DO JOURNAL</span>
-    <strong>Seus próprios relatos ainda não formam um padrão.</strong>
-    <p>Use tags e notas em algumas partidas. O Chibi vai cruzar o que você sentiu com o resultado real.</p>
+    <strong>{reviewedCoverage.entries
+      ? "Você já revisou partidas, mas nenhum comportamento se repetiu o suficiente."
+      : "Seus próprios relatos ainda não formam um padrão."}</strong>
+    <p>{reviewedCoverage.entries
+      ? reviewedCoverage.entries+" partida(s) passaram pelo checklist · "+reviewedCoverage.complete+" review(s) 6/6. Continue registrando boas e ruins."
+      : "Use o Quick Review Checklist em algumas partidas. O Chibi vai cruzar o que você sentiu com o resultado real."}</p>
   </section>;
 
   return <section className="journal-patterns">
@@ -127,7 +139,7 @@ export default function ChibiJournalPatterns({matches,journalVersion,onEvidence}
       <div className="journal-patterns-sample">
         <small>PARTIDAS COM JOURNAL</small>
         <strong>{totalJournaled}</strong>
-        <span>{rows.length} tag{rows.length===1?"":"s"} observada{rows.length===1?"":"s"}</span>
+        <span>{rows.length} tag{rows.length===1?"":"s"} · {reviewedCoverage.complete} review{reviewedCoverage.complete===1?"":"s"} 6/6</span>
       </div>
     </div>
 
