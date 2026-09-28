@@ -3,6 +3,7 @@ import { TftMatch } from "../api/tft";
 import {
   cancelChibiSession,
   ChibiSession,
+  ChibiSessionRecord,
   finishChibiSession,
   getActiveSession,
   getSessionHistory,
@@ -32,9 +33,11 @@ function formatDate(value:number){
 export default function ChibiSessionMode({playerKey,matches,refreshing=false,onRefresh,onEvidence}:Props){
   const [version,setVersion]=useState(0);
   const [active,setActive]=useState<ChibiSession|null>(()=>getActiveSession(playerKey));
+  const [lastRecord,setLastRecord]=useState<ChibiSessionRecord|null>(null);
 
   useEffect(()=>{
     setActive(getActiveSession(playerKey));
+    setLastRecord(null);
     setVersion(value=>value+1);
   },[playerKey]);
 
@@ -56,8 +59,9 @@ export default function ChibiSessionMode({playerKey,matches,refreshing=false,onR
 
   function finish(){
     if(!active)return;
-    finishChibiSession(playerKey,matches);
+    const record=finishChibiSession(playerKey,matches);
     setActive(null);
+    setLastRecord(record);
     setVersion(value=>value+1);
   }
 
@@ -158,14 +162,50 @@ export default function ChibiSessionMode({playerKey,matches,refreshing=false,onR
         </div>
       </>
     ):(
-      <div className="session-start">
+      <>
+        {lastRecord&&<article className="session-recap">
+          <div className="session-recap-main">
+            <span>SESSÃO FECHADA</span>
+            <h3>{lastRecord.achieved?"O experimento bateu a meta":"O experimento terminou — agora revise o porquê"}</h3>
+            <p>{lastRecord.detail}</p>
+            <div className="session-recap-placements">
+              {lastRecord.placements.map((placement,index)=><i className={placementClass(placement)} key={index}>{placement}º</i>)}
+            </div>
+          </div>
+
+          <div className="session-recap-delta">
+            <small>MÉDIA</small>
+            <div>
+              <span><b>{lastRecord.baselineAverage??"—"}</b><em>antes</em></span>
+              <strong>→</strong>
+              <span className={lastRecord.delta!=null&&lastRecord.delta<0?"better":lastRecord.delta!=null&&lastRecord.delta>0?"worse":""}>
+                <b>{lastRecord.average??"—"}</b><em>sessão</em>
+              </span>
+            </div>
+            <p>{lastRecord.delta==null
+              ?"Sem bloco anterior suficiente para comparar."
+              :lastRecord.delta<0
+                ?"Melhora observada de "+Math.abs(lastRecord.delta).toFixed(2)+" ponto(s) na colocação média."
+                :lastRecord.delta>0
+                  ?"Piora observada de "+lastRecord.delta.toFixed(2)+" ponto(s) na colocação média."
+                  :"A colocação média ficou estável."}</p>
+          </div>
+
+          <div className="session-recap-actions">
+            {lastRecord.matchIds.length>0&&<button onClick={()=>onEvidence(lastRecord.matchIds,"Chibi Session · revisão do ciclo")}>Revisar as 3 partidas</button>}
+            <button className="primary" onClick={()=>{setLastRecord(null);start();}}>Iniciar novo experimento</button>
+          </div>
+        </article>}
+
+        {!lastRecord&&<div className="session-start">
         <div>
           <span>ANTES DE JOGAR</span>
           <h3>Teste só uma mudança nas próximas 3 partidas.</h3>
           <p>O foco será escolhido pelos sinais atuais do seu perfil. Depois, o Chibi compara essa sessão com as partidas imediatamente anteriores.</p>
         </div>
         <button onClick={start}>Iniciar sessão de 3 partidas</button>
-      </div>
+      </div>}
+      </>
     )}
 
     {history.length>0&&<details className="session-history">
