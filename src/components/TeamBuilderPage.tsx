@@ -145,6 +145,9 @@ export default function TeamBuilderPage({
   const [transitionBase,setTransitionBase]=useState<HexBoardUnit[]|null>(null);
   const [transitionBaseLevel,setTransitionBaseLevel]=useState(8);
   const [transitionBaseAugments,setTransitionBaseAugments]=useState<string[]>([]);
+  const [economyGold,setEconomyGold]=useState("");
+  const [economyReserve,setEconomyReserve]=useState("");
+  const [transitionProgress,setTransitionProgress]=useState<Record<string,number>>({});
 
   useEffect(()=>{
     if(!initialChampionIds.length)return;
@@ -165,6 +168,9 @@ export default function TeamBuilderPage({
     setMovingHex(null);
     setTransitionBase(null);
     setTransitionBaseAugments([]);
+    setTransitionProgress({});
+    setEconomyGold("");
+    setEconomyReserve("");
   },[initialChampionIds]);
 
   const champions=useMemo(()=>{
@@ -648,7 +654,140 @@ export default function TeamBuilderPage({
     targetLevel,
   ]);
 
-  const boardValue=units.reduce(
+  const economyPlan=useMemo(()=>{
+    if(!transitionAnalysis)return null;
+
+    const positiveTraitIds=new Set(
+      transitionAnalysis.traitChanges
+        .filter(row=>row.after>row.before)
+        .map(row=>row.id)
+    );
+
+    const familiarity=new Map<string,{games:number;placement:number}>();
+    for(const match of matches){
+      for(const unit of match.units){
+        const current=familiarity.get(unit.characterId)||{games:0,placement:0};
+        current.games++;
+        current.placement+=match.placement;
+        familiarity.set(unit.characterId,current);
+      }
+    }
+
+    const enteringRows=transitionAnalysis.entering.map(unit=>{
+      const unitCost=costFor(unit.id,staticData);
+      const targetCopies=copiesFor(unit.tier||1);
+      const traits=unitTraitIds(unit.id,staticData);
+      const traitGain=traits.filter(id=>positiveTraitIds.has(id)).length;
+      const itemCount=unit.items?.length||0;
+      const roleScore=unit.role==="carry"?5:unit.role==="tank"?4:unit.role==="utility"?1:0;
+      const score=roleScore+itemCount*2+traitGain*2+(unitCost>=4?1:0);
+      const hist=familiarity.get(unit.id);
+      const label=unit.role==="carry"||itemCount>=2
+        ?"core"
+        :unitCost>=4
+          ?"cap"
+          :traitGain>0
+            ?"ponte"
+            :"peça";
+      return {
+        id:unit.id,
+        unit,
+        kind:"enter" as const,
+        label,
+        unitCost,
+        targetCopies,
+        score,
+        traitGain,
+        personalGames:hist?.games||0,
+        personalAverage:hist?.games?hist.placement/hist.games:null,
+      };
+    });
+
+    const upgradeRows=transitionAnalysis.upgrades.map(row=>{
+      const unitCost=costFor(row.unit.id,staticData);
+      const itemCount=row.unit.items?.length||0;
+      const roleScore=row.unit.role==="carry"?5:row.unit.role==="tank"?4:row.unit.role==="utility"?1:0;
+      const hist=familiarity.get(row.unit.id);
+      return {
+        id:row.unit.id,
+        unit:row.unit,
+        kind:"upgrade" as const,
+        label:"upgrade",
+        unitCost,
+        targetCopies:row.extraCopies,
+        score:roleScore+itemCount*2+1,
+        traitGain:0,
+        personalGames:hist?.games||0,
+        personalAverage:hist?.games?hist.placement/hist.games:null,
+      };
+    });
+
+    const queue=[...enteringRows,...upgradeRows]
+      .sort((a,b)=>b.score-a.score||a.unitCost-b.unitCost||a.id.localeCompare(b.id))
+      .map(row=>{
+        const acquired=Math.max(0,Math.min(row.targetCopies,transitionProgress[row.id]||0));
+        const remainingCopies=Math.max(0,row.targetCopies-acquired);
+        return {
+          ...row,
+          acquired,
+          remainingCopies,
+          remainingCost:remainingCopies*row.unitCost,
+          complete:remainingCopies===0,
+        };
+      });
+
+    const totalRemainingCost=queue.reduce((sum,row)=>sum+row.remainingCost,0);
+    const totalTargetCost=queue.reduce((sum,row)=>sum+row.targetCopies*row.unitCost,0);
+
+    const gold=economyGold.trim()===""?null:Math.max(0,Math.floor(Number(economyGold)||0));
+    const reserve=economyReserve.trim()===""?0:Math.max(0,Math.floor(Number(economyReserve)||0));
+    const spendable=gold==null?null:Math.max(0,gold-reserve);
+    let runway=spendable;
+
+    const queueWithBudget=queue.map(row=>{
+      if(runway==null){
+        return {...row,fundedCopies:null as number|null,budgetStatus:"sem orçamento"};
+      }
+      const fundedCopies=Math.min(row.remainingCopies,Math.floor(runway/row.unitCost));
+      runway-=fundedCopies*row.unitCost;
+      const budgetStatus=row.remainingCopies===0
+        ?"concluído"
+        :fundedCopies>=row.remainingCopies
+          ?"coberto"
+          :fundedCopies>0
+            ?"parcial"
+            :"aguarda";
+      return {...row,fundedCopies,budgetStatus};
+    });
+
+    const firstPending=queueWithBudget.find(row=>!row.complete)||null;
+    const completed=queue.filter(row=>row.complete).length;
+    const coverage=spendable==null||totalRemainingCost===0
+      ?null
+      :Math.min(100,Math.round(spendable/totalRemainingCost*100));
+
+    return {
+      queue:queueWithBudget,
+      totalRemainingCost,
+      totalTargetCost,
+      gold,
+      reserve,
+      spendable,
+      remainingBudget:runway,
+      firstPending,
+      completed,
+      coverage,
+    };
+  },[
+    transitionAnalysis,
+    transitionProgress,
+    economyGold,
+    economyReserve,
+    matches,
+    staticData,
+  ]);
+
+  const boardValue=units.reduce
     (sum,unit)=>sum+costFor(unit.id,staticData)*copiesFor(unit.tier||1),
     0
   );
@@ -855,6 +994,7 @@ export default function TeamBuilderPage({
   function captureTransitionBase(){
     if(!units.length)return;
     setTransitionBase(units.map(unit=>({...unit,items:[...(unit.items||[])]})));
+    setTransitionProgress({});
     setTransitionBaseLevel(targetLevel);
     setTransitionBaseAugments([...selectedAugments]);
     setSelectedId(null);
@@ -877,6 +1017,25 @@ export default function TeamBuilderPage({
   function clearTransition(){
     setTransitionBase(null);
     setTransitionBaseAugments([]);
+    setTransitionProgress({});
+    setEconomyGold("");
+    setEconomyReserve("");
+  }
+
+  function changeTransitionCopies(id:string,delta:number,maxCopies:number){
+    setTransitionProgress(current=>{
+      const next=Math.max(0,Math.min(maxCopies,(current[id]||0)+delta));
+      if(next===0){
+        const copy={...current};
+        delete copy[id];
+        return copy;
+      }
+      return {...current,[id]:next};
+    });
+  }
+
+  function resetTransitionProgress(){
+    setTransitionProgress({});
   }
 
   function saveCurrentBoard(){
@@ -906,6 +1065,9 @@ export default function TeamBuilderPage({
     setMovingHex(null);
     setTransitionBase(null);
     setTransitionBaseAugments([]);
+    setTransitionProgress({});
+    setEconomyGold("");
+    setEconomyReserve("");
   }
 
   async function copyBoardSummary(){
@@ -952,11 +1114,11 @@ export default function TeamBuilderPage({
     }
   }
 
-  return <main className="builder-page builder-v2 builder-v3 builder-v4 builder-v5 builder-v6 builder-v7">
+  return <main className="builder-page builder-v2 builder-v3 builder-v4 builder-v5 builder-v6 builder-v7 builder-v8">
     <section className="builder-hero">
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>← Voltar ao perfil</button>}
-        <span className="eyebrow">CHIBI LAB · TEAM BUILDER V7</span>
+        <span className="eyebrow">CHIBI LAB · TEAM BUILDER V8</span>
         <h1>Monte o board.<br/><em>Teste uma decisão por vez.</em></h1>
         <p>{initialChampionIds.length
           ?"Comp carregada. Mova, remova ou substitua peças e compare variantes com o seu histórico."
