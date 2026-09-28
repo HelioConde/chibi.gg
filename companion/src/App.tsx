@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { LogicalPosition, LogicalSize } from "@tauri-apps/api/dpi";
 import { availableMonitors, getCurrentWindow, Monitor } from "@tauri-apps/api/window";
 import { DEMO_FRAMES, demoFrame } from "./live/demoProvider";
-import { OverlayStateId } from "./live/types";
+import { frameFromSnapshot } from "./live/decisionEngine";
+import { LiveSnapshot, OverlayStateId } from "./live/types";
 import { addSessionMarker, getSessionMarkers } from "./sessionStore";
 
 type PresetId="compact"|"coach"|"full";
@@ -22,6 +23,20 @@ function isTauri(){
 
 export default function App(){
   const [stateId,setStateId]=useState<OverlayStateId>("weak");
+  const [source,setSource]=useState<"demo"|"manual">("demo");
+  const [manualSnapshot,setManualSnapshot]=useState<LiveSnapshot>({
+    source:"manual",
+    capturedAt:Date.now(),
+    stage:"3-2",
+    hp:70,
+    gold:40,
+    level:6,
+    streak:"L1",
+    boardStrength:55,
+    contestants:0,
+    upgradePairs:1,
+    frontlineReady:true,
+  });
   const [preset,setPreset]=useState<PresetId>("coach");
   const [corner,setCorner]=useState<CornerId>("top-left");
   const [monitors,setMonitors]=useState<Monitor[]>([]);
@@ -31,7 +46,12 @@ export default function App(){
   const [notice,setNotice]=useState("Ctrl+Shift+Space mostra/oculta · Ctrl+Shift+L libera o mouse");
   const [markerCount,setMarkerCount]=useState(()=>getSessionMarkers().length);
 
-  const frame=useMemo(()=>demoFrame(stateId),[stateId]);
+  const frame=useMemo(
+    ()=>source==="demo"
+      ? demoFrame(stateId)
+      : frameFromSnapshot({...manualSnapshot,capturedAt:Date.now()}),
+    [source,stateId,manualSnapshot],
+  );
   const snapshot=frame.snapshot;
   const decision=frame.decision;
   const compact=PRESETS[preset].compact;
@@ -124,10 +144,10 @@ export default function App(){
           <span data-tauri-drag-region>c</span>
           <div data-tauri-drag-region>
             <strong data-tauri-drag-region>Chibi Overlay</strong>
-            <small data-tauri-drag-region>GM1.2 · demo local</small>
+            <small data-tauri-drag-region>{source==="demo"?"GM1.2 · demo local":"GM1.3 · provider manual"}</small>
           </div>
         </div>
-        <div className="live"><i/> DEMO</div>
+        <div className="live"><i/> {source==="demo"?"DEMO":"MANUAL"}</div>
       </header>
 
       <div className="state-strip">
@@ -166,7 +186,12 @@ export default function App(){
       </div>}
 
       <footer className="companion-controls">
-        <div className="scenario-tabs">
+        <div className="source-tabs">
+          <button className={source==="demo"?"active":""} onClick={()=>setSource("demo")}>Demo</button>
+          <button className={source==="manual"?"active":""} onClick={()=>setSource("manual")}>Manual</button>
+        </div>
+
+        {source==="demo"?<div className="scenario-tabs">
           {DEMO_FRAMES.map(item=>(
             <button
               className={item.id===stateId?"active":""}
@@ -174,7 +199,16 @@ export default function App(){
               key={item.id}
             >{item.label}</button>
           ))}
-        </div>
+        </div>:!compact&&<div className="manual-provider">
+          <label><span>Stage</span><input value={manualSnapshot.stage||""} onChange={event=>setManualSnapshot(current=>({...current,stage:event.target.value}))}/></label>
+          <label><span>HP</span><input type="number" min="0" max="100" value={manualSnapshot.hp??0} onChange={event=>setManualSnapshot(current=>({...current,hp:Number(event.target.value)}))}/></label>
+          <label><span>Gold</span><input type="number" min="0" max="200" value={manualSnapshot.gold??0} onChange={event=>setManualSnapshot(current=>({...current,gold:Number(event.target.value)}))}/></label>
+          <label><span>Level</span><input type="number" min="1" max="10" value={manualSnapshot.level??1} onChange={event=>setManualSnapshot(current=>({...current,level:Number(event.target.value)}))}/></label>
+          <label><span>Força</span><input type="range" min="0" max="100" value={manualSnapshot.boardStrength??60} onChange={event=>setManualSnapshot(current=>({...current,boardStrength:Number(event.target.value)}))}/><b>{manualSnapshot.boardStrength??60}</b></label>
+          <label><span>Contest</span><input type="number" min="0" max="7" value={manualSnapshot.contestants??0} onChange={event=>setManualSnapshot(current=>({...current,contestants:Number(event.target.value)}))}/></label>
+          <label><span>Pares</span><input type="number" min="0" max="9" value={manualSnapshot.upgradePairs??0} onChange={event=>setManualSnapshot(current=>({...current,upgradePairs:Number(event.target.value)}))}/></label>
+          <label className="toggle"><span>Frontline pronta</span><input type="checkbox" checked={manualSnapshot.frontlineReady!==false} onChange={event=>setManualSnapshot(current=>({...current,frontlineReady:event.target.checked}))}/></label>
+        </div>}
 
         <div className="preset-actions">
           {(Object.keys(PRESETS) as PresetId[]).map(id=>(
