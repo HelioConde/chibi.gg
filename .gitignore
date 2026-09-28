@@ -5,6 +5,9 @@ overlay-python/dist/
 overlay-python/__pycache__/
 overlay-python/chibi_overlay/__pycache__/
 overlay-python/**/__pycache__/
+chibi-native-companion/build/
+chibi-native-companion/dist/
+chibi-native-companion/**/__pycache__/
 work/
 .env
 .env.local

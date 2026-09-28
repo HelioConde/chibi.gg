@@ -6,16 +6,25 @@ from chibi.core.context import CompanionContext
 from chibi.core.events import EventBus
 from chibi.core.logging import configure
 from chibi.debug.reports import telemetry_report
+from chibi.debug.inspector import investigate
+from chibi.riot.game.detector import GameProcessDetector
 from chibi.riot.lcu.gameflow import DemoGameflowMonitor, GameflowMonitor
+from chibi.riot.lcu.client import LcuClient
+from chibi.riot.lcu.connection import LcuUnavailableError
 from chibi.session.manager import SessionManager
 from chibi.telemetry.manager import TelemetryManager
 from chibi.ui.tray import create_tray
 from chibi.ui.window import CompanionWindow
 
 def main() -> int:
-    parser = argparse.ArgumentParser(); parser.add_argument("--demo", action="store_true"); parser.add_argument("--debug", action="store_true"); parser.add_argument("--telemetry-report", action="store_true"); args = parser.parse_args()
+    parser = argparse.ArgumentParser(); parser.add_argument("--demo", action="store_true"); parser.add_argument("--debug", action="store_true"); parser.add_argument("--telemetry-report", action="store_true"); parser.add_argument("--discover-game", action="store_true"); parser.add_argument("--investigate", action="store_true"); args = parser.parse_args()
     configure(args.debug); telemetry = TelemetryManager().poll()
     if args.telemetry_report: print(telemetry_report(telemetry)); return 0
+    if args.discover_game: print(GameProcessDetector().record_diff()); return 0
+    if args.investigate:
+        try: connected = bool(LcuClient().phase())
+        except LcuUnavailableError: connected = False
+        print(investigate(connected)); return 0
     app = QApplication(sys.argv); app.setApplicationName("Chibi Native Companion")
     context, bus, sessions, window = CompanionContext(telemetry=telemetry), EventBus(), SessionManager(), CompanionWindow()
     def update(snapshot: object) -> None:
