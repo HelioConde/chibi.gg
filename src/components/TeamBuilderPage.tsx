@@ -424,7 +424,7 @@ export default function TeamBuilderPage({
     }
   }
 
-  return <main className="builder-page builder-v2">
+  return <main className="builder-page builder-v2 builder-v3">
     <section className="builder-hero">
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>← Voltar ao perfil</button>}
