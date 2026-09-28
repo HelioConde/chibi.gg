@@ -1316,7 +1316,11 @@ function App() {
                         <strong>{formatDay(session.end)} · {formatClock(session.start)}–{formatClock(session.end)}</strong>
                         <small>{session.games} jogo{session.games===1?"":"s"} no contexto completo</small>
                         {session.delta!=null&&<em className={session.delta<-.25?"better":session.delta>.25?"worse":"stable"}>
-                          {session.delta<0?"Melhorou ":"Piorou "}{Math.abs(session.delta).toFixed(2)} vs sessão anterior
+                          {Math.abs(session.delta)<=.25
+                            ?"Estável vs sessão anterior"
+                            :session.delta<0
+                              ?"Melhorou "+Math.abs(session.delta).toFixed(2)+" vs sessão anterior"
+                              :"Piorou "+Math.abs(session.delta).toFixed(2)+" vs sessão anterior"}
                         </em>}
                       </div>
 
