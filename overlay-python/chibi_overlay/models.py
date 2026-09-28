@@ -95,7 +95,7 @@ class OverlayFields:
 def fields_for_overlay(
     *, riot_state: GameState, live: RiotLiveState, review: OverlaySnapshot
 ) -> OverlayFields:
-    if riot_state is not GameState.LOBBY:
+    if riot_state not in {GameState.LOBBY, GameState.POST_GAME}:
         return OverlayFields(
             stage=live.stage,
             hp=live.hp,

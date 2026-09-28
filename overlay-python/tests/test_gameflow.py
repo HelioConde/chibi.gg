@@ -29,3 +29,17 @@ def test_closed_client_is_offline() -> None:
 
 def test_unknown_phase_stays_explicit() -> None:
     assert normalize_gameflow(connected=True, phase="SomethingNew").state is GameState.UNKNOWN
+
+
+@pytest.mark.parametrize(
+    ("phase", "expected"),
+    [
+        ("Reconnect", GameState.RECONNECTING),
+        ("Reconnecting", GameState.RECONNECTING),
+        ("PreEndOfGame", GameState.POST_GAME),
+        ("EndOfGame", GameState.POST_GAME),
+        ("WaitingForStats", GameState.POST_GAME),
+    ],
+)
+def test_normalizes_reconnect_and_post_game_phases(phase: str, expected: GameState) -> None:
+    assert normalize_gameflow(connected=True, phase=phase).state is expected

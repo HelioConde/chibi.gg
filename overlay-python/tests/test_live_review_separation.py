@@ -53,6 +53,18 @@ def test_review_values_keep_an_explicit_review_origin_outside_game() -> None:
     assert fields.stage.source is FieldSource.REVIEW
 
 
+def test_post_game_can_use_review_values_with_an_explicit_review_origin() -> None:
+    review = OverlaySnapshot.from_dict({"stage": "4-5", "gold": 52})
+    fields = fields_for_overlay(
+        riot_state=GameState.POST_GAME,
+        live=RiotLiveState(),
+        review=review,
+    )
+    assert fields.stage.value == "4-5"
+    assert fields.gold.value == 52
+    assert fields.stage.source is FieldSource.REVIEW
+
+
 @pytest.mark.parametrize(
     "state",
     [

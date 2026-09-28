@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import replace
 from time import monotonic
 
 from PySide6.QtCore import QObject, QThread, QTimer, Signal, Slot
@@ -27,6 +28,8 @@ def normalize_gameflow(
         state = GameState.CLIENT_OFFLINE
     elif phase in {"", "None", "Lobby"}:
         state = GameState.LOBBY
+    elif phase in {"Reconnect", "Reconnecting"}:
+        state = GameState.RECONNECTING
     elif phase == "Matchmaking":
         state = GameState.MATCHMAKING
     elif phase == "ReadyCheck":
@@ -41,6 +44,8 @@ def normalize_gameflow(
         state = GameState.CHAMP_SELECT
     elif phase == "InProgress":
         state = GameState.IN_GAME
+    elif phase in {"PreEndOfGame", "EndOfGame", "PostGame", "WaitingForStats"}:
+        state = GameState.POST_GAME
     else:
         state = GameState.UNKNOWN
     return GameStateSnapshot(
@@ -86,6 +91,18 @@ class _GameflowWorker(QObject):
             phase = self.client.gameflow_phase()
             session = self.client.gameflow_session()
             response = self.client.ready_check_response() if phase == "ReadyCheck" else None
+            participants = (
+                tuple(
+                    replace(
+                        participant,
+                        is_local_player=bool(player.puuid)
+                        and participant.puuid == player.puuid,
+                    )
+                    for participant in session.participants
+                )
+                if session
+                else ()
+            )
             snapshot = normalize_gameflow(
                 connected=True,
                 phase=phase,
@@ -97,6 +114,7 @@ class _GameflowWorker(QObject):
                     "game_mode": session.game_mode if session else "",
                     "player_count": session.player_count if session else 0,
                     "is_ranked": session.is_ranked if session else False,
+                    "participants": participants,
                 },
             )
         except LcuUnavailableError:

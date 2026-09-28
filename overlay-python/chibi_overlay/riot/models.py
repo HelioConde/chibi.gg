@@ -39,8 +39,20 @@ class RiotLiveState:
     board: LiveField[list[object]] = field(default_factory=LiveField.unavailable)
 
 
+@dataclass(frozen=True, slots=True)
+class Participant:
+    """Non-competitive participant metadata made available by the gameflow session."""
+
+    puuid: str = ""
+    summoner_id: int | None = None
+    profile_icon_id: int | None = None
+    cosmetics: dict[str, object] = field(default_factory=dict)
+    is_local_player: bool = False
+
+
 class GameState(str, Enum):
     CLIENT_OFFLINE = "client_offline"
+    RECONNECTING = "reconnecting"
     LOBBY = "lobby"
     MATCHMAKING = "matchmaking"
     READY_CHECK = "ready_check"
@@ -48,6 +60,7 @@ class GameState(str, Enum):
     READY_CHECK_DECLINED = "ready_check_declined"
     CHAMP_SELECT = "champ_select"
     IN_GAME = "in_game"
+    POST_GAME = "post_game"
     UNKNOWN = "unknown"
 
 
@@ -87,12 +100,14 @@ class StatePresentation:
 
 PRESENTATIONS: dict[GameState, StatePresentation] = {
     GameState.CLIENT_OFFLINE: StatePresentation("○", "CLIENTE RIOT OFFLINE", "Abra o cliente Riot para conectar.", "neutral"),
+    GameState.RECONNECTING: StatePresentation("◌", "RECONECTANDO", "Reconectando ao cliente Riot.", "queue"),
     GameState.LOBBY: StatePresentation("◌", "PRONTO PARA JOGAR", "Entre na fila quando quiser.", "neutral"),
     GameState.MATCHMAKING: StatePresentation("◌", "NA FILA", "Procurando partida...", "queue"),
     GameState.READY_CHECK: StatePresentation("!", "CONFIRME A PARTIDA", "Partida encontrada. Responda no cliente Riot.", "alert"),
-    GameState.READY_CHECK_ACCEPTED: StatePresentation("✓", "PARTIDA ACEITA", "Resposta registrada. Aguardando jogadores.", "success"),
-    GameState.READY_CHECK_DECLINED: StatePresentation("×", "PARTIDA RECUSADA", "Você recusou a partida.", "danger"),
+    GameState.READY_CHECK_ACCEPTED: StatePresentation("✓", "PARTIDA ACEITA", "Aguardando os outros jogadores.", "success"),
+    GameState.READY_CHECK_DECLINED: StatePresentation("×", "PARTIDA RECUSADA", "Aguardando retorno do cliente.", "danger"),
     GameState.CHAMP_SELECT: StatePresentation("◇", "PREPARANDO A PARTIDA", "Seleção em andamento.", "queue"),
     GameState.IN_GAME: StatePresentation("●", "EM PARTIDA", "Boa partida.", "success"),
+    GameState.POST_GAME: StatePresentation("◇", "PÓS-PARTIDA", "Revise o momento quando estiver pronto.", "neutral"),
     GameState.UNKNOWN: StatePresentation("?", "ESTADO DESCONHECIDO", "Aguardando uma atualização do cliente.", "neutral"),
 }

@@ -119,11 +119,11 @@ class OverlayWindow(QMainWindow):
 
         title_wrap = QVBoxLayout()
         title_wrap.setSpacing(0)
-        title = QLabel("CHIBI COMPANION")
-        title.setObjectName("brandTitle")
+        self.brand_title = QLabel("CHIBI COMPANION")
+        self.brand_title.setObjectName("brandTitle")
         self.player_label = QLabel("snapshot local")
         self.player_label.setObjectName("muted")
-        title_wrap.addWidget(title)
+        title_wrap.addWidget(self.brand_title)
         title_wrap.addWidget(self.player_label)
         header.addLayout(title_wrap)
         header.addStretch(1)
@@ -155,16 +155,16 @@ class OverlayWindow(QMainWindow):
 
         layout.addLayout(header)
 
+        self.status_card = GameStatusCard()
+        layout.addWidget(self.status_card)
+
         self.rank_label = QLabel("Perfil ainda não conectado")
         self.rank_label.setObjectName("rankLabel")
         layout.addWidget(self.rank_label)
 
-        self.live_label = QLabel("Aguardando League Client")
+        self.live_label = QLabel("REVIEW SNAPSHOT")
         self.live_label.setObjectName("liveLabel")
         layout.addWidget(self.live_label)
-
-        self.status_card = GameStatusCard()
-        layout.addWidget(self.status_card)
 
         self.stats_wrap = QWidget()
         stats = QGridLayout(self.stats_wrap)
@@ -200,7 +200,7 @@ class OverlayWindow(QMainWindow):
         focus_layout = QVBoxLayout(self.focus_card)
         focus_layout.setContentsMargins(11, 9, 11, 9)
         focus_layout.setSpacing(4)
-        focus_caption = QLabel("FOCO FIXADO")
+        focus_caption = QLabel("FOCO DA SESSÃO · REVIEW")
         focus_caption.setObjectName("sectionCaption")
         self.focus_title = QLabel("Revise uma decisão por vez")
         self.focus_title.setObjectName("focusTitle")
@@ -225,18 +225,13 @@ class OverlayWindow(QMainWindow):
         board_layout.setSpacing(6)
 
         board_title = QHBoxLayout()
-        self.board_caption = self._caption("BOARD SNAPSHOT")
+        self.board_caption = self._caption("REVIEW SNAPSHOT · BOARD")
         board_title.addWidget(self.board_caption)
         board_title.addStretch(1)
         self.score_label = QLabel("—")
         self.score_label.setObjectName("score")
         board_title.addWidget(self.score_label)
         board_layout.addLayout(board_title)
-
-        self.board_unavailable_label = QLabel("Board ao vivo ainda não disponível")
-        self.board_unavailable_label.setObjectName("muted")
-        self.board_unavailable_label.setVisible(False)
-        board_layout.addWidget(self.board_unavailable_label)
 
         self.board_grid_wrap = QWidget()
         self.board_grid = QGridLayout(self.board_grid_wrap)
@@ -259,7 +254,7 @@ class OverlayWindow(QMainWindow):
         review_layout = QVBoxLayout(self.review_card)
         review_layout.setContentsMargins(10, 9, 10, 9)
         review_layout.setSpacing(5)
-        review_layout.addWidget(self._caption("PERGUNTAS PARA REVER"))
+        review_layout.addWidget(self._caption("REVIEW SNAPSHOT · PERGUNTAS PARA REVER"))
         self.review_labels: list[QLabel] = []
         for index in range(3):
             label = QLabel(f"{index + 1}. —")
@@ -273,7 +268,7 @@ class OverlayWindow(QMainWindow):
 
         self.footer_wrap = QWidget()
         footer = QHBoxLayout(self.footer_wrap)
-        self.snapshot_path_label = QLabel(f"snapshot: {Path(self.store.snapshot_path).name}")
+        self.snapshot_path_label = QLabel(f"REVIEW SNAPSHOT: {Path(self.store.snapshot_path).name}")
         self.snapshot_path_label.setObjectName("footerText")
         footer.addWidget(self.snapshot_path_label)
         footer.addStretch(1)
@@ -487,17 +482,16 @@ class OverlayWindow(QMainWindow):
         fields = fields_for_overlay(
             riot_state=riot.state, live=riot.live, review=snap
         )
+        is_review_context = riot.state in {GameState.LOBBY, GameState.POST_GAME}
         self.player_label.setText(riot.riot_id or snap.player or "snapshot local")
-        live_context = riot.queue_name.upper()
-        if riot.details.get("game_mode") == "TFT" and riot.details.get("player_count"):
-            live_context = f"{live_context} · {riot.details['player_count']} JOGADORES"
-        self.rank_label.setText(live_context or snap.rank or "Perfil ainda não conectado")
-        if riot.state is GameState.IN_GAME:
-            self.live_label.setText("DADOS DE PARTIDA AINDA NÃO DISPONÍVEIS")
-        elif riot.state in self.LIVE_SESSION_STATES:
-            self.live_label.setText("RIOT LIVE")
-        else:
-            self.live_label.setText("SNAPSHOT · REVISÃO")
+        self.brand_title.setText("CHIBI" if riot.state is GameState.IN_GAME else "CHIBI COMPANION")
+        self.player_label.setVisible(riot.state is not GameState.IN_GAME)
+        self.rank_label.setText(
+            (snap.rank or "Perfil Chibi ainda não conectado")
+            if is_review_context
+            else self._session_context(riot)
+        )
+        self.live_label.setText("REVIEW SNAPSHOT" if is_review_context else "RIOT LIVE")
         self.connection_badge.setText("RIOT CONECTADO" if riot.connected else "RIOT OFFLINE")
         self.status_card.set_snapshot(riot)
         self.focus_title.setText(snap.focus or "Revise uma decisão por vez")
@@ -510,12 +504,9 @@ class OverlayWindow(QMainWindow):
         self.score_label.setVisible(riot.state is GameState.LOBBY)
         self.score_label.setText("—" if snap.score is None else f"{snap.score}/100")
 
-        board_is_unavailable = fields.board.source is FieldSource.UNAVAILABLE
-        self.board_caption.setText(
-            "BOARD AO VIVO" if riot.state is GameState.IN_GAME else "BOARD SNAPSHOT"
+        self.board_grid_wrap.setVisible(
+            fields.board.source is FieldSource.REVIEW and fields.board.available
         )
-        self.board_unavailable_label.setVisible(board_is_unavailable)
-        self.board_grid_wrap.setVisible(not board_is_unavailable)
         by_slot = {
             unit.slot: unit for unit in (fields.board.value or []) if hasattr(unit, "slot")
         }
@@ -532,6 +523,21 @@ class OverlayWindow(QMainWindow):
             text = questions[index] if index < len(questions) else "—"
             label.setText(f"{index + 1}. {text}")
         self._apply_state_layout(fields)
+
+    @staticmethod
+    def _session_context(riot: GameStateSnapshot) -> str:
+        """Only display queue/session facts explicitly provided by the local client."""
+        details = riot.details
+        is_tft = str(details.get("game_mode") or "").upper() == "TFT"
+        is_ranked = bool(details.get("is_ranked", False))
+        player_count = details.get("player_count")
+        if is_tft:
+            label = "TFT RANQUEADA" if is_ranked else "TFT"
+        else:
+            label = riot.queue_name.upper() or "SESSÃO RIOT"
+        if isinstance(player_count, int) and player_count > 0:
+            return f"{label} · {player_count} JOGADORES"
+        return label
 
     @staticmethod
     def _field_text(field: object) -> str:
@@ -555,11 +561,10 @@ class OverlayWindow(QMainWindow):
             self.auto_compacted = False
 
         self._apply_mode()
-        is_lobby = state is GameState.LOBBY
-        is_in_game = state is GameState.IN_GAME
-        has_live_stats = any(
+        is_review_context = state in {GameState.LOBBY, GameState.POST_GAME}
+        has_review_stats = any(
             getattr(field, "available", False)
-            and getattr(field, "source", FieldSource.UNAVAILABLE) is FieldSource.LIVE
+            and getattr(field, "source", FieldSource.UNAVAILABLE) is FieldSource.REVIEW
             for field in (
                 getattr(fields, "stage"),
                 getattr(fields, "hp"),
@@ -568,19 +573,26 @@ class OverlayWindow(QMainWindow):
                 getattr(fields, "streak"),
             )
         )
-        has_live_board = (
+        has_review_board = (
             getattr(getattr(fields, "board"), "available", False)
             and getattr(getattr(fields, "board"), "source", FieldSource.UNAVAILABLE)
-            is FieldSource.LIVE
+            is FieldSource.REVIEW
         )
 
-        self.rank_label.setVisible(is_lobby)
-        self.live_label.setVisible(is_lobby or is_in_game)
-        self.stats_wrap.setVisible(is_lobby and not self._is_compact() or is_in_game and has_live_stats)
-        self.focus_card.setVisible(is_lobby and not self._is_compact())
-        self.detail_wrap.setVisible((is_lobby and not self._is_compact()) or (is_in_game and has_live_board))
-        self.board_card.setVisible((is_lobby and not self._is_compact()) or (is_in_game and has_live_board))
-        self.review_card.setVisible(is_lobby and not self._is_compact())
+        self.rank_label.setVisible(is_review_context or state in self.LIVE_SESSION_STATES)
+        self.live_label.setVisible(
+            is_review_context
+            or (state in self.LIVE_SESSION_STATES and state is not GameState.IN_GAME)
+        )
+        self.stats_wrap.setVisible(
+            is_review_context and not self._is_compact() and has_review_stats
+        )
+        self.focus_card.setVisible(is_review_context and not self._is_compact())
+        self.detail_wrap.setVisible(is_review_context and not self._is_compact())
+        self.board_card.setVisible(
+            is_review_context and not self._is_compact() and has_review_board
+        )
+        self.review_card.setVisible(is_review_context and not self._is_compact())
         self.footer_wrap.setVisible(not self.auto_compacted)
 
     def _is_compact(self) -> bool:

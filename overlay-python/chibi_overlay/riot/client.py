@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from .connection import LcuConnection, LcuUnavailableError
+from .models import Participant
 
 
 @dataclass(frozen=True, slots=True)
@@ -25,6 +26,7 @@ class GameSession:
     queue_name: str
     player_count: int
     is_ranked: bool
+    participants: tuple[Participant, ...] = ()
 
 
 class LcuClient:
@@ -62,6 +64,7 @@ class LcuClient:
             queue_name=str(queue.get("shortName") or queue.get("name") or ""),
             player_count=len(selections),
             is_ranked=bool(queue.get("isRanked", False)),
+            participants=tuple(self._participants(selections)),
         )
 
     def ready_check_response(self) -> str | None:
@@ -74,3 +77,27 @@ class LcuClient:
         if not isinstance(data, dict):
             raise LcuUnavailableError("A API local retornou uma resposta inválida.")
         return data
+
+    @staticmethod
+    def _participants(selections: list[object]) -> list[Participant]:
+        """Keep only session fields that are already present in the LCU payload."""
+        participants: list[Participant] = []
+        for selection in selections:
+            if not isinstance(selection, dict):
+                continue
+            raw_summoner_id = selection.get("summonerId")
+            raw_icon_id = selection.get("profileIconId")
+            cosmetics = {
+                str(key): value
+                for key, value in selection.items()
+                if any(token in str(key).casefold() for token in ("skin", "cosmetic", "companion"))
+            }
+            participants.append(
+                Participant(
+                    puuid=str(selection.get("puuid") or ""),
+                    summoner_id=raw_summoner_id if isinstance(raw_summoner_id, int) else None,
+                    profile_icon_id=raw_icon_id if isinstance(raw_icon_id, int) else None,
+                    cosmetics=cosmetics,
+                )
+            )
+        return participants
