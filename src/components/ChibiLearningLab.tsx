@@ -414,6 +414,43 @@ export default function ChibiLearningLab({matches,staticData,onEvidence,onOpenBu
     return result;
   },[packages,globalComps]);
 
+  const packageRoutes=useMemo(()=>{
+    const routes:Array<{
+      id:string;
+      from:PackageRow;
+      to:PackageRow;
+      shared:string[];
+      remove:string[];
+      add:string[];
+      score:number;
+    }>=[];
+
+    for(let left=0;left<packages.length;left++){
+      for(let right=left+1;right<packages.length;right++){
+        const from=packages[left];
+        const to=packages[right];
+        const shared=from.units.filter(id=>to.units.includes(id));
+        if(!shared.length)continue;
+
+        const remove=from.units.filter(id=>!to.units.includes(id));
+        const add=to.units.filter(id=>!from.units.includes(id));
+        const score=shared.length*30+Math.min(from.flexScore,to.flexScore);
+
+        routes.push({
+          id:from.id+"->"+to.id,
+          from,
+          to,
+          shared,
+          remove,
+          add,
+          score,
+        });
+      }
+    }
+
+    return routes.sort((a,b)=>b.score-a.score).slice(0,3);
+  },[packages]);
+
   const focus=useMemo(()=>focusPlan(matches),[matches]);
 
   return <section className="learning-lab">
@@ -583,6 +620,42 @@ export default function ChibiLearningLab({matches,staticData,onEvidence,onOpenBu
           Carregue mais partidas para o Chibi detectar núcleos repetidos. Packages só aparecem depois de pelo menos duas ocorrências.
         </div>
       )}
+
+      {packageRoutes.length>0&&<div className="flex-routes">
+        <div className="flex-routes-head">
+          <div>
+            <span>FLEX ROUTES</span>
+            <strong>Como sair de um core para outro sem reconstruir tudo</strong>
+          </div>
+          <small>{packageRoutes.length} rota{packageRoutes.length===1?"":"s"}</small>
+        </div>
+
+        <div className="flex-route-list">
+          {packageRoutes.map(route=>(
+            <article key={route.id}>
+              <div className="flex-route-core">
+                <div>
+                  <small>CORE A</small>
+                  <strong>{route.from.units.map(id=>championName(id,staticData)).join(" + ")}</strong>
+                </div>
+                <span>→</span>
+                <div>
+                  <small>CORE B</small>
+                  <strong>{route.to.units.map(id=>championName(id,staticData)).join(" + ")}</strong>
+                </div>
+              </div>
+
+              <div className="flex-route-changes">
+                <span className="keep"><b>MANTÉM</b>{route.shared.map(id=>championName(id,staticData)).join(", ")}</span>
+                {route.remove.length>0&&<span className="remove"><b>SAI</b>{route.remove.map(id=>championName(id,staticData)).join(", ")}</span>}
+                {route.add.length>0&&<span className="add"><b>ENTRA</b>{route.add.map(id=>championName(id,staticData)).join(", ")}</span>}
+              </div>
+
+              {onOpenBuilder&&<button onClick={()=>onOpenBuilder(route.to.units)}>Abrir destino no Builder</button>}
+            </article>
+          ))}
+        </div>
+      </div>}
 
       <footer className="flex-package-method">
         <b>Como funciona nesta versão</b>
