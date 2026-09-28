@@ -167,12 +167,17 @@ export default function MatchJournal({matchId,placement,playerKey="",target,deta
   function setChecklistTag(
     selected:MatchJournalEntry["tags"][number]|null,
     group:MatchJournalEntry["tags"],
+    areaId:string,
   ){
     setEntry(current=>{
       const remaining=current.tags.filter(tag=>!group.includes(tag));
+      const reviewedAreas=current.reviewedAreas||[];
       return {
         ...current,
         tags:selected?[...remaining,selected]:remaining,
+        reviewedAreas:reviewedAreas.includes(areaId)
+          ? reviewedAreas
+          : [...reviewedAreas,areaId],
       };
     });
     setSaved(false);
@@ -226,12 +231,17 @@ export default function MatchJournal({matchId,placement,playerKey="",target,deta
     <details className="journal-review-checklist">
       <summary>
         <span><b>Quick Review Checklist</b><small>6 perguntas para revisar sem precisar saber de antemão qual foi o erro.</small></span>
-        <em>{entry.tags.length} marcado{entry.tags.length===1?"":"s"}</em>
+        <em>{entry.reviewedAreas?.length||0}/{REVIEW_CHECKLIST.length} revisado</em>
       </summary>
+      <div className="journal-checklist-progress">
+        <span>{entry.reviewedAreas?.length||0} de {REVIEW_CHECKLIST.length} áreas verificadas</span>
+        <i><b style={{width:Math.round(((entry.reviewedAreas?.length||0)/REVIEW_CHECKLIST.length)*100)+"%"}}/></i>
+      </div>
       <div className="journal-checklist-grid">
         {REVIEW_CHECKLIST.map(item=>{
           const selected=item.tags.find(tag=>entry.tags.includes(tag))||null;
-          return <article className={selected?"answered":""} key={item.id}>
+          const reviewed=(entry.reviewedAreas||[]).includes(item.id);
+          return <article className={reviewed?"answered":""} key={item.id}>
             <span>{item.label}</span>
             <strong>{item.question}</strong>
             <div>
@@ -242,6 +252,7 @@ export default function MatchJournal({matchId,placement,playerKey="",target,deta
                   onClick={()=>setChecklistTag(
                     entry.tags.includes(option.tag)?null:option.tag,
                     item.tags,
+                    item.id,
                   )}
                   key={option.tag}
                 >
@@ -251,7 +262,7 @@ export default function MatchJournal({matchId,placement,playerKey="",target,deta
               <button
                 type="button"
                 className={!selected?"clear active": "clear"}
-                onClick={()=>setChecklistTag(null,item.tags)}
+                onClick={()=>setChecklistTag(null,item.tags,item.id)}
               >
                 Sem sinal
               </button>
