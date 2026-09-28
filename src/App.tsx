@@ -23,6 +23,7 @@ import { buildActionPlan } from "./analysis/actionPlan";
 import ChibiInnovations from "./components/ChibiInnovations";
 import ChibiReview from "./components/ChibiReview";
 import ChibiLearningLab from "./components/ChibiLearningLab";
+import ChibiLearningPath from "./components/ChibiLearningPath";
 import ChibiStudyShare, { studyFocusById } from "./components/ChibiStudyShare";
 import MatchJournal from "./components/MatchJournal";
 import PatchAdaptation from "./components/PatchAdaptation";
@@ -1271,6 +1272,12 @@ function App() {
               matches={analysisMatches}
               staticData={staticData}
               journalVersion={journalVersion}
+              onEvidence={showEvidence}
+            />
+
+            <ChibiLearningPath
+              playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
+              matches={analysisMatches}
               onEvidence={showEvidence}
             />
 
