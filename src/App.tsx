@@ -31,6 +31,7 @@ import StyleShift from "./components/StyleShift";
 import GlobalMetaPage from "./components/GlobalMetaPage";
 import CompsPage from "./components/CompsPage";
 import OverlayPage from "./components/OverlayPage";
+import StatisticsPage from "./components/StatisticsPage";
 import AskChibi from "./components/AskChibi";
 import ChibiMemory from "./components/ChibiMemory";
 import ReviewQueue from "./components/ReviewQueue";
@@ -204,14 +205,16 @@ function App() {
   const [profileTab,setProfileTab]=useState<ProfileTab>("matches");
   const [recentPlayers,setRecentPlayers]=useState<RecentPlayer[]>(()=>getRecentPlayers());
   const [copiedAnalysisLink,setCopiedAnalysisLink]=useState(false);
-  const [sitePage,setSitePage]=useState<"main"|"meta"|"comps"|"overlay">(
+  const [sitePage,setSitePage]=useState<"main"|"meta"|"comps"|"stats"|"overlay">(
     window.location.hash==="#meta"
       ?"meta"
       :window.location.hash==="#comps"
         ?"comps"
-        :window.location.hash==="#overlay"
-          ?"overlay"
-          :"main"
+        :window.location.hash==="#stats"
+          ?"stats"
+          :window.location.hash==="#overlay"
+            ?"overlay"
+            :"main"
   );
 
   useEffect(()=>{
@@ -247,9 +250,11 @@ function App() {
           ?"meta"
           :window.location.hash==="#comps"
             ?"comps"
-            :window.location.hash==="#overlay"
-              ?"overlay"
-              :"main"
+            :window.location.hash==="#stats"
+              ?"stats"
+              :window.location.hash==="#overlay"
+                ?"overlay"
+                :"main"
       );
     };
 
@@ -602,6 +607,13 @@ function App() {
     }
   }
 
+  function openStats(){
+    setSitePage("stats");
+    if(window.location.hash!=="#stats"){
+      window.history.pushState({},"",window.location.pathname+window.location.search+"#stats");
+    }
+  }
+
   function openOverlay(){
     setSitePage("overlay");
     if(window.location.hash!=="#overlay"){
@@ -648,6 +660,7 @@ function App() {
         <nav>
           <button className={sitePage==="meta"?"active":""} onClick={openMeta}>Meta</button>
           <button className={sitePage==="comps"?"active":""} onClick={openComps}>Comps</button>
+          <button className={sitePage==="stats"?"active":""} onClick={openStats}>Statistics</button>
           <button className={sitePage==="overlay"?"active":""} onClick={openOverlay}>Overlay</button>
           <a href="#leaderboard">Leaderboard</a>
         </nav>
@@ -662,6 +675,14 @@ function App() {
         />
       ) : sitePage==="comps" ? (
         <CompsPage
+          staticData={staticData}
+          matches={analysisMatches}
+          hasProfile={Boolean(profile)}
+          onBack={closeExplorePage}
+          onEvidence={showCompEvidence}
+        />
+      ) : sitePage==="stats" ? (
+        <StatisticsPage
           staticData={staticData}
           matches={analysisMatches}
           hasProfile={Boolean(profile)}
