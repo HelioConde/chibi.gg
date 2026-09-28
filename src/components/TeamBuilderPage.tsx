@@ -1097,6 +1097,177 @@ export default function TeamBuilderPage({
       </div>}
     </section>
 
+    {transitionBase&&transitionAnalysis&&<section className="builder-transition-lab">
+      <div className="builder-transition-head">
+        <div>
+          <span>ROTA DE TRANSIÇÃO</span>
+          <h2>Agora → Alvo</h2>
+          <p>O custo conta somente as cópias-alvo visíveis. Não inclui rerolls, XP, juros ou probabilidade de loja.</p>
+        </div>
+        <div className="builder-transition-actions">
+          <button onClick={restoreTransitionBase}>Voltar ao atual</button>
+          <button className="secondary" onClick={captureTransitionBase}>Usar alvo como novo atual</button>
+          <button className="danger" onClick={clearTransition}>Encerrar</button>
+        </div>
+      </div>
+
+      <div className="builder-transition-boards">
+        <article>
+          <div className="builder-transition-board-head">
+            <span>AGORA</span>
+            <strong>Nível {transitionBaseLevel} · {transitionBase.length} unidades · {transitionAnalysis.baseValue}G</strong>
+          </div>
+          <HexBoard units={transitionBase} staticData={staticData} compact />
+        </article>
+        <div className="builder-transition-arrow">→</div>
+        <article>
+          <div className="builder-transition-board-head">
+            <span>ALVO</span>
+            <strong>Nível {targetLevel} · {units.length} unidades · {transitionAnalysis.targetValue}G</strong>
+          </div>
+          <HexBoard units={units} staticData={staticData} compact />
+        </article>
+      </div>
+
+      <div className="builder-transition-metrics">
+        <article>
+          <span>FICAM</span>
+          <strong>{transitionAnalysis.kept.length}</strong>
+          <small>peças preservadas</small>
+        </article>
+        <article>
+          <span>SAEM</span>
+          <strong>{transitionAnalysis.leaving.length}</strong>
+          <small>peças para liberar</small>
+        </article>
+        <article>
+          <span>ENTRAM</span>
+          <strong>{transitionAnalysis.entering.length}</strong>
+          <small>novas peças-alvo</small>
+        </article>
+        <article>
+          <span>CÓPIAS-ALVO</span>
+          <strong>{transitionAnalysis.copyCost}G</strong>
+          <small>{transitionAnalysis.enteringCost}G novas · {transitionAnalysis.upgradeCost}G upgrades</small>
+        </article>
+        <article>
+          <span>VALOR DO BOARD</span>
+          <strong>{transitionAnalysis.valueDelta>0?"+":""}{transitionAnalysis.valueDelta}G</strong>
+          <small>diferença de valor final</small>
+        </article>
+        <article>
+          <span>NÍVEL</span>
+          <strong>{transitionAnalysis.levelDelta===0?"=":(transitionAnalysis.levelDelta>0?"+":"")+transitionAnalysis.levelDelta}</strong>
+          <small>{transitionBaseLevel} → {targetLevel}</small>
+        </article>
+      </div>
+
+      <div className="builder-transition-detail-grid">
+        <article className="builder-transition-list">
+          <div className="builder-subhead">
+            <span>TROCAS DE PEÇAS</span>
+            <small>ordem visual; não é uma sequência obrigatória de compra</small>
+          </div>
+          <div className="builder-transition-swaps">
+            {transitionAnalysis.leaving.length||transitionAnalysis.entering.length
+              ?<>
+                {transitionAnalysis.leaving.map(unit=>{
+                  const entry=staticEntry(staticData?.champions,unit.id);
+                  const src=staticData?tftAssetUrl(staticData.version,"champion",entry):"";
+                  return <div className="out" key={"out-"+unit.id}>
+                    <span>{src&&<img src={src} alt=""/>}</span>
+                    <div><strong>{entry?.name||clean(unit.id)}</strong><small>− sai do board</small></div>
+                  </div>;
+                })}
+                {transitionAnalysis.entering.map(unit=>{
+                  const entry=staticEntry(staticData?.champions,unit.id);
+                  const src=staticData?tftAssetUrl(staticData.version,"champion",entry):"";
+                  const unitCost=costFor(unit.id,staticData)*copiesFor(unit.tier||1);
+                  return <div className="in" key={"in-"+unit.id}>
+                    <span>{src&&<img src={src} alt=""/>}</span>
+                    <div><strong>{entry?.name||clean(unit.id)}</strong><small>+ entra · {unitCost}G em cópias para {unit.tier||1}★</small></div>
+                  </div>;
+                })}
+              </>
+              :<p className="builder-empty-check">As mesmas peças estão nos dois boards. A transição está em upgrades, itens, posição ou Augments.</p>}
+          </div>
+
+          {transitionAnalysis.upgrades.length>0&&<div className="builder-transition-upgrades">
+            <div className="builder-subhead">
+              <span>UPGRADES PENDENTES</span>
+              <small>custo das cópias extras, sem reroll</small>
+            </div>
+            {transitionAnalysis.upgrades.map(row=>{
+              const entry=staticEntry(staticData?.champions,row.unit.id);
+              return <p key={row.unit.id}>
+                <b>{entry?.name||clean(row.unit.id)}</b>
+                <span>{row.beforeTier}★ → {row.afterTier}★ · +{row.extraCopies} cópias · {row.cost}G</span>
+              </p>;
+            })}
+          </div>}
+        </article>
+
+        <article className="builder-transition-holders">
+          <div className="builder-subhead">
+            <span>HOLDERS DE ITENS</span>
+            <small>evidência do seu histórico; não é recomendação universal</small>
+          </div>
+          {transitionAnalysis.holderHints.length
+            ?<div>
+              {transitionAnalysis.holderHints.map(({target,hint})=>{
+                const targetEntry=staticEntry(staticData?.champions,target.id);
+                const targetSrc=staticData?tftAssetUrl(staticData.version,"champion",targetEntry):"";
+                const holderEntry=hint?staticEntry(staticData?.champions,hint.holder.id):undefined;
+                const holderSrc=hint&&staticData?tftAssetUrl(staticData.version,"champion",holderEntry);
+                const itemNames=(target.items||[]).map(id=>staticEntry(staticData?.items,id)?.name||clean(id));
+                return <div className="builder-holder-row" key={target.id}>
+                  <span className="target">{targetSrc&&<img src={targetSrc} alt=""/>}</span>
+                  <div>
+                    <strong>{targetEntry?.name||clean(target.id)}</strong>
+                    <small>{itemNames.join(" · ")}</small>
+                  </div>
+                  <b>←</b>
+                  {hint
+                    ?<>
+                      <span className="holder">{holderSrc&&<img src={holderSrc} alt=""/>}</span>
+                      <div>
+                        <strong>{holderEntry?.name||clean(hint.holder.id)}</strong>
+                        <small>{hint.direct
+                          ?"já carrega item compatível no board atual"
+                          :hint.games+" partida"+(hint.games===1?"":"s")+" com item compatível"+(hint.average!=null?" · média "+hint.average.toFixed(2):"")}</small>
+                      </div>
+                    </>
+                    :<div className="no-holder"><strong>Sem evidência</strong><small>Nenhuma peça que sai apareceu com esses itens no histórico carregado.</small></div>}
+                </div>;
+              })}
+            </div>
+            :<p className="builder-empty-check">Adicione itens às peças que entram para procurar holders entre as unidades que saem.</p>}
+        </article>
+      </div>
+
+      <div className="builder-transition-context">
+        <div>
+          <span>TRAITS QUE MUDAM</span>
+          <p>{transitionAnalysis.traitChanges.length
+            ?transitionAnalysis.traitChanges.map(row=>{
+              const name=staticEntry(staticData?.traits,row.id)?.name||clean(row.id);
+              const delta=row.after-row.before;
+              return name+" "+(delta>0?"+":"")+delta;
+            }).join(" · ")
+            :"sem mudança estrutural de traits"}</p>
+        </div>
+        <div>
+          <span>AUGMENTS</span>
+          <p>{transitionAnalysis.augmentChanges.leaving.length||transitionAnalysis.augmentChanges.entering.length
+            ?[
+              ...transitionAnalysis.augmentChanges.leaving.map(id=>"− "+(staticEntry(staticData?.augments,id)?.name||clean(id))),
+              ...transitionAnalysis.augmentChanges.entering.map(id=>"+ "+(staticEntry(staticData?.augments,id)?.name||clean(id))),
+            ].join(" · ")
+            :"sem mudança de Augments"}</p>
+        </div>
+      </div>
+    </section>}
+
     <section className="builder-position-lab">
       <div className="builder-position-head">
         <div>
@@ -1616,6 +1787,6 @@ export default function TeamBuilderPage({
       </aside>
     </section>
 
-    <p className="builder-disclaimer">O Builder compara estrutura final, traits, itens e augments configurados com o histórico carregado. O posicionamento é analisado apenas no board que você monta, porque a API de partidas não expõe a posição histórica das unidades. Ele não conhece sua loja, ouro por rodada, scouting completo ou posição futura e não trata similaridade como causalidade.</p>
+    <p className="builder-disclaimer">O Builder compara estrutura final, traits, itens e augments configurados com o histórico carregado. Transições mostram custo bruto das cópias-alvo, sem estimar rerolls, XP ou probabilidade de loja. O posicionamento é analisado apenas no board montado, porque a API não expõe posições históricas. O Chibi não trata similaridade como causalidade.</p>
   </main>;
 }
