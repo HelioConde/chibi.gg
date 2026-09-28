@@ -4,6 +4,7 @@ import { answerChibiQuestion, AskChibiAnswer } from "../analysis/askChibi";
 
 type Props={
   playerName:string;
+  playerKey:string;
   matches:TftMatch[];
   onEvidence:(ids:string[],label:string)=>void;
 };
@@ -18,19 +19,22 @@ const QUICK_QUESTIONS=[
   "Estou forçando comp?",
   "O que mudou recentemente?",
   "Qual partida devo revisar?",
+  "O que eu estou repetindo?",
+  "Qual lição devo revisar?",
+  "Qual minha sessão atual?",
   "Qual linha funciona melhor para mim?",
   "Como eu jogo?",
 ];
 
-export default function AskChibi({playerName,matches,onEvidence}:Props){
+export default function AskChibi({playerName,playerKey,matches,onEvidence}:Props){
   const [open,setOpen]=useState(false);
   const [input,setInput]=useState("");
   const [counter,setCounter]=useState(1);
   const [items,setItems]=useState<ChatItem[]>([]);
 
   const initial=useMemo(
-    ()=>answerChibiQuestion("",matches),
-    [matches]
+    ()=>answerChibiQuestion("",matches,playerKey),
+    [matches,playerKey]
   );
 
   useEffect(()=>{
@@ -57,7 +61,7 @@ export default function AskChibi({playerName,matches,onEvidence}:Props){
     const value=question.trim();
     if(!value) return;
 
-    const answer=answerChibiQuestion(value,matches);
+    const answer=answerChibiQuestion(value,matches,playerKey);
     const next=counter;
     setItems(current=>[
       ...current,
