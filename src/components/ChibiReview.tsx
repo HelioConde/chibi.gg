@@ -32,6 +32,11 @@ function avg(values:number[]){
   return values.length?values.reduce((a,b)=>a+b,0)/values.length:null;
 }
 
+function signed(value:number,suffix=""){
+  const rounded=Math.round(value*10)/10;
+  return (rounded>0?"+":"")+rounded+suffix;
+}
+
 export default function ChibiReview({matches,staticData,journalVersion,onEvidence}:Props){
   const meta=useMemo(()=>buildPersonalMeta(matches),[matches]);
   const leaks=useMemo(()=>buildLeakMap(matches),[matches]);
@@ -128,6 +133,36 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
     };
   },[matches]);
 
+  const sessionComparison=useMemo(()=>{
+    const window=Math.min(5,Math.floor(matches.length/2));
+    if(window<3) return null;
+
+    const summarize=(list:TftMatch[])=>{
+      const total=Math.max(1,list.length);
+      return {
+        avg:avg(list.map(match=>match.placement))??0,
+        top4:Math.round(list.filter(match=>match.placement<=4).length/total*100),
+        wins:Math.round(list.filter(match=>match.placement===1).length/total*100),
+        bottom2:Math.round(list.filter(match=>match.placement>=7).length/total*100),
+      };
+    };
+
+    const recent=matches.slice(0,window);
+    const previous=matches.slice(window,window*2);
+    const current=summarize(recent);
+    const before=summarize(previous);
+    const avgDelta=+(current.avg-before.avg).toFixed(2);
+
+    return {
+      window,
+      current,
+      before,
+      avgDelta,
+      tone:avgDelta<-.25?"good":avgDelta>.25?"bad":"neutral",
+      ids:[...recent,...previous].map(match=>match.id),
+    };
+  },[matches]);
+
   const experiment=useMemo(()=>{
     const primary=leaks.primary;
 
@@ -179,9 +214,9 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
   return <section className="panel chibi-review coach-review">
     <div className="review-head coach-review-head">
       <div className="coach-review-copy">
-        <span>CHIBI COACH</span>
-        <h2>O que repetir, corrigir e testar</h2>
-        <p>Primeiro o que repetir, depois o que corrigir. O resto fica como evidência.</p>
+        <span>CHIBI REVIEW</span>
+        <h2>3 descobertas sobre o seu jogo</h2>
+        <p>O Chibi cruza suas próprias partidas, mostra a evidência e separa sinal forte de amostra pequena.</p>
         <DDragonArt
           staticData={staticData}
           championIds={visualChampionIds}
@@ -194,26 +229,60 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
 
     <div className="coach-signal-row">
       <article className="coach-signal positive">
-        <span>FORÇA</span>
+        <span>1 · O QUE ESTÁ FUNCIONANDO</span>
         <h3>{strength.title}</h3>
         <p>{strength.body}</p>
         <div><em>confiança {strength.confidence}</em>{strength.ids.length>0&&<button onClick={()=>onEvidence(strength.ids,"Coach · força")}>Ver evidências</button>}</div>
       </article>
 
       <article className="coach-signal warning">
-        <span>PROBLEMA</span>
+        <span>2 · O QUE ESTÁ TE PUNINDO</span>
         <h3>{problem.title}</h3>
         <p>{problem.body}</p>
         <div><em>confiança {problem.confidence}</em>{problem.ids.length>0&&<button onClick={()=>onEvidence(problem.ids,"Coach · problema")}>Ver evidências</button>}</div>
       </article>
 
       <article className={"coach-signal change "+change.tone}>
-        <span>MUDANÇA RECENTE</span>
+        <span>3 · O QUE MUDOU</span>
         <h3>{change.title}</h3>
         <p>{change.body}</p>
         <div>{change.ids.length>0&&<button onClick={()=>onEvidence(change.ids,"Coach · mudança recente")}>Comparar blocos</button>}</div>
       </article>
     </div>
+
+    {sessionComparison&&<section className={"coach-session-review "+sessionComparison.tone}>
+      <div className="coach-session-review-head">
+        <div>
+          <span>SESSION REVIEW</span>
+          <h3>Últimas {sessionComparison.window} vs {sessionComparison.window} anteriores</h3>
+          <p>Uma leitura rápida para entender se sua sessão mudou de direção — sem esconder a amostra.</p>
+        </div>
+        <button onClick={()=>onEvidence(sessionComparison.ids,"Session Review · bloco recente vs anterior")}>Ver as {sessionComparison.window*2} partidas</button>
+      </div>
+
+      <div className="coach-session-metrics">
+        <article>
+          <span>COLOCAÇÃO MÉDIA</span>
+          <strong>{sessionComparison.current.avg.toFixed(2)}</strong>
+          <small>antes {sessionComparison.before.avg.toFixed(2)} · Δ {signed(sessionComparison.avgDelta)}</small>
+        </article>
+        <article>
+          <span>TOP 4</span>
+          <strong>{sessionComparison.current.top4}%</strong>
+          <small>antes {sessionComparison.before.top4}% · Δ {signed(sessionComparison.current.top4-sessionComparison.before.top4,"%")}</small>
+        </article>
+        <article>
+          <span>1º LUGAR</span>
+          <strong>{sessionComparison.current.wins}%</strong>
+          <small>antes {sessionComparison.before.wins}% · Δ {signed(sessionComparison.current.wins-sessionComparison.before.wins,"%")}</small>
+        </article>
+        <article className={sessionComparison.current.bottom2>sessionComparison.before.bottom2?"warning":""}>
+          <span>BOTTOM 2</span>
+          <strong>{sessionComparison.current.bottom2}%</strong>
+          <small>antes {sessionComparison.before.bottom2}% · Δ {signed(sessionComparison.current.bottom2-sessionComparison.before.bottom2,"%")}</small>
+        </article>
+      </div>
+    </section>}
 
     <article className="coach-experiment">
       <div>
