@@ -16,3 +16,6 @@ verify_jwt = false
 
 [functions.public-tft-comps]
 verify_jwt = false
+
+[functions.public-tft-stats]
+verify_jwt = false
