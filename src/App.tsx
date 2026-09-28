@@ -1129,40 +1129,111 @@ function App() {
               </button>}
             </div>
 
-            <div className="home-hero-visual" aria-hidden="true">
-              <div className="home-hero-glow"></div>
-              <img src={SITE_IMAGES.art} alt=""/>
-              <DDragonArt staticData={staticData} variant="compact" label="Riot Data Dragon"/>
+            <div className="home-hero-visual home-hero-visual-v3" aria-hidden="true">
+              <div className="home-hero-orbit home-hero-orbit-one"></div>
+              <div className="home-hero-orbit home-hero-orbit-two"></div>
+              <div className="home-product-window">
+                <div className="home-product-windowbar">
+                  <span><i></i><i></i><i></i></span>
+                  <small>chibi.gg / player</small>
+                  <b>LIVE</b>
+                </div>
+
+                <div className="home-product-profile">
+                  <div className="home-product-player">
+                    <span className="home-product-avatar">
+                      {staticData&&recentPlayers[0]?.profileIconId
+                        ?<img src={profileIconUrl(staticData.version,recentPlayers[0].profileIconId)} alt=""/>
+                        :<img src={SITE_IMAGES.icon} alt=""/>}
+                    </span>
+                    <div>
+                      <small>SEU PERFIL TFT</small>
+                      <strong>{recentPlayers[0]?.gameName||"Seu Riot ID"}<em>{recentPlayers[0]?"#"+recentPlayers[0].tagLine:""}</em></strong>
+                      <span>{recentPlayers[0]?.rankLabel||"Busque um jogador para começar"}</span>
+                    </div>
+                  </div>
+
+                  <div className="home-product-kpis">
+                    <span><small>MÉDIA</small><strong>{recentPlayers[0]?.averagePlacement??"—"}</strong></span>
+                    <span><small>TOP 4</small><strong>{recentPlayers[0]?recentPlayers[0].top4Rate+"%":"—"}</strong></span>
+                    <span><small>PARTIDAS</small><strong>{recentPlayers[0]?.matches??"—"}</strong></span>
+                  </div>
+                </div>
+
+                <div className="home-product-tabs">
+                  <span className="active">Partidas</span>
+                  <span>Agora</span>
+                  <span>Coach</span>
+                </div>
+
+                <div className="home-product-body">
+                  <div className="home-product-coach">
+                    <span className="home-product-coach-icon">C</span>
+                    <div>
+                      <small>CHIBI COACH</small>
+                      <strong>{recentPlayers[0]?"Seu histórico vira ação.":"Entenda o que realmente importa."}</strong>
+                      <p>{recentPlayers[0]
+                        ?"Compare seus padrões, reveja partidas e saiba o que testar na próxima fila."
+                        :"Busque seu Riot ID e transforme partidas em decisões mais claras."}</p>
+                    </div>
+                    <b>→</b>
+                  </div>
+
+                  <div className="home-product-board">
+                    <div className="home-product-board-head">
+                      <span>SEU BOARD · VISÃO RÁPIDA</span>
+                      <small>Data Dragon</small>
+                    </div>
+                    <DDragonArt staticData={staticData} variant="compact" label="Champions do set"/>
+                  </div>
+                </div>
+
+                <div className="home-product-footer">
+                  <span><i></i> Dados do jogador</span>
+                  <span>Meta + Builder + Coach</span>
+                </div>
+              </div>
+
+              <div className="home-float-card home-float-card-meta">
+                <small>META</small>
+                <strong>Patch atual</strong>
+                <span>comps e traits</span>
+              </div>
+
+              <div className="home-float-card home-float-card-coach">
+                <span className="home-float-icon">✦</span>
+                <div><small>COACH</small><strong>Próxima ação</strong></div>
+              </div>
             </div>
           </section>
 
-          <section className="home-paths-v2" aria-label="Principais caminhos do Chibi">
+          <section className="home-paths-v2 home-paths-v3" aria-label="Principais caminhos do Chibi">
             <button onClick={openMeta}>
-              <span className="home-path-icon meta">✦</span>
+              <span className="home-path-index">01</span>
               <div>
                 <small>META</small>
-                <h2>O que está funcionando agora</h2>
-                <p>Comps e traits observados no patch atual.</p>
+                <h2>Veja o que funciona.</h2>
+                <p>Comps e traits do patch.</p>
               </div>
               <b>→</b>
             </button>
 
             <button onClick={()=>document.getElementById("home-riot-id")?.focus()}>
-              <span className="home-path-icon profile">◎</span>
+              <span className="home-path-index">02</span>
               <div>
                 <small>SEU JOGO</small>
-                <h2>Entenda suas próprias partidas</h2>
-                <p>Perfil, histórico e Coach a partir do seu Riot ID.</p>
+                <h2>Entenda seu padrão.</h2>
+                <p>Histórico, perfil e Coach.</p>
               </div>
               <b>→</b>
             </button>
 
             <button onClick={()=>openBuilder([])}>
-              <span className="home-path-icon builder">◇</span>
+              <span className="home-path-index">03</span>
               <div>
                 <small>BUILDER</small>
-                <h2>Planeje antes de jogar</h2>
-                <p>Monte boards, itens, Augments e transições.</p>
+                <h2>Planeje a próxima board.</h2>
+                <p>Itens, Augments e transições.</p>
               </div>
               <b>→</b>
             </button>
