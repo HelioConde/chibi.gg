@@ -34,6 +34,11 @@ jobs:
       - name: TypeScript check
         run: npm run typecheck
 
+      - name: Create deploy version
+        run: |
+          mkdir -p public
+          printf '{"version":"%s","deployedAt":"%s"}\n' "$GITHUB_SHA" "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" > public/version.json
+
       - name: Build
         run: npm run build
 

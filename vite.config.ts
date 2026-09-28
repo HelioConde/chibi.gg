@@ -4,4 +4,7 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   base: process.env.GITHUB_ACTIONS ? "/chibi.gg/" : "/",
+  define: {
+    __APP_VERSION__: JSON.stringify(process.env.GITHUB_SHA || "dev"),
+  },
 });
