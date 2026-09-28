@@ -11463,3 +11463,100 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
   .session-recap{grid-template-columns:1fr}
   .session-recap-actions{grid-column:auto;grid-template-columns:1fr}
 }
+
+
+/* ACTIVE SESSION GOAL STRIP 2026-09-28 */
+.active-goal-strip{
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(170px,.65fr) auto;
+  gap:14px;
+  align-items:center;
+  margin:10px 0 14px;
+  padding:12px 14px;
+  border:1px solid rgba(117,99,231,.26);
+  border-radius:11px;
+  background:linear-gradient(90deg,rgba(117,99,231,.06),#0d141d 46%);
+}
+.active-goal-strip.success{
+  border-color:rgba(72,209,153,.25);
+  background:linear-gradient(90deg,rgba(72,209,153,.05),#0d141d 46%);
+}
+.active-goal-strip.finished{
+  border-color:rgba(255,167,92,.24);
+}
+.active-goal-copy span,
+.active-goal-copy strong,
+.active-goal-copy small{
+  display:block;
+}
+.active-goal-copy span{
+  color:#8575e9;
+  font-size:7px;
+  font-weight:950;
+  letter-spacing:.7px;
+}
+.active-goal-copy strong{
+  margin-top:3px;
+  color:#dce2ec;
+  font-size:12px;
+}
+.active-goal-copy small{
+  margin-top:3px;
+  color:#6f7c91;
+  font-size:8px;
+}
+.active-goal-meter>div{
+  height:6px;
+  overflow:hidden;
+  border-radius:999px;
+  background:#1b2433;
+}
+.active-goal-meter i{
+  display:block;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,#6659da,#9883f2);
+}
+.active-goal-meter>span{
+  display:inline-block;
+  margin-top:5px;
+  color:#d6dbea;
+  font-size:9px;
+  font-weight:900;
+}
+.active-goal-meter>small{
+  margin-left:7px;
+  color:#68758a;
+  font-size:7px;
+}
+.active-goal-actions{
+  display:flex;
+  gap:5px;
+}
+.active-goal-actions button{
+  border:1px solid #3a465b;
+  border-radius:7px;
+  background:#111923;
+  color:#9eabba;
+  padding:7px 9px;
+  font-size:7px;
+  font-weight:900;
+  cursor:pointer;
+}
+.active-goal-actions button.secondary{
+  border-color:#584fc0;
+  background:rgba(117,99,231,.1);
+  color:#c9c3ff;
+}
+@media(max-width:760px){
+  .active-goal-strip{
+    grid-template-columns:1fr;
+  }
+  .active-goal-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+  .active-goal-actions button{
+    min-height:38px;
+  }
+}
