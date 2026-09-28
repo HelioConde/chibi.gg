@@ -16,7 +16,11 @@ Aplicativo Windows standalone para acompanhar o ciclo da partida TFT sem Overwol
 python app.py
 python app.py --demo
 python app.py --telemetry-report
+python app.py --vision-debug
+python app.py --import-plan game-plan.example.json
 ```
+
+O plano local salvo em `%APPDATA%\\ChibiNative\\game-plan.json` é uma referência estática de partida: ele não lê board, não sugere compras nem automatiza decisões.
 
 `CHIBI_API_BASE` pode substituir a base das Edge Functions para desenvolvimento. O desktop não contém `RIOT_API_KEY`, service role ou qualquer chave privada.
 

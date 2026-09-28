@@ -1,0 +1,15 @@
+{
+  "primary_comp": "Nome da composição principal",
+  "fallback_comps": ["Alternativa 1", "Alternativa 2"],
+  "session_focus": "Economia",
+  "patch": "",
+  "set_number": null,
+  "core_units": ["Unidade core 1", "Unidade core 2"],
+  "carries": ["Carry principal"],
+  "frontline": ["Frontline principal"],
+  "traits": ["Trait principal"],
+  "carry_items": ["Item carry 1", "Item carry 2"],
+  "tank_items": ["Item tank 1"],
+  "level_plan": ["Lv 6 → estabilizar", "Lv 7 → completar core", "Lv 8 → cap final"],
+  "roll_plan": ["Role apenas para estabilizar o board"]
+}

@@ -1,6 +1,7 @@
 from __future__ import annotations
 import argparse
 import sys
+from pathlib import Path
 from time import time
 from PySide6.QtCore import QUrl
 from PySide6.QtGui import QDesktopServices
@@ -21,9 +22,11 @@ from chibi.navigation import build_analysis_url
 from chibi.telemetry.manager import TelemetryManager
 from chibi.ui.tray import create_tray
 from chibi.ui.window import CompanionWindow
+from chibi.plan import GamePlanStore
+from chibi.vision.debug import vision_debug_report
 
 def main() -> int:
-    parser = argparse.ArgumentParser(); parser.add_argument("--demo", action="store_true"); parser.add_argument("--debug", action="store_true"); parser.add_argument("--telemetry-report", action="store_true"); parser.add_argument("--discover-game", action="store_true"); parser.add_argument("--investigate", action="store_true"); args = parser.parse_args()
+    parser = argparse.ArgumentParser(); parser.add_argument("--demo", action="store_true"); parser.add_argument("--debug", action="store_true"); parser.add_argument("--telemetry-report", action="store_true"); parser.add_argument("--discover-game", action="store_true"); parser.add_argument("--investigate", action="store_true"); parser.add_argument("--vision-debug", action="store_true"); parser.add_argument("--import-plan"); args = parser.parse_args()
     configure(args.debug); telemetry = TelemetryManager().poll()
     if args.telemetry_report: print(telemetry_report(telemetry)); return 0
     if args.discover_game: print(GameProcessDetector().record_diff()); return 0
@@ -31,8 +34,11 @@ def main() -> int:
         try: connected = bool(LcuClient().phase())
         except LcuUnavailableError: connected = False
         print(investigate(connected)); return 0
+    plans=GamePlanStore()
+    if args.import_plan: print(plans.import_file(Path(args.import_plan))); return 0
+    if args.vision_debug: print(vision_debug_report()); return 0
     app = QApplication(sys.argv); app.setApplicationName("Chibi Native Companion")
-    context, bus, sessions, window = CompanionContext(telemetry=telemetry), EventBus(), SessionManager(), CompanionWindow()
+    context, bus, sessions, window = CompanionContext(telemetry=telemetry), EventBus(), SessionManager(), CompanionWindow(); window.set_game_plan(plans.load())
     postgame = PostGameController()
     captured_sessions: set[str] = set()
     def show_analysis(session: object, result: object) -> None:
