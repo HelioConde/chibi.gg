@@ -103,7 +103,14 @@ function performanceScore(comp:TftGlobalComp){
   return placement*.45+top4*.35+sample*.2;
 }
 
-export default function CompsPage({staticData,matches,hasProfile,onBack,onEvidence}:Props){
+export default function CompsPage({
+  staticData,
+  matches,
+  hasProfile,
+  onBack,
+  onEvidence,
+  onOpenBuilder,
+}:Props){
   const [queueId,setQueueId]=useState<number|null>(1100);
   const [data,setData]=useState<TftGlobalComps|null>(null);
   const [loading,setLoading]=useState(true);
