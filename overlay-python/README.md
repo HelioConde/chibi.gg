@@ -66,6 +66,13 @@ Para depurar transições do cliente:
 
     python app.py --debug
 
+Para investigação segura do LCU, sem valores sensíveis:
+
+    python app.py --debug-lcu
+    python app.py --debug-lcu-schema
+
+O primeiro salva uma cópia sanitizada da sessão. O segundo grava apenas paths, tipos, tamanhos de listas e diffs entre capturas em `%APPDATA%\ChibiOverlay\debug\`. Esses comandos consultam somente `/lol-gameflow/v1/session`; não fazem varredura de portas ou rotas desconhecidas.
+
 Para desenvolver sem o Riot Client:
 
     python app.py --demo
