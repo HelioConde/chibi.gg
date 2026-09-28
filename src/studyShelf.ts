@@ -17,6 +17,21 @@ export type StudyShelfItem=
       createdAt:number;
     };
 
+export type StudyShelfInput=
+  | {
+      type:"comp";
+      label:string;
+      subtitle:string;
+      unitIds:string[];
+    }
+  | {
+      type:"stat";
+      label:string;
+      subtitle:string;
+      category:"champions"|"traits"|"items"|"augments";
+      entityId:string;
+    };
+
 const KEY="chibi.gg:study-shelf:v1";
 
 function readAll():StudyShelfItem[]{
@@ -38,7 +53,7 @@ export function getStudyShelf(){
   return readAll().slice().reverse();
 }
 
-export function saveStudyShelfItem(item:Omit<StudyShelfItem,"id"|"createdAt">){
+export function saveStudyShelfItem(item:StudyShelfInput){
   const rows=readAll();
   const duplicate=rows.find(row=>{
     if(row.type!==item.type)return false;
