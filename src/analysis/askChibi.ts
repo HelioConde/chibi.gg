@@ -4,6 +4,7 @@ import { buildChibiArchetype } from "./chibiArchetype";
 import { buildStyleShift } from "./styleShift";
 import { buildLeakMap, buildPersonalMeta } from "./chibiProduct";
 import { buildChibiDNA } from "./chibiInsights";
+import { buildReviewQueue } from "./reviewQueue";
 
 export type AskChibiConfidence="alta"|"média"|"baixa";
 
@@ -78,6 +79,40 @@ export function answerChibiQuestion(question:string,matches:TftMatch[]):AskChibi
   const asksStyle=q.includes("estilo")||q.includes("tipo de jogador")||q.includes("como eu jogo");
   const asksTop4=q.includes("top 4")||q.includes("top4")||q.includes("converter")||q.includes("conversao");
   const asksBottom=q.includes("bottom")||q.includes("7")||q.includes("8")||q.includes("setimo")||q.includes("oitavo");
+  const asksReview=q.includes("qual partida")||q.includes("que partida")||q.includes("revisar primeiro")||q.includes("devo revisar")||q.includes("review queue")||q.includes("fila de revisao");
+
+  if(asksReview){
+    const queue=buildReviewQueue(matches);
+    const next=queue[0];
+
+    if(!next){
+      return {
+        intent:"review",
+        title:"Ainda não há uma partida clara para priorizar",
+        body:"Preciso de mais partidas comparáveis para montar uma fila de revisão útil.",
+        bullets:["Carregue mais histórico no mesmo contexto.","Depois eu separo problema, comparação e referência."],
+        evidence:matches.length+" partidas disponíveis",
+        confidence:"baixa",
+        matchIds:[],
+        followups:["Por que estou perdendo?","O que devo fazer agora?"],
+      };
+    }
+
+    return {
+      intent:"review",
+      title:"Revise primeiro o "+next.placement+"º lugar",
+      body:next.reason,
+      bullets:[
+        next.evidence,
+        queue[1]?"Depois compare com: "+queue[1].placement+"º lugar · "+queue[1].reason:"Depois escolha outra partida comparável.",
+        queue[2]?"Use como referência: "+queue[2].placement+"º lugar · "+queue[2].reason:"Procure uma partida melhor como referência.",
+      ],
+      evidence:"Review Queue · "+queue.length+" partidas priorizadas",
+      confidence:confidenceBySample(matches.length),
+      matchIds:[next.matchId],
+      followups:["Por que essa partida primeiro?","O que devo fazer agora?","Estou forçando comp?"],
+    };
+  }
 
   if(asksForce){
     if(!dominant||dominant.games<2){
