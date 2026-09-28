@@ -57,6 +57,26 @@ export type TftGlobalMeta = {
   traits:TftGlobalTraitStat[];
 };
 
+export type TftGlobalComp = {
+  id:string;
+  games:number;
+  averagePlacement:number;
+  top4Rate:number;
+  winRate:number;
+  volatility:number;
+  averageLevel:number;
+  averageGold:number;
+  confidence:"alta"|"média"|"inicial";
+  traits:Array<{id:string;rate:number}>;
+  units:Array<{id:string;rate:number}>;
+};
+
+export type TftGlobalComps = {
+  context:{setNumber:number;queueId:number|null;minGames:number};
+  sampleParticipants:number;
+  comps:TftGlobalComp[];
+};
+
 export type TftMatchDetail = {
   match: {
     id: string;
@@ -117,6 +137,16 @@ export function fetchTftMatch(matchId:string){
 
 export function fetchTftMeta(setNumber:number,queueId?:number|null,minGames=4,limit=20){
   return invoke<TftGlobalMeta>("public-tft-meta",{
+    setNumber,
+    queueId:queueId||0,
+    minGames,
+    limit,
+  });
+}
+
+
+export function fetchTftComps(setNumber:number,queueId?:number|null,minGames=3,limit=16){
+  return invoke<TftGlobalComps>("public-tft-comps",{
     setNumber,
     queueId:queueId||0,
     minGames,
