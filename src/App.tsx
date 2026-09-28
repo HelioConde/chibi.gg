@@ -268,6 +268,7 @@ function App() {
   const [journalVersion,setJournalVersion]=useState(0);
   const [profileTab,setProfileTab]=useState<ProfileTab>("matches");
   const [historyFilter,setHistoryFilter]=useState<"all"|"top4"|"bottom2"|"review">("all");
+  const [builderPreset,setBuilderPreset]=useState<string[]>([]);
   const [recentPlayers,setRecentPlayers]=useState<RecentPlayer[]>(()=>getRecentPlayers());
   const [copiedAnalysisLink,setCopiedAnalysisLink]=useState(false);
   const [statsTarget,setStatsTarget]=useState<{
@@ -739,7 +740,7 @@ function App() {
     if(page==="meta") return openMeta();
     if(page==="comps") return openComps();
     if(page==="stats") return openStats();
-    if(page==="builder") return openBuilder();
+    if(page==="builder") return openBuilder([]);
     return openOverlay();
   }
 
@@ -755,7 +756,8 @@ function App() {
     await loadPlayer(parsed.gameName,parsed.tagLine,platform,true,"matches");
   }
 
-  function openBuilder(){
+  function openBuilder(championIds:string[]=[]){
+    setBuilderPreset(championIds);
     setSitePage("builder");
     if(window.location.hash!=="#builder"){
       window.history.pushState({},"",window.location.pathname+window.location.search+"#builder");
@@ -816,7 +818,7 @@ function App() {
           <button className={sitePage==="meta"?"active":""} onClick={openMeta}>Meta</button>
           <button className={sitePage==="comps"?"active":""} onClick={openComps}>Comps</button>
           <button className={sitePage==="stats"?"active":""} onClick={()=>openStats()}>Statistics</button>
-          <button className={"builder-nav-button "+(sitePage==="builder"?"active":"")} onClick={openBuilder}>Builder</button>
+          <button className={"builder-nav-button "+(sitePage==="builder"?"active":"")} onClick={()=>openBuilder([])}>Builder</button>
           <button className={sitePage==="leaderboard"?"active":""} onClick={openLeaderboard}>Leaderboard</button>
           <button className={sitePage==="overlay"?"active":""} onClick={openOverlay}>Overlay</button>
         </nav>
@@ -847,6 +849,7 @@ function App() {
           hasProfile={Boolean(profile)}
           onBack={closeExplorePage}
           onEvidence={showCompEvidence}
+          onOpenBuilder={(unitIds)=>openBuilder(unitIds)}
         />
       ) : sitePage==="stats" ? (
         <StatisticsPage
@@ -866,6 +869,7 @@ function App() {
           hasProfile={Boolean(profile)}
           onBack={closeExplorePage}
           onEvidence={showCompEvidence}
+          initialChampionIds={builderPreset}
         />
       ) : sitePage==="leaderboard" ? (
         <LeaderboardPage
