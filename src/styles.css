@@ -6845,3 +6845,253 @@ a { color: inherit; text-decoration: none; }
     white-space:normal;
   }
 }
+
+/* -----------------------------------------------------------------------
+   Uploaded Chibi visual pack
+   ----------------------------------------------------------------------- */
+.brand-mark-image{
+  overflow:hidden;
+  padding:0;
+  background:#151024;
+}
+.brand-mark-image img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.hero-with-uploaded-art{
+  position:relative;
+}
+.uploaded-hero-art{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:.16;
+  filter:saturate(.82) contrast(1.05);
+  mask-image:linear-gradient(180deg,black 0%,black 52%,transparent 92%);
+  -webkit-mask-image:linear-gradient(180deg,black 0%,black 52%,transparent 92%);
+  pointer-events:none;
+}
+.uploaded-icons-art{
+  position:absolute;
+  right:-4%;
+  bottom:8%;
+  width:min(360px,34vw);
+  max-height:280px;
+  object-fit:contain;
+  opacity:.075;
+  filter:saturate(.7);
+  transform:rotate(-4deg);
+  pointer-events:none;
+}
+.hero-with-uploaded-art .ddragon-art.hero{
+  opacity:.2;
+}
+.hero-with-uploaded-art::after{
+  background:
+    radial-gradient(circle at 50% 25%,rgba(120,91,255,.07),transparent 38%),
+    linear-gradient(180deg,rgba(9,11,18,.1),rgba(9,11,18,.78) 68%,#090b12 100%);
+}
+
+/* -----------------------------------------------------------------------
+   Match review HUD + board-map readiness
+   ----------------------------------------------------------------------- */
+.match-modal-with-hud{
+  position:relative;
+  isolation:isolate;
+  overflow:auto;
+}
+.match-modal-with-hud>*:not(.match-modal-hud-art){
+  position:relative;
+  z-index:2;
+}
+.match-modal-hud-art{
+  position:absolute;
+  z-index:0;
+  top:0;
+  right:0;
+  width:min(540px,58%);
+  max-height:420px;
+  object-fit:cover;
+  object-position:top right;
+  opacity:.055;
+  filter:saturate(.65) contrast(1.05);
+  mask-image:linear-gradient(135deg,transparent 2%,black 42%,transparent 92%);
+  -webkit-mask-image:linear-gradient(135deg,transparent 2%,black 42%,transparent 92%);
+  pointer-events:none;
+}
+.match-board-map{
+  margin:12px 0 16px;
+  padding:13px;
+  border:1px solid #252e40;
+  border-radius:12px;
+  background:#0d141d;
+}
+.match-board-map-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:10px;
+}
+.match-board-map-head>div{
+  display:grid;
+  gap:4px;
+}
+.match-board-map-head span{
+  color:#7567df;
+  font-size:7px;
+  font-weight:950;
+  letter-spacing:.9px;
+}
+.match-board-map-head h3{
+  margin:0;
+  font-size:13px;
+}
+.match-board-map-head p{
+  max-width:720px;
+  margin:0;
+  color:#718095;
+  font-size:8px;
+  line-height:1.45;
+}
+.match-board-map-head>b{
+  border:1px solid rgba(117,99,231,.26);
+  border-radius:999px;
+  background:rgba(117,99,231,.07);
+  color:#9c90f7;
+  padding:6px 8px;
+  font-size:6px;
+  white-space:nowrap;
+}
+.match-board-map-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(230px,.65fr);
+  gap:10px;
+  align-items:start;
+}
+.match-board-map-grid>aside{
+  padding:10px;
+  border:1px solid #20293a;
+  border-radius:10px;
+  background:#0f1620;
+}
+.match-board-map-grid>aside>span{
+  display:block;
+  color:#66748a;
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.8px;
+}
+.match-board-bench{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:5px;
+  margin-top:8px;
+}
+.match-board-bench>div{
+  min-width:0;
+  position:relative;
+}
+.match-board-bench>div>span{
+  display:block;
+  aspect-ratio:1;
+  overflow:hidden;
+  border:1px solid #39445b;
+  border-radius:8px;
+  background:#18202c;
+}
+.match-board-bench img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.match-board-bench small{
+  position:absolute;
+  right:2px;
+  bottom:2px;
+  padding:1px 3px;
+  border-radius:4px;
+  background:rgba(4,7,12,.8);
+  color:#ffe16f;
+  font-size:5px;
+}
+.match-board-map-note{
+  margin-top:9px;
+  padding-top:9px;
+  border-top:1px solid #222b3d;
+}
+.match-board-map-note strong{
+  display:block;
+  color:#aab3c4;
+  font-size:8px;
+}
+.match-board-map-note p{
+  margin:4px 0 0;
+  color:#667389;
+  font-size:7px;
+  line-height:1.45;
+}
+
+/* -----------------------------------------------------------------------
+   Overlay — uploaded HUD pack
+   ----------------------------------------------------------------------- */
+.overlay-page-hero-art{
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+}
+.overlay-page-hero-art>*:not(.overlay-page-art){
+  position:relative;
+  z-index:2;
+}
+.overlay-page-art{
+  position:absolute;
+  inset:0 0 0 auto;
+  z-index:0;
+  width:54%;
+  height:100%;
+  object-fit:cover;
+  opacity:.1;
+  mask-image:linear-gradient(90deg,transparent,black 42%,black);
+  -webkit-mask-image:linear-gradient(90deg,transparent,black 42%,black);
+  pointer-events:none;
+}
+.overlay-live-demo{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+}
+.overlay-live-demo>*:not(.overlay-hud-art){
+  position:relative;
+  z-index:2;
+}
+.overlay-hud-art{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:.045;
+  filter:saturate(.72) contrast(1.05);
+  pointer-events:none;
+}
+.overlay-brand-image{
+  overflow:hidden;
+  padding:0!important;
+}
+.overlay-brand-image img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+@media(max-width:780px){
+  .uploaded-icons-art{display:none}
+  .match-board-map-grid{grid-template-columns:1fr}
+  .match-modal-hud-art{width:90%;opacity:.04}
+  .overlay-page-art{width:80%}
+}
