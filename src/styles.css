@@ -12836,3 +12836,15 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
     grid-template-columns:1fr;
   }
 }
+
+
+.home-session-list>button.lesson-row{border-color:rgba(89,181,225,.22);background:rgba(45,111,151,.04)}
+.home-session-list>button.lesson-row:hover{border-color:#5aaed5;background:rgba(45,111,151,.08)}
+.home-session-player.lesson>span{background:rgba(72,177,255,.11);color:#8edaff}
+.home-session-list>button.lesson-row .home-session-focus{border-left-color:rgba(89,181,225,.18)}
+.home-session-list>button.lesson-row .home-session-focus>small{color:#70bee4}
+.home-session-list>button.lesson-row .home-session-focus>strong{color:#c8dfeb}
+.home-session-list>button.lesson-row .home-session-open{color:#7fcff3}
+@media(max-width:520px){
+  .home-session-list>button.lesson-row .home-session-focus{border-left:0;border-top:1px solid rgba(89,181,225,.18)}
+}
