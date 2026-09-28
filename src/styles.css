@@ -9029,3 +9029,233 @@ a { color: inherit; text-decoration: none; }
   .study-match-banner{grid-template-columns:1fr;margin-right:36px}
   .study-match-banner blockquote{max-width:none}
 }
+
+
+/* MARKET POSITIONING 2026-09-28 */
+.hero-insight-preview{
+  width:min(920px,100%);
+  margin:22px auto 4px;
+  padding:18px 20px;
+  border:1px solid rgba(135,113,255,.3);
+  border-radius:18px;
+  background:
+    radial-gradient(circle at 12% 10%,rgba(119,89,255,.14),transparent 38%),
+    rgba(12,17,30,.78);
+  box-shadow:0 18px 55px rgba(0,0,0,.22);
+  backdrop-filter:blur(12px);
+  text-align:left;
+}
+.hero-insight-kicker{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+.hero-insight-kicker span{
+  font-size:11px;
+  letter-spacing:.14em;
+  font-weight:900;
+  color:#a898ff;
+}
+.hero-insight-kicker em{
+  font-style:normal;
+  font-size:11px;
+  color:#8290a8;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:999px;
+  padding:4px 8px;
+}
+.hero-insight-main strong{
+  display:block;
+  max-width:760px;
+  font-size:clamp(17px,2vw,24px);
+  line-height:1.2;
+  color:#f6f7ff;
+}
+.hero-insight-main p{
+  max-width:760px;
+  margin:8px 0 0;
+  color:#aab4c7;
+  font-size:13px;
+  line-height:1.55;
+}
+.hero-insight-proof{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin-top:15px;
+}
+.hero-insight-proof span{
+  min-width:0;
+  padding:10px 12px;
+  border-radius:12px;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.07);
+}
+.hero-insight-proof b,
+.hero-insight-proof small{
+  display:block;
+}
+.hero-insight-proof b{
+  font-size:15px;
+  color:#eef0ff;
+}
+.hero-insight-proof small{
+  margin-top:2px;
+  color:#7f8da5;
+  font-size:10px;
+}
+
+.player-summary-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.player-coach-button{
+  border:1px solid rgba(135,113,255,.55);
+  background:linear-gradient(135deg,rgba(112,78,255,.95),rgba(67,123,255,.92));
+  color:#fff;
+  border-radius:12px;
+  padding:10px 15px;
+  font-weight:850;
+  cursor:pointer;
+  box-shadow:0 8px 24px rgba(79,76,225,.22);
+}
+.player-coach-button:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.06);
+}
+
+.coach-session-review{
+  margin-top:14px;
+  padding:18px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.08);
+  background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.018));
+}
+.coach-session-review.good{
+  border-color:rgba(72,211,145,.23);
+}
+.coach-session-review.bad{
+  border-color:rgba(255,118,118,.23);
+}
+.coach-session-review-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:18px;
+}
+.coach-session-review-head>div{
+  min-width:0;
+}
+.coach-session-review-head span{
+  display:block;
+  color:#8e80ff;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.14em;
+}
+.coach-session-review-head h3{
+  margin:5px 0 4px;
+  font-size:20px;
+}
+.coach-session-review-head p{
+  margin:0;
+  color:#8e9ab0;
+  font-size:12px;
+}
+.coach-session-review-head button{
+  flex:0 0 auto;
+  border:1px solid rgba(138,119,255,.32);
+  background:rgba(119,91,255,.12);
+  color:#cbc4ff;
+  border-radius:10px;
+  padding:9px 11px;
+  font-size:11px;
+  font-weight:800;
+  cursor:pointer;
+}
+.coach-session-metrics{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:9px;
+  margin-top:14px;
+}
+.coach-session-metrics article{
+  padding:12px;
+  border-radius:12px;
+  background:rgba(7,12,22,.54);
+  border:1px solid rgba(255,255,255,.06);
+}
+.coach-session-metrics article.warning{
+  border-color:rgba(255,125,125,.24);
+}
+.coach-session-metrics span,
+.coach-session-metrics strong,
+.coach-session-metrics small{
+  display:block;
+}
+.coach-session-metrics span{
+  color:#718097;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+.coach-session-metrics strong{
+  margin-top:5px;
+  color:#f4f6ff;
+  font-size:21px;
+}
+.coach-session-metrics small{
+  margin-top:3px;
+  color:#7e8aa0;
+  font-size:10px;
+}
+
+.comparison-coach{
+  margin-top:16px;
+}
+.coach-learning-layer{
+  margin-top:16px;
+}
+.coach-learning-layer>.coach-secondary-content>.learning-lab,
+.coach-learning-layer>.coach-secondary-content>.panel{
+  margin:0;
+}
+
+@media (max-width:760px){
+  .hero-insight-preview{
+    padding:15px;
+    border-radius:15px;
+  }
+  .hero-insight-proof{
+    grid-template-columns:1fr;
+  }
+  .coach-session-review-head{
+    display:block;
+  }
+  .coach-session-review-head button{
+    width:100%;
+    margin-top:12px;
+  }
+  .coach-session-metrics{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .player-summary-actions{
+    width:100%;
+  }
+  .player-summary-actions button{
+    flex:1 1 140px;
+  }
+}
+
+@media (max-width:460px){
+  .coach-session-metrics{
+    grid-template-columns:1fr 1fr;
+  }
+  .hero-insight-main strong{
+    font-size:17px;
+  }
+}
