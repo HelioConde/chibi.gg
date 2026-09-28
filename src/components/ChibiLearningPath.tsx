@@ -138,6 +138,7 @@ export default function ChibiLearningPath({playerKey,matches,onEvidence}:Props){
 
   const weakest=skills.slice().sort((a,b)=>a.value-b.value)[0];
   const progress=useMemo(()=>goal?goalProgress(goal,matches):null,[goal,matches]);
+  const progressMatchIds=progress?.matchIds||[];
 
   const baselineMatches=useMemo(()=>{
     if(!goal)return [];
@@ -286,7 +287,7 @@ export default function ChibiLearningPath({playerKey,matches,onEvidence}:Props){
       )}
 
       {goal&&<div className="learning-cycle-actions">
-        {progress&&progress.matchIds.length>0&&<button onClick={()=>onEvidence(progress.matchIds,"Learning Path · partidas do ciclo")}>
+        {progressMatchIds.length>0&&<button onClick={()=>onEvidence(progressMatchIds,"Learning Path · partidas do ciclo")}>
           Ver partidas deste ciclo
         </button>}
         {goal.baselineIds.length>0&&<button onClick={()=>onEvidence(goal.baselineIds.slice(0,12),"Learning Path · linha de base")}>
