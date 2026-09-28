@@ -9879,3 +9879,31 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
   font-size:9px;
   line-height:1.5;
 }
+
+
+/* Chibi Study Reply — peer review without public backend */
+.study-reply-inline{grid-column:1/-1;margin-top:8px;border:1px solid rgba(72,177,255,.2);background:rgba(45,111,151,.06);border-radius:9px;padding:9px 10px}
+.study-reply-inline>span{display:block;color:#7fcff3!important;font-size:7px!important;font-weight:900;letter-spacing:.8px}
+.study-reply-inline>p{margin:4px 0 0;color:#aeb8ca;font-size:9px;line-height:1.5}
+
+.study-reply-card{margin:12px 0 14px;border:1px solid rgba(117,99,231,.28);background:rgba(117,99,231,.05);border-radius:12px;padding:13px}
+.study-reply-head span{display:block;color:#9e8cff;font-size:8px;font-weight:900;letter-spacing:1px}
+.study-reply-head strong{display:block;margin:3px 0 2px;font-size:12px}
+.study-reply-head small{display:block;color:#727c91;font-size:8px}
+.study-reply-form{display:grid;grid-template-columns:180px 1fr;gap:8px;margin-top:10px}
+.study-reply-form input,.study-reply-form textarea{border:1px solid #293047;background:#0a0f17;color:#dce2f1;border-radius:9px;padding:9px;outline:none;font-size:9px}
+.study-reply-form textarea{grid-column:2;grid-row:1/3;min-height:82px;resize:vertical;line-height:1.5}
+.study-reply-form input:focus,.study-reply-form textarea:focus{border-color:#7563e7}
+.study-reply-footer{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.study-reply-footer>small{color:#626c80;font-size:8px}
+.study-reply-footer>div{display:flex;gap:6px}
+.study-reply-footer button{border:1px solid #343c54;background:#141a27;color:#dce2f0;border-radius:8px;padding:8px 10px;font-size:8px;font-weight:900}
+.study-reply-footer button.primary{border-color:#6b58db;background:linear-gradient(135deg,#5b48cf,#8168ef);color:white}
+.study-reply-footer button:disabled{opacity:.45;cursor:not-allowed}
+@media (max-width:650px){
+  .study-reply-form{grid-template-columns:1fr}
+  .study-reply-form textarea{grid-column:1;grid-row:auto}
+  .study-reply-footer{align-items:stretch;flex-direction:column}
+  .study-reply-footer>div{display:grid;grid-template-columns:1fr}
+  .study-reply-footer button{width:100%}
+}
