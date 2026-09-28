@@ -25,6 +25,7 @@ export function getBuilderPresets():BuilderPreset[]{
         augments:Array.isArray(row.augments)?row.augments.slice(0,3).map(String):[],
         units:row.units.map((unit:HexBoardUnit)=>({
           ...unit,
+          role:unit.role==="carry"||unit.role==="tank"||unit.role==="utility"?unit.role:undefined,
           items:Array.isArray(unit.items)?unit.items.slice(0,3).map(String):[],
         })),
       }))
