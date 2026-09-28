@@ -5,6 +5,9 @@ import { buildStyleShift } from "./styleShift";
 import { buildLeakMap, buildPersonalMeta } from "./chibiProduct";
 import { buildChibiDNA } from "./chibiInsights";
 import { buildReviewQueue } from "./reviewQueue";
+import { buildJournalBehaviorSignal } from "../journal";
+import { getDueLessons, getLessons } from "../lessons";
+import { getActiveSession, sessionProgress } from "../sessionMode";
 
 export type AskChibiConfidence="alta"|"média"|"baixa";
 
@@ -60,7 +63,7 @@ function confidenceBySample(matches:number):AskChibiConfidence{
   return "baixa";
 }
 
-export function answerChibiQuestion(question:string,matches:TftMatch[]):AskChibiAnswer{
+export function answerChibiQuestion(question:string,matches:TftMatch[],playerKey=""):AskChibiAnswer{
   const q=normalize(question);
   const action=buildActionPlan(matches);
   const dna=buildChibiDNA(matches);
@@ -69,6 +72,11 @@ export function answerChibiQuestion(question:string,matches:TftMatch[]):AskChibi
   const leaks=buildLeakMap(matches);
   const personal=buildPersonalMeta(matches);
   const dominant=repeatedLineSignal(matches);
+  const journalSignal=buildJournalBehaviorSignal(matches);
+  const dueLessons=playerKey?getDueLessons(playerKey):[];
+  const lessons=playerKey?getLessons(playerKey):[];
+  const activeSession=playerKey?getActiveSession(playerKey):null;
+  const activeSessionProgress=activeSession?sessionProgress(activeSession,matches):null;
   const allIds=matches.map(match=>match.id);
 
   const asksWhy=q.includes("por que")||q.includes("porque")||q.includes("perdendo")||q.includes("perco")||q.includes("perdi")||q.includes("errado")||q.includes("erro");
@@ -80,6 +88,110 @@ export function answerChibiQuestion(question:string,matches:TftMatch[]):AskChibi
   const asksTop4=q.includes("top 4")||q.includes("top4")||q.includes("converter")||q.includes("conversao");
   const asksBottom=q.includes("bottom")||q.includes("7")||q.includes("8")||q.includes("setimo")||q.includes("oitavo");
   const asksReview=q.includes("qual partida")||q.includes("que partida")||q.includes("revisar primeiro")||q.includes("devo revisar")||q.includes("review queue")||q.includes("fila de revisao");
+  const asksJournal=q.includes("journal")||q.includes("repetindo")||q.includes("repito")||q.includes("habito")||q.includes("comportamento")||q.includes("anotei")||q.includes("registrei");
+  const asksLesson=q.includes("licao")||q.includes("aprendi")||q.includes("lembrar")||q.includes("relembrar");
+  const asksSession=q.includes("sessao")||q.includes("experimento")||q.includes("3 partidas")||q.includes("tres partidas");
+
+  if(asksJournal){
+    if(!journalSignal){
+      return {
+        intent:"journal",
+        title:"Seu Journal ainda não mostra um comportamento recorrente",
+        body:"Preciso de pelo menos duas marcações comparáveis antes de transformar percepção em padrão.",
+        bullets:[
+          "Use o Quick Review Checklist depois das partidas.",
+          "Marque também partidas boas para evitar viés de lembrar erros só quando perde.",
+        ],
+        evidence:"Sem padrão auto-relatado forte nesta amostra",
+        confidence:"baixa",
+        matchIds:[],
+        followups:["Qual partida devo revisar?","O que devo fazer agora?"],
+      };
+    }
+
+    return {
+      intent:"journal",
+      title:"Você está repetindo: "+journalSignal.label,
+      body:journalSignal.tone==="warning"
+        ? "Esse comportamento apareceu repetidamente nas partidas que você marcou e ficou concentrado em resultados piores."
+        : "Esse comportamento apareceu repetidamente nas suas anotações e ficou associado a resultados melhores nesta amostra.",
+      bullets:[
+        journalSignal.evidence,
+        "Pergunta para a próxima sessão: "+journalSignal.question,
+        "Confiança do padrão: "+journalSignal.confidence+".",
+      ],
+      evidence:journalSignal.evidence,
+      confidence:journalSignal.confidence==="inicial"?"baixa":journalSignal.confidence,
+      matchIds:journalSignal.matchIds,
+      followups:["O que devo fazer agora?","Qual lição devo revisar?","Qual partida devo revisar?"],
+    };
+  }
+
+  if(asksLesson){
+    const lesson=dueLessons[0]||lessons[0]||null;
+    if(!lesson){
+      return {
+        intent:"lesson",
+        title:"Você ainda não salvou uma Chibi Lesson",
+        body:"Depois de revisar uma partida, escreva no Journal o que aprendeu e use “Salvar como lição”.",
+        bullets:[
+          "A lição fica ligada à partida de origem.",
+          "O Chibi volta a mostrá-la em intervalos crescentes.",
+        ],
+        evidence:"0 lições disponíveis",
+        confidence:"baixa",
+        matchIds:[],
+        followups:["Qual partida devo revisar?","O que eu estou repetindo?"],
+      };
+    }
+
+    return {
+      intent:"lesson",
+      title:dueLessons[0]?"Esta lição está pronta para revisão":"Sua lição mais recente",
+      body:lesson.text,
+      bullets:[
+        lesson.reviewCount===0?"Você ainda não confirmou esta lição.":lesson.reviewCount+" revisão"+(lesson.reviewCount===1?"":"ões")+" registrada(s).",
+        dueLessons[0]?"Ela está na fila de revisão agora.":"Nenhuma lição está vencida; esta é apenas a mais recente.",
+      ],
+      evidence:"Chibi Lesson ligada a 1 partida",
+      confidence:"média",
+      matchIds:[lesson.matchId],
+      followups:["Abrir a partida dessa lição","O que eu estou repetindo?","Qual minha sessão atual?"],
+    };
+  }
+
+  if(asksSession){
+    if(!activeSession){
+      return {
+        intent:"session",
+        title:"Você não tem uma Chibi Session ativa",
+        body:"Na aba Agora, inicie um experimento de 3 partidas para testar uma única mudança por vez.",
+        bullets:[
+          "O foco é definido antes da fila.",
+          "O Chibi compara as 3 partidas com o bloco anterior.",
+          "O Journal pode acrescentar uma pergunta comportamental.",
+        ],
+        evidence:"Nenhuma sessão ativa neste navegador",
+        confidence:"baixa",
+        matchIds:[],
+        followups:["O que devo fazer agora?","O que eu estou repetindo?"],
+      };
+    }
+
+    return {
+      intent:"session",
+      title:activeSession.focusTitle,
+      body:"Sua Chibi Session está em "+(activeSessionProgress?.played||0)+"/"+activeSession.targetGames+" partidas.",
+      bullets:[
+        ...activeSession.focusSteps.slice(0,2),
+        activeSession.journalPrompt?"Pergunta do Journal: "+activeSession.journalPrompt:activeSession.successMetric,
+      ],
+      evidence:activeSessionProgress?.detail||activeSession.description,
+      confidence:"média",
+      matchIds:activeSessionProgress?.matchIds||[],
+      followups:["Como saber se melhorei?","Qual lição devo revisar?","Qual partida devo revisar?"],
+    };
+  }
 
   if(asksReview){
     const queue=buildReviewQueue(matches);
