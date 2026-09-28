@@ -1,0 +1,26 @@
+{
+  "player": "AlchemyFlames#br1",
+  "rank": "Exemplo local · dados manuais",
+  "focus": "Compare este momento com uma partida parecida depois da fila.",
+  "avoid": "Evite transformar o overlay em uma ordem de jogada ao vivo.",
+  "stage": "3-2",
+  "hp": 72,
+  "gold": 38,
+  "level": 6,
+  "streak": "W2",
+  "status": "REVIEW SNAPSHOT",
+  "score": 68,
+  "review_questions": [
+    "O que já estava forte neste board?",
+    "Qual upgrade realmente mudou a estabilidade?",
+    "O que você faria diferente ao rever este momento?"
+  ],
+  "board": [
+    { "slot": 15, "label": "T", "role": "tank" },
+    { "slot": 16, "label": "F", "role": "tank" },
+    { "slot": 18, "label": "U", "role": "utility" },
+    { "slot": 22, "label": "C", "role": "carry" },
+    { "slot": 23, "label": "S", "role": "carry" }
+  ],
+  "updated_at": "2026-09-28T00:00:00Z"
+}
