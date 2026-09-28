@@ -13,6 +13,7 @@ import {
   suggestGoal,
 } from "../goals";
 import { staticEntry, tftAssetUrl, TftStaticData } from "../tftStatic";
+import { saveLesson } from "../lessons";
 
 type Props={
   playerKey:string;
@@ -89,6 +90,20 @@ export default function ChibiSessionPlan({
   function finishGoal(){
     const record=completeGoal(playerKey,matches);
     if(!record)return;
+
+    if(
+      (record.outcome.verdict==="improved"||record.outcome.verdict==="worse")&&
+      record.outcome.matchIds.length>0
+    ){
+      const direction=record.outcome.verdict==="improved"?"melhorou":"piorou";
+      saveLesson(
+        playerKey,
+        record.outcome.matchIds[0],
+        record.title+": "+record.outcome.metricLabel+" "+direction+" de "+record.outcome.metricBefore+" para "+record.outcome.metricAfter+". "+record.outcome.nextFocus,
+        record.outcome.matchIds,
+      );
+    }
+
     setGoal(null);
     setHistoryVersion(value=>value+1);
   }
@@ -206,7 +221,7 @@ export default function ChibiSessionPlan({
         </div>
         <div>
           <button onClick={()=>onEvidence(outcome.matchIds,"Experimento · "+(goal?.title||"sessão"))}>Rever 5 partidas</button>
-          <button className="primary" onClick={finishGoal}>Concluir e salvar</button>
+          <button className="primary" onClick={finishGoal}>Concluir e salvar aprendizado</button>
         </div>
       </div>
     </section>}
