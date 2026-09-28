@@ -107,6 +107,15 @@ export default function ChibiSessionMode({playerKey,matches,refreshing=false,onR
           </article>
         </div>
 
+        {active.journalPrompt&&<article className="session-journal-question">
+          <div>
+            <span>PERGUNTA DE COMPORTAMENTO · JOURNAL</span>
+            <strong>{active.journalPrompt}</strong>
+            {active.journalSignal&&<small>{active.journalSignal}{active.journalEvidence?" · "+active.journalEvidence:""}</small>}
+          </div>
+          <em>Use como lembrete, não como regra automática.</em>
+        </article>}
+
         <div className="session-live">
           <div className="session-placements">
             <span>PARTIDAS DA SESSÃO</span>
