@@ -2858,3 +2858,209 @@ a { color: inherit; text-decoration: none; }
     text-align:left;
   }
 }
+
+/* -----------------------------------------------------------------------
+   Review Queue — guided match review
+   ----------------------------------------------------------------------- */
+.review-queue{
+  margin:14px 0;
+  border-color:rgba(117,99,231,.3);
+  background:
+    radial-gradient(circle at 100% 0%,rgba(117,99,231,.08),transparent 26%),
+    #0c1119;
+}
+.review-queue-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+}
+.review-queue-head>div:first-child>span{
+  display:block;
+  color:#8f7cff;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:1.2px;
+}
+.review-queue-head h2{
+  margin:5px 0 4px;
+  font-size:21px;
+  letter-spacing:-.4px;
+}
+.review-queue-head p{
+  margin:0;
+  color:#7d899d;
+  font-size:9px;
+  line-height:1.5;
+}
+.review-queue-progress{
+  min-width:72px;
+  padding:9px 10px;
+  border:1px solid #293249;
+  border-radius:9px;
+  background:#101722;
+  text-align:center;
+}
+.review-queue-progress strong{
+  display:block;
+  font-size:16px;
+}
+.review-queue-progress small{
+  color:#68758a;
+  font-size:7px;
+}
+.review-next{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:12px;
+  padding:11px 12px;
+  border:1px solid rgba(117,99,231,.22);
+  border-radius:10px;
+  background:rgba(117,99,231,.045);
+}
+.review-next>div{
+  display:grid;
+  gap:3px;
+}
+.review-next span{
+  color:#8e7cf3;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.8px;
+}
+.review-next strong{
+  font-size:10px;
+}
+.review-next button{
+  border:1px solid #6355cf;
+  border-radius:8px;
+  background:rgba(117,99,231,.12);
+  color:#cec7ff;
+  padding:8px 10px;
+  font-size:8px;
+  font-weight:900;
+}
+.review-queue-list{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:10px;
+}
+.review-queue-item{
+  min-width:0;
+  display:grid;
+  grid-template-columns:28px minmax(0,1fr);
+  gap:9px;
+  padding:11px;
+  border:1px solid #222b3c;
+  border-radius:10px;
+  background:#0d131c;
+}
+.review-queue-item.priority{
+  border-color:rgba(255,159,92,.24);
+}
+.review-queue-item.compare{
+  border-color:rgba(92,172,242,.22);
+}
+.review-queue-item.reference{
+  border-color:rgba(72,209,153,.22);
+}
+.review-queue-item.done{
+  opacity:.58;
+}
+.review-index{
+  width:26px;
+  height:26px;
+  display:grid;
+  place-items:center;
+  border-radius:8px;
+  background:#171e2a;
+  color:#c3cbd9;
+  font-size:9px;
+  font-weight:900;
+}
+.review-queue-item.done .review-index{
+  background:rgba(72,209,153,.1);
+  color:#77d5ae;
+}
+.review-item-main{
+  min-width:0;
+}
+.review-item-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.review-item-top span{
+  color:#718097;
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.8px;
+}
+.review-item-top b{
+  font-size:10px;
+}
+.review-item-main h3{
+  margin:7px 0 5px;
+  font-size:12px;
+}
+.review-item-main p{
+  margin:0;
+  color:#8490a4;
+  font-size:9px;
+  line-height:1.45;
+}
+.review-item-main small{
+  display:block;
+  margin-top:7px;
+  color:#627086;
+  font-size:7px;
+  line-height:1.4;
+}
+.review-item-actions{
+  grid-column:1/-1;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+  margin-top:2px;
+}
+.review-item-actions button{
+  border:1px solid #30394c;
+  border-radius:8px;
+  background:#111823;
+  color:#aab5c7;
+  padding:7px 8px;
+  font-size:8px;
+  font-weight:900;
+}
+.review-item-actions button.reviewed{
+  border-color:rgba(72,209,153,.26);
+  background:rgba(72,209,153,.07);
+  color:#83d7b4;
+}
+.review-queue-note{
+  margin:9px 0 0;
+  color:#5f6c80;
+  font-size:7px;
+}
+@media(max-width:900px){
+  .review-queue-list{
+    grid-template-columns:1fr;
+  }
+}
+@media(max-width:620px){
+  .review-queue-head,
+  .review-next{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .review-next button{
+    width:100%;
+  }
+  .review-queue-progress{
+    text-align:left;
+  }
+}
