@@ -11403,3 +11403,30 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
     min-height:38px;
   }
 }
+
+
+/* Overlay Session Focus — fixed before queue, never live-adaptive */
+.overlay-session-focus{margin:18px 0;padding:18px}
+.overlay-session-focus-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.overlay-session-focus-head>div:first-child>span{display:block;color:#8f7cff;font-size:8px;font-weight:900;letter-spacing:1px}
+.overlay-session-focus-head h2{margin:5px 0 5px;font-size:18px;letter-spacing:-.35px}
+.overlay-session-focus-head p{margin:0;color:#7d879b;font-size:9px;line-height:1.5}
+.overlay-session-progress{min-width:88px;border:1px solid rgba(117,99,231,.25);background:rgba(117,99,231,.07);border-radius:10px;padding:9px 10px;text-align:center}
+.overlay-session-progress small{display:block;color:#6e7890;font-size:6px;font-weight:900;letter-spacing:.8px}
+.overlay-session-progress strong{display:block;margin:2px 0;color:#cabfff;font-size:19px}
+.overlay-session-progress span{display:block;color:#657086;font-size:6px}
+.overlay-session-rule{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,.55fr);gap:9px;margin-top:12px}
+.overlay-session-rule>div,.overlay-session-rule>aside{border:1px solid #222b3d;background:#0d131c;border-radius:10px;padding:10px}
+.overlay-session-rule>div>span,.overlay-session-rule>aside>span{display:block;color:#7fcff3;font-size:7px;font-weight:900;letter-spacing:.8px}
+.overlay-session-rule ol{display:flex;flex-direction:column;gap:6px;margin:8px 0 0;padding:0;list-style:none}
+.overlay-session-rule li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:7px}
+.overlay-session-rule li b{width:20px;height:20px;display:grid;place-items:center;border-radius:999px;background:rgba(72,177,255,.1);color:#8edaff;font-size:7px}
+.overlay-session-rule li p,.overlay-session-rule aside p{margin:1px 0 0;color:#8490a5;font-size:8px;line-height:1.45}
+.overlay-session-rule>aside{border-color:rgba(237,155,98,.18);background:rgba(120,68,31,.035)}
+.overlay-session-rule>aside>span{color:#e0a06f}
+.overlay-session-safety{display:block;margin-top:9px;color:#606b80;font-size:7px;line-height:1.45}
+@media(max-width:700px){
+  .overlay-session-focus-head{flex-direction:column}
+  .overlay-session-progress{width:100%;text-align:left}
+  .overlay-session-rule{grid-template-columns:1fr}
+}
