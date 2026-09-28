@@ -148,6 +148,7 @@ class GameflowMonitor(QObject):
         self.worker.moveToThread(self.thread)
         self.thread.started.connect(self.worker.start)
         self.worker.snapshot_ready.connect(self.state_changed)
+        self.thread.finished.connect(self.worker.deleteLater)
 
     def start(self) -> None:
         if not self.thread.isRunning():
@@ -156,7 +157,6 @@ class GameflowMonitor(QObject):
     def stop(self) -> None:
         if not self.thread.isRunning():
             return
-        self.worker.stop()
         self.thread.quit()
         self.thread.wait(2500)
 
