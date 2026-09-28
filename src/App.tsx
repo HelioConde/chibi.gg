@@ -35,6 +35,7 @@ import LobbyAutopsy from "./components/LobbyAutopsy";
 import MatchStory from "./components/MatchStory";
 import ChibiShareCard from "./components/ChibiShareCard";
 import PersonalVsGlobalMeta from "./components/PersonalVsGlobalMeta";
+import ChibiFlex from "./components/ChibiFlex";
 import ChibiIdentity from "./components/ChibiIdentity";
 import ChibiActionCenter from "./components/ChibiActionCenter";
 import StyleShift from "./components/StyleShift";
@@ -1297,6 +1298,15 @@ function App() {
               queueId={metaQueueId}
               staticData={staticData}
               onEvidence={showEvidence}
+            />
+
+            <ChibiFlex
+              matches={analysisMatches}
+              setNumber={currentSet}
+              queueId={metaQueueId}
+              staticData={staticData}
+              onEvidence={showEvidence}
+              onOpenBuilder={openBuilder}
             />
 
             <details className="coach-secondary-panel coach-learning-layer">
