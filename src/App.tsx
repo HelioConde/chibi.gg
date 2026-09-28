@@ -1061,6 +1061,8 @@ function App() {
         <OverlayPage
           hasProfile={Boolean(profile)}
           playerName={profile?.player.gameName||""}
+          playerKey={profile?profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine:""}
+          matches={analysisMatches}
           onBack={closeExplorePage}
         />
       ) : !profile ? (
