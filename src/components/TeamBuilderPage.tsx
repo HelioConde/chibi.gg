@@ -88,6 +88,7 @@ export default function TeamBuilderPage({
   const [variantA,setVariantA]=useState<HexBoardUnit[]|null>(null);
   const [savedPresets,setSavedPresets]=useState<BuilderPreset[]>(()=>getBuilderPresets());
   const [copied,setCopied]=useState(false);
+  const [costFilter,setCostFilter]=useState<number>(0);
 
   useEffect(()=>{
     if(!initialChampionIds.length)return;
@@ -111,10 +112,13 @@ export default function TeamBuilderPage({
         name:String(entry.name||clean(id)),
         cost:Math.max(1,Math.min(5,Number(entry.tier||1))),
       }))
-      .filter(row=>!normalized||row.name.toLowerCase().includes(normalized)||row.id.toLowerCase().includes(normalized))
+      .filter(row=>
+        (!normalized||row.name.toLowerCase().includes(normalized)||row.id.toLowerCase().includes(normalized))
+        && (!costFilter||row.cost===costFilter)
+      )
       .sort((a,b)=>a.cost-b.cost||a.name.localeCompare(b.name))
       .slice(0,140);
-  },[staticData,query]);
+  },[staticData,query,costFilter]);
 
   const boardIds=useMemo(()=>new Set(units.map(unit=>unit.id)),[units]);
 
@@ -157,6 +161,43 @@ export default function TeamBuilderPage({
       .sort((a,b)=>b.sharedScore-a.sharedScore||b.shared.length-a.shared.length||a.cost-b.cost)
       .slice(0,8);
   },[staticData,units.length,boardIds,traitCounts]);
+
+  const costCurve=useMemo(()=>{
+    const counts=[0,0,0,0,0];
+    for(const unit of units){
+      const cost=costFor(unit.id,staticData);
+      counts[Math.max(1,Math.min(5,cost))-1]++;
+    }
+    return counts;
+  },[units,staticData]);
+
+  const selectedChampion=useMemo(()=>{
+    if(!selectedId)return null;
+    const entry=staticEntry(staticData?.champions,selectedId);
+    if(!entry)return null;
+    return {
+      id:selectedId,
+      name:String(entry.name||clean(selectedId)),
+      cost:Math.max(1,Math.min(5,Number(entry.tier||1))),
+      traits:entry.traits||[],
+      image:staticData?tftAssetUrl(staticData.version,"champion",entry):"",
+    };
+  },[selectedId,staticData]);
+
+  const bridgeCandidate=useMemo(
+    ()=>candidateUnits.slice().sort((a,b)=>a.cost-b.cost||b.sharedScore-a.sharedScore)[0]||null,
+    [candidateUnits]
+  );
+
+  const capCandidate=useMemo(
+    ()=>candidateUnits
+      .filter(candidate=>candidate.cost>=4)
+      .slice()
+      .sort((a,b)=>b.sharedScore-a.sharedScore||b.cost-a.cost)[0]||null,
+    [candidateUnits]
+  );
+
+  const primaryTrait=traitCounts[0]||null;
 
   const variantAEvaluation=useMemo(()=>{
     if(!variantA)return null;
@@ -316,7 +357,7 @@ export default function TeamBuilderPage({
     if(!selectedId)return;
     setUnits(current=>{
       const withoutSame=current.filter(unit=>unit.id!==selectedId&&unit.hex!==hex);
-      return [...withoutSame,{id:selectedId,hex,tier:2}];
+      return [...withoutSame,{id:selectedId,hex,tier:1}];
     });
     setSelectedId(null);
   }
@@ -387,7 +428,7 @@ export default function TeamBuilderPage({
     <section className="builder-hero">
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>← Voltar ao perfil</button>}
-        <span className="eyebrow">CHIBI LAB · TEAM BUILDER V2</span>
+        <span className="eyebrow">CHIBI LAB · TEAM BUILDER V3</span>
         <h1>Monte o board.<br/><em>Teste uma decisão por vez.</em></h1>
         <p>{initialChampionIds.length
           ?"Comp carregada. Mova, remova ou substitua peças e compare variantes com o seu histórico."
@@ -447,6 +488,75 @@ export default function TeamBuilderPage({
         <article><span>TRAITS VISÍVEIS</span><strong>{traitCounts.length}</strong></article>
         <article><span>COMPARÁVEIS</span><strong>{similar.length}</strong></article>
       </div>
+    </section>
+
+    <section className="builder-planner-hud">
+      <div className="builder-planner-head">
+        <div>
+          <span>PLANO DO BOARD</span>
+          <h2>Qual é a próxima decisão?</h2>
+          <p>O Chibi organiza o que já está visível no seu board. Compatibilidade estrutural não é tier list nem recomendação automática.</p>
+        </div>
+        <div className={"builder-slot-state "+(overSlots>0?"warning":openSlots===0?"good":"")}>
+          <small>SLOTS</small>
+          <strong>{units.length}/{targetLevel}</strong>
+          <span>{overSlots>0?"excesso de "+overSlots:openSlots>0?openSlots+" vaga"+(openSlots===1?"":"s")+" aberta"+(openSlots===1?"":"s"):"board fechado"}</span>
+        </div>
+      </div>
+
+      <div className="builder-planner-grid">
+        <article className="builder-plan-card focus">
+          <span>FOCO ATUAL</span>
+          <strong>{primaryTrait
+            ?(staticEntry(staticData?.traits,primaryTrait[0])?.name||clean(primaryTrait[0]))+" · "+primaryTrait[1]
+            :"Sem estrutura definida"}</strong>
+          <small>{primaryTrait
+            ?"Trait mais presente entre as peças escolhidas."
+            :"Adicione unidades para descobrir a estrutura dominante."}</small>
+        </article>
+
+        <article className="builder-plan-card">
+          <span>PONTE BARATA</span>
+          <strong>{bridgeCandidate?bridgeCandidate.name:"—"}</strong>
+          <small>{bridgeCandidate
+            ?bridgeCandidate.cost+"g · conecta "+bridgeCandidate.shared.slice(0,2).map(id=>staticEntry(staticData?.traits,id)?.name||clean(id)).join(" + ")
+            :"Nenhuma peça de conexão visível."}</small>
+          {bridgeCandidate&&<button onClick={()=>setSelectedId(bridgeCandidate.id)}>Selecionar</button>}
+        </article>
+
+        <article className="builder-plan-card">
+          <span>PEÇA DE CAP</span>
+          <strong>{capCandidate?capCandidate.name:"—"}</strong>
+          <small>{capCandidate
+            ?capCandidate.cost+"g · compartilha "+capCandidate.shared.length+" trait"+(capCandidate.shared.length===1?"":"s")
+            :"Nenhuma peça 4g/5g conectada à estrutura atual."}</small>
+          {capCandidate&&<button onClick={()=>setSelectedId(capCandidate.id)}>Selecionar</button>}
+        </article>
+
+        <article className="builder-plan-card curve">
+          <span>CURVA DE CUSTO</span>
+          <div className="builder-cost-curve">
+            {costCurve.map((count,index)=><b className={"cost-"+(index+1)} key={index}>
+              <em>{index+1}g</em>
+              <strong>{count}</strong>
+            </b>)}
+          </div>
+          <small>{units.length?averageUnitCost.toFixed(1)+"g de custo médio por unidade":"Board vazio"}</small>
+        </article>
+      </div>
+
+      {selectedChampion&&<div className="builder-selection-guide">
+        <span className={"builder-selection-image cost-"+selectedChampion.cost}>
+          {selectedChampion.image&&<img src={selectedChampion.image} alt=""/>}
+        </span>
+        <div>
+          <small>CHAMPION SELECIONADO</small>
+          <strong>{selectedChampion.name} · {selectedChampion.cost}g</strong>
+          <p>{selectedChampion.traits.slice(0,3).map(id=>staticEntry(staticData?.traits,id)?.name||clean(id)).join(" · ")||"Sem traits carregadas"}</p>
+        </div>
+        <b>Clique em um hex vazio para adicionar ou em uma unidade para substituir.</b>
+        <button onClick={()=>setSelectedId(null)}>Cancelar</button>
+      </div>}
     </section>
 
     {variantA&&variantAEvaluation&&variantDiff&&<section className="builder-ab-compare">
@@ -540,7 +650,7 @@ export default function TeamBuilderPage({
           units={units}
           staticData={staticData}
           onHexClick={addToHex}
-          onUnitClick={removeUnit}
+          onUnitClick={selectedId?(unit)=>addToHex(unit.hex):removeUnit}
           interactive
           emptyLabel="Selecione um champion na biblioteca e clique no hex desejado."
         />
@@ -548,7 +658,7 @@ export default function TeamBuilderPage({
         <div className="builder-roster">
           <div className="builder-subhead">
             <span>SEU BOARD</span>
-            <small>Clique nas estrelas para testar valor do board; remover aqui não depende do hex.</small>
+            <small>Ajuste estrelas aqui. No tabuleiro, clique numa unidade sem seleção para remover; com champion selecionado, clique para substituir.</small>
           </div>
           {units.length?<div className="builder-roster-grid">
             {units.slice().sort((a,b)=>a.hex-b.hex).map(unit=>{
@@ -605,6 +715,13 @@ export default function TeamBuilderPage({
 
         <input value={query} onChange={event=>setQuery(event.target.value)} placeholder="Pesquisar champion..."/>
 
+        <div className="builder-cost-filters" aria-label="Filtrar champions por custo">
+          <button className={costFilter===0?"active":""} onClick={()=>setCostFilter(0)}>Todos</button>
+          {[1,2,3,4,5].map(cost=>(
+            <button className={(costFilter===cost?"active ":"")+"cost-"+cost} onClick={()=>setCostFilter(cost)} key={cost}>{cost}g</button>
+          ))}
+        </div>
+
         <div className="builder-champion-grid">
           {champions.map(row=>{
             const entry=staticEntry(staticData?.champions,row.id);
@@ -635,7 +752,7 @@ export default function TeamBuilderPage({
                 <span>{src&&<img src={src} alt=""/>}</span>
                 <div>
                   <strong>{candidate.name}</strong>
-                  <small>{candidate.shared.slice(0,2).map(clean).join(" · ")}</small>
+                  <small>{candidate.cost}g · {candidate.shared.slice(0,2).map(id=>staticEntry(staticData?.traits,id)?.name||clean(id)).join(" · ")}</small>
                 </div>
                 <b>{candidate.shared.length}</b>
               </button>;
