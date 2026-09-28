@@ -5,6 +5,10 @@ export type JournalTag =
   | "early-roll"
   | "weak-opener"
   | "awkward-items"
+  | "greeded-items"
+  | "late-roll"
+  | "missed-scout"
+  | "bad-position"
   | "good-scout"
   | "pivoted";
 
@@ -54,6 +58,10 @@ export const JOURNAL_TAGS:Array<{id:JournalTag;label:string;help:string}>=[
   {id:"early-roll",label:"Rolei cedo",help:"Você sentiu que gastou ouro antes do timing ideal."},
   {id:"weak-opener",label:"Opener fraco",help:"O começo da partida pareceu abaixo do esperado."},
   {id:"awkward-items",label:"Itens desconfortáveis",help:"Os componentes/itens limitaram suas opções."},
+  {id:"greeded-items",label:"Segurei componentes",help:"Você adiou um slam esperando uma combinação melhor."},
+  {id:"late-roll",label:"Rolei tarde",help:"Você sentiu que demorou demais para converter ouro em força."},
+  {id:"missed-scout",label:"Não scoutei",help:"Você percebeu tarde contestação, posicionamento ou direção da lobby."},
+  {id:"bad-position",label:"Posicionamento ruim",help:"Você acredita que o posicionamento final custou combates importantes."},
   {id:"good-scout",label:"Boa leitura do lobby",help:"Você sentiu que scout/contest ajudou suas decisões."},
   {id:"pivoted",label:"Fiz pivot",help:"Você mudou de plano de forma relevante durante a partida."},
 ];
@@ -78,6 +86,10 @@ const JOURNAL_QUESTIONS:Record<JournalTag,string>={
   "early-roll":"Quando sentir pressão, o que você precisa ver para decidir que vale gastar agora?",
   "weak-opener":"Com opener fraco, você está preservando HP ou perseguindo uma linha que ainda não existe?",
   "awkward-items":"Você consegue jogar o melhor holder disponível em vez de esperar o item perfeito?",
+  "greeded-items":"Qual componente você poderia ter transformado em força antes sem destruir suas opções?",
+  "late-roll":"Qual sinal mostrava que seu board precisava gastar uma rodada antes?",
+  "missed-scout":"Qual informação da lobby teria mudado sua decisão se você tivesse visto uma rodada antes?",
+  "bad-position":"Qual unidade adversária você precisava respeitar no posicionamento desta partida?",
   "good-scout":"Em que momento o scout mudou uma decisão sua de verdade?",
   "pivoted":"O pivot aconteceu por um sinal real da partida ou só porque o plano inicial falhou?",
 };
