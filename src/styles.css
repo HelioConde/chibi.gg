@@ -7998,3 +7998,99 @@ a { color: inherit; text-decoration: none; }
 @media(max-width:560px){
   .builder-saved-list{grid-template-columns:1fr}
 }
+
+/* -----------------------------------------------------------------------
+   Match history — answer-first priority bar
+   ----------------------------------------------------------------------- */
+.matches-priority-bar{
+  display:grid;
+  grid-template-columns:minmax(0,1.1fr) minmax(0,1.1fr) auto;
+  gap:8px;
+  align-items:stretch;
+  margin-bottom:10px;
+}
+.matches-priority-problem,
+.matches-priority-action,
+.matches-priority-cta{
+  min-width:0;
+  padding:10px 11px;
+  border:1px solid #222b3d;
+  border-radius:10px;
+  background:#0d141d;
+}
+.matches-priority-problem{
+  border-color:rgba(230,140,140,.22);
+  background:linear-gradient(135deg,rgba(220,100,100,.04),#0d141d 46%);
+}
+.matches-priority-action{
+  border-color:rgba(117,99,231,.24);
+  background:linear-gradient(135deg,rgba(117,99,231,.045),#0d141d 46%);
+}
+.matches-priority-problem>span,
+.matches-priority-action>span{
+  display:block;
+  color:#66748a;
+  font-size:6px;
+  font-weight:950;
+  letter-spacing:.75px;
+}
+.matches-priority-problem>span{color:#d48888}
+.matches-priority-action>span{color:#8174e5}
+.matches-priority-problem>strong,
+.matches-priority-action>strong{
+  display:block;
+  margin-top:4px;
+  color:#e0e5ee;
+  font-size:10px;
+  line-height:1.35;
+}
+.matches-priority-problem>small,
+.matches-priority-action>small{
+  display:block;
+  margin-top:3px;
+  color:#667389;
+  font-size:7px;
+  line-height:1.4;
+}
+.matches-priority-cta{
+  min-width:150px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:5px;
+}
+.matches-priority-cta button{
+  border:1px solid #5e52bd;
+  border-radius:7px;
+  background:rgba(117,99,231,.1);
+  color:#c9c2ff;
+  padding:7px 9px;
+  font-size:7px;
+  font-weight:900;
+  cursor:pointer;
+}
+.matches-priority-cta button.secondary{
+  border-color:#30394d;
+  background:#111823;
+  color:#8895aa;
+}
+@media(max-width:900px){
+  .matches-priority-bar{
+    grid-template-columns:1fr 1fr;
+  }
+  .matches-priority-cta{
+    grid-column:1/-1;
+    min-width:0;
+    flex-direction:row;
+  }
+  .matches-priority-cta button{flex:1}
+}
+@media(max-width:620px){
+  .matches-priority-bar{
+    grid-template-columns:1fr;
+  }
+  .matches-priority-cta{
+    grid-column:auto;
+    flex-direction:column;
+  }
+}
