@@ -9856,3 +9856,26 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
   .patch-impact-grid{grid-template-columns:1fr}
   .patch-impact-head{align-items:flex-start;flex-direction:column}
 }
+
+
+.coach-review-empty{
+  margin:0 0 12px;
+  padding:16px;
+  border:1px dashed #30394d;
+  border-radius:12px;
+  background:#0d131c;
+}
+.coach-review-empty strong,
+.coach-review-empty span{
+  display:block;
+}
+.coach-review-empty strong{
+  color:#d6dbea;
+  font-size:12px;
+}
+.coach-review-empty span{
+  margin-top:5px;
+  color:#758196;
+  font-size:9px;
+  line-height:1.5;
+}
