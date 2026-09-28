@@ -178,9 +178,15 @@ Chibi Memory compara evolução
 - hotkey `Ctrl+Shift+Space` para mostrar/ocultar
 - hotkey `Ctrl+Shift+L` para click-through
 - modo compacto/expandido
+- presets Compacto / Coach / Completo
+- seleção de monitor e canto do overlay
+- posição e preset persistidos localmente
 - quatro estados locais de demonstração
+- contrato `LiveSnapshot → OverlayDecision` separado da UI
+- marcador local de snapshots para futura integração com Journal/Review
 - GitHub Actions próprio para frontend + Rust
-- próximo: seletor de monitor, posição/tamanho persistidos e preset de HUD
+- workflow manual para gerar MSI/NSIS no Windows
+- próximo: calibração de HUD e provider de captura local
 
 ### GM1.3
 - captura local
