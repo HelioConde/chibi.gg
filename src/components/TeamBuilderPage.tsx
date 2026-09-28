@@ -787,7 +787,7 @@ export default function TeamBuilderPage({
     staticData,
   ]);
 
-  const boardValue=units.reduce
+  const boardValue=units.reduce(
     (sum,unit)=>sum+costFor(unit.id,staticData)*copiesFor(unit.tier||1),
     0
   );
