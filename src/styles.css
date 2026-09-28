@@ -9834,3 +9834,25 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
     min-height:0;
   }
 }
+
+
+/* Patch for you — personal pool changes */
+.patch-personal-copy{margin:6px 0 0;color:#818a9f;font-size:10px;line-height:1.5;max-width:650px}
+.patch-personal-impact{margin:12px 0 14px}
+.patch-impact-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.patch-impact-head span{color:#8f7cff;font-size:8px;font-weight:900;letter-spacing:1px}
+.patch-impact-head small{color:#697287;font-size:8px}
+.patch-impact-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.patch-impact-grid button{border:1px solid #232b3e;background:#0d131c;color:#d9dfec;border-radius:10px;padding:11px;text-align:left}
+.patch-impact-grid button>span{display:block;color:#7d879b;font-size:7px;font-weight:900;letter-spacing:.8px;margin-bottom:5px}
+.patch-impact-grid button>strong{display:block;font-size:11px;line-height:1.35}
+.patch-impact-grid button>p{margin:5px 0;color:#7d879b;font-size:8px;line-height:1.45}
+.patch-impact-grid button>small{display:block;color:#626c80;font-size:8px}
+.patch-impact-grid button.good{border-color:rgba(71,208,154,.22);background:rgba(34,117,84,.05)}
+.patch-impact-grid button.good>span,.patch-impact-grid button.good>strong{color:#77d8b0}
+.patch-impact-grid button.warning{border-color:rgba(255,166,91,.23);background:rgba(126,73,27,.05)}
+.patch-impact-grid button.warning>span,.patch-impact-grid button.warning>strong{color:#e9ae70}
+@media (max-width:650px){
+  .patch-impact-grid{grid-template-columns:1fr}
+  .patch-impact-head{align-items:flex-start;flex-direction:column}
+}
