@@ -170,13 +170,17 @@ Chibi Memory compara evolução
 - board hexagonal demonstrativo
 - arquitetura documentada
 
-### GM1.2
-- workspace do companion
-- janela transparente
+### GM1.2 — em andamento
+- companion Tauri separado em `/companion`
+- janela transparente e sem moldura
 - always-on-top
-- hotkey
-- seletor de monitor
-- modo demo local sem leitura do jogo
+- fora da taskbar
+- hotkey `Ctrl+Shift+Space` para mostrar/ocultar
+- hotkey `Ctrl+Shift+L` para click-through
+- modo compacto/expandido
+- quatro estados locais de demonstração
+- GitHub Actions próprio para frontend + Rust
+- próximo: seletor de monitor, posição/tamanho persistidos e preset de HUD
 
 ### GM1.3
 - captura local
