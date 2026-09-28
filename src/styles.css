@@ -8873,6 +8873,12 @@ a { color: inherit; text-decoration: none; }
 .learning-confidence small{grid-column:1/-1;color:#727b90;font-size:9px;letter-spacing:1.15px;font-weight:900}
 .learning-confidence strong{font-size:17px;letter-spacing:-.3px}
 .learning-confidence span{align-self:center;font-size:11px;color:#8d96ab}
+.confidence-reasons{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;padding-top:7px;border-top:1px solid #222a3a}
+.confidence-reasons i{display:inline-flex;align-items:center;gap:4px;border:1px solid #2a3245;border-radius:999px;padding:3px 6px;background:#111722;font-style:normal}
+.confidence-reasons i b{color:#7e879b;font-size:7px;text-transform:uppercase;letter-spacing:.55px}
+.confidence-reasons i em{color:#8f98ab;font-size:8px;font-style:normal}
+.confidence-reasons i.ready{border-color:rgba(71,208,154,.2);background:rgba(34,117,84,.06)}
+.confidence-reasons i.ready b,.confidence-reasons i.ready em{color:#78cda9}
 .learning-confidence.high{border-color:rgba(71,208,154,.28);background:rgba(34,117,84,.09)}
 .learning-confidence.high strong{color:#78dfb5}
 .learning-confidence.medium{border-color:rgba(255,194,83,.24);background:rgba(123,88,26,.08)}
