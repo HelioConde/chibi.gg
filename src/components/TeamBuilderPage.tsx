@@ -1103,6 +1103,12 @@ export default function TeamBuilderPage({
       transitionAnalysis
         ?"Transição: "+transitionAnalysis.leaving.length+" saem · "+transitionAnalysis.entering.length+" entram · "+transitionAnalysis.copyCost+"G em cópias-alvo"
         :"",
+      economyPlan&&economyPlan.queue.length
+        ?"Progresso: "+economyPlan.completed+"/"+economyPlan.queue.length+" alvos · "+economyPlan.totalRemainingCost+"G restantes"
+        :"",
+      economyPlan?.gold!=null
+        ?"Economia: "+economyPlan.gold+"G atual · "+economyPlan.reserve+"G reserva · "+economyPlan.spendable+"G livres"
+        :"",
     ].filter(Boolean).join("\n");
 
     try{
@@ -1167,7 +1173,7 @@ export default function TeamBuilderPage({
             setSelectedAugments([...variantAAugments]);
             setSelectedId(null);
           }}>Restaurar A</button>}
-          <button className="secondary" onClick={()=>{setUnits([]);setSelectedAugments([]);setSelectedId(null);setSelectedItemHex(null);setMovingHex(null);setTransitionBase(null);setTransitionBaseAugments([]);}}>Limpar board</button>
+          <button className="secondary" onClick={()=>{setUnits([]);setSelectedAugments([]);setSelectedId(null);setSelectedItemHex(null);setMovingHex(null);setTransitionBase(null);setTransitionBaseAugments([]);setTransitionProgress({});setEconomyGold("");setEconomyReserve("");}}>Limpar board</button>
         </div>
       </div>
     </section>
@@ -1323,6 +1329,136 @@ export default function TeamBuilderPage({
           <small>{transitionBaseLevel} → {targetLevel}</small>
         </article>
       </div>
+
+      {economyPlan&&<section className="builder-economy-lab">
+        <div className="builder-economy-head">
+          <div>
+            <span>PLANO DE ECONOMIA</span>
+            <h3>O que comprar primeiro?</h3>
+            <p>Defina seu ouro atual e, se quiser, uma reserva. A fila usa apenas o board-alvo e as cópias configuradas; não prevê loja nem reroll.</p>
+          </div>
+          <div className="builder-economy-inputs">
+            <label>
+              <span>OURO ATUAL</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                inputMode="numeric"
+                value={economyGold}
+                onChange={event=>setEconomyGold(event.target.value.replace(/[^0-9]/g,""))}
+                placeholder="ex: 42"
+              />
+            </label>
+            <label>
+              <span>RESERVAR</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                inputMode="numeric"
+                value={economyReserve}
+                onChange={event=>setEconomyReserve(event.target.value.replace(/[^0-9]/g,""))}
+                placeholder="ex: 10"
+              />
+            </label>
+          </div>
+        </div>
+
+        <div className="builder-economy-metrics">
+          <article>
+            <span>ORÇAMENTO LIVRE</span>
+            <strong>{economyPlan.spendable==null?"—":economyPlan.spendable+"G"}</strong>
+            <small>{economyPlan.gold==null?"informe seu ouro":economyPlan.reserve+"G preservados"}</small>
+          </article>
+          <article>
+            <span>CUSTO RESTANTE</span>
+            <strong>{economyPlan.totalRemainingCost}G</strong>
+            <small>somente cópias ainda não marcadas</small>
+          </article>
+          <article>
+            <span>COBERTURA</span>
+            <strong>{economyPlan.coverage==null?"—":economyPlan.coverage+"%"}</strong>
+            <small>{economyPlan.spendable==null?"aguardando orçamento":"do custo restante"}</small>
+          </article>
+          <article>
+            <span>ALVOS CONCLUÍDOS</span>
+            <strong>{economyPlan.completed}/{economyPlan.queue.length}</strong>
+            <small>pela contagem manual de cópias</small>
+          </article>
+        </div>
+
+        <div className="builder-economy-next">
+          <div>
+            <span>PRÓXIMO ALVO</span>
+            {economyPlan.firstPending
+              ?<>
+                <strong>{staticEntry(staticData?.champions,economyPlan.firstPending.id)?.name||clean(economyPlan.firstPending.id)}</strong>
+                <p>Faltam {economyPlan.firstPending.remainingCopies} cópia{economyPlan.firstPending.remainingCopies===1?"":"s"} · {economyPlan.firstPending.remainingCost}G de custo direto.</p>
+              </>
+              :<>
+                <strong>Cópias-alvo concluídas</strong>
+                <p>Revise posição, itens e o momento da troca antes de encerrar a transição.</p>
+              </>}
+          </div>
+          {economyPlan.queue.some(row=>row.acquired>0)&&<button onClick={resetTransitionProgress}>Zerar contagem</button>}
+        </div>
+
+        {economyPlan.queue.length
+          ?<div className="builder-buy-queue">
+            {economyPlan.queue.map((row,index)=>{
+              const entry=staticEntry(staticData?.champions,row.id);
+              const src=staticData?tftAssetUrl(staticData.version,"champion",entry):"";
+              const role=row.unit.role==="carry"?"Carry":row.unit.role==="tank"?"Tank":row.unit.role==="utility"?"Utilidade":"";
+              const reason=[
+                role,
+                row.traitGain>0?row.traitGain+" trait"+(row.traitGain===1?"":"s")+" ganha"+(row.traitGain===1?"":"m"):"",
+                row.personalGames>0?row.personalGames+" partida"+(row.personalGames===1?"":"s")+" no histórico":"",
+              ].filter(Boolean).join(" · ");
+
+              const budgetCopy=row.fundedCopies;
+              const budgetText=row.complete
+                ?"alvo concluído"
+                :budgetCopy==null
+                  ?"informe ouro para simular"
+                  :row.budgetStatus==="coberto"
+                    ?"cabe no orçamento livre"
+                    :row.budgetStatus==="parcial"
+                      ?budgetCopy+"/"+row.remainingCopies+" cópias cabem agora"
+                      :"fora do orçamento livre";
+
+              return <article className={"builder-buy-row "+(row.complete?"complete":"")} key={row.kind+"-"+row.id}>
+                <b className="builder-buy-order">{index+1}</b>
+                <span className={"builder-buy-image cost-"+costFor(row.id,staticData)}>{src&&<img src={src} alt=""/>}</span>
+                <div className="builder-buy-copy">
+                  <div>
+                    <em>{row.label}</em>
+                    <strong>{entry?.name||clean(row.id)}</strong>
+                  </div>
+                  <small>{row.kind==="upgrade"
+                    ?"upgrade · "+row.targetCopies+" cópia"+(row.targetCopies===1?"":"s")+" extra"+(row.targetCopies===1?"":"s")
+                    :"alvo "+(row.unit.tier||1)+"★ · "+row.targetCopies+" cópia"+(row.targetCopies===1?"":"s")}</small>
+                  {reason&&<small>{reason}{row.personalAverage!=null?" · média "+row.personalAverage.toFixed(2):""}</small>}
+                </div>
+                <div className="builder-copy-counter">
+                  <button disabled={row.acquired<=0} onClick={()=>changeTransitionCopies(row.id,-1,row.targetCopies)}>−</button>
+                  <span><strong>{row.acquired}</strong>/{row.targetCopies}</span>
+                  <button disabled={row.acquired>=row.targetCopies} onClick={()=>changeTransitionCopies(row.id,1,row.targetCopies)}>+</button>
+                </div>
+                <div className="builder-buy-cost">
+                  <strong>{row.remainingCost}G</strong>
+                  <small>{budgetText}</small>
+                </div>
+              </article>;
+            })}
+          </div>
+          :<p className="builder-empty-check">Não há novas cópias para comprar: a transição muda apenas itens, posição, Traits ou Augments.</p>}
+
+        <div className="builder-economy-note">
+          <b>Como ler a fila</b>
+          <p>“Core”, “ponte”, “cap” e “upgrade” descrevem o papel da peça dentro do board que você montou. A ordem não garante que trocar imediatamente seja correto; se a unidade ainda não apareceu, apenas siga para o próximo alvo que a loja oferecer.</p>
+        </div>
+      </section>}
 
       <div className="builder-transition-detail-grid">
         <article className="builder-transition-list">
