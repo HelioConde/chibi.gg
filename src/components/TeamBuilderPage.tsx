@@ -6,6 +6,7 @@ import {
   TftStaticData,
 } from "../tftStatic";
 import HexBoard, { HexBoardUnit } from "./HexBoard";
+import DDragonArt from "./DDragonArt";
 
 type Props={
   staticData:TftStaticData|null;
@@ -109,6 +110,12 @@ export default function TeamBuilderPage({
         <span className="eyebrow">CHIBI LAB · TEAM BUILDER</span>
         <h1>Monte o board.<br/><em>Compare com o seu histórico.</em></h1>
         <p>Um Team Builder pensado para experimentar rotas e depois perguntar ao Chibi se você já jogou algo parecido.</p>
+        <DDragonArt
+          staticData={staticData}
+          championIds={units.map(unit=>unit.id)}
+          variant="ribbon"
+          label="Board visual · Data Dragon"
+        />
       </div>
 
       <div className="builder-summary">
