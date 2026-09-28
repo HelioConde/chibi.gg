@@ -95,22 +95,27 @@ class OverlayFields:
 def fields_for_overlay(
     *, riot_state: GameState, live: RiotLiveState, review: OverlaySnapshot
 ) -> OverlayFields:
-    if riot_state is GameState.IN_GAME:
+    if riot_state is not GameState.LOBBY:
         return OverlayFields(
             stage=live.stage,
             hp=live.hp,
             gold=live.gold,
             level=live.level,
             streak=live.streak,
-            board=LiveField(value=live.board.value, source=live.board.source, updated_at=live.board.updated_at),
+            board=LiveField(
+                value=live.board.value,
+                source=live.board.source,
+                updated_at=live.board.updated_at,
+                available=live.board.available,
+            ),
         )
 
     updated_at = time()
     return OverlayFields(
-        stage=LiveField(review.stage or None, FieldSource.REVIEW, updated_at),
-        hp=LiveField(review.hp, FieldSource.REVIEW, updated_at),
-        gold=LiveField(review.gold, FieldSource.REVIEW, updated_at),
-        level=LiveField(review.level, FieldSource.REVIEW, updated_at),
-        streak=LiveField(review.streak or None, FieldSource.REVIEW, updated_at),
-        board=LiveField(review.board, FieldSource.REVIEW, updated_at),
+        stage=LiveField(review.stage or None, FieldSource.REVIEW, updated_at, bool(review.stage and review.stage != "—")),
+        hp=LiveField(review.hp, FieldSource.REVIEW, updated_at, review.hp is not None),
+        gold=LiveField(review.gold, FieldSource.REVIEW, updated_at, review.gold is not None),
+        level=LiveField(review.level, FieldSource.REVIEW, updated_at, review.level is not None),
+        streak=LiveField(review.streak or None, FieldSource.REVIEW, updated_at, bool(review.streak and review.streak != "—")),
+        board=LiveField(review.board, FieldSource.REVIEW, updated_at, bool(review.board)),
     )

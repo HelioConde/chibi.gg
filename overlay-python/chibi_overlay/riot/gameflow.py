@@ -136,7 +136,7 @@ class _GameflowWorker(QObject):
         if snapshot.state is GameState.IN_GAME:
             live = snapshot.live
             LOGGER.info(
-                "[LCU] TFT live sources stage=%s hp=%s gold=%s level=%s streak=%s board=%s",
+                "[LIVE] stage source: %s | hp source: %s | gold source: %s | level source: %s | streak source: %s | board source: %s",
                 live.stage.source.value,
                 live.hp.source.value,
                 live.gold.source.value,

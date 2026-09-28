@@ -20,10 +20,11 @@ class LiveField(Generic[T]):
     value: T | None
     source: FieldSource
     updated_at: float = field(default_factory=time)
+    available: bool = True
 
     @classmethod
     def unavailable(cls) -> "LiveField[T]":
-        return cls(value=None, source=FieldSource.UNAVAILABLE)
+        return cls(value=None, source=FieldSource.UNAVAILABLE, available=False)
 
 
 @dataclass(frozen=True, slots=True)

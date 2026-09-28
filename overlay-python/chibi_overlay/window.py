@@ -39,7 +39,15 @@ class HotkeySignals(QObject):
 
 class OverlayWindow(QMainWindow):
     EXPANDED_SIZE = (540, 610)
-    COMPACT_SIZE = (430, 245)
+    COMPACT_SIZE = (370, 190)
+    LIVE_SESSION_STATES = {
+        GameState.MATCHMAKING,
+        GameState.READY_CHECK,
+        GameState.READY_CHECK_ACCEPTED,
+        GameState.READY_CHECK_DECLINED,
+        GameState.CHAMP_SELECT,
+        GameState.IN_GAME,
+    }
 
     def __init__(self, store: LocalStore, *, demo: bool = False) -> None:
         super().__init__()
@@ -51,6 +59,11 @@ class OverlayWindow(QMainWindow):
         self.settings = store.load_settings()
         self.snapshot = OverlaySnapshot()
         self.compact = bool(self.settings.get("compact", False))
+        self.auto_compact_in_game = bool(
+            self.settings.get("auto_compact_in_game", True)
+        )
+        self.auto_compacted = False
+        self.user_mode_before_game = self.compact
         self.locked = bool(self.settings.get("locked", False))
         self.clickthrough = bool(self.settings.get("clickthrough", False))
         self.drag_origin: QPoint | None = None
@@ -235,9 +248,9 @@ class OverlayWindow(QMainWindow):
         board_layout.addWidget(self.board_grid_wrap)
         detail_layout.addWidget(self.board_card)
 
-        review_card = QFrame()
-        review_card.setObjectName("panelCard")
-        review_layout = QVBoxLayout(review_card)
+        self.review_card = QFrame()
+        self.review_card.setObjectName("panelCard")
+        review_layout = QVBoxLayout(self.review_card)
         review_layout.setContentsMargins(10, 9, 10, 9)
         review_layout.setSpacing(5)
         review_layout.addWidget(self._caption("PERGUNTAS PARA REVER"))
@@ -248,11 +261,12 @@ class OverlayWindow(QMainWindow):
             label.setWordWrap(True)
             review_layout.addWidget(label)
             self.review_labels.append(label)
-        detail_layout.addWidget(review_card)
+        detail_layout.addWidget(self.review_card)
 
         layout.addWidget(self.detail_wrap)
 
-        footer = QHBoxLayout()
+        self.footer_wrap = QWidget()
+        footer = QHBoxLayout(self.footer_wrap)
         self.snapshot_path_label = QLabel(f"snapshot: {Path(self.store.snapshot_path).name}")
         self.snapshot_path_label.setObjectName("footerText")
         footer.addWidget(self.snapshot_path_label)
@@ -276,7 +290,7 @@ class OverlayWindow(QMainWindow):
         plus.setToolTip("Aumentar opacidade (Ctrl+Shift+Up)")
         plus.clicked.connect(lambda: self.adjust_opacity(0.05))
         footer.addWidget(plus)
-        layout.addLayout(footer)
+        layout.addWidget(self.footer_wrap)
 
         self.setCentralWidget(root)
         self.setStyleSheet(self._stylesheet())
@@ -468,11 +482,11 @@ class OverlayWindow(QMainWindow):
             live_context = f"{live_context} · {riot.details['player_count']} JOGADORES"
         self.rank_label.setText(live_context or snap.rank or "Perfil ainda não conectado")
         if riot.state is GameState.IN_GAME:
-            self.live_label.setText("RIOT LIVE · STATS INDISPONÍVEIS")
-        elif riot.connected:
-            self.live_label.setText("SNAPSHOT · REVISÃO")
+            self.live_label.setText("DADOS DE PARTIDA AINDA NÃO DISPONÍVEIS")
+        elif riot.state in self.LIVE_SESSION_STATES:
+            self.live_label.setText("RIOT LIVE")
         else:
-            self.live_label.setText("INDISPONÍVEL")
+            self.live_label.setText("SNAPSHOT · REVISÃO")
         self.connection_badge.setText("RIOT CONECTADO" if riot.connected else "RIOT OFFLINE")
         self.status_card.set_snapshot(riot)
         self.focus_title.setText(snap.focus or "Revise uma decisão por vez")
@@ -482,7 +496,7 @@ class OverlayWindow(QMainWindow):
         self.stat_labels["gold"].setText(self._field_text(fields.gold))
         self.stat_labels["level"].setText(self._field_text(fields.level))
         self.stat_labels["streak"].setText(self._field_text(fields.streak))
-        self.score_label.setVisible(riot.state is not GameState.IN_GAME)
+        self.score_label.setVisible(riot.state is GameState.LOBBY)
         self.score_label.setText("—" if snap.score is None else f"{snap.score}/100")
 
         board_is_unavailable = fields.board.source is FieldSource.UNAVAILABLE
@@ -506,26 +520,73 @@ class OverlayWindow(QMainWindow):
         for index, label in enumerate(self.review_labels):
             text = questions[index] if index < len(questions) else "—"
             label.setText(f"{index + 1}. {text}")
+        self._apply_state_layout(fields)
 
     @staticmethod
     def _field_text(field: object) -> str:
         value = getattr(field, "value", None)
         source = getattr(field, "source", FieldSource.UNAVAILABLE)
-        if source is FieldSource.UNAVAILABLE or value in (None, ""):
+        available = bool(getattr(field, "available", False))
+        if not available or source is FieldSource.UNAVAILABLE or value in (None, ""):
             return "—"
         return str(value)
 
+    def _apply_state_layout(self, fields: object) -> None:
+        state = self.riot_state.state
+        should_auto_compact = (
+            self.auto_compact_in_game and state in self.LIVE_SESSION_STATES
+        )
+        if should_auto_compact and not self.auto_compacted:
+            self.user_mode_before_game = self.compact
+            self.auto_compacted = True
+        elif not should_auto_compact and self.auto_compacted:
+            self.compact = self.user_mode_before_game
+            self.auto_compacted = False
+
+        self._apply_mode()
+        is_lobby = state is GameState.LOBBY
+        is_in_game = state is GameState.IN_GAME
+        has_live_stats = any(
+            getattr(field, "available", False)
+            and getattr(field, "source", FieldSource.UNAVAILABLE) is FieldSource.LIVE
+            for field in (
+                getattr(fields, "stage"),
+                getattr(fields, "hp"),
+                getattr(fields, "gold"),
+                getattr(fields, "level"),
+                getattr(fields, "streak"),
+            )
+        )
+        has_live_board = (
+            getattr(getattr(fields, "board"), "available", False)
+            and getattr(getattr(fields, "board"), "source", FieldSource.UNAVAILABLE)
+            is FieldSource.LIVE
+        )
+
+        self.rank_label.setVisible(is_lobby)
+        self.live_label.setVisible(is_lobby or is_in_game)
+        self.stats_wrap.setVisible(is_lobby and not self._is_compact() or is_in_game and has_live_stats)
+        self.focus_card.setVisible(is_lobby and not self._is_compact())
+        self.detail_wrap.setVisible((is_lobby and not self._is_compact()) or (is_in_game and has_live_board))
+        self.board_card.setVisible((is_lobby and not self._is_compact()) or (is_in_game and has_live_board))
+        self.review_card.setVisible(is_lobby and not self._is_compact())
+        self.footer_wrap.setVisible(not self.auto_compacted)
+
+    def _is_compact(self) -> bool:
+        return self.compact or self.auto_compacted
+
     def _apply_mode(self) -> None:
-        self.detail_wrap.setVisible(not self.compact)
-        self.stats_wrap.setVisible(not self.compact)
-        self.focus_card.setVisible(not self.compact)
-        width, height = self.COMPACT_SIZE if self.compact else self.EXPANDED_SIZE
+        compact = self._is_compact()
+        self.detail_wrap.setVisible(not compact)
+        self.stats_wrap.setVisible(not compact)
+        self.focus_card.setVisible(not compact)
+        width, height = self.COMPACT_SIZE if compact else self.EXPANDED_SIZE
         self.resize(width, height)
-        self.compact_button.setText("↗" if self.compact else "↕")
+        self.compact_button.setText("↗" if compact else "↕")
 
     def toggle_compact(self) -> None:
         self.compact = not self.compact
-        self._apply_mode()
+        self.render_snapshot()
         self._save_settings()
 
     def toggle_lock(self) -> None:

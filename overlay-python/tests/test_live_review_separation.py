@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from chibi_overlay.models import OverlaySnapshot, fields_for_overlay
 from chibi_overlay.riot.models import FieldSource, GameState, RiotLiveState
+import pytest
 
 
 def test_in_game_never_falls_back_to_demo_review_values() -> None:
@@ -50,3 +51,24 @@ def test_review_values_keep_an_explicit_review_origin_outside_game() -> None:
     assert fields.stage.value == "3-2"
     assert fields.gold.value == 38
     assert fields.stage.source is FieldSource.REVIEW
+
+
+@pytest.mark.parametrize(
+    "state",
+    [
+        GameState.MATCHMAKING,
+        GameState.READY_CHECK,
+        GameState.READY_CHECK_ACCEPTED,
+        GameState.READY_CHECK_DECLINED,
+        GameState.CHAMP_SELECT,
+        GameState.IN_GAME,
+    ],
+)
+def test_live_session_states_never_use_review_stats(state: GameState) -> None:
+    review = OverlaySnapshot.from_dict(
+        {"stage": "3-2", "hp": 72, "gold": 38, "level": 6, "streak": "W2"}
+    )
+    fields = fields_for_overlay(
+        riot_state=state, live=RiotLiveState(), review=review
+    )
+    assert [fields.stage.value, fields.hp.value, fields.gold.value, fields.level.value, fields.streak.value] == [None, None, None, None, None]
