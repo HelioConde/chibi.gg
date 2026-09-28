@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { TftMatch } from "../api/tft";
-import { buildLeakMap, buildPersonalMeta, buildSessionCoach } from "../analysis/chibiProduct";
+import { buildLeakMap, buildSessionCoach } from "../analysis/chibiProduct";
+import { buildRankedReviewSignals } from "../analysis/chibiReviewRanking";
 import { getJournalEntries, JOURNAL_TAGS } from "../journal";
 import { staticEntry, TftStaticData } from "../tftStatic";
 import DDragonArt from "./DDragonArt";
@@ -37,10 +38,16 @@ function signed(value:number,suffix=""){
   return (rounded>0?"+":"")+rounded+suffix;
 }
 
+function relevanceLabel(priority:number){
+  if(priority>=72)return "relevância alta";
+  if(priority>=52)return "relevância média";
+  return "sinal inicial";
+}
+
 export default function ChibiReview({matches,staticData,journalVersion,onEvidence}:Props){
-  const meta=useMemo(()=>buildPersonalMeta(matches),[matches]);
   const leaks=useMemo(()=>buildLeakMap(matches),[matches]);
   const session=useMemo(()=>buildSessionCoach(matches),[matches]);
+  const rankedSignals=useMemo(()=>buildRankedReviewSignals(matches),[matches]);
 
   const visualChampionIds=useMemo(()=>{
     const scores=new Map<string,number>();
@@ -83,55 +90,6 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
   const bottom4=matches.filter(match=>match.placement>=5);
   const top4AvgLevel=avg(top4.map(match=>match.level));
   const bottom4AvgLevel=avg(bottom4.map(match=>match.level));
-
-  const strength=meta[0]
-    ? {
-        title:traitName(meta[0].id,staticData),
-        body:`Sua melhor média entre linhas repetidas foi ${meta[0].avgPlacement}, com Top 4 em ${meta[0].top4Rate}% de ${meta[0].games} partidas.`,
-        confidence:meta[0].confidence,
-        ids:meta[0].matchIds,
-      }
-    : {
-        title:"Ainda sem força recorrente",
-        body:"A amostra não repetiu uma linha o suficiente para destacar um padrão confiável.",
-        confidence:"baixa" as const,
-        ids:[] as string[],
-      };
-
-  const problem=leaks.primary
-    ? {
-        title:leaks.primary.title,
-        body:`${leaks.primary.description} ${leaks.primary.evidence}.`,
-        confidence:leaks.primary.confidence,
-        ids:leaks.primary.matchIds,
-      }
-    : {
-        title:"Nenhum problema dominante",
-        body:"A amostra atual não mostra um vazamento suficientemente claro para virar prioridade.",
-        confidence:"baixa" as const,
-        ids:[] as string[],
-      };
-
-  const change=useMemo(()=>{
-    const window=Math.min(5,Math.floor(matches.length/2));
-    if(window<3) return {
-      title:"Ainda cedo para comparar blocos",
-      body:"Carregue mais partidas para comparar mudança recente com segurança.",
-      tone:"neutral",
-      ids:[] as string[],
-    };
-    const recent=matches.slice(0,window);
-    const previous=matches.slice(window,window*2);
-    const a=avg(recent.map(match=>match.placement))??0;
-    const b=avg(previous.map(match=>match.placement))??0;
-    const diff=a-b;
-    return {
-      title:diff<-.25?"Seu bloco recente melhorou":diff>.25?"Seu bloco recente piorou":"Seu ritmo ficou parecido",
-      body:`Últimas ${window}: média ${a.toFixed(2)} · ${window} anteriores: ${b.toFixed(2)}.`,
-      tone:diff<-.25?"good":diff>.25?"bad":"neutral",
-      ids:[...recent,...previous].map(match=>match.id),
-    };
-  },[matches]);
 
   const sessionComparison=useMemo(()=>{
     const window=Math.min(5,Math.floor(matches.length/2));
@@ -216,7 +174,7 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
       <div className="coach-review-copy">
         <span>CHIBI REVIEW</span>
         <h2>3 descobertas sobre o seu jogo</h2>
-        <p>O Chibi cruza suas próprias partidas, mostra a evidência e separa sinal forte de amostra pequena.</p>
+        <p>O Chibi compara vários sinais do seu histórico e mostra apenas os 3 mais relevantes agora, sempre com evidência e confiança.</p>
         <DDragonArt
           staticData={staticData}
           championIds={visualChampionIds}
@@ -227,27 +185,27 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
       <small>{matches.length} partidas</small>
     </div>
 
-    <div className="coach-signal-row">
-      <article className="coach-signal positive">
-        <span>1 · O QUE ESTÁ FUNCIONANDO</span>
-        <h3>{strength.title}</h3>
-        <p>{strength.body}</p>
-        <div><em>confiança {strength.confidence}</em>{strength.ids.length>0&&<button onClick={()=>onEvidence(strength.ids,"Coach · força")}>Ver evidências</button>}</div>
-      </article>
-
-      <article className="coach-signal warning">
-        <span>2 · O QUE ESTÁ TE PUNINDO</span>
-        <h3>{problem.title}</h3>
-        <p>{problem.body}</p>
-        <div><em>confiança {problem.confidence}</em>{problem.ids.length>0&&<button onClick={()=>onEvidence(problem.ids,"Coach · problema")}>Ver evidências</button>}</div>
-      </article>
-
-      <article className={"coach-signal change "+change.tone}>
-        <span>3 · O QUE MUDOU</span>
-        <h3>{change.title}</h3>
-        <p>{change.body}</p>
-        <div>{change.ids.length>0&&<button onClick={()=>onEvidence(change.ids,"Coach · mudança recente")}>Comparar blocos</button>}</div>
-      </article>
+    <div className="coach-signal-row ranked-review-signals">
+      {rankedSignals.map((signal,index)=>(
+        <article className={"coach-signal "+signal.tone} key={signal.id}>
+          <div className="review-signal-rank">
+            <span>{index+1}</span>
+            <small>{relevanceLabel(signal.priority)}</small>
+          </div>
+          <span>{signal.eyebrow}</span>
+          {signal.subjectId&&<strong className="review-signal-subject">{traitName(signal.subjectId,staticData)}</strong>}
+          <h3>{signal.title}</h3>
+          <p>{signal.body}</p>
+          <small className="review-signal-evidence">{signal.evidence}</small>
+          <div>
+            <em>confiança {signal.confidence}</em>
+            {signal.matchIds.length>0&&<button onClick={()=>onEvidence(
+              signal.matchIds,
+              "Chibi Review · "+(signal.subjectId?traitName(signal.subjectId,staticData)+" · ":"")+signal.title,
+            )}>Ver evidências</button>}
+          </div>
+        </article>
+      ))}
     </div>
 
     {sessionComparison&&<section className={"coach-session-review "+sessionComparison.tone}>
