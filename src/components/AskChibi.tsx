@@ -33,6 +33,12 @@ export default function AskChibi({playerName,matches,onEvidence}:Props){
   );
 
   useEffect(()=>{
+    const onOpen=()=>setOpen(true);
+    window.addEventListener("chibi:open",onOpen);
+    return ()=>window.removeEventListener("chibi:open",onOpen);
+  },[]);
+
+  useEffect(()=>{
     if(!open) return;
     const onKey=(event:KeyboardEvent)=>{
       if(event.key==="Escape") setOpen(false);
