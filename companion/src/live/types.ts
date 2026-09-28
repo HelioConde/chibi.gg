@@ -18,6 +18,10 @@ export type LiveSnapshot={
   level?:number;
   streak?:string;
   board?:LiveUnit[];
+  boardStrength?:number;
+  contestants?:number;
+  upgradePairs?:number;
+  frontlineReady?:boolean;
 };
 
 export type OverlayDecision={
