@@ -23,6 +23,7 @@ import MatchJournal from "./components/MatchJournal";
 import PatchAdaptation from "./components/PatchAdaptation";
 import BoardCounterfactual from "./components/BoardCounterfactual";
 import LobbyAutopsy from "./components/LobbyAutopsy";
+import MatchStory from "./components/MatchStory";
 import ChibiShareCard from "./components/ChibiShareCard";
 import PersonalVsGlobalMeta from "./components/PersonalVsGlobalMeta";
 import ChibiIdentity from "./components/ChibiIdentity";
@@ -1214,6 +1215,11 @@ function App() {
                   <span><small>DURAÇÃO</small><b>{formatDuration(selectedMatch.match.duration)}</b></span>
                 </div>
               </section>}
+
+              {openedMatch&&<MatchStory
+                target={openedMatch}
+                detail={selectedMatch}
+              />}
 
               {openedMatch&&<LobbyAutopsy
                 target={openedMatch}
