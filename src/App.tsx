@@ -29,6 +29,7 @@ import ChibiLearningLab from "./components/ChibiLearningLab";
 import ChibiLearningPath from "./components/ChibiLearningPath";
 import ChibiBoardDrill from "./components/ChibiBoardDrill";
 import ChibiJournalPatterns from "./components/ChibiJournalPatterns";
+import ChibiLessons from "./components/ChibiLessons";
 import ChibiCoachMode from "./components/ChibiCoachMode";
 import ChibiStudyShare, { studyFocusById } from "./components/ChibiStudyShare";
 import ChibiStudyReply from "./components/ChibiStudyReply";
@@ -1387,6 +1388,22 @@ function App() {
               <details className="coach-secondary-panel">
                 <summary>
                   <span>
+                    <b>Lições que você quer lembrar</b>
+                    <small>Transforme notas de partidas em lembretes revisados ao longo do tempo.</small>
+                  </span>
+                  <em>Lessons</em>
+                </summary>
+                <div className="coach-secondary-content">
+                  <ChibiLessons
+                    playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
+                    onEvidence={showEvidence}
+                  />
+                </div>
+              </details>
+
+              <details className="coach-secondary-panel">
+                <summary>
+                  <span>
                     <b>Padrões que você registrou</b>
                     <small>Veja se comportamentos anotados no Journal estão se repetindo nas derrotas ou boas partidas.</small>
                   </span>
@@ -1825,6 +1842,7 @@ function App() {
                 <MatchJournal
                   matchId={openedMatch.id}
                   placement={openedMatch.placement}
+                  playerKey={profile?profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine:""}
                   target={openedMatch}
                   detail={selectedMatch}
                   onSaved={()=>setJournalVersion((value)=>value+1)}
