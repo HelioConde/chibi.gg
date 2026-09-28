@@ -19,6 +19,13 @@ export function getBuilderPresets():BuilderPreset[]{
     if(!Array.isArray(parsed))return [];
     return parsed
       .filter(row=>row&&typeof row.id==="string"&&Array.isArray(row.units))
+      .map(row=>({
+        ...row,
+        units:row.units.map((unit:HexBoardUnit)=>({
+          ...unit,
+          items:Array.isArray(unit.items)?unit.items.slice(0,3).map(String):[],
+        })),
+      }))
       .slice(0,MAX);
   }catch{
     return [];
@@ -30,7 +37,7 @@ export function saveBuilderPreset(input:Omit<BuilderPreset,"id"|"createdAt">){
     ...input,
     id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),
     createdAt:Date.now(),
-    units:input.units.map(unit=>({...unit})),
+    units:input.units.map(unit=>({...unit,items:[...(unit.items||[])].slice(0,3)})),
   };
 
   const next=[preset,...getBuilderPresets()].slice(0,MAX);
