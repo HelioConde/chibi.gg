@@ -38,6 +38,7 @@ import PersonalVsGlobalMeta from "./components/PersonalVsGlobalMeta";
 import ChibiFlex from "./components/ChibiFlex";
 import ChibiIdentity from "./components/ChibiIdentity";
 import ChibiActionCenter from "./components/ChibiActionCenter";
+import ChibiSessionMode from "./components/ChibiSessionMode";
 import StyleShift from "./components/StyleShift";
 import GlobalMetaPage from "./components/GlobalMetaPage";
 import CompsPage from "./components/CompsPage";
@@ -1254,6 +1255,14 @@ function App() {
           </nav>
 
           {profileTab==="overview"&&<>
+            <ChibiSessionMode
+              playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
+              matches={analysisMatches}
+              refreshing={loading}
+              onRefresh={searchPlayer}
+              onEvidence={showEvidence}
+            />
+
             <ChibiActionCenter
               playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
               matches={analysisMatches}
