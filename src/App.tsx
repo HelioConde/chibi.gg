@@ -1022,10 +1022,13 @@ function App() {
           <span className="brand-mark brand-mark-image"><img src={SITE_IMAGES.icon} alt=""/></span>
           <span>chibi<span>.gg</span></span>
         </button>
-        <nav>
+        <nav className="product-nav" aria-label="Produtos Chibi">
           <button className={sitePage==="meta"?"active":""} onClick={openMeta}>Meta</button>
+          <button className={sitePage==="comps"?"active":""} onClick={openComps}>Comps</button>
+          <button className={sitePage==="stats"?"active":""} onClick={()=>openStats()}>Statistics</button>
           <button className={"builder-nav-button "+(sitePage==="builder"?"active":"")} onClick={()=>openBuilder([])}>Builder</button>
           <button className={sitePage==="leaderboard"?"active":""} onClick={openLeaderboard}>Leaderboard</button>
+          <button className={"companion-nav-button "+(sitePage==="overlay"?"active":"")} onClick={openOverlay}>Companion</button>
         </nav>
         <GlobalSearch
           staticData={staticData}
