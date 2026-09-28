@@ -23,6 +23,7 @@ type Props={
   onEvidence:(ids:string[],label:string)=>void;
   initialCategory?:Category;
   initialQuery?:string;
+  initialView?:ViewMode;
 };
 
 type PersonalStat={
@@ -149,9 +150,10 @@ export default function StatisticsPage({
   onEvidence,
   initialCategory="champions",
   initialQuery="",
+  initialView="stats",
 }:Props){
   const [category,setCategory]=useState<Category>(initialCategory);
-  const [view,setView]=useState<ViewMode>("stats");
+  const [view,setView]=useState<ViewMode>(initialView);
   const [queueId,setQueueId]=useState<number|null>(1100);
   const [stats,setStats]=useState<TftGlobalStats|null>(null);
   const [loading,setLoading]=useState(true);
@@ -161,7 +163,8 @@ export default function StatisticsPage({
   useEffect(()=>{
     setCategory(initialCategory);
     setQuery(initialQuery);
-  },[initialCategory,initialQuery]);
+    setView(initialView);
+  },[initialCategory,initialQuery,initialView]);
 
   useEffect(()=>{
     let cancelled=false;
