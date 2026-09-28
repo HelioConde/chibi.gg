@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && node scripts/package-dev.mjs",
+    "dev": "npm run build",
+    "package:dev": "npm run build",
+    "debug:reset": "node scripts/reset-debug.mjs",
     "test": "npm run build && node --test dist/**/*.test.js"
   },
   "devDependencies": {

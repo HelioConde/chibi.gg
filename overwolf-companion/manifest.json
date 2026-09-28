@@ -1,6 +1,7 @@
 {
   "manifest_version": 1,
   "type": "WebApp",
+  "permissions": ["GameInfo"],
   "meta": {
     "name": "Chibi Overwolf Companion",
     "author": "HelioConde",
@@ -16,6 +17,11 @@
       "game_ids": [5426]
     },
     "game_events": [5426],
+    "developer": {
+      "enable_auto_refresh": true,
+      "reload_delay": 1000,
+      "filter": "*.json;*.html;*.js"
+    },
     "start_window": "background",
     "windows": {
       "background": {

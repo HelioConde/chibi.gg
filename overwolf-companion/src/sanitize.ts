@@ -1,6 +1,6 @@
 import type { JsonObject, JsonValue } from "./models.js";
 
-const SENSITIVE = ["token", "password", "authorization", "credential", "spectator", "secret", "puuid", "summonerid"];
+const SENSITIVE = ["token", "password", "authorization", "auth", "credential", "spectator", "secret", "cookie", "session", "puuid", "summonerid", "summoner_name", "displayname", "gameid"];
 
 export function sanitizePayload(value: unknown): JsonValue {
   if (value === null || typeof value === "string" || typeof value === "number" || typeof value === "boolean") return value;
