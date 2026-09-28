@@ -47,7 +47,7 @@ export default function ReviewQueue({playerKey,matches,onOpenMatch}:Props){
       <div>
         <span>REVIEW QUEUE</span>
         <h2>Revise só o que importa</h2>
-        <p>O Chibi escolheu três partidas com papéis diferentes: problema, contraste e referência.</p>
+        <p>O Chibi escolheu problema, contraste e referência — e já diz o que você deve procurar em cada uma.</p>
       </div>
       <div className="review-queue-progress">
         <strong>{completed}/{queue.length}</strong>
@@ -74,8 +74,13 @@ export default function ReviewQueue({playerKey,matches,onOpenMatch}:Props){
               <span>{kindLabel(item)}</span>
               <b>{item.placement}º</b>
             </div>
+            <div className={"review-signal "+item.tone}>{item.signal}</div>
             <h3>{item.title}</h3>
             <p>{item.reason}</p>
+            <div className="review-focus">
+              <span>O QUE PROCURAR</span>
+              <strong>{item.focus}</strong>
+            </div>
             <small>{item.evidence}</small>
           </div>
 
