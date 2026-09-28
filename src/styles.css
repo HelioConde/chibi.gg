@@ -3130,3 +3130,424 @@ a { color: inherit; text-decoration: none; }
     min-height:38px;
   }
 }
+
+/* -----------------------------------------------------------------------
+   Competitive profile pass — OP.GG / Blitz inspired density, Chibi hierarchy
+   ----------------------------------------------------------------------- */
+
+.recent-players{
+  width:min(760px,100%);
+  margin:14px auto 0;
+  text-align:left;
+}
+.recent-players-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:8px;
+}
+.recent-players-head>div{
+  display:grid;
+  gap:3px;
+}
+.recent-players-head span{
+  color:#8875f3;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:1px;
+}
+.recent-players-head strong{
+  font-size:10px;
+  color:#d3d9e6;
+}
+.recent-players-head>small{
+  color:#667389;
+  font-size:8px;
+}
+.recent-player-list{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.recent-player-card{
+  position:relative;
+  display:flex;
+  align-items:center;
+  border:1px solid #242c3d;
+  border-radius:10px;
+  background:#0d131c;
+  overflow:hidden;
+}
+.recent-player-card:hover{
+  border-color:#3a4560;
+  background:#101722;
+}
+.recent-player-open{
+  min-width:0;
+  flex:1;
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) auto;
+  gap:9px;
+  align-items:center;
+  border:0;
+  background:transparent;
+  color:inherit;
+  padding:9px 40px 9px 9px;
+  text-align:left;
+  cursor:pointer;
+}
+.recent-player-avatar{
+  width:32px;
+  height:32px;
+  display:grid;
+  place-items:center;
+  border-radius:9px;
+  background:linear-gradient(135deg,#6c55e1,#9974ff);
+  color:#fff;
+  font-size:11px;
+  font-weight:950;
+}
+.recent-player-copy{
+  min-width:0;
+  display:grid;
+  gap:2px;
+}
+.recent-player-copy strong{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  font-size:10px;
+}
+.recent-player-copy strong small{
+  margin-left:2px;
+  color:#707b8f;
+  font-size:8px;
+}
+.recent-player-copy em{
+  color:#6e7a90;
+  font-size:8px;
+  font-style:normal;
+}
+.recent-player-stats{
+  display:grid;
+  gap:1px;
+  text-align:right;
+}
+.recent-player-stats b{
+  font-size:11px;
+}
+.recent-player-stats small{
+  color:#67758b;
+  font-size:7px;
+}
+.recent-player-remove{
+  position:absolute;
+  right:7px;
+  top:50%;
+  width:24px;
+  height:24px;
+  transform:translateY(-50%);
+  display:grid;
+  place-items:center;
+  border:0;
+  border-radius:7px;
+  background:transparent;
+  color:#566277;
+  cursor:pointer;
+}
+.recent-player-remove:hover{
+  background:#171e2a;
+  color:#c6cfde;
+}
+
+.player-summary-shell{
+  display:grid;
+  grid-template-columns:minmax(280px,1fr) auto auto;
+  gap:18px;
+  align-items:center;
+  margin-top:18px;
+  padding:16px 18px;
+  border:1px solid #242c3d;
+  border-radius:14px;
+  background:
+    radial-gradient(circle at 0% 0%,rgba(117,99,231,.08),transparent 32%),
+    #0c1119;
+}
+.player-summary-main{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:13px;
+}
+.player-avatar-wrap{
+  position:relative;
+  flex:0 0 auto;
+}
+.player-summary-shell .avatar{
+  width:58px;
+  height:58px;
+  font-size:23px;
+  border-radius:16px;
+}
+.player-avatar-wrap>span{
+  position:absolute;
+  right:-5px;
+  bottom:-5px;
+  min-width:27px;
+  height:20px;
+  display:grid;
+  place-items:center;
+  padding:0 5px;
+  border:2px solid #0c1119;
+  border-radius:999px;
+  background:#171e2a;
+  color:#c4ccda;
+  font-size:8px;
+  font-weight:900;
+}
+.player-summary-copy{
+  min-width:0;
+}
+.player-summary-copy .eyebrow{
+  margin-bottom:3px;
+  font-size:8px;
+}
+.player-summary-copy h1{
+  margin:0;
+  font-size:clamp(24px,2.5vw,34px);
+  line-height:1.08;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.player-rank-line{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:7px;
+  color:#7a879b;
+  font-size:9px;
+}
+.player-rank-line strong{
+  color:#d7ddea;
+  font-size:10px;
+}
+.player-rank-line>span:not(.player-trend)::before{
+  content:"·";
+  margin-right:7px;
+  color:#465166;
+}
+.player-trend{
+  padding:4px 6px;
+  border-radius:6px;
+  background:#151c28;
+  color:#8793a8;
+  font-size:8px;
+  font-weight:900;
+}
+.player-trend.good{
+  background:rgba(72,209,153,.08);
+  color:#7cd8b2;
+}
+.player-trend.warning{
+  background:rgba(255,164,92,.08);
+  color:#d7a06f;
+}
+.player-summary-kpis{
+  display:grid;
+  grid-template-columns:repeat(3,96px);
+  gap:7px;
+}
+.player-summary-kpis article{
+  min-height:66px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:9px 10px;
+  border:1px solid #222b3c;
+  border-radius:9px;
+  background:#0f1620;
+}
+.player-summary-kpis span{
+  color:#6c788d;
+  font-size:7px;
+}
+.player-summary-kpis strong{
+  margin-top:3px;
+  font-size:15px;
+}
+.player-summary-kpis small{
+  margin-top:2px;
+  color:#627086;
+  font-size:7px;
+}
+.player-summary-actions{
+  display:flex;
+  align-items:center;
+}
+.player-summary-actions .refresh-button{
+  min-height:38px;
+}
+
+.profile-context-strip{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:8px 0;
+  padding:7px 8px;
+  border:1px solid #20283a;
+  border-radius:10px;
+  background:#0a1018;
+}
+.profile-context-strip>span{
+  color:#68758a;
+  font-size:8px;
+  white-space:nowrap;
+}
+.profile-context-strip .queue-tabs{
+  padding:0;
+  border:0;
+  background:transparent;
+}
+.profile-tabs.simplified-tabs{
+  margin-top:8px;
+}
+
+.match-context-line{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:5px;
+  margin-bottom:5px;
+}
+.match-context-line span{
+  color:#647187;
+  font-size:7px;
+}
+.match-context-line span+span::before{
+  content:"·";
+  margin-right:5px;
+  color:#3f4a5d;
+}
+
+.match-meta-rich{
+  min-width:188px;
+  align-self:stretch;
+  display:flex!important;
+  flex-direction:column;
+  align-items:flex-end!important;
+  justify-content:center;
+}
+.match-value-grid{
+  display:grid;
+  grid-template-columns:repeat(4,42px);
+  gap:3px;
+  margin-bottom:7px;
+}
+.match-value-grid>span{
+  display:grid;
+  gap:1px;
+  padding:5px 4px;
+  border-radius:6px;
+  background:#111822;
+  text-align:center;
+}
+.match-value-grid b{
+  color:#d8deea;
+  font-size:9px;
+}
+.match-value-grid small{
+  color:#5f6d82!important;
+  font-size:6px!important;
+}
+.match-meta-rich>strong{
+  font-size:9px!important;
+}
+.match-meta-rich>small{
+  margin-top:3px;
+  color:#7e8aa0!important;
+  font-size:7px!important;
+}
+
+.match-list-v2 .match-row-v2{
+  grid-template-columns:48px minmax(0,1fr) 188px;
+  gap:12px;
+}
+.match-list-v2 .compact-board{
+  gap:5px;
+}
+.match-list-v2 .compact-board .unit-card{
+  width:42px;
+}
+.match-list-v2 .compact-board .unit-portrait{
+  width:40px;
+  height:40px;
+}
+
+@media(max-width:980px){
+  .player-summary-shell{
+    grid-template-columns:1fr auto;
+  }
+  .player-summary-kpis{
+    grid-column:1/-1;
+    grid-template-columns:repeat(3,1fr);
+  }
+}
+@media(max-width:760px){
+  .player-summary-shell{
+    grid-template-columns:1fr;
+    align-items:stretch;
+  }
+  .player-summary-actions .refresh-button{
+    width:100%;
+  }
+  .profile-context-strip{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .match-list-v2 .match-row-v2{
+    grid-template-columns:42px minmax(0,1fr);
+  }
+  .match-meta-rich{
+    grid-column:2;
+    width:100%;
+    min-width:0;
+    align-items:flex-start!important;
+  }
+  .match-value-grid{
+    grid-template-columns:repeat(4,minmax(44px,1fr));
+    width:100%;
+  }
+}
+@media(max-width:560px){
+  .recent-players-head{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .recent-player-open{
+    grid-template-columns:30px minmax(0,1fr);
+  }
+  .recent-player-stats{
+    grid-column:2;
+    text-align:left;
+    display:flex;
+    align-items:baseline;
+    gap:5px;
+  }
+  .player-summary-main{
+    align-items:flex-start;
+  }
+  .player-summary-shell .avatar{
+    width:50px;
+    height:50px;
+  }
+  .player-summary-kpis{
+    grid-template-columns:1fr 1fr;
+  }
+  .player-summary-kpis article:last-child{
+    grid-column:1/-1;
+  }
+}
