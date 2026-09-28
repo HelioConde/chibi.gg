@@ -10,6 +10,9 @@ export type ReviewQueueItem={
   title:string;
   reason:string;
   evidence:string;
+  signal:string;
+  focus:string;
+  tone:"danger"|"warning"|"good"|"neutral";
   score:number;
 };
 
@@ -32,6 +35,81 @@ function reviewScore(match:TftMatch){
   if(match.level>=9&&match.placement>=5) score+=10;
   if(threeStars(match)===0&&match.placement>=6) score+=6;
   return score;
+}
+
+
+function diagnoseMatch(match:TftMatch){
+  const stars=threeStars(match);
+
+  if(match.placement===1){
+    return {
+      signal:"Vitória referência",
+      focus:"Use este board final como baseline para comparar partidas parecidas que terminaram pior.",
+      tone:"good" as const,
+    };
+  }
+
+  if(match.placement>=7&&match.goldLeft>=10){
+    return {
+      signal:"Ouro não convertido",
+      focus:"Compare o valor/qualidade do board final com o ouro que terminou guardado.",
+      tone:"danger" as const,
+    };
+  }
+
+  if(match.placement>=7&&match.level>=8){
+    return {
+      signal:"Nível sem conversão",
+      focus:"Compare upgrades, estrelas e traits com os jogadores que chegaram ao Top 4.",
+      tone:"danger" as const,
+    };
+  }
+
+  if(match.placement>=7){
+    return {
+      signal:"Bottom 2",
+      focus:"Procure a primeira diferença observável entre este board e seus jogos de 4º–6º.",
+      tone:"danger" as const,
+    };
+  }
+
+  if(match.placement>=5&&match.goldLeft>=10){
+    return {
+      signal:"Meio da lobby com ouro",
+      focus:"Veja se o snapshot final mostra força de board abaixo do que seu ouro restante permitiria investigar.",
+      tone:"warning" as const,
+    };
+  }
+
+  if(match.placement>=5&&match.level>=8){
+    return {
+      signal:"Nível alto · fora do Top 4",
+      focus:"Compare qualidade do board final, não apenas nível.",
+      tone:"warning" as const,
+    };
+  }
+
+  if(match.placement>1&&match.placement<=4){
+    return {
+      signal:"Top 4 sem fechar",
+      focus:"Compare com 1º–2º e procure diferenças finais de estrelas, traits, itens e valor do board.",
+      tone:"warning" as const,
+    };
+  }
+
+  if(stars>0){
+    return {
+      signal:"Board com 3★",
+      focus:"Use esta partida para entender se o spike de estrelas veio acompanhado de resultado.",
+      tone:"neutral" as const,
+    };
+  }
+
+  return {
+    signal:"Partida de contraste",
+    focus:"Compare esta estrutura com a partida principal e procure uma diferença observável por vez.",
+    tone:"neutral" as const,
+  };
 }
 
 function describeEvidence(match:TftMatch){
@@ -90,6 +168,8 @@ export function buildReviewQueue(matches:TftMatch[]):ReviewQueueItem[]{
       || threeStars(b)-threeStars(a)
       || b.level-a.level)[0]||null;
 
+  const priorityDiagnosis=diagnoseMatch(priority);
+
   const items:ReviewQueueItem[]=[
     {
       kind:"priority",
@@ -98,12 +178,16 @@ export function buildReviewQueue(matches:TftMatch[]):ReviewQueueItem[]{
       title:"Revisar primeiro",
       reason:plan.problem.title,
       evidence:describeEvidence(priority),
+      signal:priorityDiagnosis.signal,
+      focus:priorityDiagnosis.focus,
+      tone:priorityDiagnosis.tone,
       score:reviewScore(priority),
     },
   ];
 
   if(compare){
     const same=priorityTrait&&coreTrait(compare)===priorityTrait;
+    const diagnosis=diagnoseMatch(compare);
     items.push({
       kind:"compare",
       matchId:compare.id,
@@ -113,11 +197,15 @@ export function buildReviewQueue(matches:TftMatch[]):ReviewQueueItem[]{
         ?"Board de identidade parecida com resultado diferente."
         :"Uma partida útil para contrastar com o problema principal.",
       evidence:describeEvidence(compare),
+      signal:diagnosis.signal,
+      focus:diagnosis.focus,
+      tone:diagnosis.tone,
       score:50,
     });
   }
 
   if(reference){
+    const diagnosis=diagnoseMatch(reference);
     items.push({
       kind:"reference",
       matchId:reference.id,
@@ -127,6 +215,9 @@ export function buildReviewQueue(matches:TftMatch[]):ReviewQueueItem[]{
         ?"Uma vitória ajuda a enxergar o que estava presente quando o resultado fechou."
         :"Uma das melhores partidas restantes da amostra.",
       evidence:describeEvidence(reference),
+      signal:diagnosis.signal,
+      focus:diagnosis.focus,
+      tone:diagnosis.tone,
       score:25,
     });
   }
