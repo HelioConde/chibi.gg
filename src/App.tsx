@@ -1103,6 +1103,12 @@ function App() {
               <h1>Entenda suas partidas.<br/><span>Suba com intenção.</span></h1>
               <p>Busque seu Riot ID para ver evolução, partidas, padrões e caminhos práticos para melhorar no TFT.</p>
 
+              <div className="home-hero-benefits" aria-label="Principais benefícios">
+                <span><i>✓</i> Perfil e histórico</span>
+                <span><i>✓</i> Meta do patch</span>
+                <span><i>✓</i> Builder + Coach</span>
+              </div>
+
               <form className="search-box home-search-v2" onSubmit={handleSubmit}>
                 <select aria-label="Região" value={platform} onChange={(e)=>setPlatform(e.target.value)}>
                   <option value="br1">BR</option><option value="na1">NA</option><option value="euw1">EUW</option>
@@ -1112,6 +1118,13 @@ function App() {
                 <input id="home-riot-id" value={riotId} onChange={(e)=>setRiotId(e.target.value)} placeholder="Nome#TAG" aria-label="Riot ID"/>
                 <button type="submit" disabled={loading}>{loading ? "Analisando..." : "Buscar jogador →"}</button>
               </form>
+              <div className="home-search-note">
+                <span>Sem conta para consultar</span>
+                <i></i>
+                <span>Digite Nome#TAG</span>
+                <i></i>
+                <span>Resultado em segundos</span>
+              </div>
 
               {error && <div className="lookup-error">{error}</div>}
 
@@ -1188,6 +1201,24 @@ function App() {
                   </div>
                 </div>
 
+                <div className="home-product-insights">
+                  <article>
+                    <small>PARTIDAS</small>
+                    <strong>Veja o que mudou</strong>
+                    <span><i></i><i></i><i></i><i></i><i></i></span>
+                  </article>
+                  <article>
+                    <small>PADRÕES</small>
+                    <strong>Entenda seus sinais</strong>
+                    <span className="bars"><i></i><i></i><i></i></span>
+                  </article>
+                  <article>
+                    <small>PRÓXIMA AÇÃO</small>
+                    <strong>Saiba o que testar</strong>
+                    <b>Coach →</b>
+                  </article>
+                </div>
+
                 <div className="home-product-footer">
                   <span><i></i> Dados do jogador</span>
                   <span>Meta + Builder + Coach</span>
@@ -1209,34 +1240,41 @@ function App() {
 
           <section className="home-paths-v2 home-paths-v3" aria-label="Principais caminhos do Chibi">
             <button onClick={openMeta}>
-              <span className="home-path-index">01</span>
+              <span className="home-path-index"><i>✦</i><em>01</em></span>
               <div>
                 <small>META</small>
-                <h2>Veja o que funciona.</h2>
-                <p>Comps e traits do patch.</p>
+                <h2>Veja o que está funcionando agora.</h2>
+                <p>Comps, traits e sinais do patch atual.</p>
               </div>
               <b>→</b>
             </button>
 
             <button onClick={()=>document.getElementById("home-riot-id")?.focus()}>
-              <span className="home-path-index">02</span>
+              <span className="home-path-index"><i>◎</i><em>02</em></span>
               <div>
                 <small>SEU JOGO</small>
-                <h2>Entenda seu padrão.</h2>
-                <p>Histórico, perfil e Coach.</p>
+                <h2>Entenda seu padrão de partidas.</h2>
+                <p>Perfil, histórico e análise do Coach.</p>
               </div>
               <b>→</b>
             </button>
 
             <button onClick={()=>openBuilder([])}>
-              <span className="home-path-index">03</span>
+              <span className="home-path-index"><i>◇</i><em>03</em></span>
               <div>
                 <small>BUILDER</small>
-                <h2>Planeje a próxima board.</h2>
-                <p>Itens, Augments e transições.</p>
+                <h2>Planeje antes de entrar na fila.</h2>
+                <p>Boards, itens, Augments e transições.</p>
               </div>
               <b>→</b>
             </button>
+          </section>
+
+          <section className="home-proof-strip" aria-label="O que o Chibi entrega">
+            <div><span>01</span><strong>Perfil + histórico</strong><small>Seu jogo em uma leitura clara.</small></div>
+            <div><span>02</span><strong>Meta do patch</strong><small>Dados observados e contexto atual.</small></div>
+            <div><span>03</span><strong>Builder completo</strong><small>Board, itens, Augments e transições.</small></div>
+            <div><span>04</span><strong>Insights acionáveis</strong><small>Menos números soltos, mais próxima ação.</small></div>
           </section>
 
           <HomeMetaPreview
