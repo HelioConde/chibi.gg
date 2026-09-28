@@ -33,6 +33,7 @@ import CompsPage from "./components/CompsPage";
 import AskChibi from "./components/AskChibi";
 import ChibiMemory from "./components/ChibiMemory";
 import ReviewQueue from "./components/ReviewQueue";
+import { markMatchReviewed } from "./reviewProgress";
 
 function cleanName(value:string){
   return value
@@ -168,6 +169,8 @@ function App() {
   const [staticData,setStaticData]=useState<TftStaticData|null>(null);
   const [selectedQueue,setSelectedQueue]=useState<number|null>(null);
   const [openedMatch,setOpenedMatch]=useState<TftMatch|null>(null);
+  const [guidedReviewIds,setGuidedReviewIds]=useState<string[]>([]);
+  const [guidedReviewIndex,setGuidedReviewIndex]=useState(0);
   const [evidenceIds,setEvidenceIds]=useState<string[]|null>(null);
   const [evidenceLabel,setEvidenceLabel]=useState("");
   const [journalVersion,setJournalVersion]=useState(0);
@@ -371,6 +374,8 @@ function App() {
     setSelectedMatch(null);
     setOpenedMatch(null);
     setMatchError("");
+    setGuidedReviewIds([]);
+    setGuidedReviewIndex(0);
     showEvidence(ids,label);
   }
 
@@ -461,6 +466,20 @@ function App() {
     }
   }
 
+  function closeMatchReview(){
+    setSelectedMatch(null);
+    setOpenedMatch(null);
+    setMatchError("");
+    setGuidedReviewIds([]);
+    setGuidedReviewIndex(0);
+  }
+
+  function openGuidedReview(match:TftMatch,queueIds:string[],index:number){
+    setGuidedReviewIds(queueIds);
+    setGuidedReviewIndex(index);
+    void openMatch(match);
+  }
+
   async function openMatch(match:TftMatch){
     setMatchLoading(true);
     setMatchError("");
@@ -475,6 +494,30 @@ function App() {
     }finally{
       setMatchLoading(false);
     }
+  }
+
+  function completeGuidedReview(){
+    if(!profile||!openedMatch) return;
+
+    const playerKey=profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine;
+    markMatchReviewed(playerKey,openedMatch.id,true);
+
+    const nextIndex=guidedReviewIndex+1;
+    const nextId=guidedReviewIds[nextIndex];
+    const nextMatch=nextId
+      ? analysisMatches.find(match=>match.id===nextId)
+      : null;
+
+    if(nextMatch){
+      setGuidedReviewIndex(nextIndex);
+      void openMatch(nextMatch);
+      return;
+    }
+
+    closeMatchReview();
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      document.getElementById("review-queue")?.scrollIntoView({behavior:"smooth",block:"start"});
+    }));
   }
 
   function openMeta(){
@@ -735,7 +778,7 @@ function App() {
             {!evidenceIds?.length&&<ReviewQueue
               playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
               matches={analysisMatches}
-              onOpenMatch={openMatch}
+              onOpenMatch={openGuidedReview}
             />}
             <div className="content-grid">
             <section className="panel history" id="match-history">
@@ -875,9 +918,9 @@ function App() {
       )}
 
       {(matchLoading || selectedMatch || matchError) && (
-        <div className="match-overlay" onClick={()=>{setSelectedMatch(null);setOpenedMatch(null);setMatchError("");}}>
+        <div className="match-overlay" onClick={closeMatchReview}>
           <section className="match-modal" onClick={(e)=>e.stopPropagation()}>
-            <button className="match-close" onClick={()=>{setSelectedMatch(null);setOpenedMatch(null);setMatchError("");}}>×</button>
+            <button className="match-close" onClick={closeMatchReview}>×</button>
             {matchLoading && <div className="match-state">Carregando detalhes da partida...</div>}
             {matchError && <div className="match-state error">{matchError}</div>}
 
@@ -968,6 +1011,24 @@ function App() {
                   ))}
                 </div>
               </details>
+
+              {openedMatch&&guidedReviewIds.length>0&&<section className="guided-review-footer">
+                <div>
+                  <span>REVIEW QUEUE</span>
+                  <strong>{guidedReviewIndex+1} de {guidedReviewIds.length}</strong>
+                  <small>{guidedReviewIndex+1<guidedReviewIds.length
+                    ?"Depois desta, o Chibi abre automaticamente a próxima."
+                    :"Última partida da revisão guiada."}</small>
+                </div>
+                <div className="guided-review-actions">
+                  <button className="secondary" onClick={closeMatchReview}>Sair da fila</button>
+                  <button onClick={completeGuidedReview}>
+                    {guidedReviewIndex+1<guidedReviewIds.length
+                      ?"Marcar revisada e abrir próxima →"
+                      :"Marcar revisada e concluir ✓"}
+                  </button>
+                </div>
+              </section>}
             </>}
           </section>
         </div>
