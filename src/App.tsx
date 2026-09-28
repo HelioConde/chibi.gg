@@ -27,6 +27,7 @@ import ChibiSessionPlan from "./components/ChibiSessionPlan";
 import ActiveGoalStrip from "./components/ActiveGoalStrip";
 import ChibiLearningLab from "./components/ChibiLearningLab";
 import ChibiLearningPath from "./components/ChibiLearningPath";
+import ChibiBoardDrill from "./components/ChibiBoardDrill";
 import ChibiCoachMode from "./components/ChibiCoachMode";
 import ChibiStudyShare, { studyFocusById } from "./components/ChibiStudyShare";
 import ChibiStudyReply from "./components/ChibiStudyReply";
@@ -1368,6 +1369,23 @@ function App() {
             </details>
 
             <div className="coach-secondary-stack">
+
+              <details className="coach-secondary-panel">
+                <summary>
+                  <span>
+                    <b>Treino de leitura de board</b>
+                    <small>Compare dois boards seus e tente prever qual terminou melhor.</small>
+                  </span>
+                  <em>Drill</em>
+                </summary>
+                <div className="coach-secondary-content">
+                  <ChibiBoardDrill
+                    matches={analysisMatches}
+                    staticData={staticData}
+                    onEvidence={showCounterEvidence}
+                  />
+                </div>
+              </details>
 
               <details className="coach-secondary-panel">
                 <summary>
