@@ -765,7 +765,7 @@ function App() {
       setProfile(data);
       setMatches(data.matches || []);
       scrollPageTop();
-      setHasMore((data.matches?.length || 0) >= 12);
+      setHasMore((data.matches?.length || 0) >= 20);
 
       const recentRank=data.ranked?.find((row)=>String(row.queueType).toUpperCase()==="RANKED_TFT")
         || data.ranked?.find((row)=>String(row.queueType).toUpperCase().includes("RANKED_TFT"))
