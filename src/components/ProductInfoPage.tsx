@@ -68,6 +68,14 @@ function About(){
       </div>
     </section>
 
+    <section className="legal-section">
+      <div className="legal-section-title">
+        <span>FLUXO DE CONTA</span>
+        <h2>Protótipo agora · RSO na produção aprovada</h2>
+      </div>
+      <p className="legal-boundary-note">O protótipo público atual usa busca por Riot ID para demonstrar o fluxo de perfil e revisão. A documentação atual de TFT classifica estatísticas do próprio jogador e ferramentas que mostram o próprio histórico como casos de produção que usam Riot Sign On (RSO). O RSO só fica disponível depois que a aplicação de produção é aprovada; por isso a integração de login será concluída nessa etapa, se solicitada/confirmada pela Riot no processo de aprovação.</p>
+    </section>
+
     <section className="legal-section legal-boundaries">
       <div className="legal-section-title">
         <span>LIMITES DO PRODUTO</span>
@@ -110,8 +118,9 @@ function Privacy(){
       <h2>4. Chaves e credenciais</h2>
       <p>A chave da Riot API e a service role do Supabase não são incluídas no JavaScript público do site. As chamadas que precisam dessas credenciais acontecem em funções de backend.</p>
 
-      <h2>5. Login</h2>
-      <p>A versão pública atual permite consultar perfis sem criar conta. O botão de entrada existente não representa, por si só, uma implementação de Riot Sign On. Se autenticação for adicionada futuramente, esta política deverá ser atualizada antes de tratar novos dados de conta.</p>
+      <h2>5. Login e Riot Sign On</h2>
+      <p>O protótipo público atual demonstra o produto com busca direta por Riot ID. Para a versão de produção, o Chibi está preparado para adicionar Riot Sign On (RSO) ao fluxo de dados pessoais assim que a aplicação de produção for aprovada e a Riot disponibilizar as credenciais/etapas de RSO.</p>
+      <p>Quando RSO for ativado, esta política será atualizada antes do lançamento para explicar tokens, sessão, revogação e retenção aplicáveis.</p>
 
       <h2>6. Limites</h2>
       <p>O Chibi usa dados para histórico, análise pós-partida e ferramentas de estudo. O produto não usa o histórico público para oferecer scouting live de oponentes ou automação de decisões durante a partida.</p>

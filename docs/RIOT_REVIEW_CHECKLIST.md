@@ -12,7 +12,8 @@ This checklist tracks the public-facing state of chibi.gg while the Riot product
 
 ## Public product flow
 
-- [x] Riot ID search works without requiring account creation.
+- [x] Prototype Riot ID search demonstrates the profile/review flow.
+- [x] Public site explains that self-history production flow is expected to transition to Riot Sign On after production approval.
 - [x] Profile, rank and recent match history are visible.
 - [x] Match Review is post-game and evidence-first.
 - [x] Chibi Dataset is labeled as observed data, not the entire TFT population.
@@ -30,6 +31,20 @@ This checklist tracks the public-facing state of chibi.gg while the Riot product
 - [x] Riot Developer legal boilerplate visible in the site footer.
 - [x] Legal Jibber Jabber non-endorsement notice visible on information pages.
 - [x] Official Riot policy links are available from the information pages.
+
+## Riot Sign On readiness
+
+Current Riot TFT documentation lists self player stats and training tools that show a player's own match history as production use cases requiring RSO integration. RSO client access is only available after a production application is approved.
+
+Before final production launch:
+
+- [ ] Receive Production API key approval.
+- [ ] Follow Riot's RSO onboarding instructions for the approved application.
+- [ ] Add backend OAuth callback/token exchange; never expose an RSO client secret in the browser.
+- [ ] Use `/riot/account/v1/accounts/me` to bind the signed-in Riot account.
+- [ ] Update Privacy/Terms with token/session retention and revocation details.
+- [ ] Decide which existing direct Riot-ID profile flows remain public after Riot review and which self-history features require the signed-in account.
+- [ ] Re-test all profile, history, Study and Companion flows under the approved access model.
 
 ## Gameplay integrity
 
@@ -61,6 +76,7 @@ The public product must not be changed to provide:
 7. Confirm the Riot boilerplate is visible.
 8. Confirm `/riot.txt` is still publicly reachable.
 9. Take screenshots of the submitted description and any approval response for the Overwolf follow-up.
+10. If Riot instructs RSO integration, preserve the app message/instructions together with the approval screenshot.
 
 ## Official references
 
