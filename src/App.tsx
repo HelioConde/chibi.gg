@@ -1714,17 +1714,16 @@ function App() {
 
                 {historySessions.map((session)=>(
                   <section className="history-session-group" key={(session.end||session.index)+":"+session.index}>
-                    <header className="history-session-head">
-                      <div>
+                    <header className="history-session-head history-session-head-compact">
+                      <div className="history-session-titleline">
                         <span>SESSÃO {historySessions.length>1?historySessions.length-session.index:"ATUAL"}</span>
                         <strong>{formatDay(session.end)} · {formatClock(session.start)}–{formatClock(session.end)}</strong>
-                        <small>{session.games} jogo{session.games===1?"":"s"} no contexto completo</small>
-                        {session.delta!=null&&<em className={session.delta<-.25?"better":session.delta>.25?"worse":"stable"}>
-                          {Math.abs(session.delta)<=.25
-                            ?"Estável vs sessão anterior"
-                            :session.delta<0
-                              ?"Melhorou "+Math.abs(session.delta).toFixed(2)+" vs sessão anterior"
-                              :"Piorou "+Math.abs(session.delta).toFixed(2)+" vs sessão anterior"}
+                        <small>{session.games} jogo{session.games===1?"":"s"}</small>
+                        {session.wins>0&&<small>{session.wins} vitória{session.wins===1?"":"s"}</small>}
+                        {session.delta!=null&&Math.abs(session.delta)>.25&&<em className={session.delta<0?"better":"worse"}>
+                          {session.delta<0
+                            ?"↑ "+Math.abs(session.delta).toFixed(2)+" vs anterior"
+                            :"↓ "+Math.abs(session.delta).toFixed(2)+" vs anterior"}
                         </em>}
                       </div>
 
@@ -1733,7 +1732,6 @@ function App() {
                         <span><small>TOP 4</small><b>{session.games<8
                           ? session.displayMatches.filter(match=>match.placement<=4).length+"/"+session.games
                           : session.top4Rate+"%"}</b></span>
-                        <span><small>1º</small><b>{session.wins}</b></span>
                         <span className={session.bottom2>0?"warning":""}><small>BOTTOM 2</small><b>{session.bottom2}</b></span>
                       </div>
                     </header>
@@ -1801,95 +1799,66 @@ function App() {
             </section>
 
             <aside className="profile-match-sidebar">
-              <section className={"profile-review-teaser "+(primaryReviewSignal?"tone-"+primaryReviewSignal.tone:"")}>
-                <div>
-                  <span>CHIBI REVIEW</span>
-                  <strong>{analysisMatches.length<8
-                    ? headlineStats.top4+"/"+headlineStats.total+" Top 4 · amostra inicial"
-                    : primaryReviewSignal
-                      ? (primaryReviewSignal.subjectId
-                        ? (staticEntry(staticData?.traits,primaryReviewSignal.subjectId)?.name||fallbackTraitName(primaryReviewSignal.subjectId))+" · "+primaryReviewSignal.title
-                        : primaryReviewSignal.title)
-                      : "Ainda juntando evidência"}</strong>
-                  <small>{analysisMatches.length<8
-                    ? "Compare seus melhores resultados sem transformar poucos jogos em padrão."
-                    : primaryReviewSignal
-                      ? primaryReviewSignal.evidence+" · confiança "+primaryReviewSignal.confidence
-                      : "Mais partidas deixam a leitura mais confiável."}</small>
+              <section className={"profile-insight-card "+(primaryReviewSignal?"tone-"+primaryReviewSignal.tone:"")}>
+                <div className="profile-insight-head">
+                  <div>
+                    <span>CHIBI SNAPSHOT</span>
+                    <strong>{analysisMatches.length<8
+                      ? headlineStats.top4+"/"+headlineStats.total+" Top 4 · amostra inicial"
+                      : primaryReviewSignal
+                        ? (primaryReviewSignal.subjectId
+                          ? (staticEntry(staticData?.traits,primaryReviewSignal.subjectId)?.name||fallbackTraitName(primaryReviewSignal.subjectId))+" · "+primaryReviewSignal.title
+                          : primaryReviewSignal.title)
+                        : "Ainda juntando evidência"}</strong>
+                  </div>
+                  <small>{visibleDna.sampleSize} partidas</small>
                 </div>
-                <button onClick={()=>changeProfileTab("coach")}>Abrir Review →</button>
+
+                <div className="placement-strip profile-insight-placements" aria-label="Colocações recentes">
+                  {visibleDna.placements.slice(0,8).map((p,index)=>(
+                    <span className={placementClass(p)} key={index} title={(index+1)+"ª partida mais recente: "+p+"º"}>{p}</span>
+                  ))}
+                </div>
+
+                <div className="profile-insight-metrics">
+                  <span>
+                    <small>{visibleDna.sampleSize<8?"Amostra":"Consistência"}</small>
+                    <b>{visibleDna.sampleSize<8?visibleDna.sampleSize+" jogos":visibleDna.consistency+"%"}</b>
+                  </span>
+                  <span>
+                    <small>Bottom 2</small>
+                    <b>{analysisMatches.filter(match=>match.placement>=7).length}</b>
+                  </span>
+                </div>
+
+                {visibleDna.insights[0]&&(()=>{
+                  const insight=visibleDna.insights[0];
+                  const subject=insight.subject
+                    ? staticEntry(staticData?.traits,insight.subject)?.name || fallbackTraitName(insight.subject)
+                    : "";
+                  return <div className={"profile-insight-signal "+insight.tone}>
+                    <span>{insight.confidence}</span>
+                    <strong>{subject||insight.title}</strong>
+                    {subject&&<small>{insight.title}</small>}
+                  </div>;
+                })()}
+
+                <div className="profile-insight-actions">
+                  <button onClick={()=>changeProfileTab("coach")}>Abrir Review →</button>
+                  <button className="secondary" onClick={()=>changeProfileTab("overview")}>Ver resumo</button>
+                </div>
+
+                <details className="profile-insight-more">
+                  <summary>Mais sinais</summary>
+                  <div>
+                    <span><small>Flexibilidade</small><b>{visibleDna.sampleSize<8?"—":visibleDna.flexibility+"%"}</b></span>
+                    <span><small>Conversão</small><b>{visibleDna.sampleSize<8?"—":visibleDna.conversion+"%"}</b></span>
+                    <p>{evidenceIds?.length
+                      ? "Leitura recalculada com a evidência ativa."
+                      : "Indicadores descritivos da amostra; não são MMR ou avaliação oficial da Riot."}</p>
+                  </div>
+                </details>
               </section>
-
-              <aside className="panel insights dna-panel dna-panel-v2">
-              <div className="panel-title">
-                <div>
-                  <span>PADRÃO RECENTE</span>
-                  <h2>{evidenceIds?.length?"O que esta evidência mostra":"Resumo das suas partidas"}</h2>
-                </div>
-                <small>{visibleDna.sampleSize} partidas</small>
-              </div>
-
-              <div className="placement-strip" aria-label="Colocações recentes">
-                {visibleDna.placements.slice(0,8).map((p,index)=>(
-                  <span className={placementClass(p)} key={index} title={(index+1)+"ª partida mais recente: "+p+"º"}>{p}</span>
-                ))}
-              </div>
-
-              <div className="dna-grid dna-grid-primary">
-                <article>
-                  <span>{visibleDna.sampleSize<8?"Amostra":"Consistência"}</span>
-                  <strong>{visibleDna.sampleSize<8?visibleDna.sampleSize+" jogos":visibleDna.consistency+"%"}</strong>
-                  <small>{visibleDna.sampleSize<8?"leitura ainda inicial":"variação das colocações"}</small>
-                </article>
-                <article>
-                  <span>{visibleDna.sampleSize<8?"Bottom 2":"Estabilidade"}</span>
-                  <strong>{visibleDna.sampleSize<8
-                    ? analysisMatches.filter(match=>match.placement>=7).length
-                    : visibleDna.stability+"%"}</strong>
-                  <small>{visibleDna.sampleSize<8?"nas partidas do filtro":"evitou Bottom 2"}</small>
-                </article>
-              </div>
-
-              {visibleDna.insights[0]&&(()=>{
-                const insight=visibleDna.insights[0];
-                const subject=insight.subject
-                  ? staticEntry(staticData?.traits,insight.subject)?.name || fallbackTraitName(insight.subject)
-                  : "";
-                return <article className={"insight dna-primary-insight "+insight.tone}>
-                  <div className="insight-head"><b>{insight.title}</b><span>{insight.confidence}</span></div>
-                  {subject&&<strong className="insight-subject">{subject}</strong>}
-                  <p>{insight.body}</p>
-                </article>;
-              })()}
-
-              <details className="dna-more">
-                <summary><span><b>Ver DNA completo</b><small>flexibilidade, conversão e outros sinais</small></span><em>Detalhes</em></summary>
-                <div className="dna-more-body">
-                  <div className="dna-grid">
-                    <article><span>Flexibilidade</span><strong>{visibleDna.flexibility}%</strong><small>diversidade de linhas</small></article>
-                    <article><span>Conversão</span><strong>{visibleDna.conversion}%</strong><small>Top 4 que viraram 1º</small></article>
-                  </div>
-
-                  <div className="dna-insights">
-                    {visibleDna.insights.slice(1).map((insight)=>{
-                      const subject=insight.subject
-                        ? staticEntry(staticData?.traits,insight.subject)?.name || fallbackTraitName(insight.subject)
-                        : "";
-                      return <article className={"insight "+insight.tone} key={insight.id}>
-                        <div className="insight-head"><b>{insight.title}</b><span>{insight.confidence}</span></div>
-                        {subject&&<strong className="insight-subject">{subject}</strong>}
-                        <p>{insight.body}</p>
-                        <small>{insight.evidence}</small>
-                      </article>;
-                    })}
-                  </div>
-
-                  <p className="dna-disclaimer">{evidenceIds?.length
-                    ? "DNA recalculado somente com as partidas da evidência ativa. Não é MMR, elo alternativo nem avaliação oficial da Riot."
-                    : "Indicadores descritivos da amostra carregada. Não são MMR, elo alternativo nem avaliação oficial da Riot."}</p>
-                </div>
-              </details>
-              </aside>
             </aside>
           </div>
 
