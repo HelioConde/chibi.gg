@@ -141,6 +141,14 @@ Checklist público/técnico para a revisão da Riot:
 
 **[`docs/RIOT_REVIEW_CHECKLIST.md`](docs/RIOT_REVIEW_CHECKLIST.md)**
 
+Rascunho preservado para a Production Application:
+
+**[`docs/RIOT_APPLICATION_DRAFT.md`](docs/RIOT_APPLICATION_DRAFT.md)**
+
+Plano técnico para a transição para Riot Sign On após aprovação:
+
+**[`docs/RSO_PLAN.md`](docs/RSO_PLAN.md)**
+
 Antes de continuar o projeto no Codex, leia esse arquivo inteiro.
 
 As três prioridades atuais da Etapa 2 estão concluídas:
