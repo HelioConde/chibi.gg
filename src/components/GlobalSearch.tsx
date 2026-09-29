@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { RecentPlayer } from "../recentPlayers";
 import { profileIconUrl, TftStaticData, TftStaticEntry } from "../tftStatic";
+import { useI18n } from "../i18n";
 
 type Category="champions"|"traits"|"items";
 
@@ -44,6 +45,7 @@ export default function GlobalSearch({
   onSearchPlayer,
   onOpenPage,
 }:Props){
+  const { t } = useI18n();
   const [open,setOpen]=useState(false);
   const [query,setQuery]=useState("");
   const inputRef=useRef<HTMLInputElement|null>(null);
@@ -119,7 +121,7 @@ export default function GlobalSearch({
       requestAnimationFrame(()=>inputRef.current?.focus());
     }}>
       <span>⌕</span>
-      <b>Pesquisar</b>
+      <b>{t("search.trigger")}</b>
       <kbd>Ctrl K</kbd>
     </button>
 
@@ -132,21 +134,21 @@ export default function GlobalSearch({
             value={query}
             onChange={event=>setQuery(event.target.value)}
             onKeyDown={event=>{if(event.key==="Enter")submit();}}
-            placeholder="Jogador#TAG, champion, item ou trait..."
+            placeholder={t("search.placeholder")}
           />
           {query&&<button onClick={()=>setQuery("")}>×</button>}
         </div>
 
         {!query&&<div className="global-search-pages">
-          <button onClick={()=>{onOpenPage("meta");close();}}><span>Meta</span><small>visão geral do dataset</small></button>
-          <button onClick={()=>{onOpenPage("comps");close();}}><span>Comps</span><small>boards observados</small></button>
-          <button onClick={()=>{onOpenPage("stats");close();}}><span>Statistics</span><small>champions, traits e items</small></button>
-          <button onClick={()=>{onOpenPage("builder");close();}}><span>Builder</span><small>monte e compare boards</small></button>
-          <button onClick={()=>{onOpenPage("overlay");close();}}><span>Overlay</span><small>Grande mudança 1</small></button>
+          <button onClick={()=>{onOpenPage("meta");close();}}><span>{t("nav.meta")}</span><small>{t("search.metaDesc")}</small></button>
+          <button onClick={()=>{onOpenPage("comps");close();}}><span>{t("nav.comps")}</span><small>{t("search.compsDesc")}</small></button>
+          <button onClick={()=>{onOpenPage("stats");close();}}><span>{t("nav.statistics")}</span><small>{t("search.statsDesc")}</small></button>
+          <button onClick={()=>{onOpenPage("builder");close();}}><span>{t("nav.builder")}</span><small>{t("search.builderDesc")}</small></button>
+          <button onClick={()=>{onOpenPage("overlay");close();}}><span>Overlay</span><small>{t("search.overlayDesc")}</small></button>
         </div>}
 
         {recentResults.length>0&&<div className="global-search-section">
-          <div className="global-search-section-head"><span>PERFIS</span><small>recentes neste navegador</small></div>
+          <div className="global-search-section-head"><span>{t("search.profiles")}</span><small>{t("search.recent")}</small></div>
           {recentResults.map(player=>(
             <button className="global-search-result profile-result" onClick={()=>{onOpenRecent(player);close();}} key={player.platform+":"+player.gameName+"#"+player.tagLine}>
               <span className="search-result-avatar">
@@ -161,7 +163,7 @@ export default function GlobalSearch({
         </div>}
 
         {entityResults.length>0&&<div className="global-search-section">
-          <div className="global-search-section-head"><span>TFT</span><small>{entityResults.length} resultados</small></div>
+          <div className="global-search-section-head"><span>TFT</span><small>{t("search.results",{count:entityResults.length})}</small></div>
           {entityResults.map(row=>(
             <button className="global-search-result" onClick={()=>selectEntity(row)} key={row.category+":"+row.id}>
               <span className="search-result-type">{row.category.slice(0,1).toUpperCase()}</span>
@@ -172,11 +174,11 @@ export default function GlobalSearch({
         </div>}
 
         {query.includes("#")&&<button className="global-search-player-action" onClick={submit}>
-          Buscar Riot ID exato <strong>{query}</strong> →
+          {t("search.exactRiotId")} <strong>{query}</strong> →
         </button>}
 
         {query&&!query.includes("#")&&!entityResults.length&&!recentResults.length&&<div className="global-search-empty">
-          Nenhum champion, item, trait, augment ou perfil recente encontrado. Para jogador remoto, use <b>Nome#TAG</b>.
+          {t("search.empty")}
         </div>}
       </section>
     </div>}
