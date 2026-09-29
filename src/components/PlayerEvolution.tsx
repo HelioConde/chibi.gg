@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { TftMatch } from "../api/tft";
 import { queueLabel, staticEntry, tftAssetUrl, TftStaticData } from "../tftStatic";
 import { getRankHistory, RankSnapshot } from "../rankHistory";
+import { useI18n } from "../i18n";
 
 type Props={
   playerKey:string;
@@ -111,6 +112,7 @@ function normalizedLp(snapshot:RankSnapshot){
 }
 
 export default function PlayerEvolution({playerKey,matches,staticData,onEvidence}:Props){
+  const { t }=useI18n();
   const [version,setVersion]=useState(0);
 
   useEffect(()=>{
@@ -176,26 +178,26 @@ export default function PlayerEvolution({playerKey,matches,staticData,onEvidence
     {blockComparison.previous.games>=3&&<article className="panel player-depth-card evolution-block-card">
       <div className="depth-card-head">
         <div>
-          <span>MUDANÇA RECENTE</span>
-          <h3>Últimas 5 × 5 anteriores</h3>
+          <span>{t("evolution.recentChange")}</span>
+          <h3>{t("evolution.lastVsPrevious")}</h3>
         </div>
         <button onClick={()=>onEvidence(
           [...blockComparison.latest.matchIds,...blockComparison.previous.matchIds],
           "Evolução · últimas 5 vs 5 anteriores",
-        )}>Ver 10 partidas</button>
+        )}>{t("evolution.viewTen")}</button>
       </div>
 
       <div className="evolution-block-grid">
         <article className={blockComparison.averageDelta==null?"":blockComparison.averageDelta<0?"better":blockComparison.averageDelta>0?"worse":""}>
-          <span>COLOCAÇÃO MÉDIA</span>
+          <span>{t("evolution.average")}</span>
           <div><b>{blockComparison.previous.average??"—"}</b><em>→</em><strong>{blockComparison.latest.average??"—"}</strong></div>
           <small>{blockComparison.averageDelta==null
-            ?"sem comparação"
+            ?t("evolution.noComparison")
             :blockComparison.averageDelta<0
-              ? Math.abs(blockComparison.averageDelta).toFixed(2)+" melhor"
+              ?t("evolution.better",{value:Math.abs(blockComparison.averageDelta).toFixed(2)})
               :blockComparison.averageDelta>0
-                ? blockComparison.averageDelta.toFixed(2)+" pior"
-                : "estável"}</small>
+                ?t("evolution.worse",{value:blockComparison.averageDelta.toFixed(2)})
+                :t("evolution.stable")}</small>
         </article>
 
         <article className={blockComparison.top4Delta>0?"better":blockComparison.top4Delta<0?"worse":""}>
@@ -211,19 +213,19 @@ export default function PlayerEvolution({playerKey,matches,staticData,onEvidence
         </article>
 
         <article className={blockComparison.linesDelta>0?"better":blockComparison.linesDelta<0?"worse":""}>
-          <span>LINHAS PRINCIPAIS</span>
+          <span>{t("evolution.mainLines")}</span>
           <div><b>{blockComparison.previous.lines}</b><em>→</em><strong>{blockComparison.latest.lines}</strong></div>
-          <small>{blockComparison.linesDelta===0?"estável":(blockComparison.linesDelta>0?"+":"")+blockComparison.linesDelta+" linha(s)"}</small>
+          <small>{blockComparison.linesDelta===0?t("evolution.stable"):t("evolution.linesDelta",{value:(blockComparison.linesDelta>0?"+":"")+blockComparison.linesDelta})}</small>
         </article>
       </div>
 
-      <p className="evolution-block-note">Blocos de 5 jogos são voláteis. Esta comparação serve para detectar direção recente e escolher partidas para revisar, não para provar melhora permanente.</p>
+      <p className="evolution-block-note">{t("evolution.blockNote")}</p>
     </article>}
 
     <article className="panel player-depth-card rank-history-card">
       <div className="depth-card-head">
         <div>
-          <span>EVOLUÇÃO</span>
+          <span>{t("evolution.title")}</span>
           <h3>Rank History</h3>
         </div>
         <small>{history.length} snapshot{history.length===1?"":"s"}</small>
@@ -233,11 +235,11 @@ export default function PlayerEvolution({playerKey,matches,staticData,onEvidence
         <div className="rank-history-now">
           <strong>{rankLabel(history[history.length-1])}</strong>
           <span className={rankDelta==null?"":rankDelta>=0?"positive":"negative"}>
-            {rankDelta==null?"linha de base":(rankDelta>0?"+":"")+rankDelta+" LP normalizado"}
+            {rankDelta==null?t("evolution.rankBaseline"):t("evolution.normalizedLp",{value:(rankDelta>0?"+":"")+rankDelta})}
           </span>
         </div>
 
-        <div className="rank-history-strip" aria-label="Histórico visual de rank">
+        <div className="rank-history-strip" aria-label={t("evolution.rankAria")}>
           {history.slice(-12).map((snapshot,index)=>{
             const value=normalizedLp(snapshot);
             const all=history.slice(-12).map(normalizedLp);
@@ -252,15 +254,15 @@ export default function PlayerEvolution({playerKey,matches,staticData,onEvidence
           })}
         </div>
 
-        <small className="rank-history-note">Snapshots são salvos quando este perfil é atualizado neste navegador.</small>
-      </>:<p className="depth-empty">Atualize o perfil em visitas diferentes para construir o histórico de LP.</p>}
+        <small className="rank-history-note">{t("evolution.rankNote")}</small>
+      </>:<p className="depth-empty">{t("evolution.rankEmpty")}</p>}
     </article>
 
     <article className="panel player-depth-card">
       <div className="depth-card-head">
         <div>
-          <span>RECENTES</span>
-          <h3>Colocações recentes</h3>
+          <span>{t("evolution.recent")}</span>
+          <h3>{t("evolution.placements")}</h3>
         </div>
       </div>
 
@@ -272,14 +274,14 @@ export default function PlayerEvolution({playerKey,matches,staticData,onEvidence
         ))}
       </div>
 
-      <p className="depth-card-copy">Leitura visual rápida do ritmo recente. Menor colocação é melhor.</p>
+      <p className="depth-card-copy">{t("evolution.placementsDesc")}</p>
     </article>
 
     <article className="panel player-depth-card">
       <div className="depth-card-head">
         <div>
-          <span>MOST CHAMPIONS</span>
-          <h3>Unidades mais recorrentes</h3>
+          <span>{t("evolution.mostChampions")}</span>
+          <h3>{t("evolution.recurringUnits")}</h3>
         </div>
       </div>
 
@@ -290,18 +292,18 @@ export default function PlayerEvolution({playerKey,matches,staticData,onEvidence
           const name=entry?.name||clean(row.id);
           return <button onClick={()=>onEvidence(row.matchIds,"Champion · "+name)} key={row.id}>
             <span className="depth-icon">{image&&<img src={image} alt=""/>}</span>
-            <span><strong>{name}</strong><small>{row.games} jogos · média {row.averagePlacement}</small></span>
+            <span><strong>{name}</strong><small>{t("evolution.row",{games:row.games,average:row.averagePlacement})}</small></span>
             <b>{row.games>=5?row.top4Rate+"%":row.games+"j"}</b>
           </button>;
-        }):<p className="depth-empty">Ainda não há champions repetidos o suficiente.</p>}
+        }):<p className="depth-empty">{t("evolution.noChampions")}</p>}
       </div>
     </article>
 
     <article className="panel player-depth-card">
       <div className="depth-card-head">
         <div>
-          <span>OTHER MODES</span>
-          <h3>Filas carregadas</h3>
+          <span>{t("evolution.otherModes")}</span>
+          <h3>{t("evolution.loadedQueues")}</h3>
         </div>
       </div>
 
@@ -309,18 +311,18 @@ export default function PlayerEvolution({playerKey,matches,staticData,onEvidence
         {modes.length?modes.map(mode=>(
           <button onClick={()=>onEvidence(mode.matchIds,"Fila · "+queueLabel(staticData,mode.queueId))} key={mode.queueId}>
             <span className="depth-mode-icon">{queueLabel(staticData,mode.queueId).slice(0,2).toUpperCase()}</span>
-            <span><strong>{queueLabel(staticData,mode.queueId)}</strong><small>{mode.games} jogos · média {mode.averagePlacement}</small></span>
+            <span><strong>{queueLabel(staticData,mode.queueId)}</strong><small>{t("evolution.row",{games:mode.games,average:mode.averagePlacement})}</small></span>
             <b>{mode.games>=5?mode.top4Rate+"%":mode.games+"j"}</b>
           </button>
-        )):<p className="depth-empty">Nenhuma fila identificada na amostra.</p>}
+        )):<p className="depth-empty">{t("evolution.noQueues")}</p>}
       </div>
     </article>
 
     <article className="panel player-depth-card">
       <div className="depth-card-head">
         <div>
-          <span>MOST SYNERGIES</span>
-          <h3>Traits mais recorrentes</h3>
+          <span>{t("evolution.mostSynergies")}</span>
+          <h3>{t("evolution.recurringTraits")}</h3>
         </div>
       </div>
 
@@ -331,10 +333,10 @@ export default function PlayerEvolution({playerKey,matches,staticData,onEvidence
           const name=entry?.name||clean(row.id);
           return <button onClick={()=>onEvidence(row.matchIds,"Trait · "+name)} key={row.id}>
             <span className="depth-icon trait">{image&&<img src={image} alt=""/>}</span>
-            <span><strong>{name}</strong><small>{row.games} jogos · média {row.averagePlacement}</small></span>
+            <span><strong>{name}</strong><small>{t("evolution.row",{games:row.games,average:row.averagePlacement})}</small></span>
             <b>{row.top4Rate}%</b>
           </button>;
-        }):<p className="depth-empty">Ainda não há traits repetidas o suficiente.</p>}
+        }):<p className="depth-empty">{t("evolution.noTraits")}</p>}
       </div>
     </article>
   </section>;
