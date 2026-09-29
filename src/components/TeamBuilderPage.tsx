@@ -1269,30 +1269,30 @@ export default function TeamBuilderPage({
     {transitionBase&&transitionAnalysis&&<section className="builder-transition-lab">
       <div className="builder-transition-head">
         <div>
-          <span>ROTA DE TRANSIÇÃO</span>
-          <h2>Agora → Alvo</h2>
-          <p>O custo conta somente as cópias-alvo visíveis. Não inclui rerolls, XP, juros ou probabilidade de loja.</p>
+          <span>{t("builder.transition.route")}</span>
+          <h2>{t("builder.transition.nowToTarget")}</h2>
+          <p>{t("builder.transition.desc")}</p>
         </div>
         <div className="builder-transition-actions">
-          <button onClick={restoreTransitionBase}>Voltar ao atual</button>
-          <button className="secondary" onClick={captureTransitionBase}>Usar alvo como novo atual</button>
-          <button className="danger" onClick={clearTransition}>Encerrar</button>
+          <button onClick={restoreTransitionBase}>{t("builder.transition.backCurrent")}</button>
+          <button className="secondary" onClick={captureTransitionBase}>{t("builder.transition.useTarget")}</button>
+          <button className="danger" onClick={clearTransition}>{t("builder.transition.end")}</button>
         </div>
       </div>
 
       <div className="builder-transition-boards">
         <article>
           <div className="builder-transition-board-head">
-            <span>AGORA</span>
-            <strong>Nível {transitionBaseLevel} · {transitionBase.length} unidades · {transitionAnalysis.baseValue}G</strong>
+            <span>{t("builder.transition.now")}</span>
+            <strong>{t("builder.transition.boardSummary",{level:transitionBaseLevel,units:transitionBase.length,value:transitionAnalysis.baseValue})}</strong>
           </div>
           <HexBoard units={transitionBase} staticData={staticData} compact />
         </article>
         <div className="builder-transition-arrow">→</div>
         <article>
           <div className="builder-transition-board-head">
-            <span>ALVO</span>
-            <strong>Nível {targetLevel} · {units.length} unidades · {transitionAnalysis.targetValue}G</strong>
+            <span>{t("builder.transition.target")}</span>
+            <strong>{t("builder.transition.boardSummary",{level:targetLevel,units:units.length,value:transitionAnalysis.targetValue})}</strong>
           </div>
           <HexBoard units={units} staticData={staticData} compact />
         </article>
@@ -1300,32 +1300,32 @@ export default function TeamBuilderPage({
 
       <div className="builder-transition-metrics">
         <article>
-          <span>FICAM</span>
+          <span>{t("builder.transition.keep")}</span>
           <strong>{transitionAnalysis.kept.length}</strong>
-          <small>peças preservadas</small>
+          <small>{t("builder.transition.keepDesc")}</small>
         </article>
         <article>
-          <span>SAEM</span>
+          <span>{t("builder.transition.leave")}</span>
           <strong>{transitionAnalysis.leaving.length}</strong>
-          <small>peças para liberar</small>
+          <small>{t("builder.transition.leaveDesc")}</small>
         </article>
         <article>
-          <span>ENTRAM</span>
+          <span>{t("builder.transition.enter")}</span>
           <strong>{transitionAnalysis.entering.length}</strong>
-          <small>novas peças-alvo</small>
+          <small>{t("builder.transition.enterDesc")}</small>
         </article>
         <article>
-          <span>CÓPIAS-ALVO</span>
+          <span>{t("builder.transition.targetCopies")}</span>
           <strong>{transitionAnalysis.copyCost}G</strong>
-          <small>{transitionAnalysis.enteringCost}G novas · {transitionAnalysis.upgradeCost}G upgrades</small>
+          <small>{t("builder.transition.copyBreakdown",{newCost:transitionAnalysis.enteringCost,upgradeCost:transitionAnalysis.upgradeCost})}</small>
         </article>
         <article>
-          <span>VALOR DO BOARD</span>
+          <span>{t("builder.transition.boardValue")}</span>
           <strong>{transitionAnalysis.valueDelta>0?"+":""}{transitionAnalysis.valueDelta}G</strong>
-          <small>diferença de valor final</small>
+          <small>{t("builder.transition.valueDesc")}</small>
         </article>
         <article>
-          <span>NÍVEL</span>
+          <span>{t("builder.transition.level")}</span>
           <strong>{transitionAnalysis.levelDelta===0?"=":(transitionAnalysis.levelDelta>0?"+":"")+transitionAnalysis.levelDelta}</strong>
           <small>{transitionBaseLevel} → {targetLevel}</small>
         </article>
@@ -1334,13 +1334,13 @@ export default function TeamBuilderPage({
       {economyPlan&&<section className="builder-economy-lab">
         <div className="builder-economy-head">
           <div>
-            <span>PLANO DE ECONOMIA</span>
-            <h3>O que comprar primeiro?</h3>
-            <p>Defina seu ouro atual e, se quiser, uma reserva. A fila usa apenas o board-alvo e as cópias configuradas; não prevê loja nem reroll.</p>
+            <span>{t("builder.economy.plan")}</span>
+            <h3>{t("builder.economy.title")}</h3>
+            <p>{t("builder.economy.desc")}</p>
           </div>
           <div className="builder-economy-inputs">
             <label>
-              <span>OURO ATUAL</span>
+              <span>{t("builder.economy.currentGold")}</span>
               <input
                 type="number"
                 min="0"
@@ -1352,7 +1352,7 @@ export default function TeamBuilderPage({
               />
             </label>
             <label>
-              <span>RESERVAR</span>
+              <span>{t("builder.economy.reserve")}</span>
               <input
                 type="number"
                 min="0"
@@ -1368,41 +1368,41 @@ export default function TeamBuilderPage({
 
         <div className="builder-economy-metrics">
           <article>
-            <span>ORÇAMENTO LIVRE</span>
+            <span>{t("builder.economy.freeBudget")}</span>
             <strong>{economyPlan.spendable==null?"—":economyPlan.spendable+"G"}</strong>
-            <small>{economyPlan.gold==null?"informe seu ouro":economyPlan.reserve+"G preservados"}</small>
+            <small>{economyPlan.gold==null?t("builder.economy.tellGold"):t("builder.economy.preserved",{gold:economyPlan.reserve})}</small>
           </article>
           <article>
-            <span>CUSTO RESTANTE</span>
+            <span>{t("builder.economy.remainingCost")}</span>
             <strong>{economyPlan.totalRemainingCost}G</strong>
-            <small>somente cópias ainda não marcadas</small>
+            <small>{t("builder.economy.remainingCopies")}</small>
           </article>
           <article>
-            <span>COBERTURA</span>
+            <span>{t("builder.economy.coverage")}</span>
             <strong>{economyPlan.coverage==null?"—":economyPlan.coverage+"%"}</strong>
-            <small>{economyPlan.spendable==null?"aguardando orçamento":"do custo restante"}</small>
+            <small>{economyPlan.spendable==null?t("builder.economy.waitBudget"):t("builder.economy.ofRemaining")}</small>
           </article>
           <article>
-            <span>ALVOS CONCLUÍDOS</span>
+            <span>{t("builder.economy.completed")}</span>
             <strong>{economyPlan.completed}/{economyPlan.queue.length}</strong>
-            <small>pela contagem manual de cópias</small>
+            <small>{t("builder.economy.manual")}</small>
           </article>
         </div>
 
         <div className="builder-economy-next">
           <div>
-            <span>PRÓXIMO ALVO</span>
+            <span>{t("builder.economy.next")}</span>
             {economyPlan.firstPending
               ?<>
                 <strong>{staticEntry(staticData?.champions,economyPlan.firstPending.id)?.name||clean(economyPlan.firstPending.id)}</strong>
-                <p>Faltam {economyPlan.firstPending.remainingCopies} cópia{economyPlan.firstPending.remainingCopies===1?"":"s"} · {economyPlan.firstPending.remainingCost}G de custo direto.</p>
+                <p>{t("builder.economy.missing",{copies:economyPlan.firstPending.remainingCopies,cost:economyPlan.firstPending.remainingCost})}</p>
               </>
               :<>
-                <strong>Cópias-alvo concluídas</strong>
-                <p>Revise posição, itens e o momento da troca antes de encerrar a transição.</p>
+                <strong>{t("builder.economy.done")}</strong>
+                <p>{t("builder.economy.doneDesc")}</p>
               </>}
           </div>
-          {economyPlan.queue.some(row=>row.acquired>0)&&<button onClick={resetTransitionProgress}>Zerar contagem</button>}
+          {economyPlan.queue.some(row=>row.acquired>0)&&<button onClick={resetTransitionProgress}>{t("builder.economy.reset")}</button>}
         </div>
 
         {economyPlan.queue.length
@@ -1419,14 +1419,14 @@ export default function TeamBuilderPage({
 
               const budgetCopy=row.fundedCopies;
               const budgetText=row.complete
-                ?"alvo concluído"
+                ?t("builder.economy.targetDone")
                 :budgetCopy==null
-                  ?"informe ouro para simular"
+                  ?t("builder.economy.simulate")
                   :row.budgetStatus==="coberto"
-                    ?"cabe no orçamento livre"
+                    ?t("builder.economy.fits")
                     :row.budgetStatus==="parcial"
-                      ?budgetCopy+"/"+row.remainingCopies+" cópias cabem agora"
-                      :"fora do orçamento livre";
+                      ?t("builder.economy.partial",{funded:budgetCopy,remaining:row.remainingCopies})
+                      :t("builder.economy.out");
 
               return <article className={"builder-buy-row "+(row.complete?"complete":"")} key={row.kind+"-"+row.id}>
                 <b className="builder-buy-order">{index+1}</b>
@@ -1722,61 +1722,61 @@ export default function TeamBuilderPage({
     {variantA&&variantAEvaluation&&variantDiff&&<section className="builder-ab-compare">
       <div className="builder-ab-head">
         <div>
-          <span>COMPARAÇÃO A/B</span>
-          <h2>Veja exatamente o que mudou</h2>
-          <p>A é o snapshot salvo. “Agora” é o board atual. As métricas pessoais usam apenas partidas comparáveis do seu histórico carregado.</p>
+          <span>{t("builder.ab.title")}</span>
+          <h2>{t("builder.ab.heading")}</h2>
+          <p>{t("builder.ab.desc")}</p>
         </div>
-        <button onClick={()=>{setVariantA(null);setVariantAAugments([]);}}>Descartar A</button>
+        <button onClick={()=>{setVariantA(null);setVariantAAugments([]);}}>{t("builder.ab.discard")}</button>
       </div>
 
       <div className="builder-ab-grid">
         <article className="builder-ab-card">
-          <span>VERSÃO A</span>
+          <span>{t("builder.ab.versionA")}</span>
           <strong>{variantA.length} unidades · {variantAEvaluation.value}G · {variantAAugments.length} aug.</strong>
           <small>{variantAEvaluation.average!=null
-            ?"Histórico: média "+variantAEvaluation.average.toFixed(2)+" · Top 4 "+variantAEvaluation.top4Rate+"%"
-            :"Histórico: amostra insuficiente"}</small>
+            ?t("builder.ab.history",{average:variantAEvaluation.average.toFixed(2),top4:variantAEvaluation.top4Rate})
+            :t("builder.ab.insufficient")}</small>
         </article>
 
         <article className="builder-ab-card current">
-          <span>AGORA</span>
+          <span>{t("builder.ab.now")}</span>
           <strong>{units.length} unidades · {boardValue}G · {selectedAugments.length} aug.</strong>
           <small>{average!=null
-            ?"Histórico: média "+average.toFixed(2)+" · Top 4 "+top4Rate+"%"
-            :"Histórico: amostra insuficiente"}</small>
+            ?t("builder.ab.history",{average:average.toFixed(2),top4:top4Rate})
+            :t("builder.ab.insufficient")}</small>
         </article>
 
         <article className="builder-ab-diff">
-          <span>MUDANÇAS</span>
+          <span>{t("builder.ab.changes")}</span>
           <div>
-            <p><b>Entraram</b>{variantDiff.added.length
+            <p><b>{t("builder.ab.entered")}</b>{variantDiff.added.length
               ?variantDiff.added.map(id=>staticEntry(staticData?.champions,id)?.name||clean(id)).join(" · ")
-              :"nenhuma peça"}</p>
-            <p><b>Saíram</b>{variantDiff.removed.length
+              :t("builder.ab.nonePiece")}</p>
+            <p><b>{t("builder.ab.left")}</b>{variantDiff.removed.length
               ?variantDiff.removed.map(id=>staticEntry(staticData?.champions,id)?.name||clean(id)).join(" · ")
-              :"nenhuma peça"}</p>
+              :t("builder.ab.nonePiece")}</p>
             <p><b>Traits</b>{variantDiff.changedTraits.length
               ?variantDiff.changedTraits.map(row=>{
                 const name=staticEntry(staticData?.traits,row.id)?.name||clean(row.id);
                 const delta=row.after-row.before;
                 return name+" "+(delta>0?"+":"")+delta;
               }).join(" · ")
-              :"sem alteração estrutural"}</p>
+              :t("builder.ab.noStructure")}</p>
             <p><b>Itens</b>{variantDiff.itemChanges.length
               ?variantDiff.itemChanges.map(id=>staticEntry(staticData?.champions,id)?.name||clean(id)).join(" · ")
-              :"sem alteração de itemização"}</p>
+              :t("builder.ab.noItems")}</p>
             <p><b>Augments</b>{variantDiff.augmentChanges.before.length||variantDiff.augmentChanges.after.length
               ?[
                 ...variantDiff.augmentChanges.before.map(id=>"− "+(staticEntry(staticData?.augments,id)?.name||clean(id))),
                 ...variantDiff.augmentChanges.after.map(id=>"+ "+(staticEntry(staticData?.augments,id)?.name||clean(id))),
               ].join(" · ")
-              :"sem alteração de augments"}</p>
+              :t("builder.ab.noAugments")}</p>
             <p><b>Posições</b>{variantDiff.positionChanges.length
               ?variantDiff.positionChanges.map(id=>staticEntry(staticData?.champions,id)?.name||clean(id)).join(" · ")
-              :"sem alteração de posição"}</p>
-            <p><b>Papéis</b>{variantDiff.roleChanges.length
+              :t("builder.ab.noPosition")}</p>
+            <p><b>{t("builder.ab.roles")}</b>{variantDiff.roleChanges.length
               ?variantDiff.roleChanges.map(id=>staticEntry(staticData?.champions,id)?.name||clean(id)).join(" · ")
-              :"sem alteração de papel"}</p>
+              :t("builder.ab.noRole")}</p>
           </div>
         </article>
       </div>
@@ -1785,10 +1785,10 @@ export default function TeamBuilderPage({
     {savedPresets.length>0&&<section className="builder-saved-strip">
       <div className="builder-saved-head">
         <div>
-          <span>BOARDS SALVOS NESTE NAVEGADOR</span>
+          <span>{t("builder.saved.title")}</span>
           <strong>{savedPresets.length}/8</strong>
         </div>
-        <small>local · sem conta</small>
+        <small>{t("builder.saved.local")}</small>
       </div>
 
       <div className="builder-saved-list">
@@ -1798,13 +1798,13 @@ export default function TeamBuilderPage({
               <span>{preset.targetLevel}</span>
               <div>
                 <strong>{preset.name}</strong>
-                <small>{preset.units.length} unidades · {preset.augments?.length||0} aug. · {new Date(preset.createdAt).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})}</small>
+                <small>{t("builder.saved.meta",{units:preset.units.length,augments:preset.augments?.length||0,date:new Date(preset.createdAt).toLocaleDateString(locale,{day:"2-digit",month:"2-digit"})})}</small>
               </div>
             </button>
             <button
               className="builder-saved-delete"
               onClick={()=>setSavedPresets(deleteBuilderPreset(preset.id))}
-              aria-label={"Excluir "+preset.name}
+              aria-label={t("builder.saved.delete",{name:preset.name})}
             >×</button>
           </article>
         ))}
