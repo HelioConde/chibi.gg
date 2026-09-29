@@ -15,7 +15,6 @@ type OverlayScenario={
   level:number;
   streak:string;
   boardStatus:string;
-  boardScore:number;
   nowTitle:string;
   now:string[];
   problemTitle:string;
@@ -37,11 +36,10 @@ const SCENARIOS:OverlayScenario[]=[
     gold:42,
     level:6,
     streak:"W2",
-    boardStatus:"ESTÁVEL PARA O STAGE",
-    boardScore:72,
+    boardStatus:"SNAPSHOT ESTÁVEL OBSERVADO",
     nowTitle:"Entenda por que este trecho ficou estável",
     now:[
-      "O board registrado sustentou vida e economia neste ponto.",
+      "O snapshot registrado mostra vida e economia preservadas neste ponto.",
       "Compare este snapshot com um jogo parecido que terminou pior.",
       "Observe quais upgrades e itens estavam presentes antes da estabilidade.",
     ],
@@ -62,12 +60,11 @@ const SCENARIOS:OverlayScenario[]=[
     gold:36,
     level:6,
     streak:"L3",
-    boardStatus:"FRACO PARA O STAGE",
-    boardScore:39,
+    boardStatus:"SNAPSHOT COM PONTOS A REVISAR",
     nowTitle:"Investigue por que o board não converteu",
     now:[
       "O snapshot terminou com pares ainda sem upgrade.",
-      "A frontline aparece atrasada em relação ao carry equipado.",
+      "No snapshot demonstrado, a frontline aparece menos completa que o carry equipado.",
       "Compare com seus Top 4 de nível semelhante antes de tirar uma conclusão.",
     ],
     problemTitle:"Frontline abaixo do restante do board",
@@ -87,11 +84,10 @@ const SCENARIOS:OverlayScenario[]=[
     gold:31,
     level:7,
     streak:"L1",
-    boardStatus:"TRANSIÇÃO INCOMPLETA",
-    boardScore:58,
+    boardStatus:"SNAPSHOT DE TRANSIÇÃO",
     nowTitle:"Revise onde a transição perdeu força",
     now:[
-      "O board registrado mistura duas identidades sem fechar nenhuma delas.",
+      "O snapshot demonstrado mistura duas identidades sem uma direção final clara.",
       "Itens e unidades finais sugerem uma transição ainda em andamento.",
       "Compare com suas partidas em que a troca de linha terminou em Top 4.",
     ],
@@ -112,11 +108,10 @@ const SCENARIOS:OverlayScenario[]=[
     gold:18,
     level:8,
     streak:"W3",
-    boardStatus:"PICO DE FORÇA ATIVO",
-    boardScore:86,
+    boardStatus:"SNAPSHOT DE BOARD COMPLETO",
     nowTitle:"Use este board como referência pessoal",
     now:[
-      "O snapshot mostra um board final claramente mais completo.",
+      "O snapshot demonstrado mostra um board mais completo que os outros cenários desta demo.",
       "Os upgrades estão concentrados nas peças que sustentam a composição.",
       "Compare esta estrutura com seus jogos parecidos que não chegaram ao Top 4.",
     ],
@@ -257,10 +252,10 @@ export default function OverlayPage({
           <section className="overlay-primary">
             <div className="overlay-board-status">
               <div>
-                <span>LEITURA DO SNAPSHOT</span>
+                <span>LEITURA PÓS-JOGO DO SNAPSHOT</span>
                 <strong>{scenario.boardStatus}</strong>
               </div>
-              <b>{scenario.boardScore}/100</b>
+              <b>DEMO</b>
             </div>
 
             <article className="overlay-now-card">
@@ -309,7 +304,7 @@ export default function OverlayPage({
             <article className="overlay-contest">
               <span>CONFIANÇA DO SINAL</span>
               <strong>{scenario.contest>=2?"Alta":scenario.contest===1?"Média":"Baixa"}</strong>
-              <small>baseada apenas no snapshot demonstrado</small>
+              <small>rótulo fictício da demonstração, não um score competitivo</small>
             </article>
           </aside>
         </div>
