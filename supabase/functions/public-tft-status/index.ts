@@ -61,7 +61,7 @@ Deno.serve(async(req)=>{
     return json({
       error:"riot_api_key_rejected",
       upstreamStatus:response.status,
-      message:"A chave da Riot usada pelo Chibi expirou ou foi rejeitada.",
+      message:"A integração do Chibi com a Riot precisa ser renovada.",
     },503);
   }
   if(!response.ok){
