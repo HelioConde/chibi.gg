@@ -40,6 +40,14 @@ export type TftProfile = {
   ranked: Array<{ queueType:string; tier:string; rank:string; leaguePoints:number; wins:number; losses:number }>;
   summary: { matches:number; averagePlacement:number|null; top4Rate:number; winRate:number; firsts:number; eighths:number };
   matches: TftMatch[];
+  partial?: { summoner:boolean; ranked:boolean; history:boolean };
+  source?: {
+    account:"account-v1";
+    summoner:"tft-summoner-v1";
+    ranked:"tft-league-v1";
+    matches:"tft-match-v1";
+    retrievedAt:number;
+  };
 };
 
 export type TftGlobalTraitStat = {
@@ -69,7 +77,6 @@ export type TftGlobalComp = {
   confidence:"alta"|"média"|"inicial";
   traits:Array<{id:string;rate:number}>;
   units:Array<{id:string;rate:number}>;
-  augments:Array<{id:string;rate:number}>;
   items:Array<{id:string;rate:number}>;
   unitItems:Array<{unitId:string;items:Array<{id:string;rate:number}>}>;
 };
@@ -96,7 +103,37 @@ export type TftGlobalStats = {
   champions:TftGlobalEntityStat[];
   traits:TftGlobalEntityStat[];
   items:TftGlobalEntityStat[];
-  augments:TftGlobalEntityStat[];
+};
+
+
+export type TftServiceStatus = {
+  platform:string;
+  id:string;
+  name:string;
+  locales:string[];
+  maintenances:Array<{
+    id:string;
+    maintenanceStatus:string;
+    incidentSeverity:string;
+    titles:unknown[];
+    updates:unknown[];
+    createdAt:string;
+    updatedAt:string;
+    archiveAt:string;
+  }>;
+  incidents:Array<{
+    id:string;
+    maintenanceStatus:string;
+    incidentSeverity:string;
+    titles:unknown[];
+    updates:unknown[];
+    createdAt:string;
+    updatedAt:string;
+    archiveAt:string;
+  }>;
+  operational:boolean;
+  checkedAt:number;
+  source:"tft-status-v1";
 };
 
 export type TftLeaderboardPlayer = {
@@ -220,4 +257,9 @@ export function fetchTftLeaderboard(
     tier,
     limit,
   });
+}
+
+
+export function fetchTftStatus(platform:string){
+  return invoke<TftServiceStatus>("public-tft-status",{ platform });
 }

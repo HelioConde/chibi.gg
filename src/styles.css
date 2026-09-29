@@ -15072,3 +15072,52 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
     padding:8px 10px;
   }
 }
+
+
+/* Riot TFT service health */
+.riot-service-status{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  margin-top:10px;
+  padding:7px 10px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:999px;
+  background:rgba(8,12,20,.48);
+  color:#9aa5b6;
+  font-size:11px;
+}
+.riot-service-status>span{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#7b8494;
+  box-shadow:0 0 0 3px rgba(123,132,148,.1);
+}
+.riot-service-status b{
+  color:#dfe6ef;
+  font-size:11px;
+}
+.riot-service-status small{
+  color:inherit;
+  font-size:11px;
+}
+.riot-service-status.ok{
+  color:#80d9ad;
+  border-color:rgba(71,190,137,.18);
+}
+.riot-service-status.ok>span{
+  background:#48c98b;
+  box-shadow:0 0 0 3px rgba(72,201,139,.12);
+}
+.riot-service-status.warning{
+  color:#e7bd6c;
+  border-color:rgba(231,189,108,.2);
+}
+.riot-service-status.warning>span{
+  background:#e7bd6c;
+  box-shadow:0 0 0 3px rgba(231,189,108,.12);
+}
+.riot-service-status.loading{
+  opacity:.72;
+}

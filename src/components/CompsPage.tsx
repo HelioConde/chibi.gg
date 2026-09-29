@@ -37,9 +37,6 @@ function itemName(id:string,staticData:TftStaticData|null){
   return staticEntry(staticData?.items,id)?.name||clean(id);
 }
 
-function augmentName(id:string,staticData:TftStaticData|null){
-  return staticEntry(staticData?.augments,id)?.name||clean(id);
-}
 
 function activeTraitIds(match:TftMatch){
   return match.traits
@@ -315,20 +312,6 @@ export default function CompsPage({
                   </div>
                 </div>;
               })}
-            </div>
-          </article>
-
-          <article>
-            <span>AUGMENTS OBSERVADOS</span>
-            <div className="comp-guide-augments">
-              {selectedComp.augments.length?selectedComp.augments.slice(0,6).map(augment=>{
-                const entry=staticEntry(staticData?.augments,augment.id);
-                const src=staticData?tftAssetUrl(staticData.version,"augment",entry):"";
-                return <div key={augment.id}>
-                  <span>{src&&<img src={src} alt=""/>}</span>
-                  <div><strong>{augmentName(augment.id,staticData)}</strong><small>{Math.round(augment.rate)}% das observações</small></div>
-                </div>;
-              }):<p className="comp-guide-empty">Amostra ainda pequena para augments recorrentes.</p>}
             </div>
           </article>
 

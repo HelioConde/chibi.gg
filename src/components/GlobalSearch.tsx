@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { RecentPlayer } from "../recentPlayers";
 import { profileIconUrl, TftStaticData, TftStaticEntry } from "../tftStatic";
 
-type Category="champions"|"traits"|"items"|"augments";
+type Category="champions"|"traits"|"items";
 
 type Props={
   staticData:TftStaticData|null;
@@ -65,7 +65,6 @@ export default function GlobalSearch({
     ...rowsFrom(staticData?.champions,"champions"),
     ...rowsFrom(staticData?.traits,"traits"),
     ...rowsFrom(staticData?.items,"items"),
-    ...rowsFrom(staticData?.augments,"augments"),
   ],[staticData]);
 
   const normalized=normalize(query.trim());
@@ -133,7 +132,7 @@ export default function GlobalSearch({
             value={query}
             onChange={event=>setQuery(event.target.value)}
             onKeyDown={event=>{if(event.key==="Enter")submit();}}
-            placeholder="Jogador#TAG, champion, item, trait, augment..."
+            placeholder="Jogador#TAG, champion, item ou trait..."
           />
           {query&&<button onClick={()=>setQuery("")}>×</button>}
         </div>
@@ -141,7 +140,7 @@ export default function GlobalSearch({
         {!query&&<div className="global-search-pages">
           <button onClick={()=>{onOpenPage("meta");close();}}><span>Meta</span><small>visão geral do dataset</small></button>
           <button onClick={()=>{onOpenPage("comps");close();}}><span>Comps</span><small>boards observados</small></button>
-          <button onClick={()=>{onOpenPage("stats");close();}}><span>Statistics</span><small>champions, traits, items e augments</small></button>
+          <button onClick={()=>{onOpenPage("stats");close();}}><span>Statistics</span><small>champions, traits e items</small></button>
           <button onClick={()=>{onOpenPage("builder");close();}}><span>Builder</span><small>monte e compare boards</small></button>
           <button onClick={()=>{onOpenPage("overlay");close();}}><span>Overlay</span><small>Grande mudança 1</small></button>
         </div>}

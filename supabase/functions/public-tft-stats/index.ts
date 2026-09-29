@@ -1,7 +1,7 @@
 import { corsHeaders, json } from "../_shared/http.ts";
 import { num } from "../_shared/riot.ts";
 
-type EntityType="champions"|"traits"|"items"|"augments";
+type EntityType="champions"|"traits"|"items";
 
 function env(name:string){
   return Deno.env.get(name)||"";
@@ -31,14 +31,6 @@ function activeTraitIds(row:any){
 function entityIds(row:any,type:EntityType){
   if(type==="traits"){
     return [...new Set(activeTraitIds(row))];
-  }
-
-  if(type==="augments"){
-    return [...new Set(
-      (Array.isArray(row?.augments)?row.augments:[])
-        .map(String)
-        .filter(Boolean)
-    )];
   }
 
   if(type==="champions"){
@@ -144,7 +136,6 @@ Deno.serve(async(req)=>{
       champions:[],
       traits:[],
       items:[],
-      augments:[],
     });
   }
 
@@ -155,7 +146,7 @@ Deno.serve(async(req)=>{
 
   const url=
     supabaseUrl+
-    "/rest/v1/tft_participant_observations?select=placement,level,traits,units,augments&"+
+    "/rest/v1/tft_participant_observations?select=placement,level,traits,units&"+
     filters.join("&")+
     "&limit=5000";
 
@@ -173,6 +164,5 @@ Deno.serve(async(req)=>{
     champions:aggregate(safeRows,"champions",minGames,limit),
     traits:aggregate(safeRows,"traits",minGames,limit),
     items:aggregate(safeRows,"items",minGames,limit),
-    augments:aggregate(safeRows,"augments",minGames,limit),
   });
 });

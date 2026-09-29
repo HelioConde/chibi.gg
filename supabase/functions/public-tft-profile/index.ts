@@ -148,7 +148,7 @@ Deno.serve(async(req)=>{
       ),
       safeFetch(
         regionalBase+"/tft/match/v1/matches/by-puuid/"+encodeURIComponent(puuid)+
-          "/ids?start=0&count=12",
+          "/ids?start=0&count=20",
         headers,
       ),
     ]);
@@ -182,7 +182,7 @@ Deno.serve(async(req)=>{
 
     const matchDetails=await Promise.all(
       (Array.isArray(matchIds)?matchIds:[])
-        .slice(0,12)
+        .slice(0,20)
         .map(async(matchId:string)=>{
           const res=await safeFetch(
             regionalBase+"/tft/match/v1/matches/"+encodeURIComponent(matchId),
@@ -288,6 +288,13 @@ Deno.serve(async(req)=>{
         summoner:!summonerRes?.ok,
         ranked:!leagueRes?.ok,
         history:!idsRes?.ok,
+      },
+      source:{
+        account:"account-v1",
+        summoner:"tft-summoner-v1",
+        ranked:"tft-league-v1",
+        matches:"tft-match-v1",
+        retrievedAt:Date.now(),
       },
     });
   }catch(error){

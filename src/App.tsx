@@ -63,6 +63,7 @@ import ReviewQueue from "./components/ReviewQueue";
 import PlayerEvolution from "./components/PlayerEvolution";
 import DDragonArt from "./components/DDragonArt";
 import MatchBoardMap from "./components/MatchBoardMap";
+import RiotServiceStatus from "./components/RiotServiceStatus";
 import { SITE_IMAGES } from "./siteAssets";
 import { markMatchReviewed } from "./reviewProgress";
 import { recordRankSnapshot } from "./rankHistory";
@@ -765,7 +766,7 @@ function App() {
       setProfile(data);
       setMatches(data.matches || []);
       scrollPageTop();
-      setHasMore((data.matches?.length || 0) >= 12);
+      setHasMore((data.matches?.length || 0) >= 20);
 
       const recentRank=data.ranked?.find((row)=>String(row.queueType).toUpperCase()==="RANKED_TFT")
         || data.ranked?.find((row)=>String(row.queueType).toUpperCase().includes("RANKED_TFT"))
@@ -1189,6 +1190,8 @@ function App() {
                 <i></i>
                 <span>Resultado em segundos</span>
               </div>
+
+              <RiotServiceStatus platform={platform}/>
 
               {error && <div className="lookup-error">{error}</div>}
 
