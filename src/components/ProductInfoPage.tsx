@@ -116,7 +116,11 @@ function Privacy(){
       <h2>6. Limites</h2>
       <p>O Chibi usa dados para histórico, análise pós-partida e ferramentas de estudo. O produto não usa o histórico público para oferecer scouting live de oponentes ou automação de decisões durante a partida.</p>
 
-      <h2>7. Alterações</h2>
+      <h2>7. Contato</h2>
+      <p>Para dúvidas sobre o comportamento técnico ou esta política, use o repositório público do projeto no GitHub. Não publique informações sensíveis em uma issue pública.</p>
+      <p><a href="https://github.com/HelioConde/chibi.gg/issues" target="_blank" rel="noreferrer">Abrir issues do chibi.gg ↗</a></p>
+
+      <h2>8. Alterações</h2>
       <p>Esta política pode mudar conforme o produto, APIs e requisitos de plataforma evoluírem. A data no topo indica a revisão publicada.</p>
     </section>
 

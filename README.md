@@ -137,6 +137,10 @@ O checkpoint técnico e o plano da próxima etapa estão em:
 
 **[`docs/CODEX_HANDOFF.md`](docs/CODEX_HANDOFF.md)**
 
+Checklist público/técnico para a revisão da Riot:
+
+**[`docs/RIOT_REVIEW_CHECKLIST.md`](docs/RIOT_REVIEW_CHECKLIST.md)**
+
 Antes de continuar o projeto no Codex, leia esse arquivo inteiro.
 
 As três prioridades atuais da Etapa 2 estão concluídas:
