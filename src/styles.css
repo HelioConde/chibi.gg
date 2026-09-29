@@ -17807,3 +17807,38 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
     grid-template-columns:repeat(2,1fr);
   }
 }
+
+
+/* -----------------------------------------------------------------------
+   Ask Chibi evidence metadata
+   ----------------------------------------------------------------------- */
+.chibi-answer-basis{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  margin-top:9px;
+}
+.chibi-answer-basis span{
+  padding:4px 6px;
+  border:1px solid #232c3e;
+  border-radius:6px;
+  background:#101721;
+  color:#738096;
+  font-size:6px;
+  font-weight:850;
+}
+.chibi-answer-limit{
+  display:block;
+  margin-top:7px;
+  color:#59677b;
+  font-size:6px;
+  line-height:1.4;
+}
+@media(max-width:620px){
+  .chibi-answer-basis{
+    gap:4px;
+  }
+  .chibi-answer-basis span{
+    font-size:5.5px;
+  }
+}

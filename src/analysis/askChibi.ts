@@ -243,19 +243,26 @@ export function answerChibiQuestion(question:string,matches:TftMatch[],playerKey
       };
     }
 
-    const strong=dominant.share>=45;
+    const enoughSample=matches.length>=8;
+    const strong=enoughSample&&dominant.share>=45;
     return {
       intent:"force",
-      title:strong?"Existe sinal de concentração em uma mesma linha":"Há repetição, mas ainda não dá para chamar de força excessiva",
-      body:strong
-        ? "Sua linha principal aparece em "+dominant.share+"% das partidas desta amostra. Isso pode ser preferência legítima ou dependência; a API não mostra se a decisão foi tomada cedo demais."
-        : "A linha mais repetida aparece em "+dominant.share+"% da amostra, abaixo de um nível que eu trataria como sinal forte.",
+      title:!enoughSample
+        ?"Amostra inicial: existe repetição, mas ainda não dá para chamar de padrão"
+        :strong
+          ?"Existe sinal de concentração em uma mesma linha"
+          :"Há repetição, mas ainda não dá para chamar de força excessiva",
+      body:!enoughSample
+        ? "A mesma identidade apareceu em "+dominant.games+" de "+matches.length+" partidas. Com tão poucos jogos, isso pode ser só uma sequência curta."
+        :strong
+          ? "Sua linha principal aparece em "+dominant.share+"% das partidas desta amostra. Isso pode ser preferência legítima ou dependência; a API não mostra se a decisão foi tomada cedo demais."
+          : "A linha mais repetida aparece em "+dominant.share+"% da amostra, abaixo de um nível que eu trataria como sinal forte.",
       bullets:[
         dominant.games+" partidas compartilham a mesma identidade principal de board.",
         strong?"Revise se houve spots reais para pivotar nas partidas relacionadas.":"Continue observando antes de mudar seu estilo.",
       ],
       evidence:dominant.games+" de "+matches.length+" partidas · "+dominant.share+"%",
-      confidence:confidenceBySample(matches.length),
+      confidence:enoughSample?confidenceBySample(matches.length):"baixa",
       matchIds:dominant.matchIds,
       followups:["O que devo fazer agora?","Mostre o que está funcionando."],
     };
@@ -316,10 +323,15 @@ export function answerChibiQuestion(question:string,matches:TftMatch[],playerKey
       };
     }
 
+    const enoughSample=matches.length>=8;
     return {
       intent:"working",
-      title:"Sua melhor linha repetida nesta amostra tem média "+best.avgPlacement,
-      body:"Ela aparece em "+best.games+" partidas, com Top 4 em "+best.top4Rate+"%. Eu trataria isso como referência pessoal, não como ordem para forçar.",
+      title:enoughSample
+        ?"Sua melhor linha repetida nesta amostra tem média "+best.avgPlacement
+        :"Uma linha se repetiu nesta amostra inicial",
+      body:enoughSample
+        ?"Ela aparece em "+best.games+" partidas, com Top 4 em "+best.top4Rate+"%. Eu trataria isso como referência pessoal, não como ordem para forçar."
+        :"Ela apareceu em "+best.games+" de "+matches.length+" partidas. Ainda é cedo para chamar isso de sua melhor linha com segurança.",
       bullets:[
         "Score pessoal: "+best.fitScore+"/100.",
         "Confiança: "+best.confidence+".",
@@ -333,17 +345,20 @@ export function answerChibiQuestion(question:string,matches:TftMatch[],playerKey
   }
 
   if(asksStyle){
+    const enoughSample=matches.length>=8;
     return {
       intent:"style",
-      title:"Seu arquétipo atual é: "+archetype.title,
-      body:archetype.description,
+      title:enoughSample?"Seu arquétipo atual é: "+archetype.title:"Amostra inicial do seu estilo: "+archetype.title,
+      body:enoughSample
+        ?archetype.description
+        :"Com "+matches.length+" partidas, este arquétipo é só uma leitura provisória. "+archetype.description,
       bullets:[
         "Flexibilidade: "+archetype.dimensions.flexibility+"%.",
         "Estabilidade: "+archetype.dimensions.stability+"%.",
         "Boards com 3★: "+archetype.dimensions.reroll+"%.",
       ],
       evidence:matches.length+" partidas no contexto atual",
-      confidence:confidenceBySample(matches.length),
+      confidence:enoughSample?confidenceBySample(matches.length):"baixa",
       matchIds:allIds,
       followups:["O que mudou recentemente?","Qual linha funciona melhor para mim?"],
     };
@@ -352,9 +367,29 @@ export function answerChibiQuestion(question:string,matches:TftMatch[],playerKey
   if(asksTop4){
     const top4=matches.filter(match=>match.placement<=4);
     const wins=matches.filter(match=>match.placement===1);
+    const enoughSample=matches.length>=8;
+
+    if(!enoughSample){
+      return {
+        intent:"top4",
+        title:top4.length?"Amostra inicial de Top 4":"Ainda não há Top 4 suficiente para analisar",
+        body:top4.length
+          ? "Você teve "+top4.length+" Top 4 em "+matches.length+" partidas carregadas. Ainda é cedo para tratar a ausência ou presença de vitórias como um padrão de conversão."
+          : "Carregue mais partidas comparáveis antes de avaliar conversão.",
+        bullets:[
+          wins.length+" vitória(s) em "+top4.length+" Top 4.",
+          "A Riot mostra o snapshot final, mas não o timing completo de decisões que levou até a colocação.",
+        ],
+        evidence:top4.length+" Top 4 em "+matches.length+" partidas",
+        confidence:"baixa",
+        matchIds:top4.map(match=>match.id),
+        followups:["Qual partida devo revisar?","O que mudou recentemente?"],
+      };
+    }
+
     return {
       intent:"top4",
-      title:wins.length===0&&top4.length>=2?"Seu problema visível está na conversão dos Top 4":"Sua conversão precisa ser lida com contexto",
+      title:wins.length===0&&top4.length>=2?"Seus Top 4 ainda não converteram em vitória nesta amostra":"Sua conversão precisa ser lida com contexto",
       body:top4.length
         ? "Você teve "+top4.length+" Top 4 e "+wins.length+" vitória(s) nesta amostra."
         : "Ainda não há Top 4 suficiente nesta amostra para analisar conversão.",
@@ -362,7 +397,7 @@ export function answerChibiQuestion(question:string,matches:TftMatch[],playerKey
         top4.length?"Conversão observada: "+Math.round(wins.length/top4.length*100)+"%.":"Sem base para calcular conversão.",
         "A API mostra o board final, mas não mostra o timing completo das decisões que levaram até ele.",
       ],
-      evidence:top4.length+" partidas de Top 4",
+      evidence:top4.length+" partidas de Top 4 em "+matches.length+" jogos",
       confidence:top4.length>=6?"média":"baixa",
       matchIds:top4.map(match=>match.id),
       followups:["O que devo revisar nos Top 4?","O que está funcionando?"],
@@ -371,24 +406,50 @@ export function answerChibiQuestion(question:string,matches:TftMatch[],playerKey
 
   if(asksBottom){
     const bottom=matches.filter(match=>match.placement>=7);
+    const enoughSample=matches.length>=6;
     return {
       intent:"bottom",
-      title:bottom.length?"Seus Bottom 2 merecem revisão direta":"Bottom 2 não é o principal sinal desta amostra",
+      title:bottom.length
+        ? enoughSample
+          ?"Seus Bottom 2 merecem revisão direta"
+          :"Há Bottom 2 nesta amostra inicial"
+        :"Bottom 2 não é o principal sinal desta amostra",
       body:bottom.length
         ? bottom.length+" de "+matches.length+" partidas terminaram em 7º/8º."
         : "Você não teve 7º/8º nas partidas carregadas deste contexto.",
       bullets:[
-        bottom.length?"Comece comparando nível, estrelas e traits finais dessas derrotas com 4º–6º.":"Procure outro sinal no Action Center.",
+        bottom.length
+          ? enoughSample
+            ?"Comece comparando nível, estrelas e traits finais dessas derrotas com 4º–6º."
+            :"Revise essas partidas, mas não trate a frequência como padrão ainda."
+          :"Procure outro sinal no Action Center.",
         "O Lobby Autopsy pode mostrar contestação e diferenças observáveis em cada derrota.",
       ],
-      evidence:bottom.length+" Bottom 2",
-      confidence:confidenceBySample(matches.length),
+      evidence:bottom.length+" Bottom 2 em "+matches.length+" partidas",
+      confidence:enoughSample?confidenceBySample(matches.length):"baixa",
       matchIds:bottom.length?bottom.map(match=>match.id):allIds,
       followups:["Por que estou perdendo?","O que devo fazer agora?"],
     };
   }
 
   if(asksNow){
+    if(matches.length<8){
+      return {
+        intent:"now",
+        title:"Amostra inicial: revise antes de mudar seu jogo",
+        body:"Com "+matches.length+" partidas, o melhor próximo passo é revisar exemplos concretos e coletar um bloco comparável antes de transformar variação em diagnóstico.",
+        bullets:[
+          "Abra primeiro uma partida priorizada pela Review Queue.",
+          "Mantenha o próximo bloco no mesmo set e fila para aumentar a comparabilidade.",
+          "Use o Journal para registrar contexto que a Riot API não captura.",
+        ],
+        evidence:matches.length+" partidas no contexto atual",
+        confidence:"baixa",
+        matchIds:allIds,
+        followups:["Qual partida devo revisar?","O que mudou recentemente?"],
+      };
+    }
+
     return {
       intent:"now",
       title:action.action.title,
@@ -402,6 +463,22 @@ export function answerChibiQuestion(question:string,matches:TftMatch[],playerKey
   }
 
   if(asksWhy||q.length>0){
+    if(matches.length<8){
+      return {
+        intent:"why",
+        title:"Ainda não há evidência suficiente para apontar uma causa principal",
+        body:"Tenho "+matches.length+" partidas neste contexto. Posso mostrar diferenças observáveis entre elas, mas não chamar uma variação curta de causa ou padrão.",
+        bullets:[
+          "Use a Review Queue para abrir a partida mais útil primeiro.",
+          "Compare board final, nível, estrelas, traits e itens entre resultados próximos.",
+        ],
+        evidence:matches.length+" partidas no contexto atual",
+        confidence:"baixa",
+        matchIds:allIds,
+        followups:["Qual partida devo revisar?","O que mudou recentemente?","Estou forçando comp?"],
+      };
+    }
+
     return {
       intent:"why",
       title:action.problem.title,
