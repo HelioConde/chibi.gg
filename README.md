@@ -141,4 +141,6 @@ Antes de continuar o projeto no Codex, leia esse arquivo inteiro.
 
 A próxima prioridade recomendada da Etapa 2 é:
 
-> **Comps v2 — assinatura melhor**, medindo primeiro o agrupamento atual e então testando uma assinatura híbrida de traits + core units sem fragmentar demais a amostra.
+> **Ask Chibi com evidência**, garantindo que perguntas sobre o histórico do jogador apontem as partidas usadas, tamanho da amostra, confiança e limites do dado.
+
+A assinatura de Comps já usa o modo adaptativo `adaptive-traits-v2`, que evita criar grupos pequenos demais quando um par de traits ainda não possui amostra suficiente.
