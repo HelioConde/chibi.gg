@@ -186,7 +186,7 @@ export function buildLeakMap(matches:TftMatch[]):LeakMap{
     });
   }
 
-  if(top4.length>=2){
+  if(top4.length>=2 && total>=8){
     const conversion=pct(wins.length,top4.length);
     const signalConfidence=confidence(top4.length,total);
     items.push({
