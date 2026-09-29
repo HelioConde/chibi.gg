@@ -19,7 +19,6 @@ import {
   latestTftSetNumber,
 } from "./tftStatic";
 import { buildChibiDNA } from "./analysis/chibiInsights";
-import { buildActionPlan } from "./analysis/actionPlan";
 import { buildRankedReviewSignals } from "./analysis/chibiReviewRanking";
 import ChibiInnovations from "./components/ChibiInnovations";
 import ChibiReview from "./components/ChibiReview";
@@ -498,7 +497,6 @@ function App() {
   );
 
   const dna=useMemo(()=>buildChibiDNA(analysisMatches),[analysisMatches]);
-  const quickPlan=useMemo(()=>buildActionPlan(analysisMatches),[analysisMatches]);
   const reviewSignals=useMemo(()=>buildRankedReviewSignals(analysisMatches),[analysisMatches]);
   const primaryReviewSignal=reviewSignals[0]||null;
 
@@ -610,19 +608,6 @@ function App() {
 
     return enriched.filter(session=>session.displayMatches.length>0);
   },[historyBaseMatches,visibleMatches]);
-
-  const latestSession=useMemo(()=>{
-    if(!analysisMatches.length)return [];
-    const sorted=analysisMatches.slice().sort((a,b)=>(b.playedAt||0)-(a.playedAt||0));
-    const session=[sorted[0]];
-    for(let index=1;index<sorted.length;index++){
-      const previous=session[session.length-1];
-      const gap=Math.abs((previous.playedAt||0)-(sorted[index].playedAt||0));
-      if(gap>2.5*60*60*1000)break;
-      session.push(sorted[index]);
-    }
-    return session;
-  },[analysisMatches]);
 
   const openedMatchNavigation=useMemo(()=>{
     if(!openedMatch)return {newer:null as TftMatch|null,older:null as TftMatch|null,index:-1};
