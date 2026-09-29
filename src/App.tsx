@@ -68,6 +68,7 @@ import MatchBoardMap from "./components/MatchBoardMap";
 import RiotServiceStatus from "./components/RiotServiceStatus";
 import RiotDataBar from "./components/RiotDataBar";
 import { SITE_IMAGES } from "./siteAssets";
+import { DEMO_PROFILE, demoMatchDetail, isDemoMatchId } from "./demoProfile";
 import { markMatchReviewed } from "./reviewProgress";
 import { recordRankSnapshot } from "./rankHistory";
 import {
@@ -362,6 +363,7 @@ function matchRoundLabel(match:TftMatch){
 
 function App() {
   const [riotId,setRiotId]=useState("");
+  const [demoMode,setDemoMode]=useState(false);
   const [platform,setPlatform]=useState("br1");
   const [profile,setProfile]=useState<TftProfile|null>(null);
   const [matches,setMatches]=useState<TftMatch[]>([]);
@@ -438,7 +440,9 @@ function App() {
     const setRaw=Number(params.get("set"));
     const setNumber=Number.isFinite(setRaw)&&setRaw>0?setRaw:null;
 
-    if(player&&tag){
+    if(params.get("demo")==="review"){
+      openReviewDemo(tab,queue,setNumber??18,false);
+    }else if(player&&tag){
       setRiotId(player+"#"+tag);
       setPlatform(region);
       void loadPlayer(player,tag,region,false,tab,queue,setNumber);
@@ -749,6 +753,18 @@ function App() {
   ){
     if(!profile) return;
     const url=new URL(window.location.href);
+
+    if(demoMode){
+      url.search="";
+      url.searchParams.set("demo","review");
+      url.searchParams.set("tab",tab);
+      if(queue!=null) url.searchParams.set("queue",String(queue));
+      if(setNumber!=null) url.searchParams.set("set",String(setNumber));
+      url.hash="";
+      window.history.replaceState({},"",url.toString());
+      return;
+    }
+
     url.searchParams.set("player",profile.player.gameName);
     url.searchParams.set("tag",profile.player.tagLine);
     url.searchParams.set("region",profile.player.platform);
@@ -810,6 +826,50 @@ function App() {
     showEvidence(ids,label);
   }
 
+  function openReviewDemo(
+    initialTab:ProfileTab="matches",
+    initialQueue:number|null=null,
+    initialSet:number|null=18,
+    updateUrl=true,
+  ){
+    setDemoMode(true);
+    setSitePage("main");
+    setRiotId("Chibi Review Demo#DEMO");
+    setPlatform("br1");
+    setProfile(DEMO_PROFILE);
+    setMatches(DEMO_PROFILE.matches);
+    setLoading(false);
+    setLoadingMore(false);
+    setError("");
+    setHasMore(false);
+    setSelectedMatch(null);
+    setOpenedMatch(null);
+    setMatchError("");
+    setSelectedSet(initialSet??18);
+    setSelectedQueue(initialQueue);
+    setProfileTab(initialTab);
+    setHistoryFilter("all");
+    setGuidedReviewIds([]);
+    setGuidedReviewIndex(0);
+    setStudyRequest(null);
+    setStudyLookup("idle");
+    studyAttempts.current=0;
+    clearEvidence();
+
+    if(updateUrl){
+      const url=new URL(window.location.href);
+      url.search="";
+      url.searchParams.set("demo","review");
+      url.searchParams.set("tab",initialTab);
+      if(initialQueue!=null)url.searchParams.set("queue",String(initialQueue));
+      if(initialSet!=null)url.searchParams.set("set",String(initialSet));
+      url.hash="";
+      window.history.replaceState({},"",url.toString());
+    }
+
+    scrollPageTop();
+  }
+
   async function loadPlayer(
     gameName:string,
     tagLine:string,
@@ -819,6 +879,7 @@ function App() {
     initialQueue:number|null=null,
     initialSet:number|null=null,
   ){
+    setDemoMode(false);
     setLoading(true);
     setError("");
     setProfile(null);
@@ -889,6 +950,10 @@ function App() {
   }
 
   async function searchPlayer(){
+    if(demoMode){
+      openReviewDemo(profileTab,selectedQueue,currentSet,true);
+      return;
+    }
     const parsed=splitRiotId(riotId);
     if(!parsed){
       setError("Use o formato Nome#TAG.");
@@ -909,6 +974,10 @@ function App() {
   }
 
   async function refreshSessionPlayer(){
+    if(demoMode){
+      openReviewDemo("overview",selectedQueue,currentSet,true);
+      return;
+    }
     const parsed=splitRiotId(riotId);
     if(!parsed)return;
     await loadPlayer(
@@ -939,6 +1008,7 @@ function App() {
   }
 
   async function loadMore(){
+    if(demoMode) return;
     if(!profile || loadingMore || !hasMore) return;
     const parsed=splitRiotId(riotId);
     if(!parsed) return;
@@ -991,6 +1061,15 @@ function App() {
     setMatchError("");
     setSelectedMatch(null);
     setOpenedMatch(match);
+
+    if(demoMode||isDemoMatchId(match.id)){
+      const detail=demoMatchDetail(match.id);
+      if(detail){
+        setSelectedMatch(detail);
+        setMatchLoading(false);
+        return;
+      }
+    }
 
     try{
       const detail=await fetchTftMatch(match.id);
@@ -1141,6 +1220,7 @@ function App() {
   }
 
   function resetSearch(){
+    setDemoMode(false);
     setSitePage("main");
     setProfile(null);
     setMatches([]);
@@ -1295,6 +1375,11 @@ function App() {
               <button className="home-compliance-link" type="button" onClick={()=>openInfoPage("about")}>
                 <span>Dados Riot + análise pós-partida</span>
                 <small>sem scouting live ou automação de decisões · como funciona →</small>
+              </button>
+
+              <button className="home-review-demo-button" type="button" onClick={()=>openReviewDemo()}>
+                <strong>Ver demonstração para review →</strong>
+                <small>12 partidas sintéticas · não consulta a Riot API</small>
               </button>
 
               {error && <div className="lookup-error">{error}</div>}
@@ -1483,6 +1568,14 @@ function App() {
       ) : (
         <main className="profile-page">
           <button className="back-search" onClick={resetSearch}>← Nova busca</button>
+          {demoMode&&<section className="review-demo-banner">
+            <div>
+              <span>DEMONSTRAÇÃO SINTÉTICA</span>
+              <strong>Fluxo de review totalmente navegável sem depender de uma Riot API key temporária.</strong>
+              <small>Jogador, rank, partidas e lobby abaixo são dados fictícios criados apenas para avaliação do produto.</small>
+            </div>
+            <button onClick={resetSearch}>Sair da demo</button>
+          </section>}
 
           <section className="player-summary-shell player-summary-visual player-summary-compact">
             <div className="player-summary-board-art" aria-hidden="true">
@@ -1539,7 +1632,7 @@ function App() {
 
             <div className="player-summary-actions">
               <button className="player-coach-button" onClick={()=>changeProfileTab("coach")}>Chibi Review</button>
-              <button className="refresh-button" onClick={searchPlayer} disabled={loading}>{loading?"Atualizando...":"Atualizar"}</button>
+              <button className="refresh-button" onClick={searchPlayer} disabled={loading}>{demoMode?"Reiniciar demo":loading?"Atualizando...":"Atualizar"}</button>
             </div>
 
             <div className="player-summary-source">
@@ -1549,6 +1642,7 @@ function App() {
                 contextCount={analysisMatches.length}
                 refreshing={loading}
                 onRefresh={searchPlayer}
+                demo={demoMode}
                 compact
               />
             </div>
@@ -1563,7 +1657,7 @@ function App() {
               <button className={profileTab==="coach"?"active":""} onClick={()=>changeProfileTab("coach")}>Coach</button>
             </div>
             <div className="profile-tab-actions">
-              <button className="share-analysis-button" onClick={()=>changeProfileTab("share")}>Compartilhar</button>
+              {!demoMode&&<button className="share-analysis-button" onClick={()=>changeProfileTab("share")}>Compartilhar</button>}
             </div>
           </nav>
 
@@ -2085,8 +2179,8 @@ function App() {
                     {displaySetName(selectedMatch.match.setName,selectedMatch.match.setNumber)}
                     {" · "}{queueLabel(staticData,selectedMatch.match.queueId)}
                     {" · "}{formatWhen(selectedMatch.match.playedAt)}
-                    {" · Riot Match API"}
-                    {selectedMatch.source?.cache==="hit"?" · cache":""}
+                    {" · "}{demoMode?"DEMO SINTÉTICA":"Riot Match API"}
+                    {!demoMode&&selectedMatch.source?.cache==="hit"?" · cache":""}
                   </p>
                 </div>
                 {openedMatch&&<div className="match-modal-head-actions">
