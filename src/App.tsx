@@ -68,6 +68,7 @@ import MatchBoardMap from "./components/MatchBoardMap";
 import RiotServiceStatus from "./components/RiotServiceStatus";
 import RiotDataBar from "./components/RiotDataBar";
 import { SITE_IMAGES } from "./siteAssets";
+import { LanguageSwitcher, useI18n } from "./i18n";
 import { DEMO_PROFILE, demoMatchDetail, isDemoMatchId } from "./demoProfile";
 import { markMatchReviewed } from "./reviewProgress";
 import { recordRankSnapshot } from "./rankHistory";
@@ -362,6 +363,7 @@ function matchRoundLabel(match:TftMatch){
 }
 
 function App() {
+  const { t } = useI18n();
   const [riotId,setRiotId]=useState("");
   const [demoMode,setDemoMode]=useState(false);
   const [platform,setPlatform]=useState("br1");
@@ -1246,13 +1248,13 @@ function App() {
           <span className="brand-mark brand-mark-image"><img src={SITE_IMAGES.icon} alt=""/></span>
           <span>chibi<span>.gg</span></span>
         </button>
-        <nav className="product-nav" aria-label="Produtos Chibi">
-          <button className={sitePage==="meta"?"active":""} onClick={openMeta}>Meta</button>
-          <button className={sitePage==="comps"?"active":""} onClick={openComps}>Comps</button>
-          <button className={sitePage==="stats"?"active":""} onClick={()=>openStats()}>Statistics</button>
-          <button className={"builder-nav-button "+(sitePage==="builder"?"active":"")} onClick={()=>openBuilder([])}>Builder</button>
-          <button className={sitePage==="leaderboard"?"active":""} onClick={openLeaderboard}>Leaderboard</button>
-          <button className={"companion-nav-button "+(sitePage==="overlay"?"active":"")} onClick={openOverlay}>Companion</button>
+        <nav className="product-nav" aria-label="Chibi">
+          <button className={sitePage==="meta"?"active":""} onClick={openMeta}>{t("nav.meta")}</button>
+          <button className={sitePage==="comps"?"active":""} onClick={openComps}>{t("nav.comps")}</button>
+          <button className={sitePage==="stats"?"active":""} onClick={()=>openStats()}>{t("nav.statistics")}</button>
+          <button className={"builder-nav-button "+(sitePage==="builder"?"active":"")} onClick={()=>openBuilder([])}>{t("nav.builder")}</button>
+          <button className={sitePage==="leaderboard"?"active":""} onClick={openLeaderboard}>{t("nav.leaderboard")}</button>
+          <button className={"companion-nav-button "+(sitePage==="overlay"?"active":"")} onClick={openOverlay}>{t("nav.companion")}</button>
         </nav>
         <GlobalSearch
           staticData={staticData}
@@ -1262,7 +1264,8 @@ function App() {
           onSearchPlayer={(value)=>{void searchFromGlobal(value);}}
           onOpenPage={openExplorePage}
         />
-        <button className="ghost-button" onClick={()=>openInfoPage("about")}>Como funciona</button>
+        <LanguageSwitcher />
+        <button className="ghost-button" onClick={()=>openInfoPage("about")}>{t("nav.howItWorks")}</button>
       </header>
 
       {sitePage==="about"||sitePage==="privacy"||sitePage==="terms" ? (
@@ -1335,8 +1338,8 @@ function App() {
           <section className="home-hero-v2">
             <div className="home-hero-copy">
               <div className="eyebrow">CHIBI</div>
-              <h1>Preparando sua revisão...</h1>
-              <p>PARTIDA FINALIZADA · Carregando os dados da partida.</p>
+              <h1>{t("home.loading.title")}</h1>
+              <p>{t("home.loading.subtitle")}</p>
             </div>
           </section>
         </main>
@@ -1344,43 +1347,43 @@ function App() {
         <main className="landing landing-v2">
           <section className="home-hero-v2">
             <div className="home-hero-copy">
-              <div className="eyebrow">TFT DE VERDADE · DADOS QUE AJUDAM VOCÊ A SUBIR</div>
-              <h1>Entenda suas partidas.<br/><span>Suba com intenção.</span></h1>
-              <p>Busque seu Riot ID para ver evolução, partidas, padrões e caminhos práticos para melhorar no TFT.</p>
+              <div className="eyebrow">{t("home.eyebrow")}</div>
+              <h1>{t("home.title.line1")}<br/><span>{t("home.title.line2")}</span></h1>
+              <p>{t("home.intro")}</p>
 
-              <div className="home-hero-benefits" aria-label="Principais benefícios">
-                <span><i>✓</i> Perfil e histórico</span>
-                <span><i>✓</i> Meta do patch</span>
-                <span><i>✓</i> Builder + Coach</span>
+              <div className="home-hero-benefits" aria-label={t("home.pathsAria")}>
+                <span><i>✓</i> {t("home.benefit.profile")}</span>
+                <span><i>✓</i> {t("home.benefit.meta")}</span>
+                <span><i>✓</i> {t("home.benefit.builder")}</span>
               </div>
 
               <form className="search-box home-search-v2" onSubmit={handleSubmit}>
-                <select aria-label="Região" value={platform} onChange={(e)=>setPlatform(e.target.value)}>
+                <select aria-label={t("home.region")} value={platform} onChange={(e)=>setPlatform(e.target.value)}>
                   <option value="br1">BR</option><option value="na1">NA</option><option value="euw1">EUW</option>
                   <option value="eun1">EUNE</option><option value="kr">KR</option><option value="jp1">JP</option>
                   <option value="la1">LAN</option><option value="la2">LAS</option><option value="oc1">OCE</option>
                 </select>
                 <input id="home-riot-id" value={riotId} onChange={(e)=>setRiotId(e.target.value)} placeholder="Nome#TAG" aria-label="Riot ID"/>
-                <button type="submit" disabled={loading}>{loading ? "Analisando..." : "Buscar jogador →"}</button>
+                <button type="submit" disabled={loading}>{loading ? t("home.analyzing") : t("home.searchPlayer")}</button>
               </form>
               <div className="home-search-note">
-                <span>Protótipo público</span>
+                <span>{t("home.prototype")}</span>
                 <i></i>
-                <span>Busca atual por Nome#TAG</span>
+                <span>{t("home.searchById")}</span>
                 <i></i>
-                <span>RSO planejado após aprovação</span>
+                <span>{t("home.rso")}</span>
               </div>
 
               <RiotServiceStatus platform={platform}/>
 
               <button className="home-compliance-link" type="button" onClick={()=>openInfoPage("about")}>
-                <span>Dados Riot + análise pós-partida</span>
-                <small>sem scouting live ou automação de decisões · como funciona →</small>
+                <span>{t("home.compliance.title")}</span>
+                <small>{t("home.compliance.subtitle")}</small>
               </button>
 
               <button className="home-review-demo-button" type="button" onClick={()=>openReviewDemo()}>
-                <strong>Ver demonstração para review →</strong>
-                <small>12 partidas sintéticas · não consulta a Riot API</small>
+                <strong>{t("home.demo.title")}</strong>
+                <small>{t("home.demo.subtitle")}</small>
               </button>
 
               {error && <div className="lookup-error">{error}</div>}
@@ -1392,10 +1395,10 @@ function App() {
                     :recentPlayers[0].gameName.slice(0,1).toUpperCase()}
                 </span>
                 <span>
-                  <small>ÚLTIMA BUSCA</small>
+                  <small>{t("home.lastSearch")}</small>
                   <strong>{recentPlayers[0].gameName}<em>#{recentPlayers[0].tagLine}</em></strong>
                 </span>
-                <b>{recentPlayers[0].averagePlacement??"—"} <small>média</small></b>
+                <b>{recentPlayers[0].averagePlacement??"—"} <small>{t("home.average")}</small></b>
               </button>}
             </div>
 
@@ -1406,7 +1409,7 @@ function App() {
                 <div className="home-product-windowbar">
                   <span><i></i><i></i><i></i></span>
                   <small>chibi.gg / player</small>
-                  <b>PÓS-JOGO</b>
+                  <b>{t("home.postGame")}</b>
                 </div>
 
                 <div className="home-product-profile">
@@ -1417,23 +1420,23 @@ function App() {
                         :<img src={SITE_IMAGES.icon} alt=""/>}
                     </span>
                     <div>
-                      <small>SEU PERFIL TFT</small>
-                      <strong>{recentPlayers[0]?.gameName||"Seu Riot ID"}<em>{recentPlayers[0]?"#"+recentPlayers[0].tagLine:""}</em></strong>
-                      <span>{recentPlayers[0]?.rankLabel||"Busque um jogador para começar"}</span>
+                      <small>{t("home.yourProfile")}</small>
+                      <strong>{recentPlayers[0]?.gameName||t("home.yourRiotId")}<em>{recentPlayers[0]?"#"+recentPlayers[0].tagLine:""}</em></strong>
+                      <span>{recentPlayers[0]?.rankLabel||t("home.searchToStart")}</span>
                     </div>
                   </div>
 
                   <div className="home-product-kpis">
-                    <span><small>MÉDIA</small><strong>{recentPlayers[0]?.averagePlacement??"—"}</strong></span>
-                    <span><small>TOP 4</small><strong>{recentPlayers[0]?recentPlayers[0].top4Rate+"%":"—"}</strong></span>
-                    <span><small>PARTIDAS</small><strong>{recentPlayers[0]?.matches??"—"}</strong></span>
+                    <span><small>{t("home.averageUpper")}</small><strong>{recentPlayers[0]?.averagePlacement??"—"}</strong></span>
+                    <span><small>{t("home.top4")}</small><strong>{recentPlayers[0]?recentPlayers[0].top4Rate+"%":"—"}</strong></span>
+                    <span><small>{t("home.matchesUpper")}</small><strong>{recentPlayers[0]?.matches??"—"}</strong></span>
                   </div>
                 </div>
 
                 <div className="home-product-tabs">
-                  <span className="active">Partidas</span>
-                  <span>Agora</span>
-                  <span>Coach</span>
+                  <span className="active">{t("home.matchesTab")}</span>
+                  <span>{t("home.now")}</span>
+                  <span>{t("home.coach")}</span>
                 </div>
 
                 <div className="home-product-body">
@@ -1441,17 +1444,17 @@ function App() {
                     <span className="home-product-coach-icon">C</span>
                     <div>
                       <small>CHIBI COACH</small>
-                      <strong>{recentPlayers[0]?"Seu histórico vira ação.":"Entenda o que realmente importa."}</strong>
+                      <strong>{recentPlayers[0]?t("home.historyAction"):t("home.understandImportant")}</strong>
                       <p>{recentPlayers[0]
-                        ?"Compare seus padrões, reveja partidas e saiba o que testar na próxima fila."
-                        :"Busque seu Riot ID e transforme partidas em decisões mais claras."}</p>
+                        ?t("home.historyActionDesc")
+                        :t("home.searchActionDesc")}</p>
                     </div>
                     <b>→</b>
                   </div>
 
                   <div className="home-product-board">
                     <div className="home-product-board-head">
-                      <span>SEU BOARD · VISÃO RÁPIDA</span>
+                      <span>{t("home.boardQuick")}</span>
                       <small>Data Dragon</small>
                     </div>
                     <DDragonArt staticData={staticData} variant="compact" label="Champions do set"/>
@@ -1460,48 +1463,48 @@ function App() {
 
                 <div className="home-product-insights">
                   <article>
-                    <small>PARTIDAS</small>
-                    <strong>Veja o que mudou</strong>
+                    <small>{t("home.matchesUpper")}</small>
+                    <strong>{t("home.seeWhatChanged")}</strong>
                     <span><i></i><i></i><i></i><i></i><i></i></span>
                   </article>
                   <article>
-                    <small>PADRÕES</small>
-                    <strong>Entenda seus sinais</strong>
+                    <small>{t("home.patterns")}</small>
+                    <strong>{t("home.understandSignals")}</strong>
                     <span className="bars"><i></i><i></i><i></i></span>
                   </article>
                   <article>
-                    <small>PRÓXIMA AÇÃO</small>
-                    <strong>Saiba o que testar</strong>
+                    <small>{t("home.nextAction")}</small>
+                    <strong>{t("home.knowWhatToTest")}</strong>
                     <b>Coach →</b>
                   </article>
                 </div>
 
                 <div className="home-product-footer">
-                  <span><i></i> Dados do jogador</span>
+                  <span><i></i> {t("home.playerData")}</span>
                   <span>Meta + Builder + Coach</span>
                 </div>
               </div>
 
               <div className="home-float-card home-float-card-meta">
                 <small>META</small>
-                <strong>Patch atual</strong>
-                <span>comps e traits</span>
+                <strong>{t("home.currentPatch")}</strong>
+                <span>{t("home.compsTraits")}</span>
               </div>
 
               <div className="home-float-card home-float-card-coach">
                 <span className="home-float-icon">✦</span>
-                <div><small>COACH</small><strong>Próxima ação</strong></div>
+                <div><small>COACH</small><strong>{t("home.nextAction")}</strong></div>
               </div>
             </div>
           </section>
 
-          <section className="home-paths-v2 home-paths-v3" aria-label="Principais caminhos do Chibi">
+          <section className="home-paths-v2 home-paths-v3" aria-label={t("home.pathsAria")}>
             <button onClick={openMeta}>
               <span className="home-path-index"><i>✦</i><em>01</em></span>
               <div>
                 <small>META</small>
-                <h2>Veja o que está funcionando agora.</h2>
-                <p>Comps, traits e sinais do patch atual.</p>
+                <h2>{t("home.path.meta.title")}</h2>
+                <p>{t("home.path.meta.desc")}</p>
               </div>
               <b>→</b>
             </button>
@@ -1509,9 +1512,9 @@ function App() {
             <button onClick={()=>document.getElementById("home-riot-id")?.focus()}>
               <span className="home-path-index"><i>◎</i><em>02</em></span>
               <div>
-                <small>SEU JOGO</small>
-                <h2>Entenda seu padrão de partidas.</h2>
-                <p>Perfil, histórico e análise do Coach.</p>
+                <small>{t("home.path.game.label")}</small>
+                <h2>{t("home.path.game.title")}</h2>
+                <p>{t("home.path.game.desc")}</p>
               </div>
               <b>→</b>
             </button>
@@ -1520,18 +1523,18 @@ function App() {
               <span className="home-path-index"><i>◇</i><em>03</em></span>
               <div>
                 <small>BUILDER</small>
-                <h2>Planeje antes de entrar na fila.</h2>
-                <p>Boards, itens, Augments e transições.</p>
+                <h2>{t("home.path.builder.title")}</h2>
+                <p>{t("home.path.builder.desc")}</p>
               </div>
               <b>→</b>
             </button>
           </section>
 
-          <section className="home-proof-strip" aria-label="O que o Chibi entrega">
-            <div><span>01</span><strong>Perfil + histórico</strong><small>Seu jogo em uma leitura clara.</small></div>
-            <div><span>02</span><strong>Meta do patch</strong><small>Dados observados e contexto atual.</small></div>
-            <div><span>03</span><strong>Builder completo</strong><small>Board, itens, Augments e transições.</small></div>
-            <div><span>04</span><strong>Insights acionáveis</strong><small>Menos números soltos, mais próxima ação.</small></div>
+          <section className="home-proof-strip" aria-label={t("home.proofAria")}>
+            <div><span>01</span><strong>{t("home.proof.1.title")}</strong><small>{t("home.proof.1.desc")}</small></div>
+            <div><span>02</span><strong>{t("home.proof.2.title")}</strong><small>{t("home.proof.2.desc")}</small></div>
+            <div><span>03</span><strong>{t("home.proof.3.title")}</strong><small>{t("home.proof.3.desc")}</small></div>
+            <div><span>04</span><strong>{t("home.proof.4.title")}</strong><small>{t("home.proof.4.desc")}</small></div>
           </section>
 
           <HomeMetaPreview
@@ -1543,24 +1546,24 @@ function App() {
 
           <section className="home-builder-v2">
             <div className="home-builder-copy">
-              <span>MONTE · TESTE · EVOLUA</span>
-              <h2>Builder mais inteligente.</h2>
-              <p>Monte sua composição, organize itens e Augments, compare versões e planeje como chegar no board final sem transformar a tela em uma planilha.</p>
-              <button onClick={()=>openBuilder([])}>Explorar o Builder →</button>
+              <span>{t("home.builder.kicker")}</span>
+              <h2>{t("home.builder.title")}</h2>
+              <p>{t("home.builder.desc")}</p>
+              <button onClick={()=>openBuilder([])}>{t("home.builder.explore")}</button>
             </div>
 
             <div className="home-builder-demo" aria-hidden="true">
               <div className="home-builder-demo-head">
                 <span>BOARD</span>
-                <small>planejamento rápido</small>
+                <small>{t("home.builder.quickPlanning")}</small>
               </div>
               <div className="home-builder-board">
                 {Array.from({length:14}).map((_,index)=><i className={index===3||index===5||index===8||index===10?"filled":""} key={index}></i>)}
               </div>
               <DDragonArt staticData={staticData} variant="compact" label="Champions do set"/>
               <div className="home-builder-demo-footer">
-                <span><b>8</b><small>Nível</small></span>
-                <span><b>32G</b><small>Planejado</small></span>
+                <span><b>8</b><small>{t("home.builder.level")}</small></span>
+                <span><b>32G</b><small>{t("home.builder.planned")}</small></span>
                 <span><b>3/3</b><small>Augments</small></span>
               </div>
             </div>
