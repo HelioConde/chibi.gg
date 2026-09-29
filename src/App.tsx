@@ -1777,10 +1777,10 @@ function App() {
 
                           <div className="match-meta match-meta-rich">
                             <div className="match-value-grid">
-                              <span><b>{boardValue(match,staticData)}G</b><small>board</small></span>
+                              <span title="Estimativa baseada no custo e estrelas das unidades finais"><b>~{boardValue(match,staticData)}G</b><small>board est.</small></span>
                               <span><b>{match.goldLeft}G</b><small>ouro</small></span>
                               <span><b>{match.level}</b><small>nível</small></span>
-                              <span><b>{match.playersEliminated||0}</b><small>elim.</small></span>
+                              <span><b>{analysisMatches.some(row=>(row.playersEliminated||0)>0)?(match.playersEliminated||0):"—"}</b><small>elim.</small></span>
                             </div>
                             <strong>{match.damageToPlayers>0?match.damageToPlayers+" dano":"dano n/d"}</strong>
                             <small>abrir análise →</small>
@@ -1799,14 +1799,18 @@ function App() {
               <section className={"profile-review-teaser "+(primaryReviewSignal?"tone-"+primaryReviewSignal.tone:"")}>
                 <div>
                   <span>CHIBI REVIEW</span>
-                  <strong>{primaryReviewSignal
-                    ? (primaryReviewSignal.subjectId
-                      ? (staticEntry(staticData?.traits,primaryReviewSignal.subjectId)?.name||fallbackTraitName(primaryReviewSignal.subjectId))+" · "+primaryReviewSignal.title
-                      : primaryReviewSignal.title)
-                    : "Ainda juntando evidência"}</strong>
-                  <small>{primaryReviewSignal
-                    ? primaryReviewSignal.evidence+" · confiança "+primaryReviewSignal.confidence
-                    : "Mais partidas deixam a leitura mais confiável."}</small>
+                  <strong>{analysisMatches.length<8
+                    ? headlineStats.top4+"/"+headlineStats.total+" Top 4 · amostra inicial"
+                    : primaryReviewSignal
+                      ? (primaryReviewSignal.subjectId
+                        ? (staticEntry(staticData?.traits,primaryReviewSignal.subjectId)?.name||fallbackTraitName(primaryReviewSignal.subjectId))+" · "+primaryReviewSignal.title
+                        : primaryReviewSignal.title)
+                      : "Ainda juntando evidência"}</strong>
+                  <small>{analysisMatches.length<8
+                    ? "Compare seus melhores resultados sem transformar poucos jogos em padrão."
+                    : primaryReviewSignal
+                      ? primaryReviewSignal.evidence+" · confiança "+primaryReviewSignal.confidence
+                      : "Mais partidas deixam a leitura mais confiável."}</small>
                 </div>
                 <button onClick={()=>changeProfileTab("coach")}>Abrir Review →</button>
               </section>
@@ -1828,14 +1832,16 @@ function App() {
 
               <div className="dna-grid dna-grid-primary">
                 <article>
-                  <span>Consistência</span>
-                  <strong>{visibleDna.consistency}%</strong>
-                  <small>variação das colocações</small>
+                  <span>{visibleDna.sampleSize<8?"Amostra":"Consistência"}</span>
+                  <strong>{visibleDna.sampleSize<8?visibleDna.sampleSize+" jogos":visibleDna.consistency+"%"}</strong>
+                  <small>{visibleDna.sampleSize<8?"leitura ainda inicial":"variação das colocações"}</small>
                 </article>
                 <article>
-                  <span>Estabilidade</span>
-                  <strong>{visibleDna.stability}%</strong>
-                  <small>evitou Bottom 2</small>
+                  <span>{visibleDna.sampleSize<8?"Bottom 2":"Estabilidade"}</span>
+                  <strong>{visibleDna.sampleSize<8
+                    ? analysisMatches.filter(match=>match.placement>=7).length
+                    : visibleDna.stability+"%"}</strong>
+                  <small>{visibleDna.sampleSize<8?"nas partidas do filtro":"evitou Bottom 2"}</small>
                 </article>
               </div>
 
