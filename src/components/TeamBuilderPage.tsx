@@ -832,7 +832,7 @@ export default function TeamBuilderPage({
       return {
         tone:"good",
         title:t("builder.decision.good.title"),
-        body:t("builder.decision.good.body",{count:similar.length,average:average.toFixed(2),top4:top4Rate}),
+        body:t("builder.decision.good.body",{count:similar.length,average:average.toFixed(2),top4:top4Rate??"—"}),
       };
     }
 
@@ -1110,7 +1110,7 @@ export default function TeamBuilderPage({
         ?t("builder.summary.progress",{done:economyPlan.completed,total:economyPlan.queue.length,remaining:economyPlan.totalRemainingCost})
         :"",
       economyPlan?.gold!=null
-        ?t("builder.summary.economy",{gold:economyPlan.gold,reserve:economyPlan.reserve,free:economyPlan.spendable})
+        ?t("builder.summary.economy",{gold:economyPlan.gold,reserve:economyPlan.reserve,free:economyPlan.spendable??"—"})
         :"",
     ].filter(Boolean).join("\n");
 
@@ -1734,7 +1734,7 @@ export default function TeamBuilderPage({
           <span>{t("builder.ab.versionA")}</span>
           <strong>{variantA.length} unidades · {variantAEvaluation.value}G · {variantAAugments.length} aug.</strong>
           <small>{variantAEvaluation.average!=null
-            ?t("builder.ab.history",{average:variantAEvaluation.average.toFixed(2),top4:variantAEvaluation.top4Rate})
+            ?t("builder.ab.history",{average:variantAEvaluation.average.toFixed(2),top4:variantAEvaluation.top4Rate??"—"})
             :t("builder.ab.insufficient")}</small>
         </article>
 
@@ -1742,7 +1742,7 @@ export default function TeamBuilderPage({
           <span>{t("builder.ab.now")}</span>
           <strong>{units.length} unidades · {boardValue}G · {selectedAugments.length} aug.</strong>
           <small>{average!=null
-            ?t("builder.ab.history",{average:average.toFixed(2),top4:top4Rate})
+            ?t("builder.ab.history",{average:average.toFixed(2),top4:top4Rate??"—"})
             :t("builder.ab.insufficient")}</small>
         </article>
 
