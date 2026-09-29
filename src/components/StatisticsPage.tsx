@@ -11,6 +11,7 @@ import {
   TftStaticData,
 } from "../tftStatic";
 import DDragonArt from "./DDragonArt";
+import { useI18n } from "../i18n";
 import { saveStudyShelfItem } from "../studyShelf";
 
 export type StatisticsCategory="champions"|"traits"|"items";
@@ -140,19 +141,19 @@ function signed(value:number,digits=2){
 
 function sampleBand(games:number){
   if(games>=50)return {
-    label:"mais estável",
+    labelKey:"stats.sample.high.label",
     tone:"high",
-    help:"50+ observações: ainda existe contexto, mas o número tende a ser menos sensível a poucas partidas.",
+    helpKey:"stats.sample.high.help",
   };
   if(games>=20)return {
-    label:"utilizável",
+    labelKey:"stats.sample.medium.label",
     tone:"medium",
-    help:"20–49 observações: bom para levantar hipóteses, não para tratar diferenças pequenas como verdade.",
+    helpKey:"stats.sample.medium.help",
   };
   return {
-    label:"exploratória",
+    labelKey:"stats.sample.low.label",
     tone:"low",
-    help:"Abaixo de 20 observações: use para descobrir o que investigar, não para ordenar força.",
+    helpKey:"stats.sample.low.help",
   };
 }
 
@@ -166,6 +167,7 @@ export default function StatisticsPage({
   initialQuery="",
   initialView="stats",
 }:Props){
+  const { t } = useI18n();
   const [category,setCategory]=useState<Category>(initialCategory);
   const [view,setView]=useState<ViewMode>(initialView);
   const [queueId,setQueueId]=useState<number|null>(1100);
@@ -197,7 +199,7 @@ export default function StatisticsPage({
       .catch(err=>{
         if(cancelled)return;
         setStats(null);
-        setError(err instanceof Error?err.message:"Não foi possível carregar as estatísticas.");
+        setError(err instanceof Error?err.message:t("stats.errorLoad"));
       })
       .finally(()=>{if(!cancelled)setLoading(false);});
 
@@ -240,16 +242,16 @@ export default function StatisticsPage({
     if(!personalRow){
       return {
         tone:"neutral",
-        title:"Sem amostra pessoal ainda",
-        body:"O Chibi tem leitura da base observada, mas este elemento ainda não apareceu nas partidas carregadas deste perfil.",
+        title:t("stats.interpret.none.title"),
+        body:t("stats.interpret.none.body"),
       };
     }
 
     if(personalRow.games<3||selectedRow.games<20){
       return {
         tone:"neutral",
-        title:"Sinal inicial — ainda não trate como padrão",
-        body:"Há pouca amostra pessoal ou agregada. Use os números para investigação, não como conclusão sobre força.",
+        title:t("stats.interpret.early.title"),
+        body:t("stats.interpret.early.body"),
       };
     }
 
@@ -257,25 +259,25 @@ export default function StatisticsPage({
     if(delta<=-.5){
       return {
         tone:"good",
-        title:"No seu histórico, apareceu melhor que na base",
-        body:"Sua colocação média foi "+Math.abs(delta).toFixed(2)+" melhor. Isso descreve associação na amostra; não prova que o elemento causou o resultado.",
+        title:t("stats.interpret.better.title"),
+        body:t("stats.interpret.better.body",{delta:Math.abs(delta).toFixed(2)}),
       };
     }
 
     if(delta>=.5){
       return {
         tone:"warning",
-        title:"No seu histórico, apareceu pior que na base",
-        body:"Sua colocação média foi "+delta.toFixed(2)+" pior. Vale abrir as partidas para entender contexto de board, itens e lobby.",
+        title:t("stats.interpret.worse.title"),
+        body:t("stats.interpret.worse.body",{delta:delta.toFixed(2)}),
       };
     }
 
     return {
       tone:"neutral",
-      title:"Seu resultado ficou próximo da base",
-      body:"A diferença de colocação média é pequena nesta amostra. O contexto da partida provavelmente importa mais que o número isolado.",
+      title:t("stats.interpret.close.title"),
+      body:t("stats.interpret.close.body"),
     };
-  },[selectedRow]);
+  },[selectedRow,t]);
 
   const tiers=useMemo(()=>{
     const map:{S:typeof rows;A:typeof rows;B:typeof rows;C:typeof rows}={
@@ -294,16 +296,16 @@ export default function StatisticsPage({
     :"inicial";
 
   const categoryLabel={
-    champions:"Champions",
-    traits:"Traits",
-    items:"Items",
+    champions:t("stats.category.champions"),
+    traits:t("stats.category.traits"),
+    items:t("stats.category.items"),
   }[category];
 
   function saveStatToShelf(row:typeof rows[number]){
     saveStudyShelfItem({
       type:"stat",
       label:labelFor(category,row.id,staticData),
-      subtitle:categoryLabel+" · "+row.games+" jogos · média "+row.averagePlacement,
+      subtitle:t("stats.shelfSubtitle",{category:categoryLabel,games:row.games,average:row.averagePlacement}),
       category,
       entityId:row.id,
     });
@@ -313,24 +315,24 @@ export default function StatisticsPage({
   return <main className="statistics-page">
     <section className="statistics-hero">
       <div>
-        {hasProfile&&<button className="back-search" onClick={onBack}>← Voltar ao perfil</button>}
+        {hasProfile&&<button className="back-search" onClick={onBack}>{t("common.backProfile")}</button>}
         <span className="eyebrow">CHIBI STATISTICS</span>
-        <h1>Meta global.<br/><em>E o que ele significa para você.</em></h1>
-        <p>Champions, traits e items com desempenho observado, amostra explícita e comparação pessoal quando um perfil está aberto.</p>
+        <h1>{t("stats.hero.title1")}<br/><em>{t("stats.hero.title2")}</em></h1>
+        <p>{t("stats.hero.desc")}</p>
         <DDragonArt
           staticData={staticData}
           setNumber={stats?.context.setNumber}
           championIds={stats?.champions.slice(0,6).map(row=>row.id)||[]}
           variant="ribbon"
-          label="Visual oficial · Data Dragon"
+          label={t("stats.riotVisual")}
         />
       </div>
 
       <div className={"meta-dataset-card "+maturity}>
-        <span>BASE ATUAL</span>
+        <span>{t("meta.currentBase")}</span>
         <strong>{stats?.sampleParticipants??0}</strong>
-        <small>participantes observados</small>
-        <b>{maturity}</b>
+        <small>{t("meta.observedParticipants")}</small>
+        <b>{t(maturity==="robusta"?"common.maturity.robust":maturity==="crescendo"?"common.maturity.growing":"common.maturity.initial")}</b>
       </div>
     </section>
 
@@ -338,13 +340,13 @@ export default function StatisticsPage({
       <div className="statistics-categories">
         {(["champions","traits","items"] as Category[]).map(id=>(
           <button className={category===id?"active":""} onClick={()=>setCategory(id)} key={id}>
-            {{champions:"Champions",traits:"Traits",items:"Items"}[id]}
+            {{champions:t("stats.category.champions"),traits:t("stats.category.traits"),items:t("stats.category.items")}[id]}
           </button>
         ))}
       </div>
 
       <div className="statistics-view-switch">
-        <button className={view==="stats"?"active":""} onClick={()=>setView("stats")}>Estatísticas</button>
+        <button className={view==="stats"?"active":""} onClick={()=>setView("stats")}>{t("stats.statistics")}</button>
         <button
           className={view==="tier"?"active":""}
           onClick={()=>setView("tier")}
@@ -356,40 +358,40 @@ export default function StatisticsPage({
       <input
         value={query}
         onChange={event=>setQuery(event.target.value)}
-        placeholder={"Pesquisar "+categoryLabel.toLowerCase()+"..."}
+        placeholder={t("stats.search",{category:categoryLabel.toLowerCase()})}
       />
       <div>
-        <button className={queueId===1100?"active":""} onClick={()=>setQueueId(1100)}>Ranqueada</button>
-        <button className={queueId==null?"active":""} onClick={()=>setQueueId(null)}>Todas</button>
+        <button className={queueId===1100?"active":""} onClick={()=>setQueueId(1100)}>{t("common.rankQueue")}</button>
+        <button className={queueId==null?"active":""} onClick={()=>setQueueId(null)}>{t("stats.all")}</button>
       </div>
-      <span>{stats?.context.setNumber?"Set "+stats.context.setNumber:"Set atual"}</span>
+      <span>{stats?.context.setNumber?"Set "+stats.context.setNumber:t("stats.currentSet")}</span>
     </section>
 
     <details className="statistics-sample-guide">
       <summary>
-        <span><b>Como o Chibi interpreta tamanho de amostra</b><small>Evite transformar poucos jogos em certeza.</small></span>
-        <em>Guia</em>
+        <span><b>{t("stats.sampleGuide.title")}</b><small>{t("stats.sampleGuide.subtitle")}</small></span>
+        <em>{t("stats.sampleGuide.guide")}</em>
       </summary>
       <div>
         <article className="low">
           <strong>&lt; 20</strong>
-          <span>Exploratória</span>
-          <p>Serve para encontrar perguntas. Diferenças pequenas podem desaparecer rapidamente.</p>
+          <span>{t("stats.sample.low.label")}</span>
+          <p>{t("stats.sample.low.desc")}</p>
         </article>
         <article className="medium">
           <strong>20–49</strong>
-          <span>Utilizável</span>
-          <p>Já permite comparar sinais maiores, mas ainda exige contexto e cautela.</p>
+          <span>{t("stats.sample.medium.label")}</span>
+          <p>{t("stats.sample.medium.desc")}</p>
         </article>
         <article className="high">
           <strong>50+</strong>
-          <span>Mais estável</span>
-          <p>Menos sensível a poucas partidas. Ainda não elimina viés de composição, patch ou elo.</p>
+          <span>{t("stats.sample.high.label")}</span>
+          <p>{t("stats.sample.high.desc")}</p>
         </article>
         {hasProfile&&<article className="personal">
           <strong>3+</strong>
-          <span>Sua amostra</span>
-          <p>O Chibi só começa a comparar seu resultado com a base depois de pelo menos 3 partidas pessoais.</p>
+          <span>{t("stats.sample.personal.label")}</span>
+          <p>{t("stats.sample.personal.desc")}</p>
         </article>}
       </div>
     </details>
@@ -401,27 +403,27 @@ export default function StatisticsPage({
             {imageFor(category,selectedRow.id,staticData)&&<img src={imageFor(category,selectedRow.id,staticData)} alt=""/>}
           </span>
           <div>
-            <span>LEITURA CONTEXTUAL</span>
+            <span>{t("stats.contextual")}</span>
             <h2>{labelFor(category,selectedRow.id,staticData)}</h2>
             <small>{selectedRow.id}</small>
           </div>
         </div>
-        <button onClick={()=>setSelectedEntityId(null)}>Fechar ×</button>
+        <button onClick={()=>setSelectedEntityId(null)}>{t("stats.close")}</button>
       </div>
 
       <div className="statistics-detail-grid">
         <article>
-          <span>BASE CHIBI</span>
+          <span>{t("stats.chibiBase")}</span>
           <strong>{selectedRow.averagePlacement}</strong>
-          <small>média · {selectedRow.games} jogos · {sampleBand(selectedRow.games).label}</small>
+          <small>{t("stats.averageGamesBand",{games:selectedRow.games,band:t(sampleBand(selectedRow.games).labelKey)})}</small>
           <div><b>Top 4 {selectedRow.top4Rate}%</b><b>Pick {selectedRow.pickRate}%</b><b>Win {selectedRow.winRate}%</b></div>
         </article>
 
         <article>
-          <span>SEU HISTÓRICO</span>
+          <span>{t("stats.yourHistory")}</span>
           {selectedRow.personal?<>
             <strong>{selectedRow.personal.averagePlacement}</strong>
-            <small>média · {selectedRow.personal.games} suas</small>
+            <small>{t("stats.yourAverage",{games:selectedRow.personal.games})}</small>
             <div>
               <b>Top 4 {selectedRow.personal.top4Rate}%</b>
               <b>Win {selectedRow.personal.winRate}%</b>
@@ -429,38 +431,38 @@ export default function StatisticsPage({
             </div>
           </>:<>
             <strong>—</strong>
-            <small>sem partidas carregadas com este elemento</small>
+            <small>{t("stats.noPersonalMatches")}</small>
           </>}
         </article>
 
         <article className={"statistics-detail-reading "+(selectedInterpretation?.tone||"neutral")}>
-          <span>O QUE ISSO SIGNIFICA</span>
+          <span>{t("stats.meaning")}</span>
           <strong>{selectedInterpretation?.title}</strong>
           <p>{selectedInterpretation?.body}</p>
           {selectedRow.personal&&<button onClick={()=>onEvidence(
             selectedRow.personal!.matchIds,
             categoryLabel+" · "+labelFor(category,selectedRow.id,staticData),
-          )}>Abrir suas evidências</button>}
+           )}>{t("stats.openEvidence")}</button>}
           <button className="statistics-shelf-button" onClick={()=>saveStatToShelf(selectedRow)}>
-            {shelfSavedId===category+":"+selectedRow.id?"Salvo no Shelf ✓":"Salvar no Study Shelf"}
+            {shelfSavedId===category+":"+selectedRow.id?t("stats.savedShelf"):t("stats.saveShelf")}
           </button>
         </article>
       </div>
     </section>}
 
-    {loading&&<section className="panel meta-page-state">Carregando estatísticas...</section>}
-    {!loading&&error&&<section className="panel meta-page-state error">Não foi possível carregar as estatísticas agora.</section>}
+    {loading&&<section className="panel meta-page-state">{t("stats.loading")}</section>}
+    {!loading&&error&&<section className="panel meta-page-state error">{t("stats.loadFailed")}</section>}
 
 
     {!loading&&!error&&stats&&view==="stats"&&<section className="panel statistics-table-panel">
       <div className="statistics-table-head">
-        <div><span>RANK</span><span>{categoryLabel}</span></div>
-        <span>AMOSTRA</span>
+        <div><span>{t("stats.rank")}</span><span>{categoryLabel}</span></div>
+        <span>{t("common.sample")}</span>
         <span>PICK</span>
-        <span>MÉDIA</span>
+        <span>{t("common.average")}</span>
         <span>TOP 4</span>
         <span>WIN</span>
-        {hasProfile&&<span>VOCÊ</span>}
+        {hasProfile&&<span>{t("stats.you")}</span>}
       </div>
 
       <div className="statistics-table">
@@ -494,13 +496,13 @@ export default function StatisticsPage({
               </div>
             </div>
 
-            <span className={"statistics-sample "+sampleBand(row.games).tone} title={sampleBand(row.games).help}>
-              <b>{row.games}</b><small>{sampleBand(row.games).label}</small>
+            <span className={"statistics-sample "+sampleBand(row.games).tone} title={t(sampleBand(row.games).helpKey)}>
+              <b>{row.games}</b><small>{t(sampleBand(row.games).labelKey)}</small>
             </span>
-            <span><b>{row.pickRate}%</b><small>observado</small></span>
-            <span><b>{row.averagePlacement}</b><small>colocação</small></span>
+            <span><b>{row.pickRate}%</b><small>{t("stats.observed")}</small></span>
+            <span><b>{row.averagePlacement}</b><small>{t("stats.placement")}</small></span>
             <span><b>{row.top4Rate}%</b><small>Top 4</small></span>
-            <span><b>{row.winRate}%</b><small>vitória</small></span>
+            <span><b>{row.winRate}%</b><small>{t("stats.victory")}</small></span>
 
             {hasProfile&&<div className="statistics-personal">
               {personalRow?<>
@@ -511,16 +513,16 @@ export default function StatisticsPage({
                 <button onClick={event=>{
                   event.stopPropagation();
                   onEvidence(personalRow.matchIds,categoryLabel+" · "+label);
-                }}>Ver</button>
-              </>:<small>sem amostra pessoal</small>}
+                }}>{t("stats.view")}</button>
+              </>:<small>{t("stats.noPersonalSample")}</small>}
             </div>}
           </article>;
         })}
       </div>
 
-      {!rows.length&&<div className="meta-page-state">Nenhum resultado encontrado.</div>}
+      {!rows.length&&<div className="meta-page-state">{t("stats.noResults")}</div>}
 
-      <p className="global-meta-disclaimer">Os números representam apenas o Chibi Dataset observado. Quanto menor a amostra, mais experimental deve ser a leitura.</p>
+      <p className="global-meta-disclaimer">{t("stats.datasetDisclaimer")}</p>
     </section>}
 
     {!loading&&!error&&stats&&view==="tier"&&<section className="tier-list-shell">
@@ -533,7 +535,7 @@ export default function StatisticsPage({
               const image=imageFor(category,row.id,staticData);
               return <button
                 className="tier-entity"
-                title={label+" · média "+row.averagePlacement+" · "+row.games+" jogos"}
+                title={t("stats.tierTitle",{label,average:row.averagePlacement,games:row.games})}
                 onClick={()=>{
                   setSelectedEntityId(row.id);
                   setView("stats");
@@ -542,14 +544,14 @@ export default function StatisticsPage({
               >
                 <span>{image&&<img src={image} alt=""/>}</span>
                 <strong>{label}</strong>
-                <small>{row.averagePlacement} · {row.games}j{row.personal?" · você "+row.personal.averagePlacement:""}</small>
+                <small>{t("stats.tierSmall",{average:row.averagePlacement,games:row.games,personal:row.personal?t("stats.tierPersonal",{average:row.personal.averagePlacement}):""})}</small>
               </button>;
-            }):<span className="tier-empty">Sem sinal suficiente nesta faixa.</span>}
+            }):<span className="tier-empty">{t("stats.tierEmpty")}</span>}
           </div>
         </article>
       ))}
 
-      <p className="global-meta-disclaimer">A Tier List do Chibi é uma visualização do sinal composto do dataset, não uma classificação oficial da Riot. Amostra e colocação continuam visíveis para evitar falsa precisão.</p>
+      <p className="global-meta-disclaimer">{t("stats.tierDisclaimer")}</p>
     </section>}
   </main>;
 }
