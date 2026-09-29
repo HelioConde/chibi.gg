@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chibi.gg Companion</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0b0d12;
+      color: #f4f7fb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 840px;
+      min-height: 560px;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(118, 94, 255, .18), transparent 34rem),
+        radial-gradient(circle at 90% 15%, rgba(64, 208, 255, .12), transparent 30rem),
+        #0b0d12;
+    }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 230px 1fr;
+    }
+
+    aside {
+      padding: 26px 20px;
+      border-right: 1px solid rgba(255,255,255,.07);
+      background: rgba(10, 12, 17, .72);
+    }
+
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 34px;
+    }
+
+    .brand img {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      object-fit: cover;
+      box-shadow: 0 0 30px rgba(118, 94, 255, .24);
+    }
+
+    .brand strong {
+      font-size: 20px;
+      letter-spacing: -.02em;
+    }
+
+    .brand small {
+      display: block;
+      color: #8991a3;
+      margin-top: 2px;
+      font-size: 11px;
+    }
+
+    nav {
+      display: grid;
+      gap: 8px;
+    }
+
+    .nav-item {
+      padding: 11px 12px;
+      border-radius: 10px;
+      color: #9ea6b8;
+      font-size: 14px;
+      background: transparent;
+      border: 1px solid transparent;
+    }
+
+    .nav-item.active {
+      color: white;
+      background: rgba(118, 94, 255, .14);
+      border-color: rgba(137, 119, 255, .26);
+    }
+
+    .side-note {
+      margin-top: 34px;
+      padding: 13px;
+      border-radius: 12px;
+      color: #929aac;
+      line-height: 1.45;
+      font-size: 12px;
+      background: rgba(255,255,255,.035);
+      border: 1px solid rgba(255,255,255,.05);
+    }
+
+    main {
+      padding: 34px 38px 42px;
+      overflow: auto;
+    }
+
+    .eyebrow {
+      color: #9082ff;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      font-size: 11px;
+      margin-bottom: 9px;
+    }
+
+    h1 {
+      font-size: 34px;
+      letter-spacing: -.04em;
+      margin: 0;
+    }
+
+    .lead {
+      margin: 10px 0 28px;
+      max-width: 720px;
+      color: #9ea6b8;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      padding: 17px;
+      border-radius: 15px;
+      background: rgba(17, 20, 28, .76);
+      border: 1px solid rgba(255,255,255,.07);
+      box-shadow: 0 16px 50px rgba(0,0,0,.18);
+    }
+
+    .label {
+      color: #858da0;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .value {
+      font-size: 17px;
+      font-weight: 750;
+      letter-spacing: -.02em;
+    }
+
+    .value.ok { color: #63e6a7; }
+    .value.wait { color: #f7ca62; }
+
+    .panel {
+      padding: 22px;
+      border-radius: 16px;
+      background: rgba(17, 20, 28, .76);
+      border: 1px solid rgba(255,255,255,.07);
+    }
+
+    .panel h2 {
+      margin: 0 0 16px;
+      font-size: 18px;
+    }
+
+    .roadmap {
+      display: grid;
+      gap: 10px;
+    }
+
+    .roadmap-item {
+      display: grid;
+      grid-template-columns: 28px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 13px;
+      border-radius: 11px;
+      background: rgba(255,255,255,.025);
+    }
+
+    .dot {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: rgba(118,94,255,.16);
+      color: #a99cff;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    .roadmap-item strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 3px;
+    }
+
+    .roadmap-item span {
+      color: #858da0;
+      font-size: 12px;
+    }
+
+    .tag {
+      font-size: 11px !important;
+      padding: 6px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.055);
+      color: #aab2c4 !important;
+      white-space: nowrap;
+    }
+
+    .footer {
+      margin-top: 18px;
+      color: #6f7788;
+      font-size: 11px;
+    }
+
+    @media (max-width: 940px) {
+      .status-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="brand">
+        <img src="assets/icon.png" alt="Chibi.gg" />
+        <div>
+          <strong>chibi.gg</strong>
+          <small>TFT Companion</small>
+        </div>
+      </div>
+
+      <nav>
+        <div class="nav-item active">Visão geral</div>
+        <div class="nav-item">Partidas</div>
+        <div class="nav-item">Análises</div>
+        <div class="nav-item">Composições</div>
+        <div class="nav-item">Configurações</div>
+      </nav>
+
+      <div class="side-note">
+        Shell público em desenvolvimento. A interface continuará funcionando mesmo enquanto o acesso GEP aguarda aprovação.
+      </div>
+    </aside>
+
+    <main>
+      <div class="eyebrow">Development build</div>
+      <h1>Chibi Companion</h1>
+      <p class="lead">
+        A base desktop do Chibi agora é uma janela real do Overwolf. Continuamos desenvolvendo histórico,
+        análise e experiência do usuário sem bloquear o projeto pela whitelist.
+      </p>
+
+      <section class="status-grid">
+        <article class="card">
+          <div class="label">Overwolf</div>
+          <div class="value ok">Conectado</div>
+        </article>
+        <article class="card">
+          <div class="label">Teamfight Tactics</div>
+          <div id="game-status" class="value wait">Verificando…</div>
+        </article>
+        <article class="card">
+          <div class="label">GEP / Telemetria</div>
+          <div class="value wait">Aguardando whitelist</div>
+        </article>
+      </section>
+
+      <section class="panel">
+        <h2>Próxima base do produto</h2>
+        <div class="roadmap">
+          <div class="roadmap-item">
+            <div class="dot">1</div>
+            <div>
+              <strong>Desktop público</strong>
+              <span>Janela principal exigida para um app público Overwolf.</span>
+            </div>
+            <span class="tag">em construção</span>
+          </div>
+          <div class="roadmap-item">
+            <div class="dot">2</div>
+            <div>
+              <strong>Histórico e perfil</strong>
+              <span>Reaproveitar a experiência TFT-first do site dentro do companion.</span>
+            </div>
+            <span class="tag">próximo</span>
+          </div>
+          <div class="roadmap-item">
+            <div class="dot">3</div>
+            <div>
+              <strong>Camada GEP</strong>
+              <span>Trocar mock/telemetria local por eventos autorizados quando a whitelist chegar.</span>
+            </div>
+            <span class="tag">preparado</span>
+          </div>
+          <div class="roadmap-item">
+            <div class="dot">4</div>
+            <div>
+              <strong>Coach pós-partida</strong>
+              <span>Explicar padrões de economia, composição e posicionamento sem decisões automáticas.</span>
+            </div>
+            <span class="tag">planejado</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="footer">Chibi.gg • public app shell • build 0.0.2</div>
+    </main>
+  </div>
+
+  <script type="module" src="src/desktop.js"></script>
+</body>
+</html>
