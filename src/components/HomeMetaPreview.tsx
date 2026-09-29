@@ -11,6 +11,7 @@ import {
   TftStaticData,
 } from "../tftStatic";
 import { StatisticsCategory } from "./StatisticsPage";
+import { useI18n } from "../i18n";
 
 type Props={
   staticData:TftStaticData|null;
@@ -60,6 +61,7 @@ export default function HomeMetaPreview({
   onOpenComps,
   onOpenStats,
 }:Props){
+  const { t } = useI18n();
   const [stats,setStats]=useState<TftGlobalStats|null>(null);
   const [comps,setComps]=useState<TftGlobalComps|null>(null);
 
@@ -83,43 +85,43 @@ export default function HomeMetaPreview({
   return <section className="home-meta-preview home-meta-preview-v2">
     <div className="home-meta-intro-v2">
       <div>
-        <span>AMOSTRA OBSERVADA</span>
-        <h2>O que está funcionando agora.</h2>
-        <p>Uma leitura curta do dataset observado pelo Chibi. Entre no Meta quando quiser aprofundar.</p>
+        <span>{t("metaPreview.kicker")}</span>
+        <h2>{t("metaPreview.title")}</h2>
+        <p>{t("metaPreview.desc")}</p>
       </div>
-      <button onClick={onOpenMeta}>Ver Meta completo →</button>
+      <button onClick={onOpenMeta}>{t("metaPreview.open")}</button>
     </div>
 
     <div className="home-meta-grid-v2">
       <article className="home-meta-simple-card">
         <div className="home-meta-simple-head">
           <div>
-            <span>TOP COMPS</span>
-            <strong>Boards observados</strong>
+            <span>{t("metaPreview.topComps")}</span>
+            <strong>{t("metaPreview.observedBoards")}</strong>
           </div>
-          <button onClick={onOpenComps}>Ver todas →</button>
+          <button onClick={onOpenComps}>{t("metaPreview.all")}</button>
         </div>
         <div className="home-meta-simple-list">
           {topComps.length?topComps.map((comp,index)=>(
             <button onClick={onOpenComps} key={comp.id}>
               <b>{index+1}</b>
               <span>
-                <strong>{comp.traits.slice(0,2).map(row=>label("traits",row.id,staticData)).join(" · ")||"Comp observada"}</strong>
-                <small>{comp.games} jogos · média {comp.averagePlacement}</small>
+                <strong>{comp.traits.slice(0,2).map(row=>label("traits",row.id,staticData)).join(" · ")||t("metaPreview.observedComp")}</strong>
+                <small>{t("metaPreview.gamesAverage",{games:comp.games,average:comp.averagePlacement})}</small>
               </span>
-              <em>{comp.games>=8?comp.top4Rate+"%":"amostra"}</em>
+              <em>{comp.games>=8?comp.top4Rate+"%":t("metaPreview.sample")}</em>
             </button>
-          )):<div className="home-meta-loading">Construindo comps observadas...</div>}
+          )):<div className="home-meta-loading">{t("metaPreview.building")}</div>}
         </div>
       </article>
 
       <article className="home-meta-simple-card">
         <div className="home-meta-simple-head">
           <div>
-            <span>TRAITS FORTES</span>
-            <strong>Synergies observadas</strong>
+            <span>{t("metaPreview.strongTraits")}</span>
+            <strong>{t("metaPreview.observedSynergies")}</strong>
           </div>
-          <button onClick={()=>onOpenStats("traits")}>Ver todas →</button>
+          <button onClick={()=>onOpenStats("traits")}>{t("metaPreview.all")}</button>
         </div>
         <div className="home-meta-simple-list traits">
           {topTraits.length?topTraits.map((row,index)=>{
@@ -131,16 +133,16 @@ export default function HomeMetaPreview({
                 <i>{src&&<img src={src} alt=""/>}</i>
                 <span>
                   <strong>{name}</strong>
-                  <small>{row.games} jogos · média {row.averagePlacement}</small>
+                  <small>{t("metaPreview.gamesAverage",{games:row.games,average:row.averagePlacement})}</small>
                 </span>
               </span>
-              <em>{row.games>=8?row.top4Rate+"%":"amostra"}</em>
+              <em>{row.games>=8?row.top4Rate+"%":t("metaPreview.sample")}</em>
             </button>;
-          }):<div className="home-meta-loading">Carregando traits...</div>}
+          }):<div className="home-meta-loading">{t("metaPreview.loadingTraits")}</div>}
         </div>
       </article>
     </div>
 
-    <small className="home-meta-disclaimer-v2">Dataset observado pelo Chibi. Percentuais só ganham destaque visual quando a amostra começa a ficar mais útil; não representa toda a população de TFT.</small>
+    <small className="home-meta-disclaimer-v2">{t("metaPreview.disclaimer")}</small>
   </section>;
 }
