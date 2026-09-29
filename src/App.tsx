@@ -58,6 +58,7 @@ import HomeSessionResume from "./components/HomeSessionResume";
 import HomeStudyShelf from "./components/HomeStudyShelf";
 import TeamBuilderPage from "./components/TeamBuilderPage";
 import LeaderboardPage from "./components/LeaderboardPage";
+import ProductInfoPage from "./components/ProductInfoPage";
 import AskChibi from "./components/AskChibi";
 import ChibiMemory from "./components/ChibiMemory";
 import ReviewQueue from "./components/ReviewQueue";
@@ -397,7 +398,9 @@ function App() {
     query:"",
     view:"stats",
   });
-  const [sitePage,setSitePage]=useState<"main"|"meta"|"comps"|"stats"|"builder"|"leaderboard"|"overlay">(
+  const [sitePage,setSitePage]=useState<
+    "main"|"meta"|"comps"|"stats"|"builder"|"leaderboard"|"overlay"|"about"|"privacy"|"terms"
+  >(
     window.location.hash==="#meta"
       ?"meta"
       :window.location.hash==="#comps"
@@ -410,7 +413,13 @@ function App() {
               ?"leaderboard"
               :window.location.hash==="#overlay"
                 ?"overlay"
-                :"main"
+                :window.location.hash==="#about"
+                  ?"about"
+                  :window.location.hash==="#privacy"
+                    ?"privacy"
+                    :window.location.hash==="#terms"
+                      ?"terms"
+                      :"main"
   );
 
   useEffect(()=>{
@@ -461,7 +470,13 @@ function App() {
                   ?"leaderboard"
                   :window.location.hash==="#overlay"
                     ?"overlay"
-                    :"main"
+                    :window.location.hash==="#about"
+                      ?"about"
+                      :window.location.hash==="#privacy"
+                        ?"privacy"
+                        :window.location.hash==="#terms"
+                          ?"terms"
+                          :"main"
       );
       requestAnimationFrame(()=>window.scrollTo({top:0,left:0,behavior:"auto"}));
     };
@@ -1102,6 +1117,16 @@ function App() {
     scrollPageTop();
   }
 
+  function openInfoPage(page:"about"|"privacy"|"terms"){
+    setSitePage(page);
+    const hash="#"+page;
+    if(window.location.hash!==hash){
+      window.history.pushState({},"",window.location.pathname+window.location.search+hash);
+    }
+    scrollPageTop();
+  }
+
+
   function closeExplorePage(){
     setSitePage("main");
     if(window.location.hash){
@@ -1156,10 +1181,18 @@ function App() {
           onSearchPlayer={(value)=>{void searchFromGlobal(value);}}
           onOpenPage={openExplorePage}
         />
-        <button className="ghost-button">Entrar</button>
+        <button className="ghost-button" onClick={()=>openInfoPage("about")}>Como funciona</button>
       </header>
 
-      {sitePage==="meta" ? (
+      {sitePage==="about"||sitePage==="privacy"||sitePage==="terms" ? (
+        <ProductInfoPage
+          page={sitePage}
+          onBack={closeExplorePage}
+          onOpenAbout={()=>openInfoPage("about")}
+          onOpenPrivacy={()=>openInfoPage("privacy")}
+          onOpenTerms={()=>openInfoPage("terms")}
+        />
+      ) : sitePage==="meta" ? (
         <GlobalMetaPage
           staticData={staticData}
           hasProfile={Boolean(profile)}
@@ -1258,6 +1291,11 @@ function App() {
               </div>
 
               <RiotServiceStatus platform={platform}/>
+
+              <button className="home-compliance-link" type="button" onClick={()=>openInfoPage("about")}>
+                <span>Dados Riot + análise pós-partida</span>
+                <small>sem scouting live ou automação de decisões · como funciona →</small>
+              </button>
 
               {error && <div className="lookup-error">{error}</div>}
 
@@ -1989,6 +2027,22 @@ function App() {
           />
         </main>
       )}
+
+      <footer className="site-footer">
+        <div className="site-footer-main">
+          <div>
+            <strong>chibi.gg</strong>
+            <span>TFT explicado com dados e revisão pós-partida.</span>
+          </div>
+          <nav aria-label="Informações do Chibi">
+            <button onClick={()=>openInfoPage("about")}>Como funciona</button>
+            <button onClick={()=>openInfoPage("privacy")}>Privacidade</button>
+            <button onClick={()=>openInfoPage("terms")}>Termos</button>
+            <a href="https://github.com/HelioConde/chibi.gg" target="_blank" rel="noreferrer">GitHub ↗</a>
+          </nav>
+        </div>
+        <p className="site-footer-riot">Chibi.gg isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.</p>
+      </footer>
 
       {(matchLoading || selectedMatch || matchError || studyLookup==="unavailable") && (
         <div className="match-overlay" onClick={closeMatchReview}>
