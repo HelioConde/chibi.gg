@@ -1181,7 +1181,7 @@ function App() {
           onSearchPlayer={(value)=>{void searchFromGlobal(value);}}
           onOpenPage={openExplorePage}
         />
-        <button className="ghost-button">Entrar</button>
+        <button className="ghost-button" onClick={()=>openInfoPage("about")}>Como funciona</button>
       </header>
 
       {sitePage==="about"||sitePage==="privacy"||sitePage==="terms" ? (
@@ -1291,6 +1291,11 @@ function App() {
               </div>
 
               <RiotServiceStatus platform={platform}/>
+
+              <button className="home-compliance-link" type="button" onClick={()=>openInfoPage("about")}>
+                <span>Dados Riot + análise pós-partida</span>
+                <small>sem scouting live ou automação de decisões · como funciona →</small>
+              </button>
 
               {error && <div className="lookup-error">{error}</div>}
 
