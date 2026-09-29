@@ -1815,12 +1815,12 @@ export default function TeamBuilderPage({
       <div className="panel builder-board-panel">
         <div className="builder-panel-head">
           <div>
-            <span>BOARD</span>
-            <h2>{selectedId?"Escolha um hex":positioningMode?(movingHex==null?"Selecione uma unidade":"Escolha o destino"):"Seu tabuleiro"}</h2>
+            <span>{t("builder.board")}</span>
+            <h2>{selectedId?t("builder.board.chooseHex"):positioningMode?(movingHex==null?t("builder.board.selectUnit"):t("builder.board.chooseDestination")):t("builder.board.yours")}</h2>
           </div>
           <div className="builder-board-head-actions">
-            <button className={positioningMode?"active":""} onClick={togglePositioning}>{positioningMode?"Modo mover ativo":"Posicionar"}</button>
-            {selectedId&&<button onClick={()=>setSelectedId(null)}>Cancelar seleção</button>}
+            <button className={positioningMode?"active":""} onClick={togglePositioning}>{positioningMode?t("builder.board.moveActive"):t("builder.board.position")}</button>
+            {selectedId&&<button onClick={()=>setSelectedId(null)}>{t("builder.board.cancelSelection")}</button>}
           </div>
         </div>
 
@@ -1832,13 +1832,13 @@ export default function TeamBuilderPage({
           positioning={positioningMode}
           movingHex={movingHex}
           interactive
-          emptyLabel="Selecione um champion na biblioteca e clique no hex desejado."
+          emptyLabel={t("builder.board.emptyHint")}
         />
 
         <div className="builder-roster">
           <div className="builder-subhead">
-            <span>SEU BOARD</span>
-            <small>Ajuste estrelas, itens e papéis. Use “Posicionar” para mover ou trocar peças sem removê-las.</small>
+            <span>{t("builder.roster")}</span>
+            <small>{t("builder.roster.desc")}</small>
           </div>
           {units.length?<div className="builder-roster-grid">
             {units.slice().sort((a,b)=>a.hex-b.hex).map(unit=>{
@@ -1869,22 +1869,22 @@ export default function TeamBuilderPage({
                       const itemId=unit.items?.[index];
                       const item=staticEntry(staticData?.items,itemId);
                       const itemImage=itemId&&staticData?tftAssetUrl(staticData.version,"item",item):"";
-                      const itemName=item?.name||"Slot de item";
+                      const itemName=item?.name||t("builder.item.slot");
                       return itemId
-                        ?<button className="filled" onClick={()=>removeItem(unit.hex,index)} title={"Remover "+itemName} key={index}>
+                        ?<button className="filled" onClick={()=>removeItem(unit.hex,index)} title={t("builder.item.remove",{item:itemName})} key={index}>
                           {itemImage?<img src={itemImage} alt=""/>:<span>{itemName.slice(0,1)}</span>}
                         </button>
-                        :<button className="empty" onClick={()=>openItemEditor(unit.hex)} title="Adicionar item" key={index}>+</button>;
+                        :<button className="empty" onClick={()=>openItemEditor(unit.hex)} title={t("builder.item.add")} key={index}>+</button>;
                     })}
                     <button className={"builder-item-edit "+(selectedItemHex===unit.hex?"active":"")} onClick={()=>openItemEditor(unit.hex)}>
-                      Itens
+                      {t("builder.items")}
                     </button>
                   </div>
                 </div>
                 <button className="builder-remove-unit" onClick={()=>removeUnit(unit)}>×</button>
               </article>;
             })}
-          </div>:<p className="builder-empty-check">O roster aparece aqui conforme você adiciona unidades ao tabuleiro.</p>}
+          </div>:<p className="builder-empty-check">{t("builder.roster.empty")}</p>}
         </div>
 
         {selectedItemUnit&&selectedItemChampion&&<section className="builder-item-lab">
@@ -1892,14 +1892,14 @@ export default function TeamBuilderPage({
             <div className="builder-item-target">
               <span>{selectedItemChampion.image&&<img src={selectedItemChampion.image} alt=""/>}</span>
               <div>
-                <small>ITEMIZAÇÃO</small>
+                <small>{t("builder.itemization")}</small>
                 <strong>{selectedItemChampion.name}</strong>
-                <p>{selectedItemUnit.items?.length||0}/3 itens equipados</p>
+                <p>{t("builder.item.equipped",{count:selectedItemUnit.items?.length||0})}</p>
               </div>
             </div>
             <div className="builder-item-lab-actions">
-              {!!selectedItemUnit.items?.length&&<button onClick={()=>clearUnitItems(selectedItemUnit.hex)}>Limpar itens</button>}
-              <button onClick={()=>setSelectedItemHex(null)}>Fechar</button>
+              {!!selectedItemUnit.items?.length&&<button onClick={()=>clearUnitItems(selectedItemUnit.hex)}>{t("builder.item.clear")}</button>}
+              <button onClick={()=>setSelectedItemHex(null)}>{t("builder.close")}</button>
             </div>
           </div>
 
@@ -1908,25 +1908,25 @@ export default function TeamBuilderPage({
               const itemId=selectedItemUnit.items?.[index];
               const item=staticEntry(staticData?.items,itemId);
               const itemImage=itemId&&staticData?tftAssetUrl(staticData.version,"item",item):"";
-              const itemName=item?.name||"Slot vazio";
+              const itemName=item?.name||t("builder.item.emptySlot");
               return <button
                 className={itemId?"filled":"empty"}
                 onClick={()=>itemId&&removeItem(selectedItemUnit.hex,index)}
-                title={itemId?"Clique para remover "+itemName:"Escolha um item abaixo"}
+                title={itemId?t("builder.item.clickRemove",{item:itemName}):t("builder.item.chooseBelow")}
                 key={index}
               >
                 {itemImage&&<img src={itemImage} alt=""/>}
-                <span>{itemId?itemName:"Item "+(index+1)}</span>
+                <span>{itemId?itemName:t("builder.item.label",{index:index+1})}</span>
               </button>;
             })}
           </div>
 
           <div className="builder-item-history">
             <div className="builder-subhead">
-              <span>SEU HISTÓRICO COM ESTE CHAMPION</span>
+              <span>{t("builder.item.history")}</span>
               <small>{selectedUnitItemHistory.games
-                ?selectedUnitItemHistory.games+" partida"+(selectedUnitItemHistory.games===1?"":"s")+" encontrada"+(selectedUnitItemHistory.games===1?"":"s")
-                :"Nenhuma partida carregada com esta unidade"}</small>
+                ?t("builder.item.historyFound",{count:selectedUnitItemHistory.games})
+                :t("builder.item.historyEmpty")}</small>
             </div>
             {selectedUnitItemHistory.items.length>0
               ?<div className="builder-history-items">
@@ -1937,19 +1937,19 @@ export default function TeamBuilderPage({
                   const full=(selectedItemUnit.items?.length||0)>=3;
                   return <button disabled={full} onClick={()=>addItem(row.id)} title={name} key={row.id}>
                     <span>{src&&<img src={src} alt=""/>}</span>
-                    <div><strong>{name}</strong><small>{row.games}x · média {row.avgPlacement.toFixed(2)}</small></div>
+                    <div><strong>{name}</strong><small>{t("builder.item.historyRow",{count:row.games,average:row.avgPlacement.toFixed(2)})}</small></div>
                   </button>;
                 })}
               </div>
-              :<p className="builder-empty-check">Sem itemização pessoal suficiente. Use a biblioteca abaixo sem tratar os itens como recomendação.</p>}
+              :<p className="builder-empty-check">{t("builder.item.notEnough")}</p>}
           </div>
 
           <div className="builder-item-library">
             <div className="builder-subhead">
-              <span>BIBLIOTECA DE ITENS</span>
-              <small>Data Dragon · clique para equipar até 3 itens</small>
+              <span>{t("builder.item.library")}</span>
+              <small>{t("builder.item.libraryDesc")}</small>
             </div>
-            <input value={itemQuery} onChange={event=>setItemQuery(event.target.value)} placeholder="Pesquisar item..."/>
+            <input value={itemQuery} onChange={event=>setItemQuery(event.target.value)} placeholder={t("builder.item.search")}/>
             <div className="builder-item-grid">
               {items.map(item=>{
                 const full=(selectedItemUnit.items?.length||0)>=3;
@@ -1964,8 +1964,8 @@ export default function TeamBuilderPage({
 
         <div className="builder-traits builder-traits-v2">
           <div className="builder-subhead">
-            <span>TRAITS EM TEMPO REAL</span>
-            <small>Contagem estrutural das unidades escolhidas. O Chibi não inventa breakpoint que o Data Dragon não expôs.</small>
+            <span>{t("builder.traits.live")}</span>
+            <small>{t("builder.traits.desc")}</small>
           </div>
           <div>
             {traitCounts.length?traitCounts.map(([trait,count])=>{
@@ -1976,7 +1976,7 @@ export default function TeamBuilderPage({
                 <span>{entry?.name||clean(trait)}</span>
                 <em>{count}</em>
               </b>;
-            }):<small>Adicione unidades para ver as synergies disponíveis.</small>}
+            }):<small>{t("builder.traits.empty")}</small>}
           </div>
         </div>
       </div>
@@ -1985,14 +1985,14 @@ export default function TeamBuilderPage({
         <div className="builder-panel-head">
           <div>
             <span>CHAMPIONS</span>
-            <h2>Biblioteca</h2>
+            <h2>{t("builder.library")}</h2>
           </div>
         </div>
 
-        <input value={query} onChange={event=>setQuery(event.target.value)} placeholder="Pesquisar champion..."/>
+        <input value={query} onChange={event=>setQuery(event.target.value)} placeholder={t("builder.champion.search")}/>
 
-        <div className="builder-cost-filters" aria-label="Filtrar champions por custo">
-          <button className={costFilter===0?"active":""} onClick={()=>setCostFilter(0)}>Todos</button>
+        <div className="builder-cost-filters" aria-label={t("builder.champion.filterAria")}>
+          <button className={costFilter===0?"active":""} onClick={()=>setCostFilter(0)}>{t("builder.all")}</button>
           {[1,2,3,4,5].map(cost=>(
             <button className={(costFilter===cost?"active ":"")+"cost-"+cost} onClick={()=>setCostFilter(cost)} key={cost}>{cost}g</button>
           ))}
@@ -2005,7 +2005,7 @@ export default function TeamBuilderPage({
             return <button
               className={selectedId===row.id?"selected":""}
               onClick={()=>{setSelectedItemHex(null);setSelectedId(row.id);}}
-              title={"Adicionar "+row.name}
+              title={t("builder.champion.add",{name:row.name})}
               key={row.id}
             >
               <span className={"cost-"+row.cost}>{src&&<img src={src} alt=""/>}</span>
@@ -2017,8 +2017,8 @@ export default function TeamBuilderPage({
 
         {units.length>0&&<section className="builder-candidates">
           <div className="builder-subhead">
-            <span>PEÇAS QUE CONVERSAM COM O BOARD</span>
-            <small>Ordenadas apenas por traits compartilhadas.</small>
+            <span>{t("builder.candidates")}</span>
+            <small>{t("builder.candidates.desc")}</small>
           </div>
           <div>
             {candidateUnits.slice(0,6).map(candidate=>{
@@ -2034,7 +2034,7 @@ export default function TeamBuilderPage({
               </button>;
             })}
           </div>
-          {!candidateUnits.length&&<p className="builder-empty-check">Nenhuma continuação estrutural encontrada no catálogo atual.</p>}
+          {!candidateUnits.length&&<p className="builder-empty-check">{t("builder.candidates.empty")}</p>}
         </section>}
       </aside>
 
@@ -2042,28 +2042,30 @@ export default function TeamBuilderPage({
         <div className="builder-panel-head">
           <div>
             <span>CHIBI CHECK</span>
-            <h2>O que seu histórico diz?</h2>
+            <h2>{t("builder.check.title")}</h2>
           </div>
         </div>
 
         {!hasProfile&&<div className="builder-empty-check">
-          Abra um perfil primeiro para comparar este board com o histórico do jogador.
+          {t("builder.check.noProfile")}
         </div>}
 
         {hasProfile&&units.length<3&&<div className="builder-empty-check">
-          Monte pelo menos 3 unidades para liberar a comparação pessoal.
+          {t("builder.check.needThree")}
         </div>}
 
         {hasProfile&&units.length>=3&&<>
           <div className="builder-fit-main">
-            <span>BOARDS PARECIDOS</span>
+            <span>{t("builder.check.similar")}</span>
             <strong>{similar.length}</strong>
             <small>{average!=null
-              ?"média "+average.toFixed(2)
-                +(top4Rate!=null?" · Top 4 "+top4Rate+"%":"")
-                +(itemAssignments?" · itens "+(contextOverlap.item!=null?Math.round(contextOverlap.item*100)+"%":"configurados"):"")
-                +(selectedAugments.length?" · aug. "+(contextOverlap.augment!=null?Math.round(contextOverlap.augment*100)+"%":"configurados"):"")
-              :"nenhum comparável forte ainda"}</small>
+              ?t("builder.check.summary",{
+                average:average.toFixed(2),
+                top4:top4Rate!=null?t("builder.check.top4",{value:top4Rate}):"",
+                items:itemAssignments?t("builder.check.items",{value:contextOverlap.item!=null?Math.round(contextOverlap.item*100)+"%":t("builder.check.configured")}):"",
+                augments:selectedAugments.length?t("builder.check.augments",{value:contextOverlap.augment!=null?Math.round(contextOverlap.augment*100)+"%":t("builder.check.configured")}):"",
+              })
+              :t("builder.check.none")}</small>
           </div>
 
           {similar.length>0?<div className="builder-similar-list builder-similar-list-v2">
@@ -2072,20 +2074,20 @@ export default function TeamBuilderPage({
               return <article key={match.id}>
                 <b>{match.placement}º</b>
                 <span>
-                  <strong>{Math.round(score*100)}% semelhante</strong>
-                  <small>nível {match.level} · {match.goldLeft}g final · {match.units.filter(unit=>unit.tier>=3).length} 3★{itemFit!=null?" · itens "+Math.round(itemFit*100)+"%":""}{augmentSimilarity(selectedAugments,match)!=null?" · aug. "+Math.round((augmentSimilarity(selectedAugments,match)||0)*100)+"%":""}</small>
+                  <strong>{t("builder.check.similarity",{value:Math.round(score*100)})}</strong>
+                  <small>{t("builder.check.matchMeta",{level:match.level,gold:match.goldLeft,stars:match.units.filter(unit=>unit.tier>=3).length,items:itemFit!=null?t("builder.check.items",{value:Math.round(itemFit*100)+"%"}):"",augments:augmentSimilarity(selectedAugments,match)!=null?t("builder.check.augments",{value:Math.round((augmentSimilarity(selectedAugments,match)||0)*100)+"%"}):""})}</small>
                 </span>
               </article>;
             })}
-          </div>:<p className="builder-empty-check">Seu histórico carregado ainda não tem boards suficientemente parecidos.</p>}
+          </div>:<p className="builder-empty-check">{t("builder.check.noSimilar")}</p>}
 
           {similar.length>0&&<button className="builder-evidence-button" onClick={()=>onEvidence(similar.map(row=>row.match.id),"Team Builder · boards parecidos")}>
-            Ver evidências no histórico
+            {t("builder.check.evidence")}
           </button>}
         </>}
       </aside>
     </section>
 
-    <p className="builder-disclaimer">O Builder compara estrutura final, traits, itens e augments configurados com o histórico carregado. Transições mostram custo bruto das cópias-alvo, sem estimar rerolls, XP ou probabilidade de loja. O posicionamento é analisado apenas no board montado, porque a API não expõe posições históricas. O Chibi não trata similaridade como causalidade.</p>
+    <p className="builder-disclaimer">{t("builder.disclaimer")}</p>
   </main>;
 }
