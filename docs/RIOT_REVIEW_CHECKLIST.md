@@ -7,6 +7,7 @@ This checklist tracks the public-facing state of chibi.gg while the Riot product
 ## Product URL
 
 - Public URL: https://helioconde.github.io/chibi.gg/
+- Reviewer entry point: https://helioconde.github.io/chibi.gg/review.html
 - Riot verification file: `/riot.txt`
 - Product focus: Teamfight Tactics
 
@@ -69,17 +70,18 @@ The public product must not be changed to provide:
 
 ## Before responding to Riot
 
-1. Open the production URL in a clean browser session.
-2. Open `/?demo=review` and verify the full synthetic review flow works without a Riot API call.
-3. Search a valid Riot ID and verify the real profile/history flow when the temporary key is available.
-4. Open Chibi Review and one match detail.
-5. Open Comps and confirm sample/confidence labels.
-6. Open Ask Chibi and verify evidence base/limits.
-7. Open How It Works, Privacy and Terms from the footer and also test the direct `.html` URLs.
-8. Confirm the Riot boilerplate is visible.
-9. Confirm `/riot.txt` is still publicly reachable.
-10. Take screenshots of the submitted description and any approval response for the Overwolf follow-up.
-11. If Riot instructs RSO integration, preserve the app message/instructions together with the approval screenshot.
+1. Open `/review.html` in a clean browser session and confirm every reviewer resource is reachable.
+2. Open the normal production URL.
+3. Open `/?demo=review` and verify the full synthetic review flow works without a Riot API call.
+4. Search a valid Riot ID and verify the real profile/history flow when the temporary key is available.
+5. Open Chibi Review and one match detail.
+6. Open Comps and confirm sample/confidence labels.
+7. Open Ask Chibi and verify evidence base/limits.
+8. Open How It Works, Privacy and Terms from the footer and also test the direct `.html` URLs.
+9. Confirm the Riot boilerplate is visible.
+10. Confirm `/riot.txt` is still publicly reachable.
+11. Take screenshots of the submitted description and any approval response for the Overwolf follow-up.
+12. If Riot instructs RSO integration, preserve the app message/instructions together with the approval screenshot.
 
 ## Official references
 
