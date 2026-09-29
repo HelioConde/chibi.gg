@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080c12">
+  <meta name="description" content="Ponto de entrada para revisão do protótipo público chibi.gg por Riot/Overwolf.">
+  <link rel="icon" href="./img/icon.png">
+  <link rel="stylesheet" href="./legal.css">
+  <title>chibi.gg — Reviewer entry point</title>
+</head>
+<body>
+  <main class="wrap">
+    <header class="top">
+      <a class="brand" href="./"><img src="./img/icon.png" alt=""><span>chibi.gg</span></a>
+      <nav class="nav" aria-label="Reviewer resources">
+        <a href="./about.html">Como funciona</a>
+        <a href="./privacy.html">Privacidade</a>
+        <a href="./terms.html">Termos</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <span class="eyebrow">REVIEWER ENTRY POINT</span>
+      <h1>Um caminho curto para<br><em>avaliar o Chibi.gg.</em></h1>
+      <p class="lead">Esta página reúne o protótipo, a demonstração sintética e os documentos públicos necessários para revisar o escopo do produto sem depender de uma Riot API key temporária.</p>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h2>1. Demonstração sintética</h2>
+        <p>Perfil fictício com 12 partidas, histórico, Coach, Ask Chibi e detalhes de partida. Não chama a Riot API e todo dado de jogador é explicitamente marcado como sintético.</p>
+        <p><a href="./?demo=review">Abrir reviewer demo →</a></p>
+      </article>
+
+      <article class="card">
+        <h2>2. Protótipo público</h2>
+        <p>Fluxo real por Riot ID usado para demonstrar perfil e histórico quando uma chave temporária está disponível. O fluxo de produção pessoal está preparado para migrar para RSO após aprovação.</p>
+        <p><a href="./">Abrir protótipo →</a></p>
+      </article>
+
+      <article class="card">
+        <h2>3. Como funciona</h2>
+        <p>Fontes de dados, Chibi Dataset, limitações da Match API e os limites de gameplay do produto.</p>
+        <p><a href="./about.html">Ler escopo técnico →</a></p>
+      </article>
+
+      <article class="card">
+        <h2>4. Política e verificação</h2>
+        <p>Privacidade, Termos, arquivo de verificação Riot e repositório público.</p>
+        <p>
+          <a href="./privacy.html">Privacidade</a> ·
+          <a href="./terms.html">Termos</a> ·
+          <a href="./riot.txt">riot.txt</a> ·
+          <a href="https://github.com/HelioConde/chibi.gg">GitHub</a>
+        </p>
+      </article>
+    </section>
+
+    <section class="card">
+      <h2>Escopo de gameplay</h2>
+      <ul>
+        <li>Review pós-partida e análise evidence-first.</li>
+        <li>Sem opponent scouting em tempo real.</li>
+        <li>Sem rastrear boards adversários para sugerir a próxima ação.</li>
+        <li>Sem automação de compra, venda, reroll, level up ou posicionamento.</li>
+        <li>Sem MMR/ELO alternativo.</li>
+        <li>Companion público atual é demonstração; qualquer integração live depende de aprovação e continua review-first.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>Riot Sign On</h2>
+      <p>O protótipo atual usa Riot ID para que o produto possa ser avaliado antes da aprovação. Para self-history em produção, o plano técnico do Chibi é migrar para Riot Sign On quando a aplicação de produção for aprovada e a Riot disponibilizar o onboarding/credenciais aplicáveis.</p>
+    </section>
+
+    <section class="notice">
+      <strong>RIOT GAMES NOTICE</strong>
+      <p>Chibi.gg isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.</p>
+      <p>Chibi.gg was created under Riot Games' "Legal Jibber Jabber" policy using assets owned by Riot Games. Riot Games does not endorse or sponsor this project.</p>
+    </section>
+
+    <footer class="footer">
+      Review URL: <code>/review.html</code> ·
+      <a href="https://developer.riotgames.com/policies/general">Riot Developer General Policies</a> ·
+      <a href="https://www.riotgames.com/en/legal">Riot Legal</a>
+    </footer>
+  </main>
+</body>
+</html>
