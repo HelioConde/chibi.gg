@@ -8,7 +8,7 @@ O chibi.gg não tenta ser apenas mais um site de estatísticas ou uma tier list.
 
 ## Estado atual
 
-A **Etapa 1** está estável e a **Etapa 2** está em andamento. A primeira prioridade de Comps v2 — decisão de spot — já foi concluída.
+A **Etapa 1** está estável, as três prioridades da **Etapa 2** estão concluídas e o produto está preparado para a revisão da Riot.
 
 Principais áreas já implementadas:
 
@@ -31,7 +31,11 @@ Principais áreas já implementadas:
 - Overlay desktop em Python em [`overlay-python/`](overlay-python/);
 - Study / compartilhamento;
 - observações anônimas no Supabase;
-- GitHub Pages com deploy automático.
+- GitHub Pages com deploy automático;
+- reviewer entry point em `/review.html`;
+- demo sintética de revisão em `/?demo=review`;
+- páginas estáveis de Como funciona, Privacidade e Termos;
+- plano documentado de Riot Sign On para pós-aprovação.
 
 ## Filosofia de produto
 
@@ -157,4 +161,15 @@ As três prioridades atuais da Etapa 2 estão concluídas:
 - assinatura adaptativa de comps (`adaptive-traits-v2`);
 - Ask Chibi evidence-first.
 
-A próxima frente é **Riot review readiness**: About/How It Works, Privacy, Terms, boilerplate legal visível e explicação pública dos limites de dados e de gameplay.
+O próximo gate é a **Riot Production Application**. A review readiness já está implementada.
+
+Links públicos úteis para o reviewer:
+
+- `/review.html` — ponto de entrada da revisão;
+- `/?demo=review` — demo sintética, sem depender da Riot API;
+- `/about.html` — como funciona e limites;
+- `/privacy.html` — privacidade;
+- `/terms.html` — termos;
+- `/riot.txt` — arquivo de verificação.
+
+Depois da aprovação, o fluxo pessoal deve avançar para Riot Sign On conforme `docs/RSO_PLAN.md` e as instruções provisionadas pela Riot.
