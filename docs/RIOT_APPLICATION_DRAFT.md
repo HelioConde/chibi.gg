@@ -15,6 +15,7 @@ Last updated: 2026-09-29
 - **How it works:** https://helioconde.github.io/chibi.gg/about.html
 - **Privacy:** https://helioconde.github.io/chibi.gg/privacy.html
 - **Terms:** https://helioconde.github.io/chibi.gg/terms.html
+- **Reviewer entry point:** https://helioconde.github.io/chibi.gg/review.html
 - **Reviewer demo (synthetic):** https://helioconde.github.io/chibi.gg/?demo=review
 
 ## Proposed production description
@@ -41,7 +42,7 @@ If the form provides a shorter field:
 
 ## User flow to describe to Riot
 
-1. User opens Chibi.gg. Riot reviewers can use the normal Riot-ID flow or the clearly labeled synthetic reviewer demo if a temporary development key is unavailable.
+1. Riot reviewer can start at `/review.html`, which links the normal prototype, synthetic reviewer demo, legal pages, verification file and repository. The synthetic demo remains available if a temporary development key is unavailable.
 2. Prototype: user enters a Riot ID and region to demonstrate the product.
 3. Chibi loads TFT profile/rank and recent match history through server-side Riot API calls.
 4. The player sees match history first, then evidence-first review/coach tools.
