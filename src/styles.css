@@ -18316,6 +18316,16 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
 
 
 /* i18n language switcher */
+
+.topbar-actions{
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.topbar-actions .ghost-button{
+  margin-left:0;
+}
 .language-switcher{
   display:inline-flex;
   align-items:center;
@@ -18352,6 +18362,28 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
     padding-inline:8px;
   }
   .language-switcher span{
+    display:none;
+  }
+}
+
+
+@media (max-width:980px){
+  .topbar>.topbar-actions{
+    grid-area:login;
+    margin-left:0;
+    justify-self:end;
+  }
+  .topbar-actions .ghost-button{
+    min-height:34px;
+    padding:8px 10px;
+    font-size:10px;
+  }
+}
+@media (max-width:620px){
+  .topbar-actions{
+    gap:5px;
+  }
+  .topbar-actions .ghost-button{
     display:none;
   }
 }
