@@ -232,24 +232,25 @@ Entregue:
 
 A página deve continuar tratando familiaridade como **recorrência pessoal**, não como tier.
 
-### Prioridade 2 — Comps v2: assinatura melhor
+### Prioridade 2 — Comps v2: assinatura melhor ✅ primeira iteração
 
-Hoje `public-tft-comps` agrupa principalmente pelas duas traits centrais.
+Medição realizada no Set 18 / Ranqueada antes de alterar o algoritmo:
 
-Melhoria futura:
+- 176 participantes observados;
+- assinatura rígida de 2 traits: 104 grupos, mediana 1 jogo, apenas 15 grupos com 3+ jogos;
+- adicionar um anchor unit diretamente fragmentou ainda mais a base;
+- assinatura adaptativa por par de traits com fallback para trait principal: 47 grupos, mediana 3 jogos, 35 grupos com 3+ jogos;
+- nos grupos com 3+ jogos, o método adaptativo por traits teve melhor presença média compartilhada de unidades do que o split por anchor unit testado.
 
-- estudar assinatura híbrida de traits + core units;
-- evitar juntar boards muito diferentes que compartilham apenas duas traits;
-- não fragmentar demais a amostra;
-- preservar compatibilidade com dados históricos existentes.
+Decisão implementada em `public-tft-comps`:
 
-Antes de trocar o algoritmo:
+- modo `adaptive-traits-v2`;
+- pares de traits só criam identidade própria quando atingem `max(3,minGames)`;
+- pares raros recuam para a trait principal;
+- a API expõe `signatureMode` e `signatureThreshold`;
+- o frontend explica que o agrupamento é adaptativo.
 
-1. medir quantos grupos existem hoje;
-2. medir o tamanho de cada grupo;
-3. estimar quantos grupos seriam criados por uma assinatura híbrida;
-4. evitar fragmentar amostras pequenas;
-5. manter compatibilidade com o frontend atual de Comps v2.
+A ideia de assinatura híbrida com core unit **não foi descartada**, mas foi adiada porque o teste atual reduziu a coerência média e fragmentou mais a amostra. Reavaliar quando o Chibi Dataset tiver significativamente mais partidas.
 
 ### Prioridade 3 — Ask Chibi com evidência
 
@@ -291,10 +292,10 @@ Antes de editar:
 5. Não exponha Riot API key nem Supabase service role no frontend.
 6. Não faça afirmações causais que a Riot Match API não suporta.
 
-Comece pela Etapa 2 / Prioridade 2 descrita no handoff:
-Comps v2 — assinatura híbrida de traits + core units.
+Comece pela Etapa 2 / Prioridade 3 descrita no handoff:
+Ask Chibi com evidência.
 
-Antes de alterar o agrupamento, meça a base atual e registre o impacto esperado.
+Respostas sobre o histórico do jogador devem apontar partidas, amostra, confiança e limites do dado.
 
 Faça mudanças pequenas e verificáveis. Depois de cada bloco relevante, rode typecheck e build.
 ```
@@ -303,4 +304,4 @@ Faça mudanças pequenas e verificáveis. Depois de cada bloco relevante, rode t
 
 A Etapa 1 e a Comps v2 / Prioridade 1 devem permanecer utilizáveis mesmo se a próxima mudança for interrompida.
 
-Próximo checkpoint recomendado: medir e testar a assinatura híbrida de comps sem degradar amostras pequenas. Se uma mudança grande exigir refatoração, faça de forma incremental e mantenha o build verde entre commits.
+Próximo checkpoint recomendado: tornar o Ask Chibi estritamente evidence-first para perguntas sobre o histórico do jogador. Se uma mudança grande exigir refatoração, faça de forma incremental e mantenha o build verde entre commits.
