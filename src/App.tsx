@@ -95,32 +95,34 @@ function fallbackTraitName(value:string){
     .trim();
 }
 
+type Translate=(key:string,vars?:Record<string,string|number>)=>string;
+
 function activeTraits(match:TftMatch){
   return match.traits
     .filter((t)=>t.numUnits>0 && (t.style>0 || t.numUnits>=2))
     .sort((a,b)=>b.style-a.style || b.numUnits-a.numUnits);
 }
 
-function formatClock(timestamp?:number){
+function formatClock(timestamp:number|undefined,locale:string){
   if(!timestamp) return "";
-  return new Date(timestamp).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+  return new Date(timestamp).toLocaleTimeString(locale,{hour:"2-digit",minute:"2-digit"});
 }
 
-function formatDay(timestamp?:number){
+function formatDay(timestamp:number|undefined,locale:string){
   if(!timestamp) return "";
-  return new Date(timestamp).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"});
+  return new Date(timestamp).toLocaleDateString(locale,{day:"2-digit",month:"2-digit"});
 }
 
-function formatWhen(timestamp?:number){
+function formatWhen(timestamp:number|undefined,locale:string,t:Translate){
   if(!timestamp) return "";
   const date=new Date(timestamp);
   const diff=Date.now()-date.getTime();
   const hours=Math.floor(diff/3600000);
-  if(hours<1) return "agora";
+  if(hours<1) return t("time.now");
   if(hours<24) return hours+"h";
   const days=Math.floor(hours/24);
   if(days<7) return days+"d";
-  return date.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"});
+  return date.toLocaleDateString(locale,{day:"2-digit",month:"2-digit"});
 }
 
 function displaySetName(value:string|undefined,setNumber?:number){
@@ -138,26 +140,26 @@ function placementClass(value:number){
   return "";
 }
 
-function matchReviewCue(match:TftMatch){
+function matchReviewCue(match:TftMatch,t:Translate){
   const threeStars=match.units.filter(unit=>unit.tier>=3).length;
 
   if(match.placement===1){
     return {
       tone:"good",
-      label:"Board referência",
+      label:t("reviewCue.reference"),
       title:threeStars>0
-        ? "Vitória com "+threeStars+" unidade(s) 3★ no board final."
-        : "Vitória: use este board final como referência do que converteu.",
+        ? t("reviewCue.referenceStars",{count:threeStars})
+        : t("reviewCue.referenceWin"),
     };
   }
 
   if(match.placement<=4){
     return {
       tone:"good",
-      label:"Top 4 sem fechar",
+      label:t("reviewCue.top4"),
       title:match.goldLeft>=10
-        ? "Top 4 com "+match.goldLeft+"g finais: investigue se havia uma janela de conversão."
-        : "Boa partida sem 1º: compare o board final com quem terminou acima.",
+        ? t("reviewCue.top4Gold",{gold:match.goldLeft})
+        : t("reviewCue.top4Compare"),
     };
   }
 
@@ -165,36 +167,36 @@ function matchReviewCue(match:TftMatch){
     if(match.goldLeft>=10){
       return {
         tone:"bad",
-        label:"Ouro não convertido",
-        title:"Bottom 2 terminando com "+match.goldLeft+"g: este é o primeiro sinal para revisar.",
+        label:t("reviewCue.gold"),
+        title:t("reviewCue.goldTitle",{gold:match.goldLeft}),
       };
     }
     if(match.level>=8){
       return {
         tone:"bad",
-        label:"Nível sem conversão",
-        title:"Bottom 2 mesmo terminando nível "+match.level+": chegar ao nível não bastou.",
+        label:t("reviewCue.level"),
+        title:t("reviewCue.levelTitle",{level:match.level}),
       };
     }
     return {
       tone:"bad",
-      label:"Revisar primeiro",
-      title:"Bottom 2: compare força final, upgrades e contestação visível.",
+      label:t("reviewCue.first"),
+      title:t("reviewCue.firstTitle"),
     };
   }
 
   if(match.level>=8){
     return {
       tone:"neutral",
-      label:"Nível alto · meio da lobby",
-      title:"Você chegou ao nível "+match.level+", mas o board terminou fora do Top 4.",
+      label:t("reviewCue.highLevel"),
+      title:t("reviewCue.highLevelTitle",{level:match.level}),
     };
   }
 
   return {
     tone:"neutral",
-    label:"Meio da lobby",
-    title:"Veja onde este board parou de ganhar força antes do Top 4.",
+    label:t("reviewCue.mid"),
+    title:t("reviewCue.midTitle"),
   };
 }
 
@@ -329,8 +331,15 @@ function readStudyRequest():StudyRequest|null{
   };
 }
 
-function sessionFocusLabel(value:string){
-  return ({economy:"Economia",positioning:"Posicionamento",flexibility:"Flexibilidade",items:"Itens",tempo:"Tempo",custom:"Personalizado"} as Record<string,string>)[value]||value;
+function sessionFocusLabel(value:string,t:Translate){
+  return ({
+    economy:t("sessionFocus.economy"),
+    positioning:t("sessionFocus.positioning"),
+    flexibility:t("sessionFocus.flexibility"),
+    items:t("sessionFocus.items"),
+    tempo:t("sessionFocus.tempo"),
+    custom:t("sessionFocus.custom"),
+  } as Record<string,string>)[value]||value;
 }
 
 type ProfileTab = "overview"|"coach"|"matches"|"share";
@@ -363,7 +372,7 @@ function matchRoundLabel(match:TftMatch){
 }
 
 function App() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [riotId,setRiotId]=useState("");
   const [demoMode,setDemoMode]=useState(false);
   const [platform,setPlatform]=useState("br1");
@@ -594,18 +603,18 @@ function App() {
     const bottom2=analysisMatches.filter(match=>match.placement>=7).length;
     const avg=dna.avgPlacement;
     const avgLabel=avg==null
-      ? "amostra insuficiente"
+      ? t("profile.avg.insufficient")
       : avg<=4
-        ? "acima do meio da lobby"
+        ? t("profile.avg.above")
         : avg<=4.75
-          ? "próximo do meio da lobby"
-          : "abaixo do meio da lobby";
+          ? t("profile.avg.near")
+          : t("profile.avg.below");
 
     return {total,top4,wins,bottom2,avgLabel};
-  },[analysisMatches,dna.avgPlacement]);
+  },[analysisMatches,dna.avgPlacement,t]);
 
   const trendStats=useMemo(()=>{
-    if(analysisMatches.length<6) return {label:"Pouca amostra",detail:"carregue ao menos 6 partidas",tone:""};
+    if(analysisMatches.length<6) return {label:t("profile.trend.low"),detail:t("profile.trend.load"),tone:""};
     const window=Math.min(3,Math.floor(analysisMatches.length/2));
     const recent=analysisMatches.slice(0,window);
     const previous=analysisMatches.slice(window,window*2);
@@ -613,10 +622,10 @@ function App() {
     const recentAvg=avg(recent);
     const previousAvg=avg(previous);
     const delta=recentAvg-previousAvg;
-    if(delta<=-.45) return {label:"Melhorando",detail:`${recentAvg.toFixed(2)} vs ${previousAvg.toFixed(2)} antes`,tone:"good"};
-    if(delta>=.45) return {label:"Piorando",detail:`${recentAvg.toFixed(2)} vs ${previousAvg.toFixed(2)} antes`,tone:"warning"};
-    return {label:"Estável",detail:`${recentAvg.toFixed(2)} vs ${previousAvg.toFixed(2)} antes`,tone:""};
-  },[analysisMatches]);
+    if(delta<=-.45) return {label:t("profile.trend.improving"),detail:t("profile.trend.vsBefore",{recent:recentAvg.toFixed(2),previous:previousAvg.toFixed(2)}),tone:"good"};
+    if(delta>=.45) return {label:t("profile.trend.worsening"),detail:t("profile.trend.vsBefore",{recent:recentAvg.toFixed(2),previous:previousAvg.toFixed(2)}),tone:"warning"};
+    return {label:t("profile.trend.stable"),detail:t("profile.trend.vsBefore",{recent:recentAvg.toFixed(2),previous:previousAvg.toFixed(2)}),tone:""};
+  },[analysisMatches,t]);
 
   const historyBaseMatches=useMemo(()=>{
     if(!evidenceIds?.length)return analysisMatches;
@@ -946,7 +955,7 @@ function App() {
         window.history.replaceState({},"",url.toString());
       }
     }catch(err){
-      setError(err instanceof Error ? err.message : "Não foi possível consultar este jogador agora.");
+      setError(err instanceof Error ? err.message : t("profile.error.player"));
     }finally{
       setLoading(false);
     }
@@ -1035,7 +1044,7 @@ function App() {
       });
       setHasMore(next.length >= 20);
     }catch(err){
-      setError(err instanceof Error ? err.message : "Não foi possível carregar mais partidas.");
+      setError(err instanceof Error ? err.message : t("profile.error.more"));
     }finally{
       setLoadingMore(false);
     }
@@ -1078,7 +1087,7 @@ function App() {
       const detail=await fetchTftMatch(match.id);
       setSelectedMatch(detail);
     }catch(err){
-      setMatchError(err instanceof Error ? err.message : "Não foi possível abrir esta partida.");
+      setMatchError(err instanceof Error ? err.message : t("profile.error.match"));
     }finally{
       setMatchLoading(false);
     }
