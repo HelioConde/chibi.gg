@@ -8,6 +8,7 @@ type Props={
   onRefresh:()=>void;
   compact?:boolean;
   contextCount?:number;
+  demo?:boolean;
 };
 
 function relativeTime(timestamp?:number){
@@ -28,6 +29,7 @@ export default function RiotDataBar({
   onRefresh,
   compact=false,
   contextCount,
+  demo=false,
 }:Props){
   const partial=profile.partial;
   const partialLabels=[
@@ -36,6 +38,23 @@ export default function RiotDataBar({
     partial?.history?"histórico":null,
   ].filter(Boolean) as string[];
   const source=profile.source;
+
+  if(demo){
+    return <section className={"riot-data-bar "+(compact?"compact ":"")+"demo"}>
+      <div className="riot-data-primary">
+        <div className="riot-data-title">
+          <span className="riot-data-dot"></span>
+          <div>
+            <strong>Demonstração sintética</strong>
+            <small>{matchCount} partidas fictícias · sem consulta à Riot API</small>
+          </div>
+        </div>
+      </div>
+      <div className="riot-data-side">
+        <span className="riot-demo-chip">REVIEW MODE</span>
+      </div>
+    </section>;
+  }
 
   if(compact){
     return <section className={"riot-data-bar compact "+(partialLabels.length?"partial":"complete")}>
