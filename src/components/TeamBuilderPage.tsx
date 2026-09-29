@@ -13,6 +13,7 @@ import {
   getBuilderPresets,
   saveBuilderPreset,
 } from "../builderPresets";
+import { useI18n } from "../i18n";
 
 type Props={
   staticData:TftStaticData|null;
@@ -127,6 +128,7 @@ export default function TeamBuilderPage({
   onEvidence,
   initialChampionIds=[],
 }:Props){
+  const { t, locale } = useI18n();
   const [query,setQuery]=useState("");
   const [selectedId,setSelectedId]=useState<string|null>(null);
   const [units,setUnits]=useState<HexBoardUnit[]>([]);
@@ -805,47 +807,47 @@ export default function TeamBuilderPage({
     if(!units.length){
       return {
         tone:"neutral",
-        title:"Comece pelo core que você quer testar",
-        body:"Adicione 3 ou mais unidades. O Chibi cruza champions, traits e seu histórico somente depois que há estrutura suficiente.",
+        title:t("builder.decision.start.title"),
+        body:t("builder.decision.start.body"),
       };
     }
 
     if(overSlots>0){
       return {
         tone:"warning",
-        title:"O board excede o nível-alvo",
-        body:"Você montou "+units.length+" unidades para um alvo de nível "+targetLevel+". Remova "+overSlots+" peça"+(overSlots===1?"":"s")+" ou aumente o nível-alvo antes de comparar.",
+        title:t("builder.decision.over.title"),
+        body:t("builder.decision.over.body",{units:units.length,level:targetLevel,over:overSlots}),
       };
     }
 
     if(openSlots>0&&candidateUnits[0]){
       return {
         tone:"neutral",
-        title:"Você ainda tem "+openSlots+" vaga"+(openSlots===1?"":"s")+" no nível "+targetLevel,
-        body:"Para o próximo teste, "+candidateUnits[0].name+" compartilha "+candidateUnits[0].shared.length+" trait"+(candidateUnits[0].shared.length===1?"":"s")+" com a estrutura atual. Isso é compatibilidade estrutural, não recomendação de meta.",
+        title:t("builder.decision.open.title",{open:openSlots,level:targetLevel}),
+        body:t("builder.decision.open.body",{name:candidateUnits[0].name,traits:candidateUnits[0].shared.length}),
       };
     }
 
     if(similar.length>=3&&average!=null&&average<=4.25){
       return {
         tone:"good",
-        title:"Seu histórico já mostrou bons resultados parecidos",
-        body:"Há "+similar.length+" boards comparáveis com média "+average.toFixed(2)+" e Top 4 de "+top4Rate+"%. Use isso como evidência pessoal, não como garantia de resultado.",
+        title:t("builder.decision.good.title"),
+        body:t("builder.decision.good.body",{count:similar.length,average:average.toFixed(2),top4:top4Rate}),
       };
     }
 
     if(similar.length>=3&&average!=null&&average>=5){
       return {
         tone:"warning",
-        title:"Seu histórico pede cautela com esta estrutura",
-        body:"Os "+similar.length+" boards mais próximos ficaram em média "+average.toFixed(2)+". Vale testar uma troca antes de tratar esta versão como sua rota padrão.",
+        title:t("builder.decision.caution.title"),
+        body:t("builder.decision.caution.body",{count:similar.length,average:average.toFixed(2)}),
       };
     }
 
     return {
       tone:"neutral",
-      title:"Board fechado; agora compare variantes",
-      body:"O histórico ainda não é forte o suficiente para concluir. Troque uma peça por vez e observe como champions e traits mudam antes de salvar uma direção.",
+      title:t("builder.decision.closed.title"),
+      body:t("builder.decision.closed.body"),
     };
   },[
     units.length,
@@ -856,6 +858,7 @@ export default function TeamBuilderPage({
     similar.length,
     average,
     top4Rate,
+    t,
   ]);
 
   function addToHex(hex:number){
@@ -1094,20 +1097,20 @@ export default function TeamBuilderPage({
 
     const summary=[
       "chibi.gg · Team Builder",
-      "Nível "+targetLevel+" · "+units.length+" unidades · "+boardValue+"G",
+      t("builder.summary.level",{level:targetLevel,units:units.length,value:boardValue}),
       names.join(" · "),
       traits.length?"Traits: "+traits.join(" · "):"",
       selectedAugments.length
         ?"Augments: "+selectedAugments.map(id=>staticEntry(staticData?.augments,id)?.name||clean(id)).join(" · ")
         :"",
       transitionAnalysis
-        ?"Transição: "+transitionAnalysis.leaving.length+" saem · "+transitionAnalysis.entering.length+" entram · "+transitionAnalysis.copyCost+"G em cópias-alvo"
+        ?t("builder.summary.transition",{leaving:transitionAnalysis.leaving.length,entering:transitionAnalysis.entering.length,cost:transitionAnalysis.copyCost})
         :"",
       economyPlan&&economyPlan.queue.length
-        ?"Progresso: "+economyPlan.completed+"/"+economyPlan.queue.length+" alvos · "+economyPlan.totalRemainingCost+"G restantes"
+        ?t("builder.summary.progress",{done:economyPlan.completed,total:economyPlan.queue.length,remaining:economyPlan.totalRemainingCost})
         :"",
       economyPlan?.gold!=null
-        ?"Economia: "+economyPlan.gold+"G atual · "+economyPlan.reserve+"G reserva · "+economyPlan.spendable+"G livres"
+        ?t("builder.summary.economy",{gold:economyPlan.gold,reserve:economyPlan.reserve,free:economyPlan.spendable})
         :"",
     ].filter(Boolean).join("\n");
 
@@ -1123,27 +1126,25 @@ export default function TeamBuilderPage({
   return <main className="builder-page builder-v2 builder-v3 builder-v4 builder-v5 builder-v6 builder-v7 builder-v8">
     <section className="builder-hero">
       <div>
-        {hasProfile&&<button className="back-search" onClick={onBack}>← Voltar ao perfil</button>}
+        {hasProfile&&<button className="back-search" onClick={onBack}>{t("common.backProfile")}</button>}
         <span className="eyebrow">CHIBI LAB · TEAM BUILDER V8</span>
-        <h1>Monte o board.<br/><em>Teste uma decisão por vez.</em></h1>
-        <p>{initialChampionIds.length
-          ?"Comp carregada. Mova, remova ou substitua peças e compare variantes com o seu histórico."
-          :"Monte uma estrutura, veja traits e custos em tempo real e compare com partidas que você realmente jogou."}</p>
+        <h1>{t("builder.hero.title1")}<br/><em>{t("builder.hero.title2")}</em></h1>
+        <p>{initialChampionIds.length?t("builder.hero.loaded"):t("builder.hero.empty")}</p>
         <DDragonArt
           staticData={staticData}
           championIds={units.map(unit=>unit.id)}
           variant="ribbon"
-          label="Board visual · Data Dragon"
+          label={t("builder.riotVisual")}
         />
       </div>
 
       <div className="builder-summary builder-summary-v2">
-        <div><span>NÍVEL-ALVO</span><strong>{targetLevel}</strong></div>
-        <div><span>UNIDADES</span><strong className={overSlots>0?"warning":""}>{units.length}/{targetLevel}</strong></div>
+        <div><span>{t("builder.targetLevel")}</span><strong>{targetLevel}</strong></div>
+        <div><span>{t("builder.units")}</span><strong className={overSlots>0?"warning":""}>{units.length}/{targetLevel}</strong></div>
         <div><span>BOARD VALUE</span><strong>{boardValue}G</strong></div>
-        <div><span>CUSTO MÉDIO</span><strong>{averageUnitCost.toFixed(1)}G</strong></div>
+        <div><span>{t("builder.averageCost")}</span><strong>{averageUnitCost.toFixed(1)}G</strong></div>
         <div className="builder-level-control">
-          <span>PLANEJAR NÍVEL</span>
+          <span>{t("builder.planLevel")}</span>
           <div>
             {[6,7,8,9,10].map(level=>(
               <button
@@ -1155,99 +1156,99 @@ export default function TeamBuilderPage({
           </div>
         </div>
         <div className="builder-summary-actions">
-          <button onClick={saveCurrentBoard} disabled={!units.length}>Salvar board</button>
+          <button onClick={saveCurrentBoard} disabled={!units.length}>{t("builder.saveBoard")}</button>
           <button className="secondary" onClick={copyBoardSummary} disabled={!units.length}>
-            {copied?"Resumo copiado ✓":"Copiar resumo"}
+            {copied?t("builder.summaryCopied"):t("builder.copySummary")}
           </button>
           <button className={transitionBase?"transition-active":""} onClick={captureTransitionBase} disabled={!units.length}>
-            {transitionBase?"Atualizar board atual":"Marcar board atual"}
+            {transitionBase?t("builder.updateCurrent"):t("builder.markCurrent")}
           </button>
           <button onClick={()=>{
             setVariantA(units.map(unit=>({...unit,items:[...(unit.items||[])]})));
             setVariantAAugments([...selectedAugments]);
           }} disabled={!units.length}>
-            {variantA?"Atualizar versão A":"Salvar como versão A"}
+            {variantA?t("builder.updateA"):t("builder.saveA")}
           </button>
           {variantA&&<button className="secondary" onClick={()=>{
             setUnits(variantA.map(unit=>({...unit,items:[...(unit.items||[])]})));
             setSelectedAugments([...variantAAugments]);
             setSelectedId(null);
-          }}>Restaurar A</button>}
-          <button className="secondary" onClick={()=>{setUnits([]);setSelectedAugments([]);setSelectedId(null);setSelectedItemHex(null);setMovingHex(null);setTransitionBase(null);setTransitionBaseAugments([]);setTransitionProgress({});setEconomyGold("");setEconomyReserve("");}}>Limpar board</button>
+          }}>{t("builder.restoreA")}</button>}
+          <button className="secondary" onClick={()=>{setUnits([]);setSelectedAugments([]);setSelectedId(null);setSelectedItemHex(null);setMovingHex(null);setTransitionBase(null);setTransitionBaseAugments([]);setTransitionProgress({});setEconomyGold("");setEconomyReserve("");}}>{t("builder.clearBoard")}</button>
         </div>
       </div>
     </section>
 
     <section className="builder-decision-strip">
       <div className={"builder-decision-card "+decision.tone}>
-        <span>LEITURA DO BOARD</span>
+        <span>{t("builder.boardRead")}</span>
         <h2>{decision.title}</h2>
         <p>{decision.body}</p>
       </div>
 
       <div className="builder-board-facts">
-        <article><span>2★ OU MAIS</span><strong>{twoStars}/{units.length||0}</strong></article>
+        <article><span>{t("builder.twoStars")}</span><strong>{twoStars}/{units.length||0}</strong></article>
         <article><span>3★</span><strong>{threeStars}</strong></article>
-        <article><span>ITENS</span><strong>{itemAssignments}</strong></article>
+        <article><span>{t("builder.items")}</span><strong>{itemAssignments}</strong></article>
         <article><span>AUGMENTS</span><strong>{selectedAugments.length}/3</strong></article>
-        <article><span>POSIÇÃO</span><strong>{positionAnalysis.fit==null?"—":positionAnalysis.fit+"%"}</strong></article>
-        <article><span>TRAITS VISÍVEIS</span><strong>{traitCounts.length}</strong></article>
-        <article><span>COMPARÁVEIS</span><strong>{similar.length}</strong></article>
+        <article><span>{t("builder.position")}</span><strong>{positionAnalysis.fit==null?"—":positionAnalysis.fit+"%"}</strong></article>
+        <article><span>{t("builder.visibleTraits")}</span><strong>{traitCounts.length}</strong></article>
+        <article><span>{t("builder.comparables")}</span><strong>{similar.length}</strong></article>
       </div>
     </section>
 
     <section className="builder-planner-hud">
       <div className="builder-planner-head">
         <div>
-          <span>PLANO DO BOARD</span>
-          <h2>Qual é a próxima decisão?</h2>
-          <p>O Chibi organiza o que já está visível no seu board. Compatibilidade estrutural não é tier list nem recomendação automática.</p>
+          <span>{t("builder.plan")}</span>
+          <h2>{t("builder.nextDecision")}</h2>
+          <p>{t("builder.planDesc")}</p>
         </div>
         <div className={"builder-slot-state "+(overSlots>0?"warning":openSlots===0?"good":"")}>
           <small>SLOTS</small>
           <strong>{units.length}/{targetLevel}</strong>
-          <span>{overSlots>0?"excesso de "+overSlots:openSlots>0?openSlots+" vaga"+(openSlots===1?"":"s")+" aberta"+(openSlots===1?"":"s"):"board fechado"}</span>
+          <span>{overSlots>0?t("builder.slots.excess",{count:overSlots}):openSlots>0?t("builder.slots.open",{count:openSlots}):t("builder.slots.closed")}</span>
         </div>
       </div>
 
       <div className="builder-planner-grid">
         <article className="builder-plan-card focus">
-          <span>FOCO ATUAL</span>
+          <span>{t("builder.currentFocus")}</span>
           <strong>{primaryTrait
             ?(staticEntry(staticData?.traits,primaryTrait[0])?.name||clean(primaryTrait[0]))+" · "+primaryTrait[1]
-            :"Sem estrutura definida"}</strong>
+            :t("builder.noStructure")}</strong>
           <small>{primaryTrait
-            ?"Trait mais presente entre as peças escolhidas."
-            :"Adicione unidades para descobrir a estrutura dominante."}</small>
+            ?t("builder.primaryTrait")
+            :t("builder.addToDiscover")}</small>
         </article>
 
         <article className="builder-plan-card">
-          <span>PONTE BARATA</span>
+          <span>{t("builder.cheapBridge")}</span>
           <strong>{bridgeCandidate?bridgeCandidate.name:"—"}</strong>
           <small>{bridgeCandidate
             ?bridgeCandidate.cost+"g · conecta "+bridgeCandidate.shared.slice(0,2).map(id=>staticEntry(staticData?.traits,id)?.name||clean(id)).join(" + ")
-            :"Nenhuma peça de conexão visível."}</small>
-          {bridgeCandidate&&<button onClick={()=>{setSelectedItemHex(null);setSelectedId(bridgeCandidate.id);}}>Selecionar</button>}
+            :t("builder.noBridge")}</small>
+          {bridgeCandidate&&<button onClick={()=>{setSelectedItemHex(null);setSelectedId(bridgeCandidate.id);}}>{t("builder.select")}</button>}
         </article>
 
         <article className="builder-plan-card">
-          <span>PEÇA DE CAP</span>
+          <span>{t("builder.capPiece")}</span>
           <strong>{capCandidate?capCandidate.name:"—"}</strong>
           <small>{capCandidate
             ?capCandidate.cost+"g · compartilha "+capCandidate.shared.length+" trait"+(capCandidate.shared.length===1?"":"s")
-            :"Nenhuma peça 4g/5g conectada à estrutura atual."}</small>
+            :t("builder.noCap")}</small>
           {capCandidate&&<button onClick={()=>{setSelectedItemHex(null);setSelectedId(capCandidate.id);}}>Selecionar</button>}
         </article>
 
         <article className="builder-plan-card curve">
-          <span>CURVA DE CUSTO</span>
+          <span>{t("builder.costCurve")}</span>
           <div className="builder-cost-curve">
             {costCurve.map((count,index)=><b className={"cost-"+(index+1)} key={index}>
               <em>{index+1}g</em>
               <strong>{count}</strong>
             </b>)}
           </div>
-          <small>{units.length?averageUnitCost.toFixed(1)+"g de custo médio por unidade":"Board vazio"}</small>
+          <small>{units.length?t("builder.averageUnitCost",{value:averageUnitCost.toFixed(1)}):t("builder.emptyBoard")}</small>
         </article>
       </div>
 
@@ -1256,12 +1257,12 @@ export default function TeamBuilderPage({
           {selectedChampion.image&&<img src={selectedChampion.image} alt=""/>}
         </span>
         <div>
-          <small>CHAMPION SELECIONADO</small>
+          <small>{t("builder.selectedChampion")}</small>
           <strong>{selectedChampion.name} · {selectedChampion.cost}g</strong>
-          <p>{selectedChampion.traits.slice(0,3).map(id=>staticEntry(staticData?.traits,id)?.name||clean(id)).join(" · ")||"Sem traits carregadas"}</p>
+          <p>{selectedChampion.traits.slice(0,3).map(id=>staticEntry(staticData?.traits,id)?.name||clean(id)).join(" · ")||t("builder.noTraits")}</p>
         </div>
-        <b>Clique em um hex vazio para adicionar ou em uma unidade para substituir.</b>
-        <button onClick={()=>setSelectedId(null)}>Cancelar</button>
+        <b>{t("builder.selectedHint")}</b>
+        <button onClick={()=>setSelectedId(null)}>{t("builder.cancel")}</button>
       </div>}
     </section>
 
