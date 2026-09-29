@@ -220,7 +220,7 @@ export function answerChibiQuestion(question:string,matches:TftMatch[],playerKey
         queue[2]?"Use como referência: "+queue[2].placement+"º lugar · "+queue[2].reason:"Procure uma partida melhor como referência.",
       ],
       evidence:"Review Queue · "+queue.length+" partidas priorizadas",
-      confidence:enoughSample?confidenceBySample(matches.length):"baixa",
+      confidence:confidenceBySample(matches.length),
       matchIds:[next.matchId],
       followups:["Por que essa partida primeiro?","O que devo fazer agora?","Estou forçando comp?"],
     };
@@ -262,7 +262,7 @@ export function answerChibiQuestion(question:string,matches:TftMatch[],playerKey
         strong?"Revise se houve spots reais para pivotar nas partidas relacionadas.":"Continue observando antes de mudar seu estilo.",
       ],
       evidence:dominant.games+" de "+matches.length+" partidas · "+dominant.share+"%",
-      confidence:confidenceBySample(matches.length),
+      confidence:enoughSample?confidenceBySample(matches.length):"baixa",
       matchIds:dominant.matchIds,
       followups:["O que devo fazer agora?","Mostre o que está funcionando."],
     };
@@ -358,7 +358,7 @@ export function answerChibiQuestion(question:string,matches:TftMatch[],playerKey
         "Boards com 3★: "+archetype.dimensions.reroll+"%.",
       ],
       evidence:matches.length+" partidas no contexto atual",
-      confidence:confidenceBySample(matches.length),
+      confidence:enoughSample?confidenceBySample(matches.length):"baixa",
       matchIds:allIds,
       followups:["O que mudou recentemente?","Qual linha funciona melhor para mim?"],
     };
