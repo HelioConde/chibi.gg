@@ -139,8 +139,10 @@ O checkpoint técnico e o plano da próxima etapa estão em:
 
 Antes de continuar o projeto no Codex, leia esse arquivo inteiro.
 
-A próxima prioridade recomendada da Etapa 2 é:
+As três prioridades atuais da Etapa 2 estão concluídas:
 
-> **Ask Chibi com evidência**, garantindo que perguntas sobre o histórico do jogador apontem as partidas usadas, tamanho da amostra, confiança e limites do dado.
+- Comps v2 — decisão de spot;
+- assinatura adaptativa de comps (`adaptive-traits-v2`);
+- Ask Chibi evidence-first.
 
-A assinatura de Comps já usa o modo adaptativo `adaptive-traits-v2`, que evita criar grupos pequenos demais quando um par de traits ainda não possui amostra suficiente.
+A próxima frente é **Riot review readiness**: About/How It Works, Privacy, Terms, boilerplate legal visível e explicação pública dos limites de dados e de gameplay.
