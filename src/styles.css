@@ -18213,3 +18213,103 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
     gap:2px;
   }
 }
+
+
+/* -----------------------------------------------------------------------
+   Riot reviewer demo mode
+   ----------------------------------------------------------------------- */
+.home-review-demo-button{
+  width:100%;
+  margin-top:8px;
+  padding:10px 12px;
+  border:1px solid #2a3448;
+  border-radius:9px;
+  background:#0e151f;
+  color:#bac3d2;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  text-align:left;
+  cursor:pointer;
+}
+.home-review-demo-button strong{
+  color:#d9d4ff;
+  font-size:8px;
+}
+.home-review-demo-button small{
+  color:#6f7c91;
+  font-size:6px;
+}
+.home-review-demo-button:hover{
+  border-color:#6255c6;
+  background:rgba(117,99,231,.07);
+}
+.review-demo-banner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin:10px 0 12px;
+  padding:12px 14px;
+  border:1px solid rgba(117,99,231,.35);
+  border-radius:10px;
+  background:linear-gradient(90deg,rgba(117,99,231,.10),rgba(117,99,231,.025));
+}
+.review-demo-banner>div{
+  display:grid;
+  gap:3px;
+}
+.review-demo-banner span{
+  color:#9b8df5;
+  font-size:6px;
+  font-weight:950;
+  letter-spacing:.85px;
+}
+.review-demo-banner strong{
+  color:#dce2ec;
+  font-size:9px;
+}
+.review-demo-banner small{
+  color:#79869a;
+  font-size:7px;
+  line-height:1.45;
+}
+.review-demo-banner button{
+  flex:0 0 auto;
+  min-height:30px;
+  padding:6px 9px;
+  border:1px solid #5c50bb;
+  border-radius:7px;
+  background:rgba(117,99,231,.10);
+  color:#c5bcff;
+  font-size:7px;
+  font-weight:900;
+  cursor:pointer;
+}
+.riot-data-bar.demo{
+  border-color:rgba(117,99,231,.3);
+  background:rgba(117,99,231,.04);
+}
+.riot-data-bar.demo .riot-data-dot{
+  background:#8e7ff1;
+}
+.riot-demo-chip{
+  padding:5px 7px;
+  border:1px solid rgba(117,99,231,.32);
+  border-radius:6px;
+  color:#aa9fff;
+  font-size:6px;
+  font-weight:950;
+  letter-spacing:.7px;
+}
+@media(max-width:620px){
+  .home-review-demo-button,
+  .review-demo-banner{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .home-review-demo-button small{
+    line-height:1.4;
+  }
+}
