@@ -252,18 +252,33 @@ Decisão implementada em `public-tft-comps`:
 
 A ideia de assinatura híbrida com core unit **não foi descartada**, mas foi adiada porque o teste atual reduziu a coerência média e fragmentou mais a amostra. Reavaliar quando o Chibi Dataset tiver significativamente mais partidas.
 
-### Prioridade 3 — Ask Chibi com evidência
+### Prioridade 3 — Ask Chibi com evidência ✅
 
-O componente já existe no projeto.
+Concluída em 29/09/2026.
 
-Qualquer resposta futura deve apontar para:
+Entregue:
 
-- partidas usadas;
-- tamanho da amostra;
-- confiança;
-- limite do dado.
+- cada resposta mostra base/amostra usada;
+- confiança continua visível;
+- respostas apontam partidas relacionadas quando existem;
+- a UI mostra a origem do contexto e o limite do dado;
+- respostas baseadas em Riot deixam explícito que são snapshot final, sem shops, timing de roll, scouting ou HP por rodada;
+- Journal / Lessons / Session são identificados como contexto local complementar;
+- perguntas sobre Top 4, força de linha, estilo, Bottom 2 e causa principal foram suavizadas quando a amostra é pequena;
+- perguntas genéricas sobre “por que” e “o que fazer agora” não recebem diagnóstico forte com menos de 8 partidas.
 
-Não deixar o chatbot responder TFT genericamente quando a pergunta for sobre o histórico do jogador.
+A regra permanece: se a evidência não sustenta a conclusão, o Ask Chibi deve dizer que ainda não sabe.
+
+## 7.1 Próxima etapa recomendada — Riot review readiness
+
+Enquanto a Production Application está pendente, o próximo bloco recomendado é tornar o site explicitamente pronto para revisão:
+
+- página pública **Como o Chibi funciona**;
+- Privacy Policy;
+- Terms / regras do serviço;
+- boilerplate legal obrigatório da Riot em local visível;
+- descrição pública de fontes de dados e limitações;
+- deixar claro que o Chibi não é endossado pela Riot e não oferece scouting/opponent tracking/live decision automation.
 
 ## 8. Critério de conclusão de uma mudança
 
@@ -292,10 +307,10 @@ Antes de editar:
 5. Não exponha Riot API key nem Supabase service role no frontend.
 6. Não faça afirmações causais que a Riot Match API não suporta.
 
-Comece pela Etapa 2 / Prioridade 3 descrita no handoff:
-Ask Chibi com evidência.
+Comece pela próxima etapa descrita no handoff:
+Riot review readiness.
 
-Respostas sobre o histórico do jogador devem apontar partidas, amostra, confiança e limites do dado.
+Priorize About/How It Works, Privacy, Terms e boilerplate legal visível antes de adicionar novas features live.
 
 Faça mudanças pequenas e verificáveis. Depois de cada bloco relevante, rode typecheck e build.
 ```
@@ -304,4 +319,4 @@ Faça mudanças pequenas e verificáveis. Depois de cada bloco relevante, rode t
 
 A Etapa 1 e a Comps v2 / Prioridade 1 devem permanecer utilizáveis mesmo se a próxima mudança for interrompida.
 
-Próximo checkpoint recomendado: tornar o Ask Chibi estritamente evidence-first para perguntas sobre o histórico do jogador. Se uma mudança grande exigir refatoração, faça de forma incremental e mantenha o build verde entre commits.
+Próximo checkpoint recomendado: tornar o produto publicamente verificável e legível para a revisão da Riot, sem mudar o escopo aprovado. Se uma mudança grande exigir refatoração, faça de forma incremental e mantenha o build verde entre commits.
