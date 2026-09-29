@@ -5,6 +5,7 @@ import {
   TftLeaderboardPlayer,
 } from "../api/tft";
 import { profileIconUrl, TftStaticData } from "../tftStatic";
+import { useI18n } from "../i18n";
 
 type Tier="challenger"|"grandmaster"|"master";
 
@@ -25,6 +26,7 @@ const REGIONS=[
 ] as const;
 
 export default function LeaderboardPage({staticData,onOpenPlayer}:Props){
+  const { t } = useI18n();
   const [platform,setPlatform]=useState("br1");
   const [tier,setTier]=useState<Tier>("challenger");
   const [data,setData]=useState<TftLeaderboard|null>(null);
@@ -41,7 +43,7 @@ export default function LeaderboardPage({staticData,onOpenPlayer}:Props){
       .catch(err=>{
         if(cancelled)return;
         setData(null);
-        setError(err instanceof Error?err.message:"Não foi possível carregar o ranking.");
+        setError(err instanceof Error?err.message:t("leaderboard.errorLoad"));
       })
       .finally(()=>{if(!cancelled)setLoading(false);});
 
@@ -60,12 +62,12 @@ export default function LeaderboardPage({staticData,onOpenPlayer}:Props){
     <section className="leaderboard-hero">
       <div>
         <span className="eyebrow">TFT LEADERBOARD</span>
-        <h1>Quem está no topo.<br/><em>E como joga.</em></h1>
-        <p>Ranking oficial de LP da Riot com acesso direto ao perfil Chibi quando o Riot ID pode ser resolvido.</p>
+        <h1>{t("leaderboard.title1")}<br/><em>{t("leaderboard.title2")}</em></h1>
+        <p>{t("leaderboard.desc")}</p>
       </div>
 
       <div className="leaderboard-context">
-        <span>REGIÃO</span>
+        <span>{t("leaderboard.region")}</span>
         <strong>{platform.toUpperCase()}</strong>
         <small>{tier}</small>
       </div>
@@ -86,36 +88,36 @@ export default function LeaderboardPage({staticData,onOpenPlayer}:Props){
       </div>
     </section>
 
-    {loading&&<section className="panel meta-page-state">Carregando ranking da Riot...</section>}
-    {!loading&&error&&<section className="panel meta-page-state error">Não foi possível carregar o leaderboard agora.</section>}
+    {loading&&<section className="panel meta-page-state">{t("leaderboard.loading")}</section>}
+    {!loading&&error&&<section className="panel meta-page-state error">{t("leaderboard.loadFailed")}</section>}
 
     {!loading&&!error&&data&&<>
       <section className="leaderboard-highlights">
         <article className="panel">
           <span>#1 LP</span>
           <strong>{data.players[0]?.leaguePoints??"—"}</strong>
-          <small>{data.players[0]?.gameName||"Ranqueado #1"}</small>
+          <small>{data.players[0]?.gameName||t("leaderboard.rank1")}</small>
         </article>
         <article className="panel">
-          <span>MAIOR WIN RATE</span>
+          <span>{t("leaderboard.bestWinRate")}</span>
           <strong>{bestWinRate?bestWinRate.winRate+"%":"—"}</strong>
-          <small>{bestWinRate?.gameName||"jogador não identificado"}</small>
+          <small>{bestWinRate?.gameName||t("leaderboard.unidentified")}</small>
         </article>
         <article className="panel">
-          <span>MAIS PARTIDAS</span>
+          <span>{t("leaderboard.mostGames")}</span>
           <strong>{mostGames?.games??"—"}</strong>
-          <small>{mostGames?.gameName||"jogador não identificado"}</small>
+          <small>{mostGames?.gameName||t("leaderboard.unidentified")}</small>
         </article>
       </section>
 
       <section className="panel leaderboard-table-panel">
         <div className="leaderboard-table-head">
           <span>#</span>
-          <span>Jogador</span>
+          <span>{t("leaderboard.player")}</span>
           <span>LP</span>
-          <span>Jogos</span>
-          <span>V / D</span>
-          <span>Win rate</span>
+          <span>{t("leaderboard.games")}</span>
+          <span>{t("leaderboard.winLoss")}</span>
+          <span>{t("leaderboard.winRate")}</span>
           <span></span>
         </div>
 
@@ -125,7 +127,7 @@ export default function LeaderboardPage({staticData,onOpenPlayer}:Props){
               ?profileIconUrl(staticData.version,player.profileIconId)
               :"";
             const canOpen=Boolean(player.gameName&&player.tagLine);
-            const displayName=player.gameName||"Ranqueado #"+(index+1);
+            const displayName=player.gameName||(t("leaderboard.rank1").replace("#1","#"+(index+1)));
             return <article className={canOpen?"resolved":"unresolved"} key={player.summonerId||index}>
               <b>{index+1}</b>
               <div className="leaderboard-player">
@@ -134,7 +136,7 @@ export default function LeaderboardPage({staticData,onOpenPlayer}:Props){
                   <strong>{displayName}</strong>
                   <small>{player.tagLine
                     ?"#"+player.tagLine
-                    :"Riot ID pendente"}{player.hotStreak?" · hot streak":player.veteran?" · veterano":player.freshBlood?" · novo no tier":""}</small>
+                    :t("leaderboard.pendingRiotId")}{player.hotStreak?" · hot streak":player.veteran?" · "+t("leaderboard.veteran"):player.freshBlood?" · "+t("leaderboard.newTier"):""}</small>
                 </div>
               </div>
               <strong>{player.leaguePoints}</strong>
@@ -142,14 +144,14 @@ export default function LeaderboardPage({staticData,onOpenPlayer}:Props){
               <span>{player.wins} / {player.losses}</span>
               <span>{player.winRate}%</span>
               <button disabled={!canOpen} onClick={()=>canOpen&&onOpenPlayer(player,data.platform)}>
-                {canOpen?"Abrir perfil":"ID pendente"}
+                {canOpen?t("leaderboard.openProfile"):t("leaderboard.pendingId")}
               </button>
             </article>;
           })}
         </div>
       </section>
 
-      <p className="leaderboard-disclaimer">O ranking e LP vêm dos endpoints ranqueados da Riot. A resolução de Riot ID é best-effort e pode falhar para algumas entradas.</p>
+      <p className="leaderboard-disclaimer">{t("leaderboard.disclaimer")}</p>
     </>}
   </main>;
 }
