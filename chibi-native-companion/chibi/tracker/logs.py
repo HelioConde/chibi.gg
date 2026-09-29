@@ -7,6 +7,7 @@ from pathlib import Path
 
 from .events import EventType, TFTEvent
 from .normalize import normalize_champion_id
+from .values import parse_round
 
 LOGGER = logging.getLogger("chibi.native.tracker")
 RAW_ID = re.compile(r"\{([^{}]+)\}")
@@ -31,6 +32,10 @@ def parse_log_line(line: str) -> list[TFTEvent]:
         events.append(TFTEvent(EventType.ITEM_OBTAINED, "TFT_LOG", {}))
     if "ViewState.Playing.Shop.Selling" in line:
         events.append(TFTEvent(EventType.SELL_MODE_ACTIVE, "TFT_LOG", {}))
+    if "TFTRoundSubsystem" in line or "TFTStagesRoundsTooltipViewModel" in line:
+        match = re.search(r"(?<!\d)([1-9]\d?[-:][1-9]\d?)(?!\d)", line)
+        if match and (round_value := parse_round(match.group(1).replace(":", "-"))):
+            events.append(TFTEvent(EventType.ROUND_UPDATED, "TFT_LOG", {"value": round_value}))
     return events
 
 

@@ -1,18 +1,39 @@
 import json
 
 from chibi.tracker.checkpoint import TFTCheckpointProvider
+from chibi.assets import TftAssets
+from chibi.tracker.entities import TFTChampionResolver
 from chibi.tracker.events import EventType, TFTEvent
 from chibi.tracker.heartbeat import TFTHeartbeatProvider
 from chibi.tracker.input import event_for_gesture, event_for_position
+from chibi.tracker.liveclient import TFTLiveClientProvider
 from chibi.tracker.logs import TFTLogProvider, parse_log_line
 from chibi.tracker.normalize import normalize_champion_id
 from chibi.tracker.reducer import ChibiStateReducer
+from chibi.tracker.values import parse_round, valid_gold, valid_level
+from chibi.tracker.vision import NormalizedRoi, vision_gold_provider
 
 
 def test_normalizes_confirmed_champion_ids():
     assert normalize_champion_id("DA_18_Varus") == "Varus"
     assert normalize_champion_id("DA_18_Cassiopeia") == "Cassiopeia"
     assert normalize_champion_id("DA_Scuttlecrab18") == "Scuttlecrab18"
+
+
+def test_champion_resolver_uses_static_cache_and_preserves_unknown_raw_ids(tmp_path):
+    path = tmp_path / "assets.json"
+    path.write_text(json.dumps({"entries": {"champion": {
+        "DA_18_Varus": {"name": "Varus"},
+        "DA_18_Cassiopeia": {"name": "Cassiopeia"},
+        "DA_Scuttlecrab18": {"name": "Scuttlecrab"},
+    }, "item": {}, "trait": {}}}), encoding="utf-8")
+    resolver = TFTChampionResolver(TftAssets(path))
+    assert resolver.resolve("DA_18_Varus").display_name == "Varus"
+    assert resolver.resolve("DA_18_Cassiopeia").canonical_id == "Cassiopeia"
+    assert resolver.resolve("DA_Scuttlecrab18").display_name == "Scuttlecrab"
+    assert resolver.resolve("DA_SteadfastHeart").display_name == "Leona"
+    unknown = resolver.resolve("Future_Internal_Unit")
+    assert unknown.raw_id == "Future_Internal_Unit" and not unknown.resolved
 
 
 def test_heartbeat_reads_nested_riot_session_schema_and_emits_only_changes(tmp_path):
@@ -33,6 +54,13 @@ def test_parses_purchase_and_star_up_events():
     two = parse_log_line("Audio.Event.VO.Unit.StarUp.2Star {DA_18_Cassiopeia}")[0]
     three = parse_log_line("Audio.Event.VO.Unit.StarUp.3Star {DA_18_Cassiopeia}")[0]
     assert (two.type, two.payload["stars"], three.payload["stars"]) == (EventType.UNIT_STAR_UP, 2, 3)
+
+
+def test_round_log_event_requires_a_valid_explicit_round_value():
+    events = parse_log_line("TFTRoundSubsystem stage changed to 4-5")
+    assert events[-1].type is EventType.ROUND_UPDATED
+    assert events[-1].payload["value"] == "4-5"
+    assert not parse_log_line("TFTRoundSubsystem stage changed to 99-99")
 
 
 def test_input_regions_and_drag_heuristic():
@@ -87,3 +115,53 @@ def test_reducer_keeps_speculative_history_and_checkpoint_is_authoritative():
     assert state.purchases[0]["championId"] == "Varus"
     assert state.rerolls == 1
     assert state.board[0].champion_id == "Cassiopeia"
+
+
+def test_value_validators_and_source_precedence():
+    assert not valid_level(0) and valid_level(1) and valid_level(10) and not valid_level(99)
+    assert not valid_gold(-1) and valid_gold(0) and valid_gold(50) and valid_gold(999) and not valid_gold(1000)
+    assert parse_round("2-1") == "2-1" and parse_round("4-5") == "4-5" and parse_round("round 4-5") is None
+    reducer = ChibiStateReducer()
+    reducer.apply(TFTEvent(EventType.LEVEL_UPDATED, "LIVE_CLIENT", {"value": 6}, confidence=1.0))
+    state = reducer.apply(TFTEvent(EventType.LEVEL_UPDATED, "VISION", {"value": 5}, confidence=0.99))
+    assert state.player.level.value == 6 and state.player.level.source == "LIVE_CLIENT"
+
+
+def test_roi_scales_with_capture_size_and_vision_is_disabled_outside_game():
+    roi = NormalizedRoi(0.50, 0.79, 0.07, 0.07)
+    assert roi.bounds(1600, 900) == (800, 711, 112, 63)
+    assert roi.bounds(2560, 1440) == (1280, 1138, 179, 101)
+    provider = vision_gold_provider(lambda: "lobby")
+    assert provider.poll() == [] and provider.status == "disabled"
+
+
+def test_live_client_backs_off_then_recovers_without_crashing():
+    now = [0.0]
+    responses: list[object] = [OSError("closed"), {"activePlayer": {"level": 6, "currentGold": 42}}]
+
+    def fetch():
+        value = responses.pop(0)
+        if isinstance(value, Exception):
+            raise value
+        return value
+
+    provider = TFTLiveClientProvider(fetch=fetch, clock=lambda: now[0])
+    assert provider.poll() == [] and provider.status == "unavailable"
+    assert provider.poll() == []  # Still within the first backoff window.
+    now[0] = 1.0
+    events = provider.poll()
+    assert provider.status == "connected"
+    assert {(event.type, event.payload["value"]) for event in events} == {
+        (EventType.LEVEL_UPDATED, 6), (EventType.GOLD_UPDATED, 42)
+    }
+
+
+def test_live_client_partial_payload_and_timeout_are_safe():
+    timeout = TFTLiveClientProvider(fetch=lambda: TimeoutError("timed out"))
+    # A provider exception is represented as unavailable, never leaked to the UI loop.
+    def timed_out():
+        raise TimeoutError("timed out")
+    timeout.fetch = timed_out
+    assert timeout.poll() == [] and timeout.status == "unavailable"
+    partial = TFTLiveClientProvider(fetch=lambda: {"activePlayer": {"level": None}})
+    assert partial.poll() == [] and partial.status == "connected"

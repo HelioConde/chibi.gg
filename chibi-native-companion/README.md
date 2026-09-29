@@ -30,4 +30,6 @@ O aplicativo não lê memória, não injeta DLLs, não intercepta tráfego e nã
 
 ## Tracker local
 
-`TFTHeartbeatProvider`, `TFTLogProvider`, `TFTInputProvider` e `TFTCheckpointProvider` são independentes e toleram arquivos ausentes, rotação e JSON parcial. Eles alimentam `ChibiStateReducer`; assim a origem de um campo permanece explícita e um checkpoint autoritativo pode reconciliar eventos especulativos. `TFTLiveClientProvider` é opcional e nunca é requisito para o tracker funcionar.
+`TFTHeartbeatProvider`, `TFTLogProvider`, `TFTInputProvider` e `TFTCheckpointProvider` são independentes e toleram arquivos ausentes, rotação e JSON parcial. Eles alimentam `ChibiStateReducer`; assim a origem de cada campo permanece explícita (`source`, `confidence`, `observedAt`) e um checkpoint autoritativo pode reconciliar eventos especulativos.
+
+Level e gold tentam primeiro a Live Client Data local (`127.0.0.1:2999`) com timeout curto e backoff; a porta é opcional e o tracker continua funcionando quando ela está indisponível. Round aceita apenas eventos do log que tragam explicitamente o formato `N-N`. Os três providers de visão usam ROIs relativas à janela TFT, são pausados fora da partida e permanecem aguardando templates/calibração até haver uma leitura visual validada — nunca preenchem o estado com valores estimados.

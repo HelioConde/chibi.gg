@@ -17,8 +17,10 @@ class ObservedValue(Generic[T]):
 
 @dataclass(frozen=True, slots=True)
 class BoardPiece:
-    champion_id: str
+    champion_id: str | None
     raw_id: str
+    display_name: str
+    resolved: bool
     stars: int | None = None
     price: int | None = None
     items: tuple[str, ...] = ()
@@ -40,6 +42,7 @@ class ChibiGameState:
     tft_pid: int | None = None
     game_id: str | None = None
     set_name: str | None = None
+    round: ObservedValue[str] = field(default_factory=ObservedValue)
     started_at: float | None = None
     player: PlayerState = field(default_factory=PlayerState)
     board: list[BoardPiece] = field(default_factory=list)

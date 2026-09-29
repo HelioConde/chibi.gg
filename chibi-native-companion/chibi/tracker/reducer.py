@@ -3,6 +3,7 @@ from __future__ import annotations
 from time import time
 
 from .events import EventType, TFTEvent
+from .entities import TFTChampionResolver
 from .models import BoardPiece, ChibiGameState, ObservedValue
 from .normalize import normalize_champion_id
 
@@ -11,6 +12,7 @@ class ChibiStateReducer:
     def __init__(self, puuid: str = "") -> None:
         self.state = ChibiGameState()
         self.state.player.puuid = puuid
+        self.entities = TFTChampionResolver()
 
     def set_puuid(self, puuid: str) -> None:
         if puuid:
@@ -36,6 +38,12 @@ class ChibiStateReducer:
             self.state.xp_purchases += 1
         elif event.type is EventType.CHECKPOINT_UPDATED:
             self._apply_checkpoint(event)
+        elif event.type is EventType.LEVEL_UPDATED:
+            self._update_observed("level", event)
+        elif event.type is EventType.GOLD_UPDATED:
+            self._update_observed("gold", event)
+        elif event.type is EventType.ROUND_UPDATED:
+            self._update_observed("round", event)
         return self.state
 
     @staticmethod
@@ -68,13 +76,46 @@ class ChibiStateReducer:
         if isinstance(augments, list):
             self.state.augments = [str(value) for value in augments if str(value)]
 
-    @staticmethod
-    def _piece(value: dict[str, object]) -> BoardPiece:
+    def _update_observed(self, field: str, event: TFTEvent) -> None:
+        value = event.payload.get("value")
+        target = self.state.round if field == "round" else getattr(self.state.player, field)
+        candidate = ObservedValue(value, event.source, event.confidence, event.timestamp)
+        if not _should_replace(target, candidate):
+            return
+        if field == "round":
+            self.state.round = candidate
+        else:
+            setattr(self.state.player, field, candidate)
+
+    def _piece(self, value: dict[str, object]) -> BoardPiece:
         raw = str(value.get("championName") or value.get("characterId") or "")
         items = value.get("itemNames") if isinstance(value.get("itemNames"), list) else value.get("items")
+        entity = self.entities.resolve(raw)
         return BoardPiece(
-            champion_id=normalize_champion_id(raw), raw_id=raw,
+            champion_id=entity.canonical_id, raw_id=raw, display_name=entity.display_name, resolved=entity.resolved,
             stars=value.get("starLevel") if isinstance(value.get("starLevel"), int) else None,
             price=value.get("price") if isinstance(value.get("price"), int) else None,
-            items=tuple(str(item) for item in items if str(item)) if isinstance(items, list) else (),
+            items=tuple(self.entities.resolve_item(str(item)).display_name for item in items if str(item)) if isinstance(items, list) else (),
         )
+
+
+_SOURCE_PRIORITY = {
+    "TFT_CHECKPOINT": 100,
+    "LIVE_CLIENT": 90,
+    "TFT_LOG": 70,
+    "TFT_INPUT": 60,
+    "INPUT": 60,  # Compatibility with any previously persisted observation.
+    "VISION": 40,
+    "DERIVED": 20,
+    "unknown": 0,
+}
+
+
+def _should_replace(current: ObservedValue[object], candidate: ObservedValue[object]) -> bool:
+    if candidate.value is None:
+        return False
+    if current.value is None or candidate.source == current.source:
+        return True
+    current_score = _SOURCE_PRIORITY.get(current.source, 0) + current.confidence * 10
+    candidate_score = _SOURCE_PRIORITY.get(candidate.source, 0) + candidate.confidence * 10
+    return candidate_score >= current_score

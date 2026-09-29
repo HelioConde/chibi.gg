@@ -40,17 +40,22 @@ class TFTInputProvider:
 
     def __init__(self, window_provider: object | None = None) -> None:
         self.window_provider = window_provider
-        self.status = "disabled" if not hasattr(ctypes, "windll") else "waiting"
+        self.status = "unavailable" if not hasattr(ctypes, "windll") else "waiting_for_game"
         self._left_down = False
         self._drag_start: tuple[float, float, float] | None = None
         self._keys: dict[int, bool] = {ord("D"): False, ord("F"): False}
 
     def poll(self) -> list[TFTEvent]:
         if not hasattr(ctypes, "windll"):
+            self.status = "unavailable"
             return []
         window = self.window_provider() if callable(self.window_provider) else None
-        if window is None or not self._foreground_matches(window):
-            self.status = "waiting"
+        if window is None:
+            self.status = "waiting_for_game"
+            self._left_down = False
+            return []
+        if not self._foreground_matches(window):
+            self.status = "idle"
             self._left_down = False
             return []
         self.status = "connected"

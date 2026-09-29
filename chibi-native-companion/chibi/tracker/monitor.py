@@ -14,6 +14,7 @@ from .input import TFTInputProvider
 from .liveclient import TFTLiveClientProvider
 from .logs import TFTLogProvider
 from .reducer import ChibiStateReducer
+from .vision import vision_gold_provider, vision_level_provider, vision_round_provider
 
 LOGGER = logging.getLogger("chibi.native.tracker")
 
@@ -30,7 +31,11 @@ class TFTTrackerMonitor(QObject):
         self.input = TFTInputProvider(find_tft_window)
         self.checkpoint = TFTCheckpointProvider()
         self.liveclient = TFTLiveClientProvider()
-        self.providers = (self.heartbeat, self.log, self.input, self.checkpoint, self.liveclient)
+        lifecycle = lambda: self.reducer.state.lifecycle
+        self.vision_level = vision_level_provider(lifecycle)
+        self.vision_gold = vision_gold_provider(lifecycle)
+        self.vision_round = vision_round_provider(lifecycle)
+        self.providers = (self.heartbeat, self.log, self.input, self.checkpoint, self.liveclient, self.vision_level, self.vision_gold, self.vision_round)
         self._provider_key: tuple[tuple[str, str], ...] = ()
         self.timer = QTimer(self)
         self.timer.setInterval(interval_ms)
