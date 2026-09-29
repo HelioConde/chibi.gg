@@ -169,14 +169,14 @@ export default function OverlayPage({
         {hasProfile&&<button className="back-search" onClick={onBack}>← Voltar ao perfil</button>}
         <span className="eyebrow">CHIBI COMPANION · REVIEW FIRST</span>
         <h1>Capture o momento.<br/><em>Entenda depois.</em></h1>
-        <p>O companion registra snapshots úteis durante sua sessão e transforma esses momentos em revisão pós-jogo. Nada de prescrever jogadas em tempo real: o valor está em aprender com o que aconteceu.</p>
+        <p>Esta página mostra o conceito de revisão do Companion. Captura live não está habilitada na versão pública atual. Quando uma integração aprovada disponibilizar snapshots permitidos, eles serão usados para revisão pós-jogo — não para prescrever jogadas durante a partida.</p>
       </div>
 
       <div className="overlay-beta-card">
         <span>FASE ATUAL</span>
         <strong>Python Desktop v1</strong>
         <small>janela local + snapshots</small>
-        <b>PYTHON FOUNDATION PRONTA</b>
+        <b>PROTÓTIPO LOCAL</b>
       </div>
     </section>
 
@@ -215,7 +215,7 @@ export default function OverlayPage({
     <section className="overlay-demo-shell">
       <div className="overlay-demo-toolbar">
         <div>
-          <span>REVER SNAPSHOT</span>
+          <span>CENÁRIOS DE REVIEW · DEMO</span>
           {SCENARIOS.map(item=>(
             <button
               key={item.id}
@@ -275,8 +275,8 @@ export default function OverlayPage({
 
             {!compact&&<div className="overlay-board-preview">
               <div className="overlay-board-copy">
-                <span>BOARD ATUAL</span>
-                <small>visual preparado para receber posições reais do companion</small>
+                <span>BOARD DO SNAPSHOT · DEMO</span>
+                <small>estrutura visual preparada para dados permitidos de uma integração aprovada</small>
               </div>
               <div className="overlay-hex-board" aria-label="Demonstração de tabuleiro">
                 {Array.from({length:28}).map((_,index)=>{
@@ -315,15 +315,15 @@ export default function OverlayPage({
         </div>
       </div>
 
-      <p className="overlay-demo-note">Esta tela é uma simulação de revisão pós-jogo. O companion não deve usar o estado atual da partida para prescrever ações, rastrear adversários ou substituir decisões do jogador; snapshots servem para reflexão depois da partida.</p>
+      <p className="overlay-demo-note">Todos os valores desta demonstração são cenários fictícios de interface. Esta tela não representa telemetria live ativa. O Companion não deve usar o estado atual da partida para prescrever ações, rastrear adversários ou substituir decisões do jogador; snapshots permitidos servem para reflexão depois da partida.</p>
     </section>
 
     <section className="panel overlay-companion-status">
       <div className="overlay-companion-title">
         <div>
           <span>CHIBI COMPANION · GM1.2</span>
-          <h2>A fundação desktop em Python já está pronta</h2>
-          <p>A primeira versão desktop roda separada do site com PySide6, janela always-on-top, hotkeys, click-through no Windows e snapshots JSON locais. A integração com o perfil do Chibi vem na próxima etapa.</p>
+          <h2>A fundação desktop local está em desenvolvimento</h2>
+          <p>A base em PySide6 testa janela, hotkeys, click-through e snapshots JSON locais. Isso é infraestrutura de desenvolvimento, não uma integração live liberada para jogadores. Qualquer fonte de telemetria futura depende das aprovações e políticas aplicáveis.</p>
         </div>
         <b>DESKTOP FOUNDATION</b>
       </div>
@@ -356,7 +356,7 @@ export default function OverlayPage({
       <article>
         <span>01</span>
         <h3>Snapshot da sessão</h3>
-        <p>Stage, HP, ouro, nível e board podem ser registrados como contexto para uma revisão posterior.</p>
+        <p>Quando uma integração aprovada fornecer esses campos, snapshots permitidos podem virar contexto para uma revisão posterior.</p>
       </article>
       <article>
         <span>02</span>
@@ -397,8 +397,8 @@ export default function OverlayPage({
         </article>
         <article>
           <b>3</b>
-          <div><strong>Captura permitida</strong><span>Snapshots locais para revisão posterior, sem recomendação dinâmica</span></div>
-          <em>PLANEJADO</em>
+          <div><strong>Integração aprovada</strong><span>Somente dados permitidos, usados para revisão posterior e sem recomendação dinâmica</span></div>
+          <em>DEPENDENTE DE APROVAÇÃO</em>
         </article>
         <article>
           <b>4</b>
