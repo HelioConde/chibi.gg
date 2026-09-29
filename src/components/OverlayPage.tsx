@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { SITE_IMAGES } from "../siteAssets";
 import { TftMatch } from "../api/tft";
 import { getActiveSession, sessionProgress } from "../sessionMode";
+import { useI18n } from "../i18n";
 
 type OverlayStateId="stable"|"weak"|"contested"|"spike";
 
@@ -26,104 +27,122 @@ type OverlayScenario={
   items:string[];
 };
 
-const SCENARIOS:OverlayScenario[]=[
-  {
-    id:"stable",
-    label:"Estável",
-    tone:"good",
-    stage:"3-2",
-    hp:82,
-    gold:42,
-    level:6,
-    streak:"W2",
-    boardStatus:"SNAPSHOT ESTÁVEL OBSERVADO",
-    nowTitle:"Entenda por que este trecho ficou estável",
-    now:[
-      "O snapshot registrado mostra vida e economia preservadas neste ponto.",
-      "Compare este snapshot com um jogo parecido que terminou pior.",
-      "Observe quais upgrades e itens estavam presentes antes da estabilidade.",
-    ],
-    problemTitle:"Nenhum vazamento dominante no snapshot",
-    problems:["Frontline suficiente","Economia preservada","Carry ainda tinha espaço de upgrade"],
-    nextSpike:"Pergunta para estudar",
-    nextSpikeDetail:"O que mudou depois deste snapshot?",
-    contest:2,
-    missing:["Carry 2★","Trait +1"],
-    items:["Tank completo","Carry item 2/3"],
-  },
-  {
-    id:"weak",
-    label:"Fraco",
-    tone:"danger",
-    stage:"3-2",
-    hp:61,
-    gold:36,
-    level:6,
-    streak:"L3",
-    boardStatus:"SNAPSHOT COM PONTOS A REVISAR",
-    nowTitle:"Investigue por que o board não converteu",
-    now:[
-      "O snapshot terminou com pares ainda sem upgrade.",
-      "No snapshot demonstrado, a frontline aparece menos completa que o carry equipado.",
-      "Compare com seus Top 4 de nível semelhante antes de tirar uma conclusão.",
-    ],
-    problemTitle:"Frontline abaixo do restante do board",
-    problems:["2 pares sem upgrade","HP já estava pressionado","Carry equipado, frontline atrasada"],
-    nextSpike:"Pergunta para estudar",
-    nextSpikeDetail:"Qual mudança teria aumentado a estabilidade?",
-    contest:2,
-    missing:["Tank 2★","Frontline +1"],
-    items:["Tank incompleto","Carry 3/3"],
-  },
-  {
-    id:"contested",
-    label:"Transição",
-    tone:"warning",
-    stage:"4-1",
-    hp:54,
-    gold:31,
-    level:7,
-    streak:"L1",
-    boardStatus:"SNAPSHOT DE TRANSIÇÃO",
-    nowTitle:"Revise onde a transição perdeu força",
-    now:[
-      "O snapshot demonstrado mistura duas identidades sem uma direção final clara.",
-      "Itens e unidades finais sugerem uma transição ainda em andamento.",
-      "Compare com suas partidas em que a troca de linha terminou em Top 4.",
-    ],
-    problemTitle:"Board final sem identidade consolidada",
-    problems:["Sinergias divididas","Carry ainda sem estrutura completa","Frontline sem fechamento claro"],
-    nextSpike:"Pergunta para estudar",
-    nextSpikeDetail:"Qual peça marcou o ponto de não retorno?",
-    contest:1,
-    missing:["Alternativa de carry","Trait flex"],
-    items:["Itens flexíveis","1 item preso"],
-  },
-  {
-    id:"spike",
-    label:"Spike",
-    tone:"good",
-    stage:"4-2",
-    hp:67,
-    gold:18,
-    level:8,
-    streak:"W3",
-    boardStatus:"SNAPSHOT DE BOARD COMPLETO",
-    nowTitle:"Use este board como referência pessoal",
-    now:[
-      "O snapshot demonstrado mostra um board mais completo que os outros cenários desta demo.",
-      "Os upgrades estão concentrados nas peças que sustentam a composição.",
-      "Compare esta estrutura com seus jogos parecidos que não chegaram ao Top 4.",
-    ],
-    problemTitle:"Pouco espaço para concluir causalidade",
-    problems:["Board já estabilizado","Economia baixa após o pico","Resultado pode depender de contexto não capturado"],
-    nextSpike:"Pergunta para estudar",
-    nextSpikeDetail:"Quais partes deste board se repetem nas suas melhores partidas?",
-    contest:2,
-    missing:["Legendária utilitária","1 upgrade 2★"],
-    items:["Core completo","Utility aberta"],
-  },
-];
+function buildScenarios(t:(key:string)=>string):OverlayScenario[]{
+  return [
+    {
+      id:"stable",
+      label:t("overlay.scenario.stable.label"),
+      tone:"good",
+      stage:"3-2",
+      hp:82,
+      gold:42,
+      level:6,
+      streak:"W2",
+      boardStatus:t("overlay.scenario.stable.status"),
+      nowTitle:t("overlay.scenario.stable.title"),
+      now:[
+        t("overlay.scenario.stable.now1"),
+        t("overlay.scenario.stable.now2"),
+        t("overlay.scenario.stable.now3"),
+      ],
+      problemTitle:t("overlay.scenario.stable.problem"),
+      problems:[
+        t("overlay.scenario.stable.problem1"),
+        t("overlay.scenario.stable.problem2"),
+        t("overlay.scenario.stable.problem3"),
+      ],
+      nextSpike:t("overlay.scenario.studyQuestion"),
+      nextSpikeDetail:t("overlay.scenario.stable.study"),
+      contest:2,
+      missing:[t("overlay.scenario.stable.missing1"),t("overlay.scenario.stable.missing2")],
+      items:[t("overlay.scenario.stable.item1"),t("overlay.scenario.stable.item2")],
+    },
+    {
+      id:"weak",
+      label:t("overlay.scenario.weak.label"),
+      tone:"danger",
+      stage:"3-2",
+      hp:61,
+      gold:36,
+      level:6,
+      streak:"L3",
+      boardStatus:t("overlay.scenario.weak.status"),
+      nowTitle:t("overlay.scenario.weak.title"),
+      now:[
+        t("overlay.scenario.weak.now1"),
+        t("overlay.scenario.weak.now2"),
+        t("overlay.scenario.weak.now3"),
+      ],
+      problemTitle:t("overlay.scenario.weak.problem"),
+      problems:[
+        t("overlay.scenario.weak.problem1"),
+        t("overlay.scenario.weak.problem2"),
+        t("overlay.scenario.weak.problem3"),
+      ],
+      nextSpike:t("overlay.scenario.studyQuestion"),
+      nextSpikeDetail:t("overlay.scenario.weak.study"),
+      contest:2,
+      missing:[t("overlay.scenario.weak.missing1"),t("overlay.scenario.weak.missing2")],
+      items:[t("overlay.scenario.weak.item1"),t("overlay.scenario.weak.item2")],
+    },
+    {
+      id:"contested",
+      label:t("overlay.scenario.transition.label"),
+      tone:"warning",
+      stage:"4-1",
+      hp:54,
+      gold:31,
+      level:7,
+      streak:"L1",
+      boardStatus:t("overlay.scenario.transition.status"),
+      nowTitle:t("overlay.scenario.transition.title"),
+      now:[
+        t("overlay.scenario.transition.now1"),
+        t("overlay.scenario.transition.now2"),
+        t("overlay.scenario.transition.now3"),
+      ],
+      problemTitle:t("overlay.scenario.transition.problem"),
+      problems:[
+        t("overlay.scenario.transition.problem1"),
+        t("overlay.scenario.transition.problem2"),
+        t("overlay.scenario.transition.problem3"),
+      ],
+      nextSpike:t("overlay.scenario.studyQuestion"),
+      nextSpikeDetail:t("overlay.scenario.transition.study"),
+      contest:1,
+      missing:[t("overlay.scenario.transition.missing1"),t("overlay.scenario.transition.missing2")],
+      items:[t("overlay.scenario.transition.item1"),t("overlay.scenario.transition.item2")],
+    },
+    {
+      id:"spike",
+      label:t("overlay.scenario.spike.label"),
+      tone:"good",
+      stage:"4-2",
+      hp:67,
+      gold:18,
+      level:8,
+      streak:"W3",
+      boardStatus:t("overlay.scenario.spike.status"),
+      nowTitle:t("overlay.scenario.spike.title"),
+      now:[
+        t("overlay.scenario.spike.now1"),
+        t("overlay.scenario.spike.now2"),
+        t("overlay.scenario.spike.now3"),
+      ],
+      problemTitle:t("overlay.scenario.spike.problem"),
+      problems:[
+        t("overlay.scenario.spike.problem1"),
+        t("overlay.scenario.spike.problem2"),
+        t("overlay.scenario.spike.problem3"),
+      ],
+      nextSpike:t("overlay.scenario.studyQuestion"),
+      nextSpikeDetail:t("overlay.scenario.spike.study"),
+      contest:2,
+      missing:[t("overlay.scenario.spike.missing1"),t("overlay.scenario.spike.missing2")],
+      items:[t("overlay.scenario.spike.item1"),t("overlay.scenario.spike.item2")],
+    },
+  ];
+}
 
 const DEMO_UNITS=["V","A","M","S","K","T","N","R"];
 
@@ -140,12 +159,14 @@ export default function OverlayPage({
   matches?:TftMatch[];
   onBack:()=>void;
 }){
+  const { t } = useI18n();
+  const scenarios=useMemo(()=>buildScenarios(t),[t]);
   const [scenarioId,setScenarioId]=useState<OverlayStateId>("weak");
   const [compact,setCompact]=useState(false);
 
   const scenario=useMemo(
-    ()=>SCENARIOS.find(item=>item.id===scenarioId)||SCENARIOS[0],
-    [scenarioId],
+    ()=>scenarios.find(item=>item.id===scenarioId)||scenarios[0],
+    [scenarioId,scenarios],
   );
 
   const activeSession=useMemo(
@@ -161,37 +182,37 @@ export default function OverlayPage({
     <section className="overlay-page-hero overlay-page-hero-art">
       <img className="overlay-page-art" src={SITE_IMAGES.art} alt="" aria-hidden="true"/>
       <div>
-        {hasProfile&&<button className="back-search" onClick={onBack}>← Voltar ao perfil</button>}
+        {hasProfile&&<button className="back-search" onClick={onBack}>{t("common.backProfile")}</button>}
         <span className="eyebrow">CHIBI COMPANION · REVIEW FIRST</span>
-        <h1>Capture o momento.<br/><em>Entenda depois.</em></h1>
-        <p>Esta página mostra o conceito de revisão do Companion. Captura live não está habilitada na versão pública atual. Quando uma integração aprovada disponibilizar snapshots permitidos, eles serão usados para revisão pós-jogo — não para prescrever jogadas durante a partida.</p>
+        <h1>{t("overlay.hero.title1")}<br/><em>{t("overlay.hero.title2")}</em></h1>
+        <p>{t("overlay.hero.desc")}</p>
       </div>
 
       <div className="overlay-beta-card">
-        <span>FASE ATUAL</span>
+        <span>{t("overlay.currentPhase")}</span>
         <strong>Python Desktop v1</strong>
-        <small>janela local + snapshots</small>
-        <b>PROTÓTIPO LOCAL</b>
+        <small>{t("overlay.localWindow")}</small>
+        <b>{t("overlay.localPrototype")}</b>
       </div>
     </section>
 
     {activeSession&&<section className="panel overlay-session-focus">
       <div className="overlay-session-focus-head">
         <div>
-          <span>FOCO FIXADO ANTES DA FILA</span>
+          <span>{t("overlay.fixedFocus")}</span>
           <h2>{activeSession.focusTitle}</h2>
-          <p>Este lembrete foi definido antes da sessão e não muda com o estado da partida.</p>
+          <p>{t("overlay.focusDesc")}</p>
         </div>
         <div className="overlay-session-progress">
           <small>CHIBI SESSION</small>
           <strong>{activeSessionProgress?.played||0}/{activeSession.targetGames}</strong>
-          <span>partidas</span>
+          <span>{t("overlay.games")}</span>
         </div>
       </div>
 
       <div className="overlay-session-rule">
         <div>
-          <span>LEMBRETE</span>
+          <span>{t("overlay.reminder")}</span>
           <ol>
             {activeSession.focusSteps.slice(0,2).map((step,index)=>(
               <li key={index}><b>{index+1}</b><p>{step}</p></li>
@@ -199,19 +220,19 @@ export default function OverlayPage({
           </ol>
         </div>
         <aside>
-          <span>EVITAR</span>
+          <span>{t("overlay.avoid")}</span>
           <p>{activeSession.avoid}</p>
         </aside>
       </div>
 
-      <small className="overlay-session-safety">O Companion não usa HP, shop, board adversário ou estágio atual para alterar este foco durante a partida.</small>
+      <small className="overlay-session-safety">{t("overlay.sessionSafety")}</small>
     </section>}
 
     <section className="overlay-demo-shell">
       <div className="overlay-demo-toolbar">
         <div>
-          <span>CENÁRIOS DE REVIEW · DEMO</span>
-          {SCENARIOS.map(item=>(
+          <span>{t("overlay.scenariosDemo")}</span>
+          {scenarios.map(item=>(
             <button
               key={item.id}
               className={scenarioId===item.id?"active":""}
@@ -220,7 +241,7 @@ export default function OverlayPage({
           ))}
         </div>
         <button className={compact?"active":""} onClick={()=>setCompact(value=>!value)}>
-          {compact?"Modo expandido":"Modo compacto"}
+          {compact?t("overlay.expanded"):t("overlay.compact")}
         </button>
       </div>
 
@@ -231,7 +252,7 @@ export default function OverlayPage({
             <span className="overlay-brand-image"><img src={SITE_IMAGES.icon} alt=""/></span>
             <div>
               <strong>Chibi Review HUD</strong>
-              <small>{hasProfile&&playerName?playerName:"demo local"} · revisão pós-jogo</small>
+              <small>{hasProfile&&playerName?playerName:t("overlay.localDemo")} · {t("overlay.postReview")}</small>
             </div>
           </div>
           <div className="overlay-live-status">
@@ -252,14 +273,14 @@ export default function OverlayPage({
           <section className="overlay-primary">
             <div className="overlay-board-status">
               <div>
-                <span>LEITURA PÓS-JOGO DO SNAPSHOT</span>
+                <span>{t("overlay.snapshotRead")}</span>
                 <strong>{scenario.boardStatus}</strong>
               </div>
               <b>DEMO</b>
             </div>
 
             <article className="overlay-now-card">
-              <span>O QUE REVISAR</span>
+              <span>{t("overlay.whatReview")}</span>
               <h2>{scenario.nowTitle}</h2>
               <ol>
                 {scenario.now.map((item,index)=>(
@@ -270,10 +291,10 @@ export default function OverlayPage({
 
             {!compact&&<div className="overlay-board-preview">
               <div className="overlay-board-copy">
-                <span>BOARD DO SNAPSHOT · DEMO</span>
-                <small>estrutura visual preparada para dados permitidos de uma integração aprovada</small>
+                <span>{t("overlay.snapshotBoard")}</span>
+                <small>{t("overlay.allowedStructure")}</small>
               </div>
-              <div className="overlay-hex-board" aria-label="Demonstração de tabuleiro">
+              <div className="overlay-hex-board" aria-label={t("overlay.boardDemoAria")}>
                 {Array.from({length:28}).map((_,index)=>{
                   const unitIndex=[15,16,18,21,23,24,25,27].indexOf(index);
                   return <div className={"overlay-hex "+(unitIndex>=0?"occupied":"")} key={index}>
@@ -282,43 +303,43 @@ export default function OverlayPage({
                 })}
               </div>
               <div className="overlay-board-foot">
-                <span>Faltando: <b>{scenario.missing.join(" · ")}</b></span>
-                <span>Itens: <b>{scenario.items.join(" · ")}</b></span>
+                <span>{t("overlay.missing")}: <b>{scenario.missing.join(" · ")}</b></span>
+                <span>{t("overlay.items")}: <b>{scenario.items.join(" · ")}</b></span>
               </div>
             </div>}
           </section>
 
           <aside className="overlay-signals">
             <article className="overlay-problem">
-              <span>PADRÃO A INVESTIGAR</span>
+              <span>{t("overlay.patternInvestigate")}</span>
               <h3>{scenario.problemTitle}</h3>
               <ul>{scenario.problems.map(item=><li key={item}>{item}</li>)}</ul>
             </article>
 
             <article className="overlay-spike">
-              <span>O QUE ESTUDAR</span>
+              <span>{t("overlay.whatStudy")}</span>
               <h3>{scenario.nextSpike}</h3>
               <p>{scenario.nextSpikeDetail}</p>
             </article>
 
             <article className="overlay-contest">
-              <span>CONFIANÇA DO SINAL</span>
-              <strong>{scenario.contest>=2?"Alta":scenario.contest===1?"Média":"Baixa"}</strong>
-              <small>rótulo fictício da demonstração, não um score competitivo</small>
+              <span>{t("overlay.signalConfidence")}</span>
+              <strong>{scenario.contest>=2?t("overlay.confidence.high"):scenario.contest===1?t("overlay.confidence.medium"):t("overlay.confidence.low")}</strong>
+              <small>{t("overlay.fakeScore")}</small>
             </article>
           </aside>
         </div>
       </div>
 
-      <p className="overlay-demo-note">Todos os valores desta demonstração são cenários fictícios de interface. Esta tela não representa telemetria live ativa. O Companion não deve usar o estado atual da partida para prescrever ações, rastrear adversários ou substituir decisões do jogador; snapshots permitidos servem para reflexão depois da partida.</p>
+      <p className="overlay-demo-note">{t("overlay.demoNote")}</p>
     </section>
 
     <section className="panel overlay-companion-status">
       <div className="overlay-companion-title">
         <div>
           <span>CHIBI COMPANION · GM1.2</span>
-          <h2>A fundação desktop local está em desenvolvimento</h2>
-          <p>A base em PySide6 testa janela, hotkeys, click-through e snapshots JSON locais. Isso é infraestrutura de desenvolvimento, não uma integração live liberada para jogadores. Qualquer fonte de telemetria futura depende das aprovações e políticas aplicáveis.</p>
+          <h2>{t("overlay.foundation.title")}</h2>
+          <p>{t("overlay.foundation.desc")}</p>
         </div>
         <b>DESKTOP FOUNDATION</b>
       </div>
@@ -327,22 +348,22 @@ export default function OverlayPage({
         <article>
           <span>HOTKEY</span>
           <strong>Ctrl + Shift + Space</strong>
-          <small>mostrar / ocultar overlay</small>
+          <small>{t("overlay.hotkey.desc")}</small>
         </article>
         <article>
           <span>CLICK-THROUGH</span>
           <strong>Ctrl + Shift + L</strong>
-          <small>liberar / recuperar o mouse</small>
+          <small>{t("overlay.click.desc")}</small>
         </article>
         <article>
           <span>PRESETS</span>
-          <strong>Compacto · Coach · Completo</strong>
-          <small>tamanho e densidade persistentes</small>
+          <strong>{t("overlay.presets.value")}</strong>
+          <small>{t("overlay.presets.desc")}</small>
         </article>
         <article>
           <span>MONITOR</span>
-          <strong>Esquerda ou direita</strong>
-          <small>posição salva por monitor</small>
+          <strong>{t("overlay.monitor.value")}</strong>
+          <small>{t("overlay.monitor.desc")}</small>
         </article>
       </div>
     </section>
@@ -350,23 +371,23 @@ export default function OverlayPage({
     <section className="overlay-principles">
       <article>
         <span>01</span>
-        <h3>Snapshot da sessão</h3>
-        <p>Quando uma integração aprovada fornecer esses campos, snapshots permitidos podem virar contexto para uma revisão posterior.</p>
+        <h3>{t("overlay.principle.1.title")}</h3>
+        <p>{t("overlay.principle.1.desc")}</p>
       </article>
       <article>
         <span>02</span>
-        <h3>Revisão guiada</h3>
-        <p>O Chibi destaca até três perguntas de revisão depois da partida, sempre ligadas às evidências registradas.</p>
+        <h3>{t("overlay.principle.2.title")}</h3>
+        <p>{t("overlay.principle.2.desc")}</p>
       </article>
       <article>
         <span>03</span>
-        <h3>Padrão principal</h3>
-        <p>O review destaca o que merece investigação sem afirmar causalidade que os dados não sustentam.</p>
+        <h3>{t("overlay.principle.3.title")}</h3>
+        <p>{t("overlay.principle.3.desc")}</p>
       </article>
       <article>
         <span>04</span>
-        <h3>Aprendizado para a próxima</h3>
-        <p>O resultado da análise vira uma pergunta ou experimento para a próxima sessão, não uma ordem durante o jogo.</p>
+        <h3>{t("overlay.principle.4.title")}</h3>
+        <p>{t("overlay.principle.4.desc")}</p>
       </article>
     </section>
 
@@ -374,31 +395,31 @@ export default function OverlayPage({
       <div className="overlay-roadmap-head">
         <div>
           <span>CHIBI COMPANION</span>
-          <h2>Da demo web para o companion de revisão</h2>
+          <h2>{t("overlay.roadmap.title")}</h2>
         </div>
-        <small>Grande mudança 1</small>
+        <small>{t("overlay.roadmap.change")}</small>
       </div>
 
       <div className="overlay-roadmap-grid">
         <article className="done">
           <b>1</b>
-          <div><strong>UX do Overlay</strong><span>Estados, hierarquia e modo compacto</span></div>
-          <em>AGORA</em>
+          <div><strong>{t("overlay.roadmap.1.title")}</strong><span>{t("overlay.roadmap.1.desc")}</span></div>
+          <em>{t("overlay.roadmap.now")}</em>
         </article>
         <article className="active">
           <b>2</b>
-          <div><strong>Companion desktop</strong><span>Janela transparente, hotkeys, presets e monitor</span></div>
+          <div><strong>{t("overlay.roadmap.2.title")}</strong><span>{t("overlay.roadmap.2.desc")}</span></div>
           <em>PYTHON V1</em>
         </article>
         <article>
           <b>3</b>
-          <div><strong>Integração aprovada</strong><span>Somente dados permitidos, usados para revisão posterior e sem recomendação dinâmica</span></div>
-          <em>DEPENDENTE DE APROVAÇÃO</em>
+          <div><strong>{t("overlay.roadmap.3.title")}</strong><span>{t("overlay.roadmap.3.desc")}</span></div>
+          <em>{t("overlay.roadmap.approval")}</em>
         </article>
         <article>
           <b>4</b>
-          <div><strong>Personalização pós-jogo</strong><span>Seu histórico ajuda a priorizar quais momentos revisar depois da sessão</span></div>
-          <em>PLANEJADO</em>
+          <div><strong>{t("overlay.roadmap.4.title")}</strong><span>{t("overlay.roadmap.4.desc")}</span></div>
+          <em>{t("overlay.roadmap.planned")}</em>
         </article>
       </div>
     </section>
