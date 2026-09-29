@@ -11,7 +11,8 @@ from chibi.tracker.logs import TFTLogProvider, parse_log_line
 from chibi.tracker.normalize import normalize_champion_id
 from chibi.tracker.reducer import ChibiStateReducer
 from chibi.tracker.values import parse_round, valid_gold, valid_level
-from chibi.tracker.vision import NormalizedRoi, vision_gold_provider
+from chibi.tracker.vision import NormalizedRoi, TFTVisionLayout, VisionCaptureManager, vision_gold_provider
+from chibi.vision.capture import CapturedFrame
 
 
 def test_normalizes_confirmed_champion_ids():
@@ -133,6 +134,58 @@ def test_roi_scales_with_capture_size_and_vision_is_disabled_outside_game():
     assert roi.bounds(2560, 1440) == (1280, 1138, 179, 101)
     provider = vision_gold_provider(lambda: "lobby")
     assert provider.poll() == [] and provider.status == "disabled"
+
+
+def test_vision_provider_rejects_low_confidence_and_confirms_unstable_changes():
+    clock = [0.0]
+    readings = iter([("48", .96), ("488", .51), ("48", .97), ("50", .80), ("50", .81)])
+    provider = vision_gold_provider(lambda: "game_running", reader=lambda _roi: next(readings))
+    provider.clock = lambda: clock[0]
+    assert provider.poll()[0].payload["value"] == 48
+    clock[0] += 1
+    assert provider.poll() == [] and provider.status == "low_confidence"
+    clock[0] += 1
+    assert provider.poll() == []  # The trusted value did not change.
+    clock[0] += 1
+    assert provider.poll() == [] and provider.status == "calibrating"
+    clock[0] += 1
+    assert provider.poll()[0].payload["value"] == 50
+
+
+def test_capture_manager_shares_frame_saves_deduplicated_samples_and_recovers(tmp_path):
+    rgb = bytes([20, 40, 60] * 100)
+
+    class FakeCapture:
+        def capture(self, _window):
+            return CapturedFrame(10, 10, 12.0, rgb)
+
+    class FakeOcr:
+        def read(self, _rgb, _width, _height):
+            return "42", .95
+
+    manager = VisionCaptureManager(
+        lambda: "game_running", calibrate=True, capture=FakeCapture(),
+        window_provider=lambda: object(), ocr=FakeOcr(), root=tmp_path, max_fps=100,
+    )
+    manager.poll()
+    assert manager.status == "capturing"
+    value = manager.reader("gold", TFTVisionLayout.GOLD)(TFTVisionLayout.GOLD)
+    assert value == ("42", .95)
+    manager.reader("gold", TFTVisionLayout.GOLD)(TFTVisionLayout.GOLD)
+    assert manager.diagnostics["samples"] == {"gold": 1, "level": 0, "round": 0}
+    assert (tmp_path / "frame-latest.png").exists() and (tmp_path / "layout-latest.png").exists()
+
+
+def test_capture_manager_is_safe_when_window_or_capture_is_unavailable(tmp_path):
+    manager = VisionCaptureManager(lambda: "game_running", window_provider=lambda: None, root=tmp_path)
+    assert manager.poll() == [] and manager.status == "waiting_for_game"
+
+    class BrokenCapture:
+        def capture(self, _window):
+            raise RuntimeError("no capture")
+
+    manager = VisionCaptureManager(lambda: "game_running", capture=BrokenCapture(), window_provider=lambda: object(), root=tmp_path)
+    assert manager.poll() == [] and manager.status == "unavailable"
 
 
 def test_live_client_backs_off_then_recovers_without_crashing():

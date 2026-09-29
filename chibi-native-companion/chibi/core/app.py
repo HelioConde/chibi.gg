@@ -26,11 +26,12 @@ from chibi.plan import GamePlanStore
 from chibi.core.settings import app_data_dir
 from chibi.vision.debug import vision_debug_report
 from chibi.vision.pending import create_pending, label_pending
+from chibi.tracker.vision import recognize_saved_roi
 from chibi.tracker.monitor import TFTTrackerMonitor
 from chibi.ui.tracker_debug import TrackerDebugPanel
 
 def main() -> int:
-    parser = argparse.ArgumentParser(); parser.add_argument("--demo", action="store_true"); parser.add_argument("--debug", action="store_true"); parser.add_argument("--tracker-debug", action="store_true"); parser.add_argument("--telemetry-report", action="store_true"); parser.add_argument("--discover-game", action="store_true"); parser.add_argument("--investigate", action="store_true"); parser.add_argument("--vision-debug", action="store_true"); parser.add_argument("--vision-capture-field", choices=("gold","level","stage")); parser.add_argument("--vision-label",nargs=2,metavar=("SAMPLE_ID","LABEL")); parser.add_argument("--import-plan"); args = parser.parse_args()
+    parser = argparse.ArgumentParser(); parser.add_argument("--demo", action="store_true"); parser.add_argument("--debug", action="store_true"); parser.add_argument("--tracker-debug", action="store_true"); parser.add_argument("--vision-calibrate", action="store_true"); parser.add_argument("--vision-test", type=Path, metavar="ROI_PNG"); parser.add_argument("--telemetry-report", action="store_true"); parser.add_argument("--discover-game", action="store_true"); parser.add_argument("--investigate", action="store_true"); parser.add_argument("--vision-debug", action="store_true"); parser.add_argument("--vision-capture-field", choices=("gold","level","stage")); parser.add_argument("--vision-label",nargs=2,metavar=("SAMPLE_ID","LABEL")); parser.add_argument("--import-plan"); args = parser.parse_args()
     configure(args.debug); telemetry = TelemetryManager().poll()
     if args.telemetry_report: print(telemetry_report(telemetry)); return 0
     if args.discover_game: print(GameProcessDetector().record_diff()); return 0
@@ -43,6 +44,7 @@ def main() -> int:
     if args.vision_debug: print(vision_debug_report()); return 0
     if args.vision_capture_field: print(create_pending(args.vision_capture_field,str(app_data_dir()/"debug"/"vision"/(args.vision_capture_field+"-region.png")))); return 0
     if args.vision_label: print(label_pending(*args.vision_label)); return 0
+    if args.vision_test: print(recognize_saved_roi(args.vision_test)); return 0
     app = QApplication(sys.argv); app.setApplicationName("Chibi Native Companion")
     instance_lock = QLockFile(str(app_data_dir() / "chibi-native.lock"))
     instance_lock.setStaleLockTime(0)
@@ -50,7 +52,7 @@ def main() -> int:
         return 0
     context, bus, sessions, window = CompanionContext(telemetry=telemetry), EventBus(), SessionManager(), CompanionWindow(plans); window.set_debug(args.debug); window.set_game_plan(plans.load()); window.set_live_telemetry(telemetry)
     postgame = PostGameController()
-    tracker = TFTTrackerMonitor()
+    tracker = TFTTrackerMonitor(vision_calibrate=args.vision_calibrate)
     debug_panel = TrackerDebugPanel() if args.tracker_debug else None
     if debug_panel: debug_panel.show()
     def update_tracker(state: object) -> None:

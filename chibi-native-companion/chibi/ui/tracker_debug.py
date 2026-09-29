@@ -35,7 +35,7 @@ class TrackerDebugPanel(QWidget):
             _observation("Level", level, now),
             _observation("Gold", gold, now),
             _observation("Round", round_value, now),
-            f"Checkpoint age: {_age(getattr(state, 'checkpoint_at', None), now)}",
+            f"Checkpoint age: {_checkpoint_age(getattr(state, 'checkpoint_at', None), now)}",
             f"Rerolls: {getattr(state, 'rerolls', 0)} · XP purchases: {getattr(state, 'xp_purchases', 0)}",
             "", "Board:",
         ]
@@ -49,6 +49,13 @@ class TrackerDebugPanel(QWidget):
         lines.extend(str(row.get("championId") or row.get("rawId") or "—") for row in purchases)
         lines.extend(["", "Recent star ups:"])
         lines.extend(f"{row.get('championId') or '—'} → {row.get('stars') or '—'}★" for row in stars)
+        vision = getattr(state, "vision", {})
+        if isinstance(vision, dict):
+            lines.extend(["", "VISION"])
+            lines.append(f"Capture: {vision.get('status', '—')} · resolution: {vision.get('resolution') or '—'} · age: {_age(vision.get('last_capture_at'), now)}")
+            samples = vision.get("samples")
+            if isinstance(samples, dict):
+                lines.append("Samples: " + " · ".join(f"{key}={value}" for key, value in samples.items()))
         lines.extend(["", "Providers:"])
         lines.extend(f"{name}: {status}" for name, status in getattr(state, "providers", {}).items())
         self.output.setPlainText("\n".join(lines))
@@ -69,3 +76,12 @@ def _observation(label: str, observed: object, now: float) -> str:
         f"{label}: {value if value is not None else '—'} "
         f"· source: {source} · confidence: {confidence:.2f} · age: {_age(observed_at, now)}"
     )
+
+
+def _checkpoint_age(timestamp: object, now: float) -> str:
+    age = _age(timestamp, now)
+    if age == "—":
+        return age
+    seconds = max(0.0, now - float(timestamp))
+    label = "normal" if seconds < 30 else "stale" if seconds <= 90 else "warning"
+    return f"{age} · {label}"

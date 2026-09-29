@@ -58,4 +58,5 @@ class ChibiGameState:
     last_event: str | None = None
     checkpoint_at: float | None = None
     providers: dict[str, str] = field(default_factory=dict)
+    vision: dict[str, object] = field(default_factory=dict)
     updated_at: float = field(default_factory=time)
