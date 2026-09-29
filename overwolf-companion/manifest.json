@@ -5,10 +5,10 @@
   "meta": {
     "name": "Chibi Overwolf Companion",
     "author": "HelioConde",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "minimum-overwolf-version": "0.311.0.6",
     "minimum-gep-version": "143.0",
-    "description": "Local debug bridge for verified Teamfight Tactics GEP telemetry.",
+    "description": "Public TFT companion shell with player-facing desktop UI and verified GEP telemetry.",
     "icon": "assets/icon.png"
   },
   "data": {
@@ -27,6 +27,22 @@
       "background": {
         "file": "index.html",
         "is_background_page": true
+      },
+      "desktop": {
+        "file": "desktop.html",
+        "transparent": false,
+        "resizable": true,
+        "desktop_only": true,
+        "show_minimize": true,
+        "show_maximize": false,
+        "size": {
+          "width": 1100,
+          "height": 720
+        },
+        "min_size": {
+          "width": 840,
+          "height": 560
+        }
       }
     }
   }
