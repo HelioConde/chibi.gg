@@ -1264,8 +1264,10 @@ function App() {
           onSearchPlayer={(value)=>{void searchFromGlobal(value);}}
           onOpenPage={openExplorePage}
         />
-        <LanguageSwitcher />
-        <button className="ghost-button" onClick={()=>openInfoPage("about")}>{t("nav.howItWorks")}</button>
+        <div className="topbar-actions">
+          <LanguageSwitcher />
+          <button className="ghost-button" onClick={()=>openInfoPage("about")}>{t("nav.howItWorks")}</button>
+        </div>
       </header>
 
       {sitePage==="about"||sitePage==="privacy"||sitePage==="terms" ? (
