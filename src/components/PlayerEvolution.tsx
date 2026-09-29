@@ -260,7 +260,7 @@ export default function PlayerEvolution({playerKey,matches,staticData,onEvidence
       <div className="depth-card-head">
         <div>
           <span>RECENTES</span>
-          <h3>Últimas 10 colocações</h3>
+          <h3>Colocações recentes</h3>
         </div>
       </div>
 
@@ -291,7 +291,7 @@ export default function PlayerEvolution({playerKey,matches,staticData,onEvidence
           return <button onClick={()=>onEvidence(row.matchIds,"Champion · "+name)} key={row.id}>
             <span className="depth-icon">{image&&<img src={image} alt=""/>}</span>
             <span><strong>{name}</strong><small>{row.games} jogos · média {row.averagePlacement}</small></span>
-            <b>{row.top4Rate}%</b>
+            <b>{row.games>=5?row.top4Rate+"%":row.games+"j"}</b>
           </button>;
         }):<p className="depth-empty">Ainda não há champions repetidos o suficiente.</p>}
       </div>
@@ -310,7 +310,7 @@ export default function PlayerEvolution({playerKey,matches,staticData,onEvidence
           <button onClick={()=>onEvidence(mode.matchIds,"Fila · "+queueLabel(staticData,mode.queueId))} key={mode.queueId}>
             <span className="depth-mode-icon">{queueLabel(staticData,mode.queueId).slice(0,2).toUpperCase()}</span>
             <span><strong>{queueLabel(staticData,mode.queueId)}</strong><small>{mode.games} jogos · média {mode.averagePlacement}</small></span>
-            <b>{mode.top4Rate}%</b>
+            <b>{mode.games>=5?mode.top4Rate+"%":mode.games+"j"}</b>
           </button>
         )):<p className="depth-empty">Nenhuma fila identificada na amostra.</p>}
       </div>
