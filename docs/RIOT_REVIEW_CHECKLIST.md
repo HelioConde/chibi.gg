@@ -25,9 +25,9 @@ This checklist tracks the public-facing state of chibi.gg while the Riot product
 
 ## Public policy pages
 
-- [x] How Chibi Works (`#about`)
-- [x] Privacy (`#privacy`)
-- [x] Terms (`#terms`)
+- [x] How Chibi Works in the SPA (`#about`) and direct static URL (`/about.html`).
+- [x] Privacy in the SPA (`#privacy`) and direct static URL (`/privacy.html`).
+- [x] Terms in the SPA (`#terms`) and direct static URL (`/terms.html`).
 - [x] Riot Developer legal boilerplate visible in the site footer.
 - [x] Legal Jibber Jabber non-endorsement notice visible on information pages.
 - [x] Official Riot policy links are available from the information pages.
@@ -72,7 +72,7 @@ The public product must not be changed to provide:
 3. Open Chibi Review and one match detail.
 4. Open Comps and confirm sample/confidence labels.
 5. Open Ask Chibi and verify evidence base/limits.
-6. Open How It Works, Privacy and Terms from the footer.
+6. Open How It Works, Privacy and Terms from the footer and also test the direct `.html` URLs.
 7. Confirm the Riot boilerplate is visible.
 8. Confirm `/riot.txt` is still publicly reachable.
 9. Take screenshots of the submitted description and any approval response for the Overwolf follow-up.

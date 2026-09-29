@@ -12,6 +12,9 @@ Last updated: 2026-09-29
 - **Public prototype:** https://helioconde.github.io/chibi.gg/
 - **Verification file:** https://helioconde.github.io/chibi.gg/riot.txt
 - **Repository:** https://github.com/HelioConde/chibi.gg
+- **How it works:** https://helioconde.github.io/chibi.gg/about.html
+- **Privacy:** https://helioconde.github.io/chibi.gg/privacy.html
+- **Terms:** https://helioconde.github.io/chibi.gg/terms.html
 
 ## Proposed production description
 

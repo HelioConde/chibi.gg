@@ -2035,9 +2035,9 @@ function App() {
             <span>TFT explicado com dados e revisão pós-partida.</span>
           </div>
           <nav aria-label="Informações do Chibi">
-            <button onClick={()=>openInfoPage("about")}>Como funciona</button>
-            <button onClick={()=>openInfoPage("privacy")}>Privacidade</button>
-            <button onClick={()=>openInfoPage("terms")}>Termos</button>
+            <a href={import.meta.env.BASE_URL+"about.html"}>Como funciona</a>
+            <a href={import.meta.env.BASE_URL+"privacy.html"}>Privacidade</a>
+            <a href={import.meta.env.BASE_URL+"terms.html"}>Termos</a>
             <a href="https://github.com/HelioConde/chibi.gg" target="_blank" rel="noreferrer">GitHub ↗</a>
           </nav>
         </div>

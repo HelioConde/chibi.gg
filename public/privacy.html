@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080c12">
+  <meta name="description" content="Política de privacidade do protótipo público chibi.gg.">
+  <link rel="icon" href="./img/icon.png">
+  <link rel="stylesheet" href="./legal.css">
+  <title>chibi.gg — Privacidade</title>
+</head>
+<body>
+  <main class="wrap">
+    <header class="top">
+  <a class="brand" href="./"><img src="./img/icon.png" alt=""><span>chibi.gg</span></a>
+  <nav class="nav" aria-label="Informações do produto">
+    <a href="./about.html">Como funciona</a>
+    <a href="./privacy.html" aria-current="page">Privacidade</a>
+    <a href="./terms.html">Termos</a>
+  </nav>
+</header>
+    <section class="hero">
+  <span class="eyebrow">PRIVACIDADE</span>
+  <h1>O que o Chibi processa<br><em>e onde fica.</em></h1>
+  <p class="lead">Última atualização: 29/09/2026. Esta política descreve o protótipo público atual.</p>
+</section>
+<section class="card">
+  <h2>1. Consultas à Riot</h2>
+  <p>Ao pesquisar um Riot ID, o frontend envia a solicitação ao backend. O backend usa serviços oficiais/suportados da Riot para obter os dados necessários ao protótipo, como perfil TFT, rank e histórico.</p>
+  <h3>2. Cache técnico e Chibi Dataset</h3>
+  <p>O backend pode manter cache técnico de partidas para reduzir consultas repetidas. Esse cache pode conter PUUIDs retornados pela Riot para localizar o participante correto dentro da partida.</p>
+  <p>Separadamente, a tabela de observações agregadas usada nas estatísticas globais armazena dados normalizados de partida, como match id, colocação, set, fila, versão, nível, ouro final, traits e unidades. Essa tabela não armazena Riot ID, nome do jogador ou PUUID.</p>
+  <h3>3. Dados locais no navegador</h3>
+  <p>Buscas recentes, Journal, Lessons, Sessions, presets do Builder, Study Shelf, snapshots locais de rank e progresso de review podem ser mantidos em <code>localStorage</code> no navegador.</p>
+  <h3>4. Credenciais</h3>
+  <p>Riot API key e Supabase service role são mantidas no backend e não devem ser incluídas no JavaScript público.</p>
+  <h3>5. Riot Sign On</h3>
+  <p>O protótipo atual usa busca por Riot ID. O fluxo de produção de self-history está preparado para adotar Riot Sign On após a aprovação da aplicação e o provisionamento das instruções/credenciais pela Riot. Antes de ativar RSO, esta política será atualizada com retenção, sessão, revogação e scopes aplicáveis.</p>
+  <h3>6. Contato</h3>
+  <p>Dúvidas técnicas podem ser abertas no <a href="https://github.com/HelioConde/chibi.gg/issues">repositório público</a>. Não publique informações sensíveis em issues públicas.</p>
+</section>
+    <section class="notice">
+      <strong>RIOT GAMES NOTICE</strong>
+      <p>Chibi.gg isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.</p>
+      <p>Chibi.gg was created under Riot Games' "Legal Jibber Jabber" policy using assets owned by Riot Games. Riot Games does not endorse or sponsor this project.</p>
+    </section>
+    <footer class="footer">
+      Public prototype: <a href="./">chibi.gg</a> ·
+      <a href="https://developer.riotgames.com/policies/general">Riot Developer General Policies</a> ·
+      <a href="https://www.riotgames.com/en/legal">Riot Legal</a>
+    </footer>
+  </main>
+</body>
+</html>
