@@ -1410,11 +1410,11 @@ export default function TeamBuilderPage({
             {economyPlan.queue.map((row,index)=>{
               const entry=staticEntry(staticData?.champions,row.id);
               const src=staticData?tftAssetUrl(staticData.version,"champion",entry):"";
-              const role=row.unit.role==="carry"?"Carry":row.unit.role==="tank"?"Tank":row.unit.role==="utility"?"Utilidade":"";
+              const role=row.unit.role==="carry"?"Carry":row.unit.role==="tank"?"Tank":row.unit.role==="utility"?t("builder.queue.utility"):"";
               const reason=[
                 role,
-                row.traitGain>0?row.traitGain+" trait"+(row.traitGain===1?"":"s")+" ganha"+(row.traitGain===1?"":"m"):"",
-                row.personalGames>0?row.personalGames+" partida"+(row.personalGames===1?"":"s")+" no histórico":"",
+                row.traitGain>0?t("builder.queue.traitsGain",{count:row.traitGain}):"",
+                row.personalGames>0?t("builder.queue.history",{count:row.personalGames}):"",
               ].filter(Boolean).join(" · ");
 
               const budgetCopy=row.fundedCopies;
@@ -1437,9 +1437,9 @@ export default function TeamBuilderPage({
                     <strong>{entry?.name||clean(row.id)}</strong>
                   </div>
                   <small>{row.kind==="upgrade"
-                    ?"upgrade · "+row.targetCopies+" cópia"+(row.targetCopies===1?"":"s")+" extra"+(row.targetCopies===1?"":"s")
-                    :"alvo "+(row.unit.tier||1)+"★ · "+row.targetCopies+" cópia"+(row.targetCopies===1?"":"s")}</small>
-                  {reason&&<small>{reason}{row.personalAverage!=null?" · média "+row.personalAverage.toFixed(2):""}</small>}
+                    ?t("builder.queue.upgrade",{copies:row.targetCopies})
+                    :t("builder.queue.target",{tier:row.unit.tier||1,copies:row.targetCopies})}</small>
+                  {reason&&<small>{reason}{row.personalAverage!=null?t("builder.queue.personalAverage",{average:row.personalAverage.toFixed(2)}):""}</small>}
                 </div>
                 <div className="builder-copy-counter">
                   <button disabled={row.acquired<=0} onClick={()=>changeTransitionCopies(row.id,-1,row.targetCopies)}>−</button>
@@ -1453,19 +1453,19 @@ export default function TeamBuilderPage({
               </article>;
             })}
           </div>
-          :<p className="builder-empty-check">Não há novas cópias para comprar: a transição muda apenas itens, posição, Traits ou Augments.</p>}
+          :<p className="builder-empty-check">{t("builder.queue.empty")}</p>}
 
         <div className="builder-economy-note">
-          <b>Como ler a fila</b>
-          <p>“Core”, “ponte”, “cap” e “upgrade” descrevem o papel da peça dentro do board que você montou. A ordem não garante que trocar imediatamente seja correto; se a unidade ainda não apareceu, apenas siga para o próximo alvo que a loja oferecer.</p>
+          <b>{t("builder.queue.readTitle")}</b>
+          <p>{t("builder.queue.readDesc")}</p>
         </div>
       </section>}
 
       <div className="builder-transition-detail-grid">
         <article className="builder-transition-list">
           <div className="builder-subhead">
-            <span>TROCAS DE PEÇAS</span>
-            <small>ordem visual; não é uma sequência obrigatória de compra</small>
+            <span>{t("builder.swaps.title")}</span>
+            <small>{t("builder.swaps.desc")}</small>
           </div>
           <div className="builder-transition-swaps">
             {transitionAnalysis.leaving.length||transitionAnalysis.entering.length
@@ -1475,7 +1475,7 @@ export default function TeamBuilderPage({
                   const src=staticData?tftAssetUrl(staticData.version,"champion",entry):"";
                   return <div className="out" key={"out-"+unit.id}>
                     <span>{src&&<img src={src} alt=""/>}</span>
-                    <div><strong>{entry?.name||clean(unit.id)}</strong><small>− sai do board</small></div>
+                    <div><strong>{entry?.name||clean(unit.id)}</strong><small>{t("builder.swaps.out")}</small></div>
                   </div>;
                 })}
                 {transitionAnalysis.entering.map(unit=>{
@@ -1484,23 +1484,23 @@ export default function TeamBuilderPage({
                   const unitCost=costFor(unit.id,staticData)*copiesFor(unit.tier||1);
                   return <div className="in" key={"in-"+unit.id}>
                     <span>{src&&<img src={src} alt=""/>}</span>
-                    <div><strong>{entry?.name||clean(unit.id)}</strong><small>+ entra · {unitCost}G em cópias para {unit.tier||1}★</small></div>
+                    <div><strong>{entry?.name||clean(unit.id)}</strong><small>{t("builder.swaps.in",{cost:unitCost,tier:unit.tier||1})}</small></div>
                   </div>;
                 })}
               </>
-              :<p className="builder-empty-check">As mesmas peças estão nos dois boards. A transição está em upgrades, itens, posição ou Augments.</p>}
+              :<p className="builder-empty-check">{t("builder.swaps.same")}</p>}
           </div>
 
           {transitionAnalysis.upgrades.length>0&&<div className="builder-transition-upgrades">
             <div className="builder-subhead">
-              <span>UPGRADES PENDENTES</span>
-              <small>custo das cópias extras, sem reroll</small>
+              <span>{t("builder.upgrades.title")}</span>
+              <small>{t("builder.upgrades.desc")}</small>
             </div>
             {transitionAnalysis.upgrades.map(row=>{
               const entry=staticEntry(staticData?.champions,row.unit.id);
               return <p key={row.unit.id}>
                 <b>{entry?.name||clean(row.unit.id)}</b>
-                <span>{row.beforeTier}★ → {row.afterTier}★ · +{row.extraCopies} cópias · {row.cost}G</span>
+                <span>{t("builder.upgrades.row",{before:row.beforeTier,after:row.afterTier,copies:row.extraCopies,cost:row.cost})}</span>
               </p>;
             })}
           </div>}
@@ -1508,8 +1508,8 @@ export default function TeamBuilderPage({
 
         <article className="builder-transition-holders">
           <div className="builder-subhead">
-            <span>HOLDERS DE ITENS</span>
-            <small>evidência do seu histórico; não é recomendação universal</small>
+            <span>{t("builder.holders.title")}</span>
+            <small>{t("builder.holders.desc")}</small>
           </div>
           {transitionAnalysis.holderHints.length
             ?<div>
@@ -1532,28 +1532,28 @@ export default function TeamBuilderPage({
                       <div>
                         <strong>{holderEntry?.name||clean(hint.holder.id)}</strong>
                         <small>{hint.direct
-                          ?"já carrega item compatível no board atual"
-                          :hint.games+" partida"+(hint.games===1?"":"s")+" com item compatível"+(hint.average!=null?" · média "+hint.average.toFixed(2):"")}</small>
+                          ?t("builder.holders.direct")
+                          :t("builder.holders.history",{games:hint.games,average:hint.average!=null?t("builder.holders.average",{average:hint.average.toFixed(2)}):""})}</small>
                       </div>
                     </>
-                    :<div className="no-holder"><strong>Sem evidência</strong><small>Nenhuma peça que sai apareceu com esses itens no histórico carregado.</small></div>}
+                    :<div className="no-holder"><strong>{t("builder.holders.none")}</strong><small>{t("builder.holders.noneDesc")}</small></div>}
                 </div>;
               })}
             </div>
-            :<p className="builder-empty-check">Adicione itens às peças que entram para procurar holders entre as unidades que saem.</p>}
+            :<p className="builder-empty-check">{t("builder.holders.empty")}</p>}
         </article>
       </div>
 
       <div className="builder-transition-context">
         <div>
-          <span>TRAITS QUE MUDAM</span>
+          <span>{t("builder.transition.traits")}</span>
           <p>{transitionAnalysis.traitChanges.length
             ?transitionAnalysis.traitChanges.map(row=>{
               const name=staticEntry(staticData?.traits,row.id)?.name||clean(row.id);
               const delta=row.after-row.before;
               return name+" "+(delta>0?"+":"")+delta;
             }).join(" · ")
-            :"sem mudança estrutural de traits"}</p>
+            :t("builder.transition.noTraitChange")}</p>
         </div>
         <div>
           <span>AUGMENTS</span>
@@ -1562,7 +1562,7 @@ export default function TeamBuilderPage({
               ...transitionAnalysis.augmentChanges.leaving.map(id=>"− "+(staticEntry(staticData?.augments,id)?.name||clean(id))),
               ...transitionAnalysis.augmentChanges.entering.map(id=>"+ "+(staticEntry(staticData?.augments,id)?.name||clean(id))),
             ].join(" · ")
-            :"sem mudança de Augments"}</p>
+            :t("builder.transition.noAugmentChange")}</p>
         </div>
       </div>
     </section>}
@@ -1570,12 +1570,12 @@ export default function TeamBuilderPage({
     <section className="builder-position-lab">
       <div className="builder-position-head">
         <div>
-          <span>FORMAÇÃO</span>
-          <h2>Posicionamento</h2>
-          <p>Marque papéis e organize as 4 fileiras. O Chibi avalia apenas a formação que você montou; a API de partidas não expõe posições históricas.</p>
+          <span>{t("builder.positioning.title")}</span>
+          <h2>{t("builder.positioning.heading")}</h2>
+          <p>{t("builder.positioning.desc")}</p>
         </div>
         <button className={positioningMode?"active":""} onClick={togglePositioning}>
-          {positioningMode?"Sair do modo mover":"Mover unidades"}
+          {positioningMode?t("builder.positioning.exitMove"):t("builder.positioning.moveUnits")}
         </button>
       </div>
 
@@ -1583,86 +1583,86 @@ export default function TeamBuilderPage({
         <article className="builder-position-stat">
           <span>FRONTLINE</span>
           <strong>{positionAnalysis.front}</strong>
-          <small>fileiras 1–2</small>
+          <small>{t("builder.positioning.frontRows")}</small>
         </article>
         <article className="builder-position-stat">
           <span>BACKLINE</span>
           <strong>{positionAnalysis.back}</strong>
-          <small>fileiras 3–4</small>
+          <small>{t("builder.positioning.backRows")}</small>
         </article>
         <article className="builder-position-stat">
-          <span>PAPÉIS DEFINIDOS</span>
+          <span>{t("builder.positioning.roles")}</span>
           <strong>{positionAnalysis.assigned}/{units.length||0}</strong>
-          <small>{positionAnalysis.tanks} tank · {positionAnalysis.carries} carry · {positionAnalysis.utilities} util.</small>
+          <small>{t("builder.positioning.rolesSummary",{tanks:positionAnalysis.tanks,carries:positionAnalysis.carries,utilities:positionAnalysis.utilities})}</small>
         </article>
         <article className={"builder-position-stat "+(positionAnalysis.fit!=null&&positionAnalysis.fit<70?"warning":"")}>
-          <span>ALINHAMENTO</span>
+          <span>{t("builder.positioning.alignment")}</span>
           <strong>{positionAnalysis.fit==null?"—":positionAnalysis.fit+"%"}</strong>
-          <small>Tank na frente · Carry atrás</small>
+          <small>{t("builder.positioning.alignmentDesc")}</small>
         </article>
       </div>
 
       <div className="builder-position-reading">
         <div>
-          <span>LEITURA RÁPIDA</span>
+          <span>{t("builder.positioning.quick")}</span>
           <strong>{positionAnalysis.assigned===0
-            ?"Defina o papel das peças principais"
+            ?t("builder.positioning.needRoles")
             :positionAnalysis.carryFront.length||positionAnalysis.tankBack.length
-              ?"Há papéis fora da zona esperada"
-              :"Papéis marcados estão coerentes com as zonas"}</strong>
+              ?t("builder.positioning.conflict")
+              :t("builder.positioning.ok")}</strong>
           <p>{positionAnalysis.assigned===0
-            ?"Use Carry, Tank e Utilidade no roster. Isso não muda as estatísticas; serve para o Chibi entender a intenção da formação."
+            ?t("builder.positioning.needRolesDesc")
             :[
-              positionAnalysis.carryFront.length?positionAnalysis.carryFront.length+" carry na frontline":"",
-              positionAnalysis.tankBack.length?positionAnalysis.tankBack.length+" tank na backline":"",
-              positionAnalysis.edgeCarries?positionAnalysis.edgeCarries+" carry de canto":"",
-            ].filter(Boolean).join(" · ")||"Nenhum conflito básico de papel detectado."}</p>
+              positionAnalysis.carryFront.length?t("builder.positioning.carryFront",{count:positionAnalysis.carryFront.length}):"",
+              positionAnalysis.tankBack.length?t("builder.positioning.tankBack",{count:positionAnalysis.tankBack.length}):"",
+              positionAnalysis.edgeCarries?t("builder.positioning.edgeCarry",{count:positionAnalysis.edgeCarries}):"",
+            ].filter(Boolean).join(" · ")||t("builder.positioning.noConflict")}</p>
         </div>
         <div className="builder-position-spread">
-          <span>OCUPAÇÃO</span>
-          <b>{positionAnalysis.columns}/7 colunas</b>
-          <b>{positionAnalysis.rows}/4 fileiras</b>
+          <span>{t("builder.positioning.occupation")}</span>
+          <b>{t("builder.positioning.columns",{count:positionAnalysis.columns})}</b>
+          <b>{t("builder.positioning.rows",{count:positionAnalysis.rows})}</b>
         </div>
       </div>
 
       {positioningMode&&<div className="builder-position-instruction">
-        <b>{movingHex==null?"Clique em uma unidade no tabuleiro para selecionar.":"Unidade selecionada no hex "+(movingHex+1)+". Clique em outro hex para mover ou trocar."}</b>
-        {movingHex!=null&&<button onClick={()=>setMovingHex(null)}>Cancelar movimento</button>}
+        <b>{movingHex==null?t("builder.positioning.select"):t("builder.positioning.moveHint",{hex:movingHex+1})}</b>
+        {movingHex!=null&&<button onClick={()=>setMovingHex(null)}>{t("builder.positioning.cancel")}</button>}
       </div>}
     </section>
 
     <section className="builder-augment-lab">
       <div className="builder-augment-head">
         <div>
-          <span>CONTEXTO DA PARTIDA</span>
+          <span>{t("builder.augments.context")}</span>
           <h2>Augments</h2>
-          <p>Monte até 3 Augments. O Chibi compara essa escolha com o seu histórico, mas mantém o board como eixo principal da análise.</p>
+          <p>{t("builder.augments.desc")}</p>
         </div>
         <div className="builder-context-overlap">
-          <small>OVERLAP NAS PARTIDAS PARECIDAS</small>
+          <small>{t("builder.augments.overlap")}</small>
           <strong>{selectedAugments.length&&contextOverlap.augment!=null?Math.round(contextOverlap.augment*100)+"%":"—"}</strong>
           <span>{selectedAugments.length
-            ?contextOverlap.withAugment+"/"+similar.length+" partidas com ao menos 1 escolhido"
-            :"escolha Augments para comparar"}</span>
+            ?t("builder.augments.overlapCount",{with:contextOverlap.withAugment,total:similar.length})
+            :t("builder.augments.chooseCompare")}</span>
         </div>
       </div>
 
       <div className="builder-augment-layout">
         <div className="builder-augment-selected">
           <div className="builder-subhead">
-            <span>SEUS 3 SLOTS</span>
-            <small>Clique em um Augment equipado para remover.</small>
+            <span>{t("builder.augments.slots")}</span>
+            <small>{t("builder.augments.removeDesc")}</small>
           </div>
           <div className="builder-augment-slots">
             {[0,1,2].map(index=>{
               const augmentId=selectedAugments[index];
               const entry=staticEntry(staticData?.augments,augmentId);
               const src=augmentId&&staticData?tftAssetUrl(staticData.version,"augment",entry):"";
-              const name=entry?.name||"Slot "+(index+1);
+              const name=entry?.name||t("builder.augments.slot",{index:index+1});
               return <button
                 className={augmentId?"filled":"empty"}
                 onClick={()=>augmentId&&removeAugment(index)}
-                title={augmentId?"Remover "+name:"Escolha um Augment"}
+                title={augmentId?t("builder.augments.remove",{name}):t("builder.augments.choose")}
                 key={index}
               >
                 <span>{src&&<img src={src} alt=""/>}</span>
@@ -1676,8 +1676,8 @@ export default function TeamBuilderPage({
 
           <div className="builder-augment-history">
             <div className="builder-subhead">
-              <span>MAIS PRESENTES NO SEU HISTÓRICO</span>
-              <small>{matches.length} partidas carregadas</small>
+              <span>{t("builder.augments.history")}</span>
+              <small>{t("builder.augments.loaded",{count:matches.length})}</small>
             </div>
             {augmentHistory.length
               ?<div className="builder-history-augments">
@@ -1690,21 +1690,21 @@ export default function TeamBuilderPage({
                     <span>{src&&<img src={src} alt=""/>}</span>
                     <div>
                       <strong>{name}</strong>
-                      <small>{row.games}x · média {row.avgPlacement.toFixed(2)}</small>
+                      <small>{t("builder.augments.historyRow",{count:row.games,average:row.avgPlacement.toFixed(2)})}</small>
                     </div>
                   </button>;
                 })}
               </div>
-              :<p className="builder-empty-check">Nenhum Augment encontrado no histórico carregado.</p>}
+              :<p className="builder-empty-check">{t("builder.augments.historyEmpty")}</p>}
           </div>
         </div>
 
         <div className="builder-augment-library">
           <div className="builder-subhead">
-            <span>BIBLIOTECA DE AUGMENTS</span>
-            <small>Data Dragon atual · máximo de 3</small>
+            <span>{t("builder.augments.library")}</span>
+            <small>{t("builder.augments.libraryDesc")}</small>
           </div>
-          <input value={augmentQuery} onChange={event=>setAugmentQuery(event.target.value)} placeholder="Pesquisar Augment..."/>
+          <input value={augmentQuery} onChange={event=>setAugmentQuery(event.target.value)} placeholder={t("builder.augments.search")}/>
           <div className="builder-augment-grid">
             {augments.map(augment=>{
               const selected=selectedAugments.includes(augment.id);
