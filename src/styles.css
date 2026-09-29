@@ -18313,3 +18313,45 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
     line-height:1.4;
   }
 }
+
+
+/* i18n language switcher */
+.language-switcher{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  min-height:36px;
+  padding:0 8px 0 10px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;
+  background:rgba(255,255,255,.045);
+  color:inherit;
+}
+.language-switcher span{
+  font-size:13px;
+  opacity:.78;
+}
+.language-switcher select{
+  appearance:none;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:inherit;
+  font:inherit;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+.language-switcher select option{
+  color:#111827;
+  background:#fff;
+}
+@media (max-width:900px){
+  .language-switcher{
+    min-height:34px;
+    padding-inline:8px;
+  }
+  .language-switcher span{
+    display:none;
+  }
+}
