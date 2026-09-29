@@ -15372,3 +15372,205 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
     grid-column:1/-1;
   }
 }
+
+
+/* -----------------------------------------------------------------------
+   Match Review 2.0
+   ----------------------------------------------------------------------- */
+.match-review-overview{
+  margin:12px 0 14px;
+  padding:16px;
+  border:1px solid rgba(117,99,231,.30);
+  border-radius:14px;
+  background:
+    radial-gradient(circle at 92% 0%,rgba(117,99,231,.09),transparent 30%),
+    linear-gradient(180deg,rgba(117,99,231,.025),#0b1018 45%);
+}
+.match-review-overview-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+}
+.match-review-overview-head>div:first-child>span{
+  display:block;
+  color:#9483ff;
+  font-size:8px;
+  font-weight:950;
+  letter-spacing:1px;
+}
+.match-review-overview-head h3{
+  margin:5px 0 4px;
+  font-size:20px;
+  letter-spacing:-.4px;
+}
+.match-review-overview-head p{
+  margin:0;
+  color:#78859a;
+  font-size:9px;
+  line-height:1.45;
+}
+.match-cache-badge{
+  flex:0 0 auto;
+  display:grid;
+  gap:1px;
+  min-width:105px;
+  padding:7px 9px;
+  border:1px solid #2e3850;
+  border-radius:9px;
+  background:#101721;
+}
+.match-cache-badge span{
+  color:#8f82ed;
+  font-size:7px;
+  font-weight:950;
+  letter-spacing:.8px;
+}
+.match-cache-badge small{
+  color:#647187;
+  font-size:6px;
+}
+.match-cache-badge.hit{
+  border-color:rgba(72,209,153,.24);
+  background:rgba(72,209,153,.035);
+}
+.match-cache-badge.hit span{
+  color:#67cca1;
+}
+.match-review-priority{
+  margin-top:13px;
+  padding:13px 14px;
+  border:1px solid rgba(126,104,255,.28);
+  border-radius:11px;
+  background:rgba(117,99,231,.055);
+}
+.match-review-priority>span{
+  display:block;
+  color:#8e7dff;
+  font-size:7px;
+  font-weight:950;
+  letter-spacing:.9px;
+}
+.match-review-priority>strong{
+  display:block;
+  margin-top:5px;
+  color:#e2e7f0;
+  font-size:12px;
+  line-height:1.35;
+}
+.match-review-priority>p{
+  margin:5px 0 0;
+  color:#8995a7;
+  font-size:9px;
+  line-height:1.5;
+}
+.match-review-facts{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:6px;
+  margin-top:9px;
+}
+.match-review-facts article{
+  min-width:0;
+  padding:9px 10px;
+  border:1px solid #232c3e;
+  border-radius:9px;
+  background:#0f1620;
+}
+.match-review-facts article.good{
+  border-color:rgba(72,209,153,.20);
+}
+.match-review-facts article.warning{
+  border-color:rgba(231,165,107,.26);
+}
+.match-review-facts span{
+  display:block;
+  color:#657288;
+  font-size:6px;
+  font-weight:900;
+}
+.match-review-facts strong{
+  display:block;
+  margin-top:4px;
+  color:#e1e6ef;
+  font-size:14px;
+}
+.match-review-facts small{
+  display:block;
+  margin-top:2px;
+  color:#5e6b80;
+  font-size:6px;
+  line-height:1.35;
+}
+.match-review-reference{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  gap:10px;
+  align-items:center;
+  margin-top:9px;
+  padding:10px 12px;
+  border:1px solid #222b3d;
+  border-radius:10px;
+  background:#0d141d;
+}
+.match-review-reference>div{
+  display:grid;
+  gap:3px;
+}
+.match-review-reference>div:last-child{
+  text-align:right;
+}
+.match-review-reference span{
+  color:#657288;
+  font-size:6px;
+  font-weight:950;
+  letter-spacing:.7px;
+}
+.match-review-reference strong{
+  color:#cfd7e4;
+  font-size:9px;
+}
+.match-review-reference i{
+  color:#59667b;
+  font-size:11px;
+  font-style:normal;
+}
+.match-review-limit{
+  display:block;
+  margin-top:8px;
+  color:#59677b;
+  font-size:7px;
+  line-height:1.4;
+}
+.match-summary-augments{
+  margin-top:10px;
+}
+
+@media(max-width:860px){
+  .match-review-facts{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+}
+@media(max-width:620px){
+  .match-review-overview-head{
+    flex-direction:column;
+  }
+  .match-cache-badge{
+    width:100%;
+  }
+  .match-review-facts{
+    grid-template-columns:1fr 1fr;
+  }
+  .match-review-facts article:last-child{
+    grid-column:1/-1;
+  }
+  .match-review-reference{
+    grid-template-columns:1fr;
+  }
+  .match-review-reference i{
+    display:none;
+  }
+  .match-review-reference>div:last-child{
+    text-align:left;
+  }
+}

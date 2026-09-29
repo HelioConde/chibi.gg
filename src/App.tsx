@@ -38,6 +38,7 @@ import PatchAdaptation from "./components/PatchAdaptation";
 import BoardCounterfactual from "./components/BoardCounterfactual";
 import LobbyAutopsy from "./components/LobbyAutopsy";
 import MatchScorecard from "./components/MatchScorecard";
+import MatchReviewOverview from "./components/MatchReviewOverview";
 import MatchStory from "./components/MatchStory";
 import ChibiShareCard from "./components/ChibiShareCard";
 import PersonalVsGlobalMeta from "./components/PersonalVsGlobalMeta";
@@ -1973,7 +1974,13 @@ function App() {
                 <div>
                   <span>REVIEW DA PARTIDA</span>
                   <h2>{openedMatch ? matchReviewCue(openedMatch).title : displaySetName(selectedMatch.match.setName,selectedMatch.match.setNumber)}</h2>
-                  <p>{displaySetName(selectedMatch.match.setName,selectedMatch.match.setNumber)} · {queueLabel(staticData,selectedMatch.match.queueId)} · {formatWhen(selectedMatch.match.playedAt)}</p>
+                  <p>
+                    {displaySetName(selectedMatch.match.setName,selectedMatch.match.setNumber)}
+                    {" · "}{queueLabel(staticData,selectedMatch.match.queueId)}
+                    {" · "}{formatWhen(selectedMatch.match.playedAt)}
+                    {" · Riot Match API"}
+                    {selectedMatch.source?.cache==="hit"?" · cache":""}
+                  </p>
                 </div>
                 {openedMatch&&<div className="match-modal-head-actions">
                   <div className="match-modal-nav" title="Use ← e → para navegar entre partidas">
@@ -2001,14 +2008,24 @@ function App() {
                   <div className="board-row modal-board">
                     {openedMatch.units.slice(0,9).map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact key={unit.characterId+index}/>)}
                   </div>
+                  {openedMatch.augments.length>0&&<div className="augment-row match-summary-augments">
+                    {openedMatch.augments.slice(0,3).map((augment)=><AugmentVisual id={augment} staticData={staticData} key={augment}/>)}
+                  </div>}
                 </div>
                 <div className="match-summary-stats">
                   <span><small>NÍVEL</small><b>{openedMatch.level}</b></span>
+                  <span><small>STAGE</small><b>{matchRoundLabel(openedMatch)||"—"}</b></span>
                   <span><small>DANO</small><b>{openedMatch.damageToPlayers}</b></span>
+                  <span><small>ELIMINAÇÕES</small><b>{openedMatch.playersEliminated||0}</b></span>
                   <span><small>OURO</small><b>{openedMatch.goldLeft}g</b></span>
                   <span><small>DURAÇÃO</small><b>{formatDuration(selectedMatch.match.duration)}</b></span>
                 </div>
               </section>}
+
+              {openedMatch&&<MatchReviewOverview
+                target={openedMatch}
+                detail={selectedMatch}
+              />}
 
               {openedMatch&&<MatchStory
                 target={openedMatch}

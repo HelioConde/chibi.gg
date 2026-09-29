@@ -151,17 +151,17 @@ export default function MatchStory({target,detail}:Props){
     </article>
 
     <article className="match-story-good">
-      <span>O QUE FUNCIONOU</span>
+      <span>SINAIS POSITIVOS DO SNAPSHOT</span>
       <ul>{story.working.slice(0,3).map(item=><li key={item}>{item}</li>)}</ul>
     </article>
 
     <article className="match-story-warning">
-      <span>O QUE TE PUNIU</span>
+      <span>SINAIS PARA REVISAR</span>
       <ul>{story.punished.slice(0,3).map(item=><li key={item}>{item}</li>)}</ul>
     </article>
 
     <article className="match-story-gap">
-      <span>{target.placement===1?"O QUE TE SEPAROU DO 2º":"O QUE TE SEPAROU DE QUEM FICOU ACIMA"}</span>
+      <span>{target.placement===1?"DIFERENÇAS VS 2º":"DIFERENÇAS VS QUEM FICOU ACIMA"}</span>
       <div className="match-gap-benchmarks">
         <div><small>VOCÊ</small><b>{target.placement}º</b><em>{story.ownValue}g board · Nv {target.level} · {threeStars(target)} 3★</em></div>
         <i>↔</i>

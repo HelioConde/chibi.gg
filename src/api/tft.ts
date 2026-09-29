@@ -47,6 +47,7 @@ export type TftProfile = {
     ranked:"tft-league-v1";
     matches:"tft-match-v1";
     retrievedAt:number;
+    cache?:{hits:number;fetched:number};
   };
 };
 
@@ -172,12 +173,19 @@ export type TftMatchDetail = {
       placement: number;
       level: number;
       goldLeft: number;
+      lastRound?: number;
+      timeEliminated?: number;
       damageToPlayers: number;
       playersEliminated: number;
       augments: string[];
       traits: TftTrait[];
       units: TftUnit[];
     }>;
+  };
+  source?: {
+    match:"tft-match-v1";
+    retrievedAt:number;
+    cache?:"hit"|"miss";
   };
 };
 
