@@ -8,6 +8,13 @@ export type TftTrait = {
   tierTotal?: number;
 };
 
+export type TftCompanion = {
+  contentId:string;
+  itemId:string;
+  skinId:string;
+  species:string;
+};
+
 export type TftUnit = {
   characterId: string;
   rarity: number;
@@ -30,6 +37,7 @@ export type TftMatch = {
   timeEliminated?: number;
   damageToPlayers: number;
   playersEliminated?: number;
+  companion?: TftCompanion|null;
   augments: string[];
   traits: TftTrait[];
   units: TftUnit[];
@@ -177,6 +185,7 @@ export type TftMatchDetail = {
       timeEliminated?: number;
       damageToPlayers: number;
       playersEliminated: number;
+      companion?: TftCompanion|null;
       augments: string[];
       traits: TftTrait[];
       units: TftUnit[];
