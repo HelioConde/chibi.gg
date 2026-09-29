@@ -1832,7 +1832,7 @@ function App() {
                               <span><b>{match.level}</b><small>nível</small></span>
                               <span><b>{match.playersEliminated||0}</b><small>elim.</small></span>
                             </div>
-                            <strong>{match.damageToPlayers} dano</strong>
+                            <strong>{match.damageToPlayers>0?match.damageToPlayers+" dano":"dano n/d"}</strong>
                             <small>abrir análise →</small>
                           </div>
                         </button>;
@@ -2015,8 +2015,8 @@ function App() {
                 <div className="match-summary-stats">
                   <span><small>NÍVEL</small><b>{openedMatch.level}</b></span>
                   <span><small>STAGE</small><b>{matchRoundLabel(openedMatch)||"—"}</b></span>
-                  <span><small>DANO</small><b>{openedMatch.damageToPlayers}</b></span>
-                  <span><small>ELIMINAÇÕES</small><b>{openedMatch.playersEliminated||0}</b></span>
+                  <span><small>DANO</small><b>{selectedMatch.match.participants.some(player=>player.damageToPlayers>0)?openedMatch.damageToPlayers:"—"}</b></span>
+                  <span><small>ELIMINAÇÕES</small><b>{selectedMatch.match.participants.some(player=>(player.playersEliminated||0)>0)?(openedMatch.playersEliminated||0):"—"}</b></span>
                   <span><small>OURO</small><b>{openedMatch.goldLeft}g</b></span>
                   <span><small>DURAÇÃO</small><b>{formatDuration(selectedMatch.match.duration)}</b></span>
                 </div>
@@ -2101,7 +2101,7 @@ function App() {
                         </div>
                       </div>
                       <div className="lobby-meta">
-                        <strong>{participant.damageToPlayers} dano</strong>
+                        <strong>{selectedMatch.match.participants.some(player=>player.damageToPlayers>0)?participant.damageToPlayers+" dano":"dano n/d"}</strong>
                         <span>{participant.goldLeft}g</span>
                       </div>
                     </article>
