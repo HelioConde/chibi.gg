@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { TftMatch } from "../api/tft";
 import { buildReviewQueue, ReviewQueueItem } from "../analysis/reviewQueue";
 import { getReviewedMatchIds, markMatchReviewed } from "../reviewProgress";
+import { useI18n } from "../i18n";
 
 type Props={
   playerKey:string;
@@ -9,14 +10,14 @@ type Props={
   onOpenMatch:(match:TftMatch,queueIds:string[],index:number)=>void;
 };
 
-function kindLabel(item:ReviewQueueItem){
-  if(item.kind==="priority") return "PRIORIDADE";
-  if(item.kind==="compare") return "COMPARAR";
-  return "REFERÊNCIA";
-}
-
 export default function ReviewQueue({playerKey,matches,onOpenMatch}:Props){
-  const queue=useMemo(()=>buildReviewQueue(matches),[matches]);
+  const { t }=useI18n();
+  const queue=useMemo(()=>buildReviewQueue(matches,t),[matches,t]);
+  const kindLabel=(item:ReviewQueueItem)=>{
+    if(item.kind==="priority") return t("reviewQueue.kind.priority");
+    if(item.kind==="compare") return t("reviewQueue.kind.compare");
+    return t("reviewQueue.kind.reference");
+  };
   const [reviewed,setReviewed]=useState<Set<string>>(()=>getReviewedMatchIds(playerKey));
 
   useEffect(()=>{
@@ -46,21 +47,21 @@ export default function ReviewQueue({playerKey,matches,onOpenMatch}:Props){
     <div className="review-queue-head">
       <div>
         <span>REVIEW QUEUE</span>
-        <h2>Revise só o que importa</h2>
-        <p>O Chibi escolheu problema, contraste e referência — e já diz o que você deve procurar em cada uma.</p>
+        <h2>{t("reviewQueue.ui.title")}</h2>
+        <p>{t("reviewQueue.ui.desc")}</p>
       </div>
       <div className="review-queue-progress">
         <strong>{completed}/{queue.length}</strong>
-        <small>revisadas</small>
+        <small>{t("reviewQueue.ui.reviewed")}</small>
       </div>
     </div>
 
     {next&&<div className="review-next">
       <div>
-        <span>PRÓXIMA AÇÃO</span>
-        <strong>{reviewed.has(next.matchId)?"Fila concluída — reveja se quiser":"Abra "+next.placement+"º lugar · "+next.title.toLowerCase()}</strong>
+        <span>{t("reviewQueue.ui.next")}</span>
+        <strong>{reviewed.has(next.matchId)?t("reviewQueue.ui.done"):t("reviewQueue.ui.openPlace",{placement:next.placement,title:next.title.toLowerCase()})}</strong>
       </div>
-      <button onClick={()=>open(next)}>Abrir análise →</button>
+      <button onClick={()=>open(next)}>{t("reviewQueue.ui.openAnalysis")}</button>
     </div>}
 
     <div className="review-queue-list">
@@ -78,22 +79,22 @@ export default function ReviewQueue({playerKey,matches,onOpenMatch}:Props){
             <h3>{item.title}</h3>
             <p>{item.reason}</p>
             <div className="review-focus">
-              <span>O QUE PROCURAR</span>
+              <span>{t("reviewQueue.ui.lookFor")}</span>
               <strong>{item.focus}</strong>
             </div>
             <small>{item.evidence}</small>
           </div>
 
           <div className="review-item-actions">
-            <button onClick={()=>open(item)}>Abrir</button>
+            <button onClick={()=>open(item)}>{t("reviewQueue.ui.open")}</button>
             <button className={done?"reviewed":""} onClick={()=>toggleReviewed(item.matchId)}>
-              {done?"Revisada ✓":"Marcar revisada"}
+              {done?t("reviewQueue.ui.reviewedDone"):t("reviewQueue.ui.mark")}
             </button>
           </div>
         </article>;
       })}
     </div>
 
-    <p className="review-queue-note">A fila usa somente o snapshot disponível das partidas. Marcar como revisada fica salvo neste navegador.</p>
+    <p className="review-queue-note">{t("reviewQueue.ui.note")}</p>
   </section>;
 }
