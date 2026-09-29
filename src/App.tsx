@@ -426,11 +426,13 @@ function App() {
     const tab=parseProfileTab(params.get("tab"));
     const queueRaw=Number(params.get("queue"));
     const queue=Number.isFinite(queueRaw)&&queueRaw>0?queueRaw:null;
+    const setRaw=Number(params.get("set"));
+    const setNumber=Number.isFinite(setRaw)&&setRaw>0?setRaw:null;
 
     if(player&&tag){
       setRiotId(player+"#"+tag);
       setPlatform(region);
-      void loadPlayer(player,tag,region,false,tab,queue);
+      void loadPlayer(player,tag,region,false,tab,queue,setNumber);
     }
     if(params.get("source")==="native") localStorage.setItem("chibi:opened_from_native","true");
 
@@ -439,6 +441,8 @@ function App() {
       setProfileTab(parseProfileTab(nextParams.get("tab")));
       const raw=Number(nextParams.get("queue"));
       setSelectedQueue(Number.isFinite(raw)&&raw>0?raw:null);
+      const setRaw=Number(nextParams.get("set"));
+      setSelectedSet(Number.isFinite(setRaw)&&setRaw>0?setRaw:null);
       setStudyRequest(readStudyRequest());
       setStudyOpenedMatchId("");
     };
@@ -723,7 +727,11 @@ function App() {
     ? Math.floor((Date.now()-latestPlayedAt)/86400000)
     : null;
 
-  function updateProfileUrl(tab:ProfileTab=profileTab,queue:number|null=selectedQueue){
+  function updateProfileUrl(
+    tab:ProfileTab=profileTab,
+    queue:number|null=selectedQueue,
+    setNumber:number|null=currentSet,
+  ){
     if(!profile) return;
     const url=new URL(window.location.href);
     url.searchParams.set("player",profile.player.gameName);
@@ -732,12 +740,14 @@ function App() {
     url.searchParams.set("tab",tab);
     if(queue!=null) url.searchParams.set("queue",String(queue));
     else url.searchParams.delete("queue");
+    if(setNumber!=null) url.searchParams.set("set",String(setNumber));
+    else url.searchParams.delete("set");
     window.history.replaceState({},"",url.toString());
   }
 
   function changeProfileTab(tab:ProfileTab){
     setProfileTab(tab);
-    updateProfileUrl(tab,selectedQueue);
+    updateProfileUrl(tab,selectedQueue,currentSet);
   }
 
   function changeSet(setNumber:number){
@@ -745,12 +755,13 @@ function App() {
     setSelectedQueue(null);
     setHistoryFilter("all");
     clearEvidence();
+    updateProfileUrl(profileTab,null,setNumber);
   }
 
   function changeQueue(queue:number|null){
     setSelectedQueue(queue);
     clearEvidence();
-    updateProfileUrl(profileTab,queue);
+    updateProfileUrl(profileTab,queue,currentSet);
   }
 
   function showEvidence(ids:string[],label:string){
@@ -791,6 +802,7 @@ function App() {
     updateUrl=true,
     initialTab:ProfileTab="matches",
     initialQueue:number|null=null,
+    initialSet:number|null=null,
   ){
     setLoading(true);
     setError("");
@@ -799,7 +811,7 @@ function App() {
     setHasMore(true);
     setSelectedMatch(null);
     setOpenedMatch(null);
-    setSelectedSet(null);
+    setSelectedSet(initialSet);
     setSelectedQueue(initialQueue);
     setProfileTab(initialTab);
     studyAttempts.current=0;
@@ -844,6 +856,14 @@ function App() {
         url.searchParams.set("tab",initialTab);
         if(initialQueue!=null) url.searchParams.set("queue",String(initialQueue));
         else url.searchParams.delete("queue");
+        const resolvedSet=initialSet ?? (
+          data.matches
+            ?.map(match=>Number(match.setNumber))
+            .find(setNumber=>Number.isFinite(setNumber)&&setNumber>0)
+          ?? null
+        );
+        if(resolvedSet!=null) url.searchParams.set("set",String(resolvedSet));
+        else url.searchParams.delete("set");
         window.history.replaceState({},"",url.toString());
       }
     }catch(err){
@@ -883,6 +903,7 @@ function App() {
       true,
       "overview",
       selectedQueue,
+      currentSet,
     );
   }
 
