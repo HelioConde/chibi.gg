@@ -18178,3 +18178,38 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
     grid-template-columns:1fr;
   }
 }
+
+
+.home-compliance-link{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  margin-top:8px;
+  padding:7px 9px;
+  border:1px solid rgba(117,99,231,.20);
+  border-radius:8px;
+  background:rgba(117,99,231,.035);
+  color:#8e82e7;
+  text-align:left;
+  cursor:pointer;
+}
+.home-compliance-link span{
+  font-size:7px;
+  font-weight:950;
+}
+.home-compliance-link small{
+  color:#6d7890;
+  font-size:6px;
+}
+.home-compliance-link:hover{
+  border-color:rgba(117,99,231,.42);
+  background:rgba(117,99,231,.06);
+}
+@media(max-width:620px){
+  .home-compliance-link{
+    width:100%;
+    align-items:flex-start;
+    flex-direction:column;
+    gap:2px;
+  }
+}
