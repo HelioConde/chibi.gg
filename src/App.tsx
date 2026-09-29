@@ -64,6 +64,8 @@ import PlayerEvolution from "./components/PlayerEvolution";
 import DDragonArt from "./components/DDragonArt";
 import MatchBoardMap from "./components/MatchBoardMap";
 import RiotServiceStatus from "./components/RiotServiceStatus";
+import RiotDataBar from "./components/RiotDataBar";
+import RiotRecentPulse from "./components/RiotRecentPulse";
 import { SITE_IMAGES } from "./siteAssets";
 import { markMatchReviewed } from "./reviewProgress";
 import { recordRankSnapshot } from "./rankHistory";
@@ -1436,6 +1438,13 @@ function App() {
             </div>
           </section>
 
+          <RiotDataBar
+            profile={profile}
+            matchCount={matches.length}
+            refreshing={loading}
+            onRefresh={searchPlayer}
+          />
+
           <section className="profile-context-strip">
             <div className="queue-tabs">
               {availableQueues.length<=1 ? (
@@ -1451,7 +1460,7 @@ function App() {
                 ))}
               </>}
             </div>
-            <span>{analysisMatches.length} partidas no contexto</span>
+            <span>{analysisMatches.length} partidas no contexto · até 20 por sincronização</span>
           </section>
 
           {error && <div className="profile-error">{error}</div>}
@@ -1668,6 +1677,8 @@ function App() {
           </>}
 
           {profileTab==="matches"&&<>
+            <RiotRecentPulse matches={analysisMatches}/>
+
             <section className={"matches-priority-bar "+(primaryReviewSignal?"tone-"+primaryReviewSignal.tone:"")}>
               <div className="matches-priority-problem">
                 <span>PRINCIPAL DESCOBERTA DO CHIBI</span>

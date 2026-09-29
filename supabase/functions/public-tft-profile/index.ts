@@ -113,7 +113,7 @@ Deno.serve(async(req)=>{
         return json({
           error:"riot_api_key_rejected",
           upstreamStatus:accountRes.status,
-          message:"A chave da Riot usada pelo Chibi expirou ou foi rejeitada. Atualize RIOT_API_KEY no Supabase.",
+          message:"A integração do Chibi com a Riot precisa ser renovada. Tente novamente mais tarde.",
         },503);
       }
 
@@ -168,7 +168,7 @@ Deno.serve(async(req)=>{
       return json({
         error:"riot_api_key_rejected",
         upstreamStatus:authFailure.status,
-        message:"A chave da Riot usada pelo Chibi expirou ou foi rejeitada. Atualize RIOT_API_KEY no Supabase.",
+        message:"A integração do Chibi com a Riot precisa ser renovada. Tente novamente mais tarde.",
       },503);
     }
 
