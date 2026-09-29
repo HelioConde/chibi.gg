@@ -19,6 +19,8 @@ This checklist tracks the public-facing state of chibi.gg while the Riot product
 - [x] Small samples use cautious language.
 - [x] Comps separates personal familiarity from global observed signals.
 - [x] Ask Chibi exposes sample, confidence/evidence and data limitations.
+- [x] Companion page explicitly labels current telemetry/snapshots as a demo/local prototype.
+- [x] Companion demo does not expose a live board score or pseudo competitive rating.
 
 ## Public policy pages
 
