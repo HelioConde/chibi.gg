@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://helioconde.github.io/chibi.gg/sitemap.xml
