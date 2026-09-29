@@ -139,7 +139,20 @@ export function buildRankedReviewSignals(matches:TftMatch[]):RankedReviewSignal[
     const conversion=pct(wins.length,top4.length);
     const confidence=confidenceFor(top4.length,total);
 
-    if(conversion<=20){
+    if(total<8){
+      results.push(signal({
+        id:"conversion-sample",
+        kind:"pattern",
+        eyebrow:"AMOSTRA INICIAL",
+        title:`${top4.length} Top 4 carregados · ainda é cedo para chamar isso de padrão`,
+        body:"O Chibi encontrou uma sequência forte de Top 4, mas a amostra ainda é pequena para avaliar conversão em vitória com segurança.",
+        evidence:`${wins.length} vitória(s) em ${top4.length} Top 4 · ${total} partidas no contexto`,
+        confidence:"baixa",
+        tone:"neutral",
+        priority:28,
+        matchIds:top4.map(match=>match.id),
+      }));
+    }else if(conversion<=20){
       results.push(signal({
         id:"conversion-low",
         kind:"risk",

@@ -38,11 +38,11 @@ export default function RiotDataBar({profile,matchCount,refreshing,onRefresh}:Pr
         </div>
       </div>
 
-      <div className="riot-api-chips" aria-label="APIs Riot usadas neste perfil">
-        <span title="Riot ID → PUUID">{source?.account||"account-v1"}</span>
-        <span title="Perfil TFT">{source?.summoner||"tft-summoner-v1"}</span>
-        <span title="Rank oficial">{source?.ranked||"tft-league-v1"}</span>
-        <span title="Histórico pós-partida">{source?.matches||"tft-match-v1"}</span>
+      <div className="riot-api-chips" aria-label="Fontes oficiais Riot usadas neste perfil">
+        <span title={source?.account||"account-v1"}>Riot ID</span>
+        <span title={source?.summoner||"tft-summoner-v1"}>Perfil TFT</span>
+        <span title={source?.ranked||"tft-league-v1"}>Rank</span>
+        <span title={source?.matches||"tft-match-v1"}>Histórico</span>
       </div>
     </div>
 

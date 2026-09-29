@@ -66,8 +66,8 @@ export default function HomeMetaPreview({
   useEffect(()=>{
     let cancelled=false;
     Promise.allSettled([
-      fetchTftStats(0,1100,2,20),
-      fetchTftComps(0,1100,2,8),
+      fetchTftStats(0,1100,4,20),
+      fetchTftComps(0,1100,4,8),
     ]).then(results=>{
       if(cancelled)return;
       const [statsResult,compsResult]=results;
@@ -83,7 +83,7 @@ export default function HomeMetaPreview({
   return <section className="home-meta-preview home-meta-preview-v2">
     <div className="home-meta-intro-v2">
       <div>
-        <span>DADOS EM TEMPO REAL</span>
+        <span>AMOSTRA OBSERVADA</span>
         <h2>O que está funcionando agora.</h2>
         <p>Uma leitura curta do dataset observado pelo Chibi. Entre no Meta quando quiser aprofundar.</p>
       </div>
@@ -107,7 +107,7 @@ export default function HomeMetaPreview({
                 <strong>{comp.traits.slice(0,2).map(row=>label("traits",row.id,staticData)).join(" · ")||"Comp observada"}</strong>
                 <small>{comp.games} jogos · média {comp.averagePlacement}</small>
               </span>
-              <em>{comp.top4Rate}%</em>
+              <em>{comp.games>=8?comp.top4Rate+"%":"amostra"}</em>
             </button>
           )):<div className="home-meta-loading">Construindo comps observadas...</div>}
         </div>
@@ -134,13 +134,13 @@ export default function HomeMetaPreview({
                   <small>{row.games} jogos · média {row.averagePlacement}</small>
                 </span>
               </span>
-              <em>{row.top4Rate}%</em>
+              <em>{row.games>=8?row.top4Rate+"%":"amostra"}</em>
             </button>;
           }):<div className="home-meta-loading">Carregando traits...</div>}
         </div>
       </article>
     </div>
 
-    <small className="home-meta-disclaimer-v2">Dataset observado pelo Chibi; não representa toda a população de TFT.</small>
+    <small className="home-meta-disclaimer-v2">Dataset observado pelo Chibi. Percentuais só ganham destaque visual quando a amostra começa a ficar mais útil; não representa toda a população de TFT.</small>
   </section>;
 }
