@@ -1755,25 +1755,28 @@ function App() {
                             <div className="match-row-title">
                               <div>
                                 <strong>{activeTraits(match).slice(0,2).map((t)=>traitLabel(t,staticData)).filter(Boolean).join(" · ") || "Board TFT"}</strong>
-                                <span className={"match-review-label "+cue.tone}>{cue.label}</span>
+                                <span
+                                  className={"match-review-label "+cue.tone}
+                                  title={cue.title}
+                                >{cue.label}</span>
                               </div>
                             </div>
 
-                            <p className={"match-card-insight "+cue.tone}>{cue.title}</p>
+                            <div className="match-lineup">
+                              <div className="trait-row compact-traits">
+                                {activeTraits(match).slice(0,3).map((trait)=>{
+                                  const entry=staticEntry(staticData?.traits,trait.name);
+                                  const image=staticData?tftAssetUrl(staticData.version,"trait",entry):"";
+                                  return <span className={"trait-chip style-"+Math.max(0,trait.style)} key={trait.name}>
+                                    {image&&<img src={image} alt=""/>}
+                                    {traitLabel(trait,staticData)} {trait.numUnits}
+                                  </span>;
+                                })}
+                              </div>
 
-                            <div className="trait-row compact-traits">
-                              {activeTraits(match).slice(0,3).map((trait)=>{
-                                const entry=staticEntry(staticData?.traits,trait.name);
-                                const image=staticData?tftAssetUrl(staticData.version,"trait",entry):"";
-                                return <span className={"trait-chip style-"+Math.max(0,trait.style)} key={trait.name}>
-                                  {image&&<img src={image} alt=""/>}
-                                  {traitLabel(trait,staticData)} {trait.numUnits}
-                                </span>;
-                              })}
-                            </div>
-
-                            <div className="board-row compact-board">
-                              {match.units.slice(0,8).map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact key={unit.characterId+index}/>)}
+                              <div className="board-row compact-board">
+                                {match.units.slice(0,8).map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact key={unit.characterId+index}/>)}
+                              </div>
                             </div>
                           </div>
 
