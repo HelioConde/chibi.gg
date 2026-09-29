@@ -304,7 +304,9 @@ export default function CompsPage({
         <button className={queueId===1100?"active":""} onClick={()=>setQueueId(1100)}>Ranqueada</button>
         <button className={queueId==null?"active":""} onClick={()=>setQueueId(null)}>Todas as filas</button>
       </div>
-      <span>{data?.context.setNumber?("Set "+data.context.setNumber):"Aguardando dados"}</span>
+      <span>{data?.context.setNumber
+        ? "Set "+data.context.setNumber+" · grupos adaptativos"
+        : "Aguardando dados"}</span>
     </div>
 
     {loading&&<section className="panel meta-page-state">Montando comps observadas...</section>}
@@ -547,7 +549,7 @@ export default function CompsPage({
         </div>}
 
         <p className="global-meta-disclaimer">
-          As comps são agrupadas pelas traits principais observadas nos boards finais do Chibi Dataset. Familiaridade pessoal, estabilidade e popularidade são lentes separadas — nenhuma delas transforma o board em tier oficial.
+          As comps usam agrupamento adaptativo: pares de traits só viram uma identidade própria quando há amostra suficiente; caso contrário o Chibi recua para a trait principal para não fragmentar poucos jogos. Familiaridade pessoal, estabilidade e popularidade continuam sendo lentes separadas — nenhuma delas transforma o board em tier oficial.
         </p>
       </section>
     </>}

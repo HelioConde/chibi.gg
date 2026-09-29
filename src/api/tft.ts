@@ -91,7 +91,13 @@ export type TftGlobalComp = {
 };
 
 export type TftGlobalComps = {
-  context:{setNumber:number;queueId:number|null;minGames:number};
+  context:{
+    setNumber:number;
+    queueId:number|null;
+    minGames:number;
+    signatureMode?:"adaptive-traits-v2";
+    signatureThreshold?:number;
+  };
   sampleParticipants:number;
   comps:TftGlobalComp[];
 };
