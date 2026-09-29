@@ -3,7 +3,7 @@
 Checkpoint: 2026-09-29  
 Branch principal: `main`
 
-A **Etapa 1** está estável e a **Etapa 2 / Prioridade 1 (Comps v2 — decisão de spot)** foi concluída. A partir daqui o projeto pode continuar sem reconstruir contexto do zero.
+A **Etapa 1** está estável, as três prioridades da **Etapa 2** foram concluídas e o bloco de **Riot review readiness** também está pronto. A partir daqui o projeto pode continuar sem reconstruir contexto do zero.
 
 ## 1. Objetivo do produto
 
@@ -44,7 +44,12 @@ A fundação funcional já existe:
 - Overlay;
 - Study / compartilhamento de análise;
 - cache/observações anônimas no Supabase;
-- deploy automático no GitHub Pages.
+- deploy automático no GitHub Pages;
+- páginas públicas de Como funciona, Privacidade e Termos;
+- reviewer entry point em `/review.html`;
+- demo sintética em `/?demo=review`, independente de Riot dev key;
+- rascunho preservado da Production Application;
+- plano técnico de Riot Sign On para depois da aprovação.
 
 A página **Comps v2 / decisão de spot** já está implementada. Não recrie do zero.
 
@@ -269,16 +274,47 @@ Entregue:
 
 A regra permanece: se a evidência não sustenta a conclusão, o Ask Chibi deve dizer que ainda não sabe.
 
-## 7.1 Próxima etapa recomendada — Riot review readiness
+## 7.1 Riot review readiness ✅
 
-Enquanto a Production Application está pendente, o próximo bloco recomendado é tornar o site explicitamente pronto para revisão:
+Concluído em 29/09/2026.
+
+Entregue:
 
 - página pública **Como o Chibi funciona**;
 - Privacy Policy;
-- Terms / regras do serviço;
-- boilerplate legal obrigatório da Riot em local visível;
-- descrição pública de fontes de dados e limitações;
-- deixar claro que o Chibi não é endossado pela Riot e não oferece scouting/opponent tracking/live decision automation.
+- Terms;
+- boilerplate legal da Riot visível;
+- URLs estáveis `/about.html`, `/privacy.html` e `/terms.html`;
+- reviewer entry point `/review.html`;
+- demo sintética `/?demo=review` com 12 partidas fictícias e fluxo navegável sem Riot API;
+- Companion público explicitamente marcado como demo/review-first, sem pseudo score live;
+- `public/riot.txt` preservado para verificação;
+- `docs/RIOT_REVIEW_CHECKLIST.md`;
+- `docs/RIOT_APPLICATION_DRAFT.md`;
+- `docs/RSO_PLAN.md`;
+- metadata pública, sitemap e robots alinhados ao produto.
+
+A demo sintética nunca deve ser apresentada como dados reais. Ela existe apenas para permitir que Riot/Overwolf avaliem UX e fluxo quando uma chave temporária estiver indisponível.
+
+### Próximo gate — Production Application
+
+Não expandir recursos live antes de resolver o gate externo.
+
+Próximos passos:
+
+1. abrir o formulário de **Production API Key / Register Product**;
+2. preencher usando `docs/RIOT_APPLICATION_DRAFT.md`;
+3. preservar exatamente a descrição efetivamente enviada;
+4. preservar screenshots da submissão/status;
+5. aguardar/reagir ao review da Riot;
+6. depois da aprovação, implementar RSO seguindo `docs/RSO_PLAN.md` e as instruções provisionadas pela Riot;
+7. enviar ao Overwolf screenshot da aprovação da Riot incluindo a descrição submetida.
+
+Não inventar client ID, secret, callback URL ou scopes de RSO antes do provisionamento da Riot.
+
+### Overwolf
+
+O PR #16 (`feat: add public Overwolf desktop shell`) permanece aberto. **Não fazer merge desse PR sem pedido explícito do usuário.**
 
 ## 8. Critério de conclusão de uma mudança
 
@@ -307,10 +343,10 @@ Antes de editar:
 5. Não exponha Riot API key nem Supabase service role no frontend.
 6. Não faça afirmações causais que a Riot Match API não suporta.
 
-Comece pela próxima etapa descrita no handoff:
-Riot review readiness.
+Comece pelo gate externo descrito no handoff:
+Riot Production Application.
 
-Priorize About/How It Works, Privacy, Terms e boilerplate legal visível antes de adicionar novas features live.
+Não recrie review readiness: ela já está pronta. Se o formulário da Riot ainda não estiver disponível no contexto, preserve o build atual e faça apenas correções que reduzam risco de review; não expanda features live.
 
 Faça mudanças pequenas e verificáveis. Depois de cada bloco relevante, rode typecheck e build.
 ```
@@ -319,4 +355,4 @@ Faça mudanças pequenas e verificáveis. Depois de cada bloco relevante, rode t
 
 A Etapa 1 e a Comps v2 / Prioridade 1 devem permanecer utilizáveis mesmo se a próxima mudança for interrompida.
 
-Próximo checkpoint recomendado: tornar o produto publicamente verificável e legível para a revisão da Riot, sem mudar o escopo aprovado. Se uma mudança grande exigir refatoração, faça de forma incremental e mantenha o build verde entre commits.
+Próximo checkpoint recomendado: registrar a Production Application exatamente como enviada e, depois, trabalhar apenas nas pendências apontadas pela Riot. Até esse gate avançar, preserve o escopo review-first, o reviewer demo e o build verde.
