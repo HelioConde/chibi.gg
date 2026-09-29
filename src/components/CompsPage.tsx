@@ -3,6 +3,7 @@ import { fetchTftComps, TftGlobalComp, TftGlobalComps, TftMatch } from "../api/t
 import { staticEntry, tftAssetUrl, TftStaticData } from "../tftStatic";
 import DDragonArt from "./DDragonArt";
 import { saveStudyShelfItem } from "../studyShelf";
+import { useI18n } from "../i18n";
 
 type Props={
   staticData:TftStaticData|null;
@@ -48,9 +49,9 @@ function activeTraitIds(match:TftMatch){
     .map(trait=>trait.name);
 }
 
-function compName(comp:TftGlobalComp,staticData:TftStaticData|null){
+function compName(comp:TftGlobalComp,staticData:TftStaticData|null,fallback:string){
   const names=comp.traits.slice(0,2).map(trait=>traitName(trait.id,staticData)).filter(Boolean);
-  return names.join(" · ")||"Comp observada";
+  return names.join(" · ")||fallback;
 }
 
 function personalFit(comp:TftGlobalComp,matches:TftMatch[]){
@@ -125,6 +126,11 @@ export default function CompsPage({
   onEvidence,
   onOpenBuilder,
 }:Props){
+  const { t } = useI18n();
+  const compLabel=(comp:TftGlobalComp)=>compName(comp,staticData,t("comps.observedComp"));
+  const confidenceText=(value:TftGlobalComp["confidence"])=>t(
+    value==="alta"?"common.confidence.high":value==="média"?"common.confidence.medium":"common.confidence.low"
+  );
   const [queueId,setQueueId]=useState<number|null>(1100);
   const [data,setData]=useState<TftGlobalComps|null>(null);
   const [loading,setLoading]=useState(true);
@@ -148,7 +154,7 @@ export default function CompsPage({
       .catch(err=>{
         if(!cancelled){
           setData(null);
-          setError(err instanceof Error?err.message:"Não foi possível carregar as comps.");
+          setError(err instanceof Error?err.message:t("comps.errorLoad"));
         }
       })
       .finally(()=>{if(!cancelled)setLoading(false);});
@@ -239,23 +245,23 @@ export default function CompsPage({
   function saveCompToShelf(comp:typeof enriched[number]){
     saveStudyShelfItem({
       type:"comp",
-      label:compName(comp,staticData),
-      subtitle:comp.games+" jogos · média "+comp.averagePlacement+" · Top 4 "+comp.top4Rate+"%",
+      label:compLabel(comp),
+      subtitle:t("comps.shelfSubtitle",{games:comp.games,average:comp.averagePlacement,top4:comp.top4Rate}),
       unitIds:comp.units.slice(0,8).map(unit=>unit.id),
     });
     setShelfSavedId(comp.id);
   }
 
   function familiarityCopy(comp:typeof enriched[number]){
-    if(!hasProfile)return "Sem perfil aberto: mostrando somente sinais do Chibi Dataset.";
-    if(!matches.length)return "Ainda não há histórico suficiente para medir familiaridade pessoal.";
+    if(!hasProfile)return t("comps.familiar.noneProfile");
+    if(!matches.length)return t("comps.familiar.noHistory");
     if(comp.fit.score>=60){
-      return "Seu histórico já repete várias traits e unidades desta identidade.";
+      return t("comps.familiar.high");
     }
     if(comp.fit.score>=30){
-      return "Há alguma sobreposição com seu histórico, mas ainda não é uma rota muito recorrente para você.";
+      return t("comps.familiar.medium");
     }
-    return "Esta rota quase não aparece no seu histórico recente.";
+    return t("comps.familiar.low");
   }
 
   function spotCopy(comp:typeof enriched[number]){
@@ -265,23 +271,21 @@ export default function CompsPage({
     const unitText=units.filter(Boolean).join(", ");
 
     if(traitText&&unitText){
-      return "Use esta rota como referência quando seu plano já estiver convergindo para "+traitText+" e várias peças recorrentes ("+unitText+") fizerem sentido no board que você está montando.";
+      return t("comps.spot.both",{traits:traitText,units:unitText});
     }
     if(traitText){
-      return "Use esta rota como referência quando seu plano já estiver convergindo para "+traitText+".";
+      return t("comps.spot.traits",{traits:traitText});
     }
-    return "Use esta rota somente como referência de board final observado; o Chibi não conhece sua sequência de lojas.";
+    return t("comps.spot.fallback");
   }
 
   return <main className="comps-page comps-page-v2">
     <section className="comps-hero">
       <div>
-        {hasProfile&&<button className="back-search" onClick={onBack}>← Voltar ao perfil</button>}
-        <span className="eyebrow">CHIBI COMPS · DECISÃO DE SPOT</span>
-        <h1>{hasProfile?"O que combina com seu histórico":"Comps com contexto"}<br/><em>sem transformar fit em tier.</em></h1>
-        <p>{hasProfile
-          ?"O Chibi separa duas perguntas: o que você já conhece e o que o dataset global observou. Familiaridade não significa que a comp é globalmente melhor."
-          :"Veja identidades de board observadas com estabilidade, popularidade, confiança e peças recorrentes."}</p>
+        {hasProfile&&<button className="back-search" onClick={onBack}>{t("common.backProfile")}</button>}
+        <span className="eyebrow">{t("comps.eyebrow")}</span>
+        <h1>{hasProfile?t("comps.hero.profile"):t("comps.hero.public")}<br/><em>{t("comps.hero.em")}</em></h1>
+        <p>{hasProfile?t("comps.hero.profileDesc"):t("comps.hero.publicDesc")}</p>
         <DDragonArt
           staticData={staticData}
           setNumber={data?.context.setNumber}
@@ -292,47 +296,47 @@ export default function CompsPage({
       </div>
 
       <div className={"meta-dataset-card "+maturity}>
-        <span>BASE ATUAL</span>
+        <span>{t("meta.currentBase")}</span>
         <strong>{data?.sampleParticipants??0}</strong>
-        <small>participantes observados</small>
-        <b>{maturity}</b>
+        <small>{t("meta.observedParticipants")}</small>
+        <b>{t(maturity==="robusta"?"common.maturity.robust":maturity==="crescendo"?"common.maturity.growing":"common.maturity.initial")}</b>
       </div>
     </section>
 
     <div className="meta-toolbar">
       <div>
-        <button className={queueId===1100?"active":""} onClick={()=>setQueueId(1100)}>Ranqueada</button>
-        <button className={queueId==null?"active":""} onClick={()=>setQueueId(null)}>Todas as filas</button>
+        <button className={queueId===1100?"active":""} onClick={()=>setQueueId(1100)}>{t("common.rankQueue")}</button>
+        <button className={queueId==null?"active":""} onClick={()=>setQueueId(null)}>{t("common.allQueues")}</button>
       </div>
       <span>{data?.context.setNumber
-        ? "Set "+data.context.setNumber+" · grupos adaptativos"
-        : "Aguardando dados"}</span>
+        ? t("comps.adaptiveGroups",{set:data.context.setNumber})
+        : t("common.waitingData")}</span>
     </div>
 
-    {loading&&<section className="panel meta-page-state">Montando comps observadas...</section>}
-    {!loading&&error&&<section className="panel meta-page-state error">Não foi possível carregar as comps agora.</section>}
+    {loading&&<section className="panel meta-page-state">{t("comps.loading")}</section>}
+    {!loading&&error&&<section className="panel meta-page-state error">{t("comps.loadFailed")}</section>}
 
     {!loading&&!error&&data&&<>
       {hero&&<section className="panel comp-answer-card comp-answer-card-v2">
         <div className="comp-answer-copy">
-          <span>{hasProfile?"MAIS FAMILIAR NO SEU HISTÓRICO":"MAIS OBSERVADA"}</span>
-          <h2>{compName(hero,staticData)}</h2>
-          <p>{hasProfile?familiarityCopy(hero):hero.games+" boards observados nesta identidade."}</p>
+          <span>{hasProfile?t("comps.mostFamiliar"):t("comps.mostObserved")}</span>
+          <h2>{compLabel(hero)}</h2>
+          <p>{hasProfile?familiarityCopy(hero):t("comps.observedBoardsCount",{games:hero.games})}</p>
           {data.sampleParticipants<250&&<div className="comp-sample-warning">
-            Base pequena: trate como direção de estudo, não como ordem para forçar.
+            {t("comps.smallSample")}
           </div>}
 
           <div className="comp-answer-actions">
-            {hasProfile&&hero.fit.matchIds.length>0&&<button onClick={()=>onEvidence(hero.fit.matchIds,"Familiaridade · "+compName(hero,staticData))}>Ver partidas relacionadas</button>}
-            {onOpenBuilder&&<button className="secondary" onClick={()=>onOpenBuilder(hero.units.slice(0,8).map(unit=>unit.id))}>Abrir no Builder</button>}
+            {hasProfile&&hero.fit.matchIds.length>0&&<button onClick={()=>onEvidence(hero.fit.matchIds,t("comps.familiarity")+" · "+compLabel(hero))}>{t("comps.relatedMatches")}</button>}
+            {onOpenBuilder&&<button className="secondary" onClick={()=>onOpenBuilder(hero.units.slice(0,8).map(unit=>unit.id))}>{t("comps.openBuilder")}</button>}
           </div>
         </div>
 
         <div className="comp-answer-metrics comp-answer-metrics-v2">
-          {hasProfile&&<div className="fit"><span>Familiaridade</span><strong>{hero.fit.score}</strong><small>{hero.fit.matchIds.length} partidas relacionadas</small></div>}
-          <div><span>Amostra global</span><strong>{hero.games}</strong><small>boards observados</small></div>
-          <div><span>Média</span><strong>{hero.averagePlacement}</strong><small>snapshot final</small></div>
-          <div><span>Confiança</span><strong className="textual">{hero.confidence}</strong><small>pela amostra</small></div>
+          {hasProfile&&<div className="fit"><span>{t("comps.familiarity")}</span><strong>{hero.fit.score}</strong><small>{t("comps.relatedCount",{count:hero.fit.matchIds.length})}</small></div>}
+          <div><span>{t("comps.globalSample")}</span><strong>{hero.games}</strong><small>{t("comps.observedBoards")}</small></div>
+          <div><span>{t("common.average")}</span><strong>{hero.averagePlacement}</strong><small>{t("comps.finalSnapshot")}</small></div>
+          <div><span>{t("comps.confidence")}</span><strong className="textual">{confidenceText(hero.confidence)}</strong><small>{t("comps.bySample")}</small></div>
         </div>
 
         <div className="comp-core-units">
@@ -347,54 +351,54 @@ export default function CompsPage({
         </div>
 
         <div className="comp-guardrail">
-          <strong>Familiaridade ≠ força global.</strong>
-          <span>Seu histórico mede recorrência pessoal. O dataset global mede apenas os boards observados pelo Chibi.</span>
+          <strong>{t("comps.guardrail.title")}</strong>
+          <span>{t("comps.guardrail.desc")}</span>
         </div>
       </section>}
 
       {selectedComp&&<section className="panel comp-guide-panel comp-guide-panel-v2">
         <div className="comp-guide-head">
           <div>
-            <span>COMP GUIDE · OBSERVADO</span>
-            <h2>{compName(selectedComp,staticData)}</h2>
-            <p>Resposta primeiro: quais sinais tornam esta rota plausível, o que você já conhece e o que a amostra global realmente mostra.</p>
+            <span>{t("comps.guide")}</span>
+            <h2>{compLabel(selectedComp)}</h2>
+            <p>{t("comps.guide.desc")}</p>
           </div>
           <div className="comp-guide-context">
-            <span>Nível médio</span><strong>{selectedComp.averageLevel}</strong>
-            <span>Ouro final</span><strong>{selectedComp.averageGold}g</strong>
+            <span>{t("comps.averageLevel")}</span><strong>{selectedComp.averageLevel}</strong>
+            <span>{t("comps.finalGold")}</span><strong>{selectedComp.averageGold}g</strong>
             <button className="comp-shelf-button" onClick={()=>saveCompToShelf(selectedComp)}>
-              {shelfSavedId===selectedComp.id?"Salvo no Shelf ✓":"Salvar no Study Shelf"}
+              {shelfSavedId===selectedComp.id?t("comps.savedShelf"):t("comps.saveShelf")}
             </button>
           </div>
         </div>
 
         <div className="comp-split-evidence">
           {hasProfile&&<article className="personal">
-            <span>SEU HISTÓRICO</span>
-            <strong>{selectedComp.fit.score}/100 familiaridade</strong>
+            <span>{t("comps.yourHistory")}</span>
+            <strong>{t("comps.familiarScore",{score:selectedComp.fit.score})}</strong>
             <p>{familiarityCopy(selectedComp)}</p>
             <div>
-              <small>Traits conhecidas <b>{selectedComp.fit.traitOverlap}%</b></small>
-              <small>Unidades conhecidas <b>{selectedComp.fit.unitOverlap}%</b></small>
-              <small>Partidas relacionadas <b>{selectedComp.fit.matchIds.length}</b></small>
+              <small>{t("comps.knownTraits")} <b>{selectedComp.fit.traitOverlap}%</b></small>
+              <small>{t("comps.knownUnits")} <b>{selectedComp.fit.unitOverlap}%</b></small>
+              <small>{t("comps.related")} <b>{selectedComp.fit.matchIds.length}</b></small>
             </div>
           </article>}
 
           <article className="global">
-            <span>AMOSTRA GLOBAL</span>
-            <strong>{selectedComp.games} boards · confiança {selectedComp.confidence}</strong>
-            <p>Média {selectedComp.averagePlacement} · Top 4 {selectedComp.top4Rate}% · volatilidade {selectedComp.volatility}.</p>
-            <small>Isso descreve a amostra observada; não é tier oficial nem previsão de resultado.</small>
+            <span>{t("comps.globalSampleUpper")}</span>
+            <strong>{t("comps.globalConfidence",{games:selectedComp.games,confidence:confidenceText(selectedComp.confidence)})}</strong>
+            <p>{t("comps.globalSummary",{average:selectedComp.averagePlacement,top4:selectedComp.top4Rate,volatility:selectedComp.volatility})}</p>
+            <small>{t("comps.globalDisclaimer")}</small>
           </article>
         </div>
 
         <div className="comp-guide-grid">
           <article>
-            <span>PEÇAS QUE DEFINEM A ROTA</span>
+            <span>{t("comps.routePieces")}</span>
 
             <div className="comp-spot-signals">
               <div>
-                <small>TRAITS CENTRAIS</small>
+                <small>{t("comps.coreTraits")}</small>
                 <div>
                   {coreTraits(selectedComp).map(trait=>(
                     <span className="trait" key={trait.id}>
@@ -406,7 +410,7 @@ export default function CompsPage({
               </div>
 
               <div>
-                <small>UNIDADES RECORRENTES</small>
+                <small>{t("comps.recurringUnits")}</small>
                 <div>
                   {coreUnits(selectedComp).map(unit=>(
                     <span className="unit" key={unit.id}>
@@ -427,7 +431,7 @@ export default function CompsPage({
                   <span className="comp-guide-portrait">{image&&<img src={image} alt="" loading="lazy" decoding="async"/>}</span>
                   <div>
                     <strong>{unitName(unit.id,staticData)}</strong>
-                    <small>presente em {Math.round(unit.rate)}%</small>
+                    <small>{t("comps.presentRate",{rate:Math.round(unit.rate)})}</small>
                     <div className="comp-guide-items">
                       {unitItems.length?unitItems.map(itemStat=>{
                         const itemEntry=staticEntry(staticData?.items,itemStat.id);
@@ -435,7 +439,7 @@ export default function CompsPage({
                         return <span title={itemName(itemStat.id,staticData)+" · "+Math.round(itemStat.rate)+"%"} key={itemStat.id}>
                           {src&&<img src={src} alt="" loading="lazy" decoding="async"/>}
                         </span>;
-                      }):<em>sem item recorrente</em>}
+                      } ):<em>{t("comps.noRecurringItem")}</em>}
                     </div>
                   </div>
                 </div>;
@@ -444,23 +448,21 @@ export default function CompsPage({
           </article>
 
           <article className="comp-guide-decision">
-            <span>QUANDO CONSIDERAR</span>
+            <span>{t("comps.whenConsider")}</span>
             <strong>{spotCopy(selectedComp)}</strong>
-            <p>{hasProfile
-              ? "Seu histórico é usado só para medir familiaridade; a recomendação não mistura isso com desempenho global."
-              : "Sem perfil aberto, o Chibi mostra apenas sinais observados da identidade."}</p>
+            <p>{hasProfile?t("comps.profileUse"):t("comps.noProfileUse")}</p>
 
-            <span className="avoid">QUANDO NÃO FORÇAR</span>
-            <strong>Quando copiar o board final exigir abandonar upgrades naturais, economia ou uma rota que já está funcionando melhor.</strong>
-            <p>O dataset não conhece sua sequência de shops, timing de roll, HP por round ou scouting. Ele só vê o snapshot final.</p>
+            <span className="avoid">{t("comps.whenNotForce")}</span>
+            <strong>{t("comps.notForceTitle")}</strong>
+            <p>{t("comps.notForceDesc")}</p>
 
             <div className="comp-guide-buttons">
               {hasProfile&&selectedComp.fit.matchIds.length>0&&<button onClick={()=>onEvidence(
                 selectedComp.fit.matchIds,
-                "Comp Guide · "+compName(selectedComp,staticData),
-              )}>Comparar com minhas partidas</button>}
+                "Comp Guide · "+compLabel(selectedComp),
+               )}>{t("comps.compareMine")}</button>}
               {onOpenBuilder&&<button className="secondary" onClick={()=>onOpenBuilder(selectedComp.units.slice(0,8).map(unit=>unit.id))}>
-                Testar no Builder
+                {t("comps.testBuilder")}
               </button>}
             </div>
           </article>
@@ -469,52 +471,52 @@ export default function CompsPage({
 
       <section className="comp-signal-grid">
         <article className="panel">
-          <span>MAIS ESTÁVEL</span>
-          <h3>{mostStable?compName(mostStable,staticData):"Sem sinal"}</h3>
+          <span>{t("comps.mostStable")}</span>
+          <h3>{mostStable?compLabel(mostStable):t("comps.noSignal")}</h3>
           <p>{mostStable
-            ?"Volatilidade "+mostStable.volatility+" · "+mostStable.games+" jogos · confiança "+mostStable.confidence
-            :"Aguardando amostra."}</p>
+            ?t("comps.stableSummary",{volatility:mostStable.volatility,games:mostStable.games,confidence:confidenceText(mostStable.confidence)})
+            :t("comps.waitSample")}</p>
         </article>
         <article className="panel">
-          <span>MAIS OBSERVADA</span>
-          <h3>{mostPopular?compName(mostPopular,staticData):"Sem sinal"}</h3>
-          <p>{mostPopular?mostPopular.games+" boards · média "+mostPopular.averagePlacement+" · confiança "+mostPopular.confidence:"Aguardando amostra."}</p>
+          <span>{t("comps.mostObserved")}</span>
+          <h3>{mostPopular?compLabel(mostPopular):t("comps.noSignal")}</h3>
+          <p>{mostPopular?t("comps.popularSummary",{games:mostPopular.games,average:mostPopular.averagePlacement,confidence:confidenceText(mostPopular.confidence)}):t("comps.waitSample")}</p>
         </article>
         <article className="panel">
-          <span>SINAL EMERGENTE</span>
-          <h3>{emerging?compName(emerging,staticData):"Ainda não disponível"}</h3>
-          <p>{emerging?emerging.games+" jogos · média "+emerging.averagePlacement+" · confiança "+emerging.confidence:"Nenhuma amostra pequena se destacou ainda."}</p>
+          <span>{t("comps.emerging")}</span>
+          <h3>{emerging?compLabel(emerging):t("common.notAvailableYet")}</h3>
+          <p>{emerging?t("comps.emergingSummary",{games:emerging.games,average:emerging.averagePlacement,confidence:confidenceText(emerging.confidence)}):t("comps.noEmerging")}</p>
         </article>
       </section>
 
       <section className="panel comp-explorer comp-explorer-v2">
         <div className="meta-explorer-head">
           <div>
-            <span>EXPLORAR</span>
-            <h2>{hasProfile?"Escolha a lente certa":"Compare os sinais observados"}</h2>
+            <span>{t("comps.explore")}</span>
+            <h2>{hasProfile?t("comps.chooseLens"):t("comps.compareSignals")}</h2>
           </div>
-          <small>{explored.length} identidades neste recorte</small>
+          <small>{t("comps.identities",{count:explored.length})}</small>
         </div>
 
         <div className="comp-explore-controls">
           <div className="comp-mode-tabs">
-            {hasProfile&&<button className={exploreMode==="familiarity"?"active":""} onClick={()=>setExploreMode("familiarity")}>Familiaridade</button>}
-            <button className={exploreMode==="confidence"?"active":""} onClick={()=>setExploreMode("confidence")}>Confiança</button>
+            {hasProfile&&<button className={exploreMode==="familiarity"?"active":""} onClick={()=>setExploreMode("familiarity")}>{t("comps.familiarity")}</button>}
+            <button className={exploreMode==="confidence"?"active":""} onClick={()=>setExploreMode("confidence")}>{t("comps.confidence")}</button>
             <button className={exploreMode==="stability"?"active":""} onClick={()=>setExploreMode("stability")}>
-              Estabilidade
+              {t("comps.stability")}
               {stabilityCutoff>0&&<small>≤ {stabilityCutoff.toFixed(2)}</small>}
             </button>
             <button className={exploreMode==="popularity"?"active":""} onClick={()=>setExploreMode("popularity")}>
-              Popularidade
-              {popularityCutoff>0&&<small>mediana {Math.round(popularityCutoff)}</small>}
+              {t("comps.popularity")}
+              {popularityCutoff>0&&<small>{t("comps.median",{value:Math.round(popularityCutoff)})}</small>}
             </button>
           </div>
 
           <div className="comp-confidence-filter">
-            <span>Amostra</span>
-            <button className={confidenceFilter==="all"?"active":""} onClick={()=>setConfidenceFilter("all")}>Todas</button>
-            <button className={confidenceFilter==="medium"?"active":""} onClick={()=>setConfidenceFilter("medium")}>Média+</button>
-            <button className={confidenceFilter==="high"?"active":""} onClick={()=>setConfidenceFilter("high")}>Alta</button>
+            <span>{t("comps.sample")}</span>
+            <button className={confidenceFilter==="all"?"active":""} onClick={()=>setConfidenceFilter("all")}>{t("comps.all")}</button>
+            <button className={confidenceFilter==="medium"?"active":""} onClick={()=>setConfidenceFilter("medium")}>{t("comps.mediumPlus")}</button>
+            <button className={confidenceFilter==="high"?"active":""} onClick={()=>setConfidenceFilter("high")}>{t("comps.high")}</button>
           </div>
         </div>
 
@@ -523,33 +525,33 @@ export default function CompsPage({
             <article className={"comp-row "+(selectedComp?.id===comp.id?"selected":"")} key={comp.id}>
               <div className="comp-rank">{index+1}</div>
               <div className="comp-row-main">
-                <strong>{compName(comp,staticData)}</strong>
+                <strong>{compLabel(comp)}</strong>
                 <div className="trait-row">
                   {comp.traits.slice(0,3).map(trait=><span className="trait-chip" key={trait.id}>{traitName(trait.id,staticData)} {Math.round(trait.rate)}%</span>)}
                 </div>
               </div>
 
               <div className="comp-row-metrics">
-                {hasProfile&&<span className="fit"><small>Familiaridade</small><b>{comp.fit.score}</b></span>}
-                <span><small>Média</small><b>{comp.averagePlacement}</b></span>
-                <span><small>Jogos</small><b>{comp.games}</b></span>
-                <span><small>Volatilidade</small><b>{comp.volatility}</b></span>
+                {hasProfile&&<span className="fit"><small>{t("comps.familiarity")}</small><b>{comp.fit.score}</b></span>}
+                <span><small>{t("common.average")}</small><b>{comp.averagePlacement}</b></span>
+                <span><small>{t("comps.games")}</small><b>{comp.games}</b></span>
+                <span><small>{t("comps.volatility")}</small><b>{comp.volatility}</b></span>
               </div>
 
               <div className="comp-row-actions">
-                <div className={"meta-confidence "+(comp.confidence==="alta"?"high":comp.confidence==="média"?"medium":"low")}>{comp.confidence}</div>
-                <button onClick={()=>setSelectedCompId(comp.id)}>Detalhes</button>
+                <div className={"meta-confidence "+(comp.confidence==="alta"?"high":comp.confidence==="média"?"medium":"low")}>{confidenceText(comp.confidence)}</div>
+                <button onClick={()=>setSelectedCompId(comp.id)}>{t("comps.details")}</button>
               </div>
             </article>
           ))}
         </div>
 
         {!explored.length&&<div className="meta-page-state">
-          Nenhuma comp atende esse filtro de confiança. Tente ampliar a amostra.
+          {t("comps.filterEmpty")}
         </div>}
 
         <p className="global-meta-disclaimer">
-          As comps usam agrupamento adaptativo: pares de traits só viram uma identidade própria quando há amostra suficiente; caso contrário o Chibi recua para a trait principal para não fragmentar poucos jogos. Familiaridade pessoal, estabilidade e popularidade continuam sendo lentes separadas — nenhuma delas transforma o board em tier oficial.
+          {t("comps.disclaimer")}
         </p>
       </section>
     </>}
