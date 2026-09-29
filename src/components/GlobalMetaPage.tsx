@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { fetchTftMeta, TftGlobalMeta, TftGlobalTraitStat } from "../api/tft";
 import { staticEntry, TftStaticData } from "../tftStatic";
 import DDragonArt from "./DDragonArt";
+import { useI18n } from "../i18n";
 
 type Props={
   staticData:TftStaticData|null;
@@ -49,6 +50,7 @@ export default function GlobalMetaPage({
   onOpenStats,
   onOpenTier,
 }:Props){
+  const { t } = useI18n();
   const [queueId,setQueueId]=useState<number|null>(1100);
   const [meta,setMeta]=useState<TftGlobalMeta|null>(null);
   const [loading,setLoading]=useState(true);
@@ -64,7 +66,7 @@ export default function GlobalMetaPage({
       .catch(err=>{
         if(!cancelled){
           setMeta(null);
-          setError(err instanceof Error?err.message:"Não foi possível carregar o meta.");
+          setError(err instanceof Error?err.message:t("meta.errorLoad"));
         }
       })
       .finally(()=>{if(!cancelled)setLoading(false);});
@@ -101,92 +103,92 @@ export default function GlobalMetaPage({
   return <main className="global-meta-page">
     <div className="global-meta-hero">
       <div>
-        {hasProfile&&<button className="back-search" onClick={onBack}>← Voltar ao perfil</button>}
+        {hasProfile&&<button className="back-search" onClick={onBack}>{t("common.backProfile")}</button>}
         <span className="eyebrow">CHIBI DATASET</span>
-        <h1>Seu ponto de entrada<br/><em>para o meta do TFT.</em></h1>
-        <p>Comps, statistics, tier list e traits observadas em um único lugar, sempre com tamanho da amostra e confiança visíveis.</p>
+        <h1>{t("meta.hero.title1")}<br/><em>{t("meta.hero.title2")}</em></h1>
+        <p>{t("meta.hero.desc")}</p>
         <DDragonArt
           staticData={staticData}
           setNumber={meta?.context.setNumber}
           variant="ribbon"
-          label="Assets oficiais Riot"
+          label={t("meta.riotAssets")}
         />
       </div>
 
       <div className={"meta-dataset-card "+maturity}>
-        <span>BASE ATUAL</span>
+        <span>{t("meta.currentBase")}</span>
         <strong>{meta?.sampleParticipants??0}</strong>
-        <small>participantes observados</small>
-        <b>{maturity}</b>
+        <small>{t("meta.observedParticipants")}</small>
+        <b>{t(maturity==="robusta"?"common.maturity.robust":maturity==="crescendo"?"common.maturity.growing":"common.maturity.initial")}</b>
       </div>
     </div>
 
     <section className="meta-hub-links">
       <button className="active">
-        <span>VISÃO GERAL</span>
-        <strong>Meta agora</strong>
-        <small>sinais do Chibi Dataset</small>
+        <span>{t("meta.overview")}</span>
+        <strong>{t("meta.now")}</strong>
+        <small>{t("meta.datasetSignals")}</small>
       </button>
       <button onClick={onOpenComps}>
         <span>COMPS</span>
-        <strong>Boards observados</strong>
-        <small>desempenho + compatibilidade pessoal</small>
+        <strong>{t("meta.observedBoards")}</strong>
+        <small>{t("meta.personalCompatibility")}</small>
       </button>
       <button onClick={onOpenStats}>
-        <span>STATISTICS</span>
-        <strong>Champions / Traits / Items</strong>
-        <small>números completos e comparação pessoal</small>
+        <span>{t("meta.statistics")}</span>
+        <strong>{t("meta.statsTitle")}</strong>
+        <small>{t("meta.statsDesc")}</small>
       </button>
       <button onClick={onOpenTier}>
-        <span>TIER LIST</span>
+        <span>{t("meta.tierList")}</span>
         <strong>S / A / B / C</strong>
-        <small>visualização do sinal composto</small>
+        <small>{t("meta.tierDesc")}</small>
       </button>
     </section>
 
     <div className="meta-toolbar">
       <div>
-        <button className={queueId===1100?"active":""} onClick={()=>setQueueId(1100)}>Ranqueada</button>
-        <button className={queueId==null?"active":""} onClick={()=>setQueueId(null)}>Todas as filas</button>
+        <button className={queueId===1100?"active":""} onClick={()=>setQueueId(1100)}>{t("common.rankQueue")}</button>
+        <button className={queueId==null?"active":""} onClick={()=>setQueueId(null)}>{t("common.allQueues")}</button>
       </div>
-      <span>{meta?.context.setNumber?("Set "+meta.context.setNumber):"Aguardando dados"}</span>
+      <span>{meta?.context.setNumber?("Set "+meta.context.setNumber):t("common.waitingData")}</span>
     </div>
 
-    {loading&&<section className="panel meta-page-state">Carregando sinais do Chibi Dataset...</section>}
-    {!loading&&error&&<section className="panel meta-page-state error">Não foi possível carregar o dataset agora.</section>}
+    {loading&&<section className="panel meta-page-state">{t("meta.loading")}</section>}
+    {!loading&&error&&<section className="panel meta-page-state error">{t("meta.loadFailed")}</section>}
 
     {!loading&&!error&&meta&&<>
       <section className="meta-signal-grid">
         <article className="panel">
-          <span>MAIS OBSERVADO</span>
-          <h2>{mostObserved?traitName(mostObserved.id,staticData):"Sem amostra"}</h2>
-          <p>{mostObserved?(mostObserved.games+" partidas · média "+mostObserved.averagePlacement+" · Top 4 "+mostObserved.top4Rate+"%"):"O dataset ainda está começando."}</p>
+          <span>{t("meta.mostObserved")}</span>
+          <h2>{mostObserved?traitName(mostObserved.id,staticData):t("common.noSample")}</h2>
+          <p>{mostObserved?t("meta.rowSummary",{games:mostObserved.games,average:mostObserved.averagePlacement,top4:mostObserved.top4Rate}):t("meta.datasetStarting")}</p>
         </article>
 
         <article className="panel established">
-          <span>SINAL ESTABELECIDO</span>
-          <h2>{established?traitName(established.id,staticData):"Ainda não disponível"}</h2>
-          <p>{established?(established.games+" partidas · média "+established.averagePlacement+" · Top 4 "+established.top4Rate+"%"):"Precisamos de pelo menos 20 observações na mesma linha."}</p>
+          <span>{t("meta.established")}</span>
+          <h2>{established?traitName(established.id,staticData):t("common.notAvailableYet")}</h2>
+          <p>{established?t("meta.rowSummary",{games:established.games,average:established.averagePlacement,top4:established.top4Rate}):t("meta.need20")}</p>
         </article>
 
         <article className="panel emerging">
-          <span>SINAL EMERGENTE</span>
-          <h2>{emerging?traitName(emerging.id,staticData):"Ainda não disponível"}</h2>
-          <p>{emerging?(emerging.games+" partidas · média "+emerging.averagePlacement+" · Top 4 "+emerging.top4Rate+"%"):"Nenhuma linha pequena o suficiente para chamar de emergente."}</p>
+          <span>{t("meta.emerging")}</span>
+          <h2>{emerging?traitName(emerging.id,staticData):t("common.notAvailableYet")}</h2>
+          <p>{emerging?t("meta.rowSummary",{games:emerging.games,average:emerging.averagePlacement,top4:emerging.top4Rate}):t("meta.noEmerging")}</p>
         </article>
       </section>
 
       <section className="panel meta-explorer">
         <div className="meta-explorer-head">
           <div>
-            <span>EXPLORADOR</span>
-            <h2>Traits observados</h2>
+            <span>{t("meta.explorer")}</span>
+            <h2>{t("meta.observedTraits")}</h2>
           </div>
-          <small>ordenado por sinal composto, não por tier</small>
+          <small>{t("meta.sortedComposite")}</small>
         </div>
 
         <div className="meta-table-head">
-          <span>Trait</span><span>Amostra</span><span>Média</span><span>Top 4</span><span>Win</span><span>Nível</span><span>Confiança</span>
+          <span>{t("meta.trait")}</span><span>{t("common.sample")}</span><span>{t("common.average")}</span><span>{t("meta.top4")}</span><span>{t("common.win")}</span><span>{t("common.level")}</span><span>{t("common.confidence")}</span>
         </div>
 
         <div className="meta-table">
@@ -202,15 +204,15 @@ export default function GlobalMetaPage({
               <b>{row.top4Rate}%</b>
               <b>{row.winRate}%</b>
               <b>{row.averageLevel}</b>
-              <span className={"meta-confidence "+conf.className}>{conf.label}</span>
+              <span className={"meta-confidence "+conf.className}>{t(conf.className==="high"?"common.confidence.high":conf.className==="medium"?"common.confidence.medium":"common.confidence.low")}</span>
             </article>;
           })}
         </div>
 
-        {!rows.length&&<div className="meta-page-state">Ainda não há observações suficientes nesse contexto.</div>}
+        {!rows.length&&<div className="meta-page-state">{t("meta.notEnough")}</div>}
 
         <p className="global-meta-disclaimer">
-          O Chibi Dataset é formado apenas pelas partidas consultadas no site. Ele não representa toda a população de TFT e não deve ser interpretado como tier list oficial.
+          {t("meta.disclaimer")}
         </p>
       </section>
     </>}
