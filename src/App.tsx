@@ -1730,7 +1730,9 @@ function App() {
 
                       <div className="history-session-stats">
                         <span><small>MÉDIA</small><b>{session.average.toFixed(2)}</b></span>
-                        <span><small>TOP 4</small><b>{session.top4Rate}%</b></span>
+                        <span><small>TOP 4</small><b>{session.games<8
+                          ? session.displayMatches.filter(match=>match.placement<=4).length+"/"+session.games
+                          : session.top4Rate+"%"}</b></span>
                         <span><small>1º</small><b>{session.wins}</b></span>
                         <span className={session.bottom2>0?"warning":""}><small>BOTTOM 2</small><b>{session.bottom2}</b></span>
                       </div>
