@@ -939,6 +939,11 @@ const messages: Record<Language, Record<string, string>> = {
     "builder.summary.economy": "Economia: {{gold}}G atual · {{reserve}}G reserva · {{free}}G livres",
 
     "builder.queue.utility": "Utilidade",
+    "builder.queue.label.core": "core",
+    "builder.queue.label.cap": "cap",
+    "builder.queue.label.bridge": "ponte",
+    "builder.queue.label.piece": "peça",
+    "builder.queue.label.upgrade": "upgrade",
     "builder.queue.traitsGain": "{{count}} trait(s) ganha(m)",
     "builder.queue.history": "{{count}} partida(s) no histórico",
     "builder.queue.upgrade": "upgrade · {{copies}} cópia(s) extra(s)",
@@ -1929,6 +1934,11 @@ const messages: Record<Language, Record<string, string>> = {
     "builder.summary.economy": "Economy: {{gold}}G current · {{reserve}}G reserve · {{free}}G free",
 
     "builder.queue.utility": "Utility",
+    "builder.queue.label.core": "core",
+    "builder.queue.label.cap": "cap",
+    "builder.queue.label.bridge": "bridge",
+    "builder.queue.label.piece": "piece",
+    "builder.queue.label.upgrade": "upgrade",
     "builder.queue.traitsGain": "{{count}} trait(s) gained",
     "builder.queue.history": "{{count}} match(es) in history",
     "builder.queue.upgrade": "upgrade · {{copies}} extra copy/copies",
