@@ -17498,3 +17498,46 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
     aspect-ratio:1;
   }
 }
+
+
+/* -----------------------------------------------------------------------
+   History set switcher
+   ----------------------------------------------------------------------- */
+.history-set-tabs{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding-right:5px;
+  border-right:1px solid #252d3f;
+}
+.history-set-tabs button{
+  min-height:24px;
+  padding:4px 8px;
+  border:1px solid #293246;
+  border-radius:7px;
+  background:#0f1620;
+  color:#6f7b90;
+  font-size:7px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.history-set-tabs button.active{
+  border-color:#6b5ddb;
+  background:rgba(117,99,231,.12);
+  color:#c9c0ff;
+}
+
+@media(max-width:820px){
+  .history-set-tabs{
+    width:100%;
+    overflow-x:auto;
+    padding:0 0 4px;
+    border-right:0;
+    border-bottom:1px solid #252d3f;
+    scrollbar-width:none;
+  }
+  .history-set-tabs::-webkit-scrollbar{display:none}
+  .history-set-tabs button{
+    flex:0 0 auto;
+  }
+}
