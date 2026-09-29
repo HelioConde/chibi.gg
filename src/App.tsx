@@ -1898,13 +1898,13 @@ function App() {
             <section className="panel history" id="match-history">
               <div className="panel-title profile-history-head">
                 <div>
-                  <span>PARTIDAS RIOT</span>
-                  <h2>Histórico recente</h2>
-                  <small>{analysisMatches.length} no Set {currentSet??"—"} · {matches.length} carregadas</small>
+                  <span>{t("profile.history.riot")}</span>
+                  <h2>{t("profile.history.title")}</h2>
+                  <small>{t("profile.history.count",{setCount:analysisMatches.length,set:currentSet??"—",loaded:matches.length})}</small>
                 </div>
 
                 <div className="history-head-controls">
-                  {availableSets.length>1&&<div className="history-set-tabs" aria-label="Conjuntos carregados">
+                  {availableSets.length>1&&<div className="history-set-tabs" aria-label={t("profile.history.setsAria")}>
                     {availableSets.map(setNumber=>(
                       <button
                         className={currentSet===setNumber?"active":""}
@@ -1920,7 +1920,7 @@ function App() {
                         <button className="active" disabled key={queueId}>{queueLabel(staticData,queueId)}</button>
                       ))
                     ) : <>
-                      <button className={selectedQueue==null?"active":""} onClick={()=>changeQueue(null)}>Todas</button>
+                      <button className={selectedQueue==null?"active":""} onClick={()=>changeQueue(null)}>{t("profile.history.all")}</button>
                       {availableQueues.map((queueId)=>(
                         <button className={selectedQueue===queueId?"active":""} onClick={()=>changeQueue(queueId)} key={queueId}>
                           {queueLabel(staticData,queueId)}
@@ -1931,8 +1931,8 @@ function App() {
 
                   <div className="history-filter-tabs">
                     {([
-                      ["all","Todas"],
-                      ["review","Revisar"],
+                      ["all",t("profile.history.all")],
+                      ["review",t("profile.history.review")],
                       ["top4","Top 4"],
                       ["bottom2","Bottom 2"],
                     ] as const).map(([id,label])=>(
@@ -1948,30 +1948,30 @@ function App() {
 
               {evidenceIds?.length&&<div className="evidence-banner">
                 <div>
-                  <span>EVIDÊNCIA ATIVA</span>
+                  <span>{t("profile.history.activeEvidence")}</span>
                   <strong>{evidenceLabel}</strong>
-                  <small>{visibleMatches.length} partida{visibleMatches.length===1?"":"s"} relacionada{visibleMatches.length===1?"":"s"}</small>
+                  <small>{t("profile.history.relatedCount",{count:visibleMatches.length})}</small>
                 </div>
-                <button onClick={clearEvidence}>Mostrar contexto completo</button>
+                <button onClick={clearEvidence}>{t("profile.history.fullContext")}</button>
               </div>}
 
               <div className="match-list match-list-v2 match-session-list">
                 {!visibleMatches.length&&<div className="history-empty-filter">
-                  Nenhuma partida encontrada neste filtro.
+                  {t("profile.history.empty")}
                 </div>}
 
                 {historySessions.map((session)=>(
                   <section className="history-session-group" key={(session.end||session.index)+":"+session.index}>
                     <header className="history-session-head history-session-head-compact">
                       <div className="history-session-titleline">
-                        <span>SESSÃO {historySessions.length>1?historySessions.length-session.index:"ATUAL"}</span>
-                        <strong>{formatDay(session.end)} · {formatClock(session.start)}–{formatClock(session.end)}</strong>
-                        <small>{session.games} jogo{session.games===1?"":"s"}</small>
-                        {session.wins>0&&<small>{session.wins} vitória{session.wins===1?"":"s"}</small>}
+                        <span>{t("profile.history.session")} {historySessions.length>1?historySessions.length-session.index:t("profile.history.current")}</span>
+                        <strong>{formatDay(session.end,locale)} · {formatClock(session.start,locale)}–{formatClock(session.end,locale)}</strong>
+                        <small>{t("profile.history.games",{count:session.games})}</small>
+                        {session.wins>0&&<small>{t("profile.history.wins",{count:session.wins})}</small>}
                         {session.delta!=null&&Math.abs(session.delta)>.25&&<em className={session.delta<0?"better":"worse"}>
                           {session.delta<0
-                            ?"↑ "+Math.abs(session.delta).toFixed(2)+" vs anterior"
-                            :"↓ "+Math.abs(session.delta).toFixed(2)+" vs anterior"}
+                            ?t("profile.history.vsPreviousUp",{value:Math.abs(session.delta).toFixed(2)})
+                            :t("profile.history.vsPreviousDown",{value:Math.abs(session.delta).toFixed(2)})}
                         </em>}
                       </div>
 
@@ -1986,7 +1986,7 @@ function App() {
 
                     <div className="history-session-games">
                       {session.displayMatches.map((match)=>{
-                        const cue=matchReviewCue(match);
+                        const cue=matchReviewCue(match,t);
                         return <button className={"match-row match-button match-row-v2 cue-"+cue.tone} key={match.id} onClick={()=>openMatch(match)}>
                           <div className="match-result-rail">
                             <TacticianVisual companion={match.companion} staticData={staticData}/>
@@ -1998,7 +1998,7 @@ function App() {
                               <span>{queueLabel(staticData,match.queueId||0)}</span>
                               {matchRoundLabel(match)&&<span>{matchRoundLabel(match)}</span>}
                               {match.duration&&<span>{formatDuration(match.duration)}</span>}
-                              <span>{formatClock(match.playedAt)}</span>
+                              <span>{formatClock(match.playedAt,locale)}</span>
                             </div>
 
                             <div className="match-row-title">
@@ -2024,7 +2024,7 @@ function App() {
                                   })}
                                 </div>
 
-                                {match.augments.length>0&&<div className="match-history-augments" aria-label="Augments da partida">
+                                {match.augments.length>0&&<div className="match-history-augments" aria-label={t("profile.history.augmentsAria")}>
                                   {match.augments.slice(0,3).map((augment)=>(
                                     <AugmentIcon id={augment} staticData={staticData} key={augment}/>
                                   ))}
@@ -2037,7 +2037,7 @@ function App() {
                                   :match.units.length>=9
                                     ?"units-many"
                                     :""
-                              )} aria-label={match.units.length+" unidades no board final"}>
+                              )} aria-label={t("profile.history.unitsAria",{count:match.units.length})}>
                                 {match.units.map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact key={unit.characterId+index}/>)}
                               </div>
                             </div>
@@ -2045,13 +2045,13 @@ function App() {
 
                           <div className="match-meta match-meta-rich">
                             <div className="match-value-grid">
-                              <span title="Estimativa baseada no custo e estrelas das unidades finais"><b>~{boardValue(match,staticData)}G</b><small>board est.</small></span>
-                              <span><b>{match.goldLeft}G</b><small>ouro</small></span>
-                              <span><b>{match.level}</b><small>nível</small></span>
-                              <span><b>{analysisMatches.some(row=>(row.playersEliminated||0)>0)?(match.playersEliminated||0):"—"}</b><small>elim.</small></span>
+                              <span title={t("profile.history.boardEstimateTitle")}><b>~{boardValue(match,staticData)}G</b><small>{t("profile.history.boardEstimate")}</small></span>
+                              <span><b>{match.goldLeft}G</b><small>{t("profile.history.gold")}</small></span>
+                              <span><b>{match.level}</b><small>{t("profile.history.level")}</small></span>
+                              <span><b>{analysisMatches.some(row=>(row.playersEliminated||0)>0)?(match.playersEliminated||0):"—"}</b><small>{t("profile.history.elim")}</small></span>
                             </div>
-                            <strong>{match.damageToPlayers>0?match.damageToPlayers+" dano":"dano n/d"}</strong>
-                            <small>abrir análise →</small>
+                            <strong>{match.damageToPlayers>0?t("profile.history.damage",{value:match.damageToPlayers}):t("profile.history.damageNA")}</strong>
+                            <small>{t("profile.history.openAnalysis")}</small>
                           </div>
                         </button>;
                       })}
@@ -2060,7 +2060,7 @@ function App() {
                 ))}
               </div>
 
-              {!evidenceIds?.length&&hasMore && <button className="load-more" onClick={loadMore} disabled={loadingMore}>{loadingMore ? "Carregando..." : "Carregar mais partidas"}</button>}
+              {!evidenceIds?.length&&hasMore && <button className="load-more" onClick={loadMore} disabled={loadingMore}>{loadingMore ? t("profile.history.loadingMore") : t("profile.history.loadMore")}</button>}
             </section>
 
             <aside className="profile-match-sidebar">
@@ -2069,26 +2069,26 @@ function App() {
                   <div>
                     <span>CHIBI SNAPSHOT</span>
                     <strong>{analysisMatches.length<8
-                      ? headlineStats.top4+"/"+headlineStats.total+" Top 4 · amostra inicial"
+                      ? t("profile.snapshot.initial",{top4:headlineStats.top4,total:headlineStats.total})
                       : primaryReviewSignal
                         ? (primaryReviewSignal.subjectId
                           ? (staticEntry(staticData?.traits,primaryReviewSignal.subjectId)?.name||fallbackTraitName(primaryReviewSignal.subjectId))+" · "+primaryReviewSignal.title
                           : primaryReviewSignal.title)
-                        : "Ainda juntando evidência"}</strong>
+                        : t("profile.snapshot.gathering")}</strong>
                   </div>
-                  <small>{visibleDna.sampleSize} partidas</small>
+                  <small>{t("profile.snapshot.matches",{count:visibleDna.sampleSize})}</small>
                 </div>
 
-                <div className="placement-strip profile-insight-placements" aria-label="Colocações recentes">
+                <div className="placement-strip profile-insight-placements" aria-label={t("profile.snapshot.placementsAria")}>
                   {visibleDna.placements.slice(0,8).map((p,index)=>(
-                    <span className={placementClass(p)} key={index} title={(index+1)+"ª partida mais recente: "+p+"º"}>{p}</span>
+                    <span className={placementClass(p)} key={index} title={t("profile.snapshot.placementTitle",{index:index+1,placement:p})}>{p}</span>
                   ))}
                 </div>
 
                 <div className="profile-insight-metrics">
                   <span>
-                    <small>{visibleDna.sampleSize<8?"Amostra":"Consistência"}</small>
-                    <b>{visibleDna.sampleSize<8?visibleDna.sampleSize+" jogos":visibleDna.consistency+"%"}</b>
+                    <small>{visibleDna.sampleSize<8?t("profile.snapshot.sample"):t("profile.snapshot.consistency")}</small>
+                    <b>{visibleDna.sampleSize<8?t("profile.snapshot.games",{count:visibleDna.sampleSize}):visibleDna.consistency+"%"}</b>
                   </span>
                   <span>
                     <small>Bottom 2</small>
@@ -2109,18 +2109,18 @@ function App() {
                 })()}
 
                 <div className="profile-insight-actions">
-                  <button onClick={()=>changeProfileTab("coach")}>Abrir Review →</button>
-                  <button className="secondary" onClick={()=>changeProfileTab("overview")}>Ver resumo</button>
+                  <button onClick={()=>changeProfileTab("coach")}>{t("profile.snapshot.openReview")}</button>
+                  <button className="secondary" onClick={()=>changeProfileTab("overview")}>{t("profile.snapshot.viewSummary")}</button>
                 </div>
 
                 <details className="profile-insight-more">
-                  <summary>Mais sinais</summary>
+                  <summary>{t("profile.snapshot.more")}</summary>
                   <div>
-                    <span><small>Flexibilidade</small><b>{visibleDna.sampleSize<8?"—":visibleDna.flexibility+"%"}</b></span>
-                    <span><small>Conversão</small><b>{visibleDna.sampleSize<8?"—":visibleDna.conversion+"%"}</b></span>
+                    <span><small>{t("profile.snapshot.flexibility")}</small><b>{visibleDna.sampleSize<8?"—":visibleDna.flexibility+"%"}</b></span>
+                    <span><small>{t("profile.snapshot.conversion")}</small><b>{visibleDna.sampleSize<8?"—":visibleDna.conversion+"%"}</b></span>
                     <p>{evidenceIds?.length
-                      ? "Leitura recalculada com a evidência ativa."
-                      : "Indicadores descritivos da amostra; não são MMR ou avaliação oficial da Riot."}</p>
+                      ? t("profile.snapshot.activeEvidence")
+                      : t("profile.snapshot.disclaimer")}</p>
                   </div>
                 </details>
               </section>
@@ -2141,12 +2141,12 @@ function App() {
         <div className="site-footer-main">
           <div>
             <strong>chibi.gg</strong>
-            <span>TFT explicado com dados e revisão pós-partida.</span>
+            <span>{t("profile.footer.tagline")}</span>
           </div>
-          <nav aria-label="Informações do Chibi">
-            <a href={import.meta.env.BASE_URL+"about.html"}>Como funciona</a>
-            <a href={import.meta.env.BASE_URL+"privacy.html"}>Privacidade</a>
-            <a href={import.meta.env.BASE_URL+"terms.html"}>Termos</a>
+          <nav aria-label={t("profile.footer.aria")}>
+            <a href={import.meta.env.BASE_URL+"about.html"}>{t("legal.about")}</a>
+            <a href={import.meta.env.BASE_URL+"privacy.html"}>{t("legal.privacy")}</a>
+            <a href={import.meta.env.BASE_URL+"terms.html"}>{t("legal.terms")}</a>
             <a href="https://github.com/HelioConde/chibi.gg" target="_blank" rel="noreferrer">GitHub ↗</a>
           </nav>
         </div>
