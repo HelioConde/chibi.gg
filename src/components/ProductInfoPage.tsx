@@ -14,6 +14,7 @@ function RiotNotice(){
   return <section className="legal-riot-notice" aria-label="Riot Games legal notice">
     <span>RIOT GAMES NOTICE</span>
     <p>{RIOT_NOTICE}</p>
+    <p>Chibi.gg was created under Riot Games' "Legal Jibber Jabber" policy using assets owned by Riot Games. Riot Games does not endorse or sponsor this project.</p>
   </section>;
 }
 
@@ -99,8 +100,8 @@ function Privacy(){
       <p>Quando você pesquisa um Riot ID, o Chibi envia a consulta ao nosso backend. O backend consulta serviços oficiais da Riot para obter informações públicas necessárias ao produto, como perfil TFT, rank e histórico de partidas.</p>
 
       <h2>2. Chibi Dataset e cache</h2>
-      <p>Para reduzir chamadas repetidas e construir estatísticas agregadas, o backend pode armazenar snapshots normalizados de partidas já consultadas. O dataset de observações usado atualmente guarda identificador da partida, colocação, data, fila, set, versão, nível, ouro final, dano/eliminações quando disponíveis, augments, traits e unidades.</p>
-      <p>O dataset agregado não armazena PUUID, Riot ID ou nome do jogador na tabela de observações usada para as estatísticas globais.</p>
+      <p>Para reduzir chamadas repetidas e construir estatísticas agregadas, o backend pode armazenar snapshots normalizados de partidas já consultadas. O cache técnico de partidas pode conter PUUIDs retornados pela Riot para localizar o participante correto dentro daquela partida. Esse identificador é usado no fluxo técnico do histórico/cache.</p>
+      <p>Separadamente, a tabela de observações usada para estatísticas globais guarda identificador da partida, colocação, data, fila, set, versão, nível, ouro final, dano/eliminações quando disponíveis, augments, traits e unidades. Essa tabela agregada não armazena PUUID, Riot ID ou nome do jogador.</p>
 
       <h2>3. Dados mantidos no seu navegador</h2>
       <p>Algumas ferramentas pessoais usam <code>localStorage</code> do navegador para continuar funcionando sem conta. Isso inclui buscas recentes, Journal/notas da partida, lições, sessões de estudo, presets do Builder, Study Shelf, snapshots locais de rank e progresso de reviews.</p>
