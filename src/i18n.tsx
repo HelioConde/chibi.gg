@@ -302,6 +302,9 @@ const messages: Record<Language, Record<string, string>> = {
     "legal.terms.6.desc": "Recursos, fontes de dados e estes termos podem ser atualizados durante o desenvolvimento. O uso continuado da versão pública após uma atualização fica sujeito à versão mais recente publicada aqui.",
 
     "stats.errorLoad": "Não foi possível carregar as estatísticas.",
+    "stats.category.champions": "Campeões",
+    "stats.category.traits": "Traits",
+    "stats.category.items": "Itens",
     "stats.hero.title1": "Meta global.",
     "stats.hero.title2": "E o que ele significa para você.",
     "stats.hero.desc": "Champions, traits e items com desempenho observado, amostra explícita e comparação pessoal quando um perfil está aberto.",
@@ -731,6 +734,9 @@ const messages: Record<Language, Record<string, string>> = {
     "legal.terms.6.desc": "Features, data sources, and these terms may be updated during development. Continued use of the public version after an update is subject to the latest version published here.",
 
     "stats.errorLoad": "Could not load statistics.",
+    "stats.category.champions": "Champions",
+    "stats.category.traits": "Traits",
+    "stats.category.items": "Items",
     "stats.hero.title1": "Global meta.",
     "stats.hero.title2": "And what it means for you.",
     "stats.hero.desc": "Champions, traits, and items with observed performance, explicit sample size, and personal comparison when a profile is open.",
