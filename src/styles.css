@@ -17389,3 +17389,112 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
     height:auto!important;
   }
 }
+
+
+/* -----------------------------------------------------------------------
+   History augments + adaptive lineup density
+   ----------------------------------------------------------------------- */
+.match-history-support{
+  display:grid;
+  align-content:center;
+  gap:5px;
+  min-width:0;
+}
+.match-history-support .compact-traits{
+  margin:0!important;
+}
+.match-history-augments{
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+.match-augment-icon{
+  position:relative;
+  width:24px;
+  height:24px;
+  flex:0 0 24px;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  border:1px solid #34405a;
+  border-radius:6px;
+  background:#111824;
+  color:#8174d9;
+  font-size:6px;
+  font-weight:950;
+}
+.match-augment-icon img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.match-history-units.units-many .unit-card{
+  flex-basis:35px!important;
+  width:35px!important;
+}
+.match-history-units.units-many .unit-portrait{
+  width:35px!important;
+  height:35px!important;
+}
+.match-history-units.units-extra{
+  gap:4px!important;
+}
+.match-history-units.units-extra .unit-card{
+  flex-basis:32px!important;
+  width:32px!important;
+}
+.match-history-units.units-extra .unit-portrait{
+  width:32px!important;
+  height:32px!important;
+}
+.match-history-units.units-extra .item-icon{
+  width:11px!important;
+  height:11px!important;
+}
+.match-history-units.units-extra .unit-stars{
+  font-size:6px!important;
+}
+
+@media(max-width:1180px){
+  .match-history-support{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    overflow:hidden;
+  }
+  .match-history-support .compact-traits{
+    flex:1 1 auto;
+    overflow:hidden;
+  }
+  .match-history-augments{
+    flex:0 0 auto;
+  }
+}
+
+@media(max-width:620px){
+  .match-history-support{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    width:100%;
+  }
+  .match-history-augments{
+    justify-self:end;
+  }
+  .match-history-units.units-many,
+  .match-history-units.units-extra{
+    grid-template-columns:repeat(auto-fit,minmax(34px,1fr))!important;
+  }
+  .match-history-units.units-many .unit-card,
+  .match-history-units.units-extra .unit-card{
+    width:100%!important;
+    max-width:40px;
+  }
+  .match-history-units.units-many .unit-portrait,
+  .match-history-units.units-extra .unit-portrait{
+    width:100%!important;
+    height:auto!important;
+    aspect-ratio:1;
+  }
+}
