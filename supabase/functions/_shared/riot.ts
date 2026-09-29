@@ -52,6 +52,12 @@ export function normalizeParticipant(me: any) {
     timeEliminated: num(me?.time_eliminated),
     damageToPlayers: num(me?.total_damage_to_players),
     playersEliminated: num(me?.players_eliminated),
+    companion: me?.companion ? {
+      contentId: String(me.companion?.content_ID || ""),
+      itemId: String(me.companion?.item_ID || ""),
+      skinId: String(me.companion?.skin_ID || ""),
+      species: String(me.companion?.species || ""),
+    } : null,
     augments: Array.isArray(me?.augments) ? me.augments.map(String) : [],
     traits: (me?.traits || []).map((trait: any) => ({
       name: String(trait?.name || ""),

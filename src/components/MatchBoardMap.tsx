@@ -21,7 +21,7 @@ export default function MatchBoardMap({match,staticData}:Props){
     <div className="match-board-confirmed">
       <span>UNIDADES FINAIS CONFIRMADAS</span>
       <div className="match-board-bench">
-        {match.units.slice(0,10).map((unit,index)=>{
+        {match.units.map((unit,index)=>{
           const entry=staticEntry(staticData?.champions,unit.characterId);
           const image=staticData?tftAssetUrl(staticData.version,"champion",entry):"";
           return <div key={unit.characterId+index}>

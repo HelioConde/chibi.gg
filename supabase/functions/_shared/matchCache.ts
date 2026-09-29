@@ -19,6 +19,7 @@ export function normalizeMatchForCache(match:any){
   if(!id)return null;
 
   return {
+    cacheVersion:2,
     id,
     playedAt:num(info?.game_datetime),
     duration:num(info?.game_length),
@@ -53,7 +54,7 @@ export async function readCachedMatches(matchIds:string[]){
     return new Map(
       (Array.isArray(rows)?rows:[])
         .map((row:any)=>[String(row?.match_id||""),row?.payload] as const)
-        .filter(([id,payload])=>Boolean(id&&payload))
+        .filter(([id,payload])=>Boolean(id&&payload&&Number(payload?.cacheVersion)===2))
     );
   }catch{
     return new Map<string,any>();

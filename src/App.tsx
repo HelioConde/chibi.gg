@@ -6,6 +6,7 @@ import {
   TftMatch,
   TftMatchDetail,
   TftProfile,
+  TftCompanion,
   TftTrait,
   TftUnit,
 } from "./api/tft";
@@ -237,6 +238,46 @@ function UnitVisual({unit,staticData,compact=false}:{unit:TftUnit;staticData:Tft
       })}
     </div>
   </div>;
+}
+
+function TacticianVisual({
+  companion,
+  staticData,
+}:{companion?:TftCompanion|null;staticData:TftStaticData|null}){
+  if(!companion)return null;
+
+  const candidates=[
+    companion.contentId,
+    companion.itemId,
+    companion.skinId,
+    companion.species,
+  ].filter(Boolean);
+
+  let entry=undefined;
+  for(const candidate of candidates){
+    entry=staticEntry(staticData?.tacticians,candidate);
+    if(entry)break;
+  }
+
+  if(!entry&&staticData?.tacticians){
+    const normalized=candidates.map(value=>value.toLowerCase());
+    entry=Object.values(staticData.tacticians).find((row)=>{
+      const source=[
+        String(row.id||""),
+        String(row.name||""),
+        String(row.image?.full||""),
+      ].join(" ").toLowerCase();
+      return normalized.some(value=>value&&source.includes(value));
+    });
+  }
+
+  const name=entry?.name||cleanName(companion.species||companion.contentId||"Chibi");
+  const image=staticData?tftAssetUrl(staticData.version,"tactician",entry):"";
+
+  return <span className="match-tactician" title={name}>
+    <span>{name.slice(0,2)}</span>
+    {image&&<img src={image} alt={name} onError={(e)=>{e.currentTarget.style.display="none";}}/>}
+  </span>;
 }
 
 function AugmentVisual({id,staticData}:{id:string;staticData:TftStaticData|null}){
@@ -1740,7 +1781,10 @@ function App() {
                       {session.displayMatches.map((match)=>{
                         const cue=matchReviewCue(match);
                         return <button className={"match-row match-button match-row-v2 cue-"+cue.tone} key={match.id} onClick={()=>openMatch(match)}>
-                          <div className={"placement "+placementClass(match.placement)}>{match.placement}º</div>
+                          <div className="match-result-rail">
+                            <TacticianVisual companion={match.companion} staticData={staticData}/>
+                            <div className={"placement "+placementClass(match.placement)}>{match.placement}º</div>
+                          </div>
 
                           <div className="match-main">
                             <div className="match-context-line">
@@ -1772,8 +1816,8 @@ function App() {
                                 })}
                               </div>
 
-                              <div className="board-row compact-board">
-                                {match.units.slice(0,8).map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact key={unit.characterId+index}/>)}
+                              <div className="board-row compact-board match-history-units" aria-label={match.units.length+" unidades no board final"}>
+                                {match.units.map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact key={unit.characterId+index}/>)}
                               </div>
                             </div>
                           </div>
@@ -1941,7 +1985,7 @@ function App() {
                     {activeTraits(openedMatch).slice(0,4).map((trait)=><span className={"trait-chip style-"+Math.max(0,trait.style)} key={trait.name}>{traitLabel(trait,staticData)} {trait.numUnits}</span>)}
                   </div>
                   <div className="board-row modal-board">
-                    {openedMatch.units.slice(0,9).map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact key={unit.characterId+index}/>)}
+                    {openedMatch.units.map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact key={unit.characterId+index}/>)}
                   </div>
                   {openedMatch.augments.length>0&&<div className="augment-row match-summary-augments">
                     {openedMatch.augments.slice(0,3).map((augment)=><AugmentVisual id={augment} staticData={staticData} key={augment}/>)}
@@ -2029,7 +2073,7 @@ function App() {
                             .map((trait)=><span className="trait-chip" key={trait.name}>{traitLabel(trait,staticData)} {trait.numUnits}</span>)}
                         </div>
                         <div className="board-row detailed">
-                          {participant.units.slice(0,9).map((unit,unitIndex)=><UnitVisual unit={unit} staticData={staticData} key={unit.characterId+unitIndex}/>)}
+                          {participant.units.map((unit,unitIndex)=><UnitVisual unit={unit} staticData={staticData} key={unit.characterId+unitIndex}/>)}
                         </div>
                         <div className="augment-row">
                           {participant.augments.slice(0,3).map((augment)=><AugmentVisual id={augment} staticData={staticData} key={augment}/>)}
