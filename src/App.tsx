@@ -2158,14 +2158,14 @@ function App() {
           <section className="match-modal match-modal-with-hud" onClick={(e)=>e.stopPropagation()}>
             <img className="match-modal-hud-art" src={SITE_IMAGES.hud} alt="" aria-hidden="true"/>
             <button className="match-close" onClick={closeMatchReview}>×</button>
-            {matchLoading && <div className="match-state">Carregando detalhes da partida...</div>}
+            {matchLoading && <div className="match-state">{t("match.loading")}</div>}
             {matchError && <div className="match-state error">{matchError}</div>}
             {studyLookup==="unavailable"&&!selectedMatch&&!matchLoading&&<div className="match-state error">
-              <h2>NÃO CONSEGUIMOS ABRIR ESTA REVISÃO AINDA</h2>
-              <p>Essa partida ainda não apareceu no histórico do perfil. Tente novamente em alguns segundos.</p>
+              <h2>{t("match.unavailable.title")}</h2>
+              <p>{t("match.unavailable.desc")}</p>
               <div className="study-retry-actions">
-                <button onClick={retryStudy}>Tentar novamente</button>
-                <button className="secondary" onClick={closeMatchReview}>Ver perfil</button>
+                <button onClick={retryStudy}>{t("match.retry")}</button>
+                <button className="secondary" onClick={closeMatchReview}>{t("match.viewProfile")}</button>
               </div>
             </div>}
 
@@ -2177,38 +2177,38 @@ function App() {
                     <span>{studyRequest.source==="native"?"CHIBI COMPANION":"CHIBI STUDY"}</span>
                     <strong>{focus.question}</strong>
                     <small>{focus.hint}</small>
-                    {studyRequest.sessionFocus&&<small>FOCO DA SESSÃO · {sessionFocusLabel(studyRequest.sessionFocus)}</small>}
+                    {studyRequest.sessionFocus&&<small>{t("match.sessionFocus")} · {sessionFocusLabel(studyRequest.sessionFocus,t)}</small>}
                   </div>
                   {studyRequest.note&&<blockquote>{studyRequest.note}</blockquote>}
                   {studyRequest.reply&&<div className="study-reply-inline">
-                    <span>RESPOSTA {studyRequest.reviewer?"· "+studyRequest.reviewer:""}</span>
+                    <span>{t("match.reply")} {studyRequest.reviewer?"· "+studyRequest.reviewer:""}</span>
                     <p>{studyRequest.reply}</p>
                   </div>}
                 </div>;
               })()}
               <div className="match-modal-head">
                 <div>
-                  <span>REVIEW DA PARTIDA</span>
-                  <h2>{openedMatch ? matchReviewCue(openedMatch).title : displaySetName(selectedMatch.match.setName,selectedMatch.match.setNumber)}</h2>
+                  <span>{t("match.review")}</span>
+                  <h2>{openedMatch ? matchReviewCue(openedMatch,t).title : displaySetName(selectedMatch.match.setName,selectedMatch.match.setNumber)}</h2>
                   <p>
                     {displaySetName(selectedMatch.match.setName,selectedMatch.match.setNumber)}
                     {" · "}{queueLabel(staticData,selectedMatch.match.queueId)}
-                    {" · "}{formatWhen(selectedMatch.match.playedAt)}
-                    {" · "}{demoMode?"DEMO SINTÉTICA":"Riot Match API"}
+                    {" · "}{formatWhen(selectedMatch.match.playedAt,locale,t)}
+                    {" · "}{demoMode?t("match.synthetic"):"Riot Match API"}
                     {!demoMode&&selectedMatch.source?.cache==="hit"?" · cache":""}
                   </p>
                 </div>
                 {openedMatch&&<div className="match-modal-head-actions">
-                  <div className="match-modal-nav" title="Use ← e → para navegar entre partidas">
+                  <div className="match-modal-nav" title={t("match.navTitle")}>
                     <button
                       disabled={!openedMatchNavigation.newer||matchLoading}
                       onClick={()=>openedMatchNavigation.newer&&void openMatch(openedMatchNavigation.newer)}
-                    >← Mais recente</button>
+                    >{t("match.newer")}</button>
                     <span>{openedMatchNavigation.index>=0?openedMatchNavigation.index+1:"—"} / {analysisMatches.length}</span>
                     <button
                       disabled={!openedMatchNavigation.older||matchLoading}
                       onClick={()=>openedMatchNavigation.older&&void openMatch(openedMatchNavigation.older)}
-                    >Mais antiga →</button>
+                    >{t("match.older")}</button>
                   </div>
                   <div className={"modal-placement "+placementClass(openedMatch.placement)}>{openedMatch.placement}º</div>
                 </div>}
@@ -2216,7 +2216,7 @@ function App() {
 
               {openedMatch&&<section className="match-summary-card">
                 <div className="match-summary-main">
-                  <span>SEU BOARD FINAL</span>
+                  <span>{t("match.finalBoard")}</span>
                   <h3>{activeTraits(openedMatch).slice(0,2).map((t)=>traitLabel(t,staticData)).filter(Boolean).join(" · ") || "Board TFT"}</h3>
                   <div className="trait-row">
                     {activeTraits(openedMatch).slice(0,4).map((trait)=><span className={"trait-chip style-"+Math.max(0,trait.style)} key={trait.name}>{traitLabel(trait,staticData)} {trait.numUnits}</span>)}
@@ -2229,12 +2229,12 @@ function App() {
                   </div>}
                 </div>
                 <div className="match-summary-stats">
-                  <span><small>NÍVEL</small><b>{openedMatch.level}</b></span>
+                  <span><small>{t("match.level")}</small><b>{openedMatch.level}</b></span>
                   <span><small>STAGE</small><b>{matchRoundLabel(openedMatch)||"—"}</b></span>
-                  <span><small>DANO</small><b>{selectedMatch.match.participants.some(player=>player.damageToPlayers>0)?openedMatch.damageToPlayers:"—"}</b></span>
-                  <span><small>ELIMINAÇÕES</small><b>{selectedMatch.match.participants.some(player=>(player.playersEliminated||0)>0)?(openedMatch.playersEliminated||0):"—"}</b></span>
-                  <span><small>OURO</small><b>{openedMatch.goldLeft}g</b></span>
-                  <span><small>DURAÇÃO</small><b>{formatDuration(selectedMatch.match.duration)}</b></span>
+                  <span><small>{t("match.damage")}</small><b>{selectedMatch.match.participants.some(player=>player.damageToPlayers>0)?openedMatch.damageToPlayers:"—"}</b></span>
+                  <span><small>{t("match.eliminations")}</small><b>{selectedMatch.match.participants.some(player=>(player.playersEliminated||0)>0)?(openedMatch.playersEliminated||0):"—"}</b></span>
+                  <span><small>{t("match.gold")}</small><b>{openedMatch.goldLeft}g</b></span>
+                  <span><small>{t("match.duration")}</small><b>{formatDuration(selectedMatch.match.duration)}</b></span>
                 </div>
               </section>}
 
@@ -2249,7 +2249,7 @@ function App() {
               />}
 
               {openedMatch&&studyRequest?.matchId===openedMatch.id&&<ChibiStudyReply
-                playerName={profile?.player.gameName||"Jogador"}
+                playerName={profile?.player.gameName||t("match.player")}
                 existingReply={studyRequest.reply}
               />}
 
@@ -2270,7 +2270,7 @@ function App() {
               />}
 
               {openedMatch&&<details className="match-detail-layer counter-layer">
-                <summary><span><b>Comparar com seu próprio histórico</b><small>Boards parecidos seus que terminaram melhor ou pior</small></span><em>Counterfactual</em></summary>
+                <summary><span><b>{t("match.compare.title")}</b><small>{t("match.compare.desc")}</small></span><em>Counterfactual</em></summary>
                 <BoardCounterfactual
                   target={openedMatch}
                   history={analysisMatches}
@@ -2280,7 +2280,7 @@ function App() {
               </details>}
 
               {openedMatch&&<details className="match-detail-layer">
-                <summary><span><b>Adicionar contexto pessoal</b><small>O que a API não sabe sobre esta partida</small></span><em>Journal</em></summary>
+                <summary><span><b>{t("match.context.title")}</b><small>{t("match.context.desc")}</small></span><em>Journal</em></summary>
                 <MatchJournal
                   matchId={openedMatch.id}
                   placement={openedMatch.placement}
@@ -2292,15 +2292,15 @@ function App() {
               </details>}
 
               <details className="match-detail-layer lobby-layer">
-                <summary><span><b>Ver lobby completo</b><small>Todos os 8 boards, itens, augments e resultados</small></span><em>{selectedMatch.match.participants.length} jogadores</em></summary>
+                <summary><span><b>{t("match.lobby.title")}</b><small>{t("match.lobby.desc")}</small></span><em>{t("match.players",{count:selectedMatch.match.participants.length})}</em></summary>
                 <div className="lobby-list">
                   {selectedMatch.match.participants.slice().sort((a,b)=>a.placement-b.placement).map((participant,index)=>(
                     <article className={"lobby-player "+(openedMatch?.placement===participant.placement?"current-player":"")} key={index}>
                       <div className={"placement "+placementClass(participant.placement)}>{participant.placement}º</div>
                       <div className="lobby-board">
                         <div className="lobby-title">
-                          <strong>Nível {participant.level}</strong>
-                          {openedMatch?.placement===participant.placement&&<span>VOCÊ</span>}
+                          <strong>{t("match.level")} {participant.level}</strong>
+                          {openedMatch?.placement===participant.placement&&<span>{t("match.you")}</span>}
                         </div>
                         <div className="trait-row lobby-traits">
                           {participant.traits
@@ -2317,7 +2317,7 @@ function App() {
                         </div>
                       </div>
                       <div className="lobby-meta">
-                        <strong>{selectedMatch.match.participants.some(player=>player.damageToPlayers>0)?participant.damageToPlayers+" dano":"dano n/d"}</strong>
+                        <strong>{selectedMatch.match.participants.some(player=>player.damageToPlayers>0)?t("match.damageValue",{value:participant.damageToPlayers}):t("match.damageNA")}</strong>
                         <span>{participant.goldLeft}g</span>
                       </div>
                     </article>
@@ -2327,29 +2327,29 @@ function App() {
 
               {openedMatch&&guidedReviewIds.length>0&&<section className="guided-review-footer">
                 <div>
-                  <span>REVIEW QUEUE</span>
+                  <span>{t("match.queue")}</span>
                   <strong>{guidedReviewIndex+1} de {guidedReviewIds.length}</strong>
                   <small>{guidedReviewIndex+1<guidedReviewIds.length
-                    ?"Depois desta, o Chibi abre automaticamente a próxima."
-                    :"Última partida da revisão guiada."}</small>
+                    ?t("match.queueNext")
+                    :t("match.queueLast")}</small>
                 </div>
                 <div className="guided-review-actions">
-                  <button className="secondary" onClick={closeMatchReview}>Sair da fila</button>
+                  <button className="secondary" onClick={closeMatchReview}>{t("match.exitQueue")}</button>
                   <button onClick={completeGuidedReview}>
                     {guidedReviewIndex+1<guidedReviewIds.length
-                      ?"Marcar revisada e abrir próxima →"
-                      :"Marcar revisada e concluir ✓"}
+                      ?t("match.markNext")
+                      :t("match.markDone")}
                   </button>
                 </div>
               </section>}
               {openedMatch&&studyRequest?.matchId===openedMatch.id&&<section className="guided-review-footer native-review-completion">
                 <div>
-                  <span>PRÓXIMA PARTIDA</span>
-                  <strong>{studyRequest.sessionFocus ? "Foco: "+sessionFocusLabel(studyRequest.sessionFocus) : "Leve uma ação desta review"}</strong>
-                  <small>O foco é contexto da sessão; a Riot API não mede diretamente se ele foi cumprido.</small>
+                  <span>{t("match.nextMatch")}</span>
+                  <strong>{studyRequest.sessionFocus ? t("match.focus",{focus:sessionFocusLabel(studyRequest.sessionFocus,t)}) : t("match.takeAction")}</strong>
+                  <small>{t("match.focusDisclaimer")}</small>
                 </div>
                 <div className="guided-review-actions">
-                  <button onClick={markStudyReviewed}>MARCAR COMO REVISTA</button>
+                  <button onClick={markStudyReviewed}>{t("match.markReviewed")}</button>
                 </div>
               </section>}
             </>}
