@@ -6,6 +6,8 @@ type Props={
   matchCount:number;
   refreshing:boolean;
   onRefresh:()=>void;
+  compact?:boolean;
+  contextCount?:number;
 };
 
 function relativeTime(timestamp?:number){
@@ -19,7 +21,14 @@ function relativeTime(timestamp?:number){
   return Math.floor(hours/24)+" d";
 }
 
-export default function RiotDataBar({profile,matchCount,refreshing,onRefresh}:Props){
+export default function RiotDataBar({
+  profile,
+  matchCount,
+  refreshing,
+  onRefresh,
+  compact=false,
+  contextCount,
+}:Props){
   const partial=profile.partial;
   const partialLabels=[
     partial?.summoner?"perfil":null,
@@ -27,6 +36,31 @@ export default function RiotDataBar({profile,matchCount,refreshing,onRefresh}:Pr
     partial?.history?"histórico":null,
   ].filter(Boolean) as string[];
   const source=profile.source;
+
+  if(compact){
+    return <section className={"riot-data-bar compact "+(partialLabels.length?"partial":"complete")}>
+      <div className="riot-data-primary">
+        <div className="riot-data-title">
+          <span className="riot-data-dot"></span>
+          <div>
+            <strong>Dados Riot</strong>
+            <small>
+              {matchCount} carregadas
+              {typeof contextCount==="number"?" · "+contextCount+" neste filtro":""}
+              {" · atualizado "+relativeTime(source?.retrievedAt)}
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div className="riot-data-side">
+        <RiotServiceStatus platform={profile.player.platform}/>
+        {partialLabels.length>0&&<span className="riot-partial-warning">
+          parcial · {partialLabels.join(" + ")}
+        </span>}
+      </div>
+    </section>;
+  }
 
   return <section className={"riot-data-bar "+(partialLabels.length?"partial":"complete")}>
     <div className="riot-data-primary">
