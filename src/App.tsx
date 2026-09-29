@@ -280,6 +280,17 @@ function TacticianVisual({
   </span>;
 }
 
+function AugmentIcon({id,staticData}:{id:string;staticData:TftStaticData|null}){
+  const entry=staticEntry(staticData?.augments,id);
+  const image=staticData?tftAssetUrl(staticData.version,"augment",entry):"";
+  const name=entry?.name||cleanName(id);
+
+  return <span className="match-augment-icon" title={name}>
+    <span>{name.slice(0,1)}</span>
+    {image&&<img src={image} alt={name} onError={(e)=>{e.currentTarget.style.display="none";}}/>}
+  </span>;
+}
+
 function AugmentVisual({id,staticData}:{id:string;staticData:TftStaticData|null}){
   const entry=staticEntry(staticData?.augments,id);
   const image=staticData?tftAssetUrl(staticData.version,"augment",entry):"";
@@ -1805,18 +1816,32 @@ function App() {
                             </div>
 
                             <div className="match-lineup">
-                              <div className="trait-row compact-traits">
-                                {activeTraits(match).slice(0,3).map((trait)=>{
-                                  const entry=staticEntry(staticData?.traits,trait.name);
-                                  const image=staticData?tftAssetUrl(staticData.version,"trait",entry):"";
-                                  return <span className={"trait-chip style-"+Math.max(0,trait.style)} key={trait.name}>
-                                    {image&&<img src={image} alt=""/>}
-                                    {traitLabel(trait,staticData)} {trait.numUnits}
-                                  </span>;
-                                })}
+                              <div className="match-history-support">
+                                <div className="trait-row compact-traits">
+                                  {activeTraits(match).slice(0,3).map((trait)=>{
+                                    const entry=staticEntry(staticData?.traits,trait.name);
+                                    const image=staticData?tftAssetUrl(staticData.version,"trait",entry):"";
+                                    return <span className={"trait-chip style-"+Math.max(0,trait.style)} key={trait.name}>
+                                      {image&&<img src={image} alt=""/>}
+                                      {traitLabel(trait,staticData)} {trait.numUnits}
+                                    </span>;
+                                  })}
+                                </div>
+
+                                {match.augments.length>0&&<div className="match-history-augments" aria-label="Augments da partida">
+                                  {match.augments.slice(0,3).map((augment)=>(
+                                    <AugmentIcon id={augment} staticData={staticData} key={augment}/>
+                                  ))}
+                                </div>}
                               </div>
 
-                              <div className="board-row compact-board match-history-units" aria-label={match.units.length+" unidades no board final"}>
+                              <div className={"board-row compact-board match-history-units "+(
+                                match.units.length>=11
+                                  ?"units-extra"
+                                  :match.units.length>=9
+                                    ?"units-many"
+                                    :""
+                              )} aria-label={match.units.length+" unidades no board final"}>
                                 {match.units.map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact key={unit.characterId+index}/>)}
                               </div>
                             </div>
