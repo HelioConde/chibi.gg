@@ -689,8 +689,8 @@ export default function TeamBuilderPage({
         :unitCost>=4
           ?"cap"
           :traitGain>0
-            ?"ponte"
-            :"peça";
+            ?"bridge"
+            :"piece";
       return {
         id:unit.id,
         unit,
@@ -1433,7 +1433,7 @@ export default function TeamBuilderPage({
                 <span className={"builder-buy-image cost-"+costFor(row.id,staticData)}>{src&&<img src={src} alt=""/>}</span>
                 <div className="builder-buy-copy">
                   <div>
-                    <em>{row.label}</em>
+                    <em>{t("builder.queue.label."+row.label)}</em>
                     <strong>{entry?.name||clean(row.id)}</strong>
                   </div>
                   <small>{row.kind==="upgrade"
@@ -1762,7 +1762,7 @@ export default function TeamBuilderPage({
                 return name+" "+(delta>0?"+":"")+delta;
               }).join(" · ")
               :t("builder.ab.noStructure")}</p>
-            <p><b>Itens</b>{variantDiff.itemChanges.length
+            <p><b>{t("builder.items")}</b>{variantDiff.itemChanges.length
               ?variantDiff.itemChanges.map(id=>staticEntry(staticData?.champions,id)?.name||clean(id)).join(" · ")
               :t("builder.ab.noItems")}</p>
             <p><b>Augments</b>{variantDiff.augmentChanges.before.length||variantDiff.augmentChanges.after.length
@@ -1771,7 +1771,7 @@ export default function TeamBuilderPage({
                 ...variantDiff.augmentChanges.after.map(id=>"+ "+(staticEntry(staticData?.augments,id)?.name||clean(id))),
               ].join(" · ")
               :t("builder.ab.noAugments")}</p>
-            <p><b>Posições</b>{variantDiff.positionChanges.length
+            <p><b>{t("builder.position")}</b>{variantDiff.positionChanges.length
               ?variantDiff.positionChanges.map(id=>staticEntry(staticData?.champions,id)?.name||clean(id)).join(" · ")
               :t("builder.ab.noPosition")}</p>
             <p><b>{t("builder.ab.roles")}</b>{variantDiff.roleChanges.length
