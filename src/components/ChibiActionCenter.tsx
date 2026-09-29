@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { TftMatch } from "../api/tft";
 import { buildActionPlan } from "../analysis/actionPlan";
 import { getGoal, goalProgress, saveGoal, suggestGoal, ChibiGoal } from "../goals";
+import { useI18n } from "../i18n";
 
 type Props={
   playerKey:string;
@@ -11,7 +12,8 @@ type Props={
 };
 
 export default function ChibiActionCenter({playerKey,matches,onEvidence,onReviewQueue}:Props){
-  const plan=useMemo(()=>buildActionPlan(matches),[matches]);
+  const { t }=useI18n();
+  const plan=useMemo(()=>buildActionPlan(matches,t),[matches,t]);
   const [goal,setGoal]=useState<ChibiGoal|null>(()=>getGoal(playerKey));
 
   useEffect(()=>{
@@ -29,34 +31,34 @@ export default function ChibiActionCenter({playerKey,matches,onEvidence,onReview
   return <section className="panel action-center action-center-v2">
     <div className="action-center-head">
       <div>
-        <span>SEU FOCO AGORA</span>
-        <h2>O que importa antes da próxima fila</h2>
+        <span>{t("actionCenter.focus")}</span>
+        <h2>{t("actionCenter.title")}</h2>
       </div>
-      <small>{matches.length} partidas analisadas</small>
+      <small>{t("actionCenter.matches",{count:matches.length})}</small>
     </div>
 
     <div className="focus-hero">
       <article className="focus-problem">
-        <span className="focus-kicker">O QUE ESTÁ SEGURANDO SEU RESULTADO</span>
+        <span className="focus-kicker">{t("actionCenter.problem")}</span>
         <div className="focus-title-row">
           <h3>{plan.problem.title}</h3>
-          <em>{plan.problem.confidence}</em>
+          <em>{t(plan.problem.confidence==="alta"?"action.confidence.high":plan.problem.confidence==="média"?"action.confidence.medium":"action.confidence.low")}</em>
         </div>
         <p>{plan.problem.body}</p>
         <div className="focus-evidence">
           <strong>{plan.problem.evidence}</strong>
-          {plan.problem.matchIds.length>0&&<button onClick={()=>onEvidence(plan.problem.matchIds,"Foco atual · problema principal")}>Ver partidas relacionadas</button>}
+          {plan.problem.matchIds.length>0&&<button onClick={()=>onEvidence(plan.problem.matchIds,"Foco atual · problema principal")}>{t("actionCenter.related")}</button>}
         </div>
       </article>
 
       <article className="focus-next">
-        <span className="focus-kicker">FAÇA ISSO AGORA</span>
+        <span className="focus-kicker">{t("actionCenter.doNow")}</span>
         <h3>{plan.action.title}</h3>
         <ol>
           {plan.action.steps.map((step,index)=><li key={index}><span>{index+1}</span><p>{step}</p></li>)}
         </ol>
         <details className="focus-avoid">
-          <summary>O que evitar</summary>
+          <summary>{t("actionCenter.avoid")}</summary>
           <p>{plan.action.avoid}</p>
         </details>
       </article>
@@ -64,7 +66,7 @@ export default function ChibiActionCenter({playerKey,matches,onEvidence,onReview
 
     <div className="focus-measure">
       <div>
-        <span>COMO SABER SE MELHOROU</span>
+        <span>{t("actionCenter.measure")}</span>
         <h3>{plan.success.title}</h3>
         <p>{plan.success.metric}</p>
       </div>
@@ -73,13 +75,13 @@ export default function ChibiActionCenter({playerKey,matches,onEvidence,onReview
         <div className="focus-goal-progress">
           <div className="action-goal-bar"><i style={{width:Math.min(100,((progress?.played||0)/(goal.targetGames||5))*100)+"%"}}/></div>
           <div className="action-goal-meta">
-            <span>{progress?.played||0}/{goal.targetGames} partidas</span>
+            <span>{t("actionCenter.goalMatches",{played:progress?.played||0,target:goal.targetGames})}</span>
             <strong>{progress?.detail||goal.description}</strong>
           </div>
-          <small>{progress?.finished?(progress.achieved?"Objetivo atingido":"Objetivo concluído sem bater a meta"):"Objetivo em andamento"}</small>
+          <small>{progress?.finished?(progress.achieved?t("actionCenter.achieved"):t("actionCenter.completed")):t("actionCenter.inProgress")}</small>
         </div>
       ):(
-        <button className="action-start-goal" onClick={startGoal}>Acompanhar nas próximas 5 partidas</button>
+        <button className="action-start-goal" onClick={startGoal}>{t("actionCenter.start")}</button>
       )}
     </div>
   </section>;
