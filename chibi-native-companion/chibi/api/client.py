@@ -25,6 +25,8 @@ class ChibiApiClient:
         return [HistoryMatch(str(item.get("id") or ""), _integer(item.get("playedAt")), _number(item.get("duration")), _integer(item.get("queueId")), item) for item in raw if isinstance(item, dict) and item.get("id")]
     def get_match(self, match_id: str) -> dict[str, object]:
         return self._post("public-tft-match", {"matchId": match_id})
+    def get_comps(self, queue_id: int = 1100) -> dict[str, object]:
+        return self._post("public-tft-comps", {"setNumber": 0, "queueId": queue_id, "minGames": 2, "limit": 18})
     def _post(self, function: str, body: dict[str, object]) -> dict[str, object]:
         request = Request(f"{self.base_url}/{function}", data=json.dumps(body).encode("utf-8"), headers={"Content-Type": "application/json", "User-Agent": "ChibiNativeCompanion/0.1"}, method="POST")
         try:

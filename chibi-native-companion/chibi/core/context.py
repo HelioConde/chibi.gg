@@ -10,3 +10,4 @@ from chibi.telemetry.models import TelemetrySnapshot
 class CompanionContext:
     gameflow: GameStateSnapshot = field(default_factory=GameStateSnapshot.offline)
     telemetry: TelemetrySnapshot = field(default_factory=TelemetrySnapshot.unavailable)
+    tracker: object | None = None

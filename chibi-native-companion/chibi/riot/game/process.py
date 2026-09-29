@@ -8,6 +8,7 @@ import psutil
 
 RIOT_NAME_TOKENS = ("riotclient", "league", "tft")
 EXCLUDED_NAME_TOKENS = ("valorant", "vanguard", "vgc", "vgtray")
+TFT_GAME_PROCESS = "tftclient-win64-shipping.exe"
 
 @dataclass(frozen=True, slots=True)
 class RiotProcess:
@@ -35,3 +36,15 @@ def discover_processes(processes: Iterable[object] | None = None) -> list[RiotPr
             found.append(RiotProcess(int(info.get("pid") or 0), name, executable, started))
         except (psutil.Error, OSError, ValueError, TypeError): continue
     return sorted(found, key=lambda process: (process.name.casefold(), process.pid))
+
+
+def tft_game_process_running(processes: Iterable[object] | None = None) -> bool:
+    source = processes if processes is not None else psutil.process_iter(["name"])
+    for item in source:
+        try:
+            info = item.info if hasattr(item, "info") else item
+            if isinstance(info, dict) and str(info.get("name") or "").casefold() == TFT_GAME_PROCESS:
+                return True
+        except (psutil.Error, OSError, TypeError):
+            continue
+    return False

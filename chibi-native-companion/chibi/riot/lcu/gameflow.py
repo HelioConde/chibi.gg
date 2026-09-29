@@ -8,6 +8,9 @@ from PySide6.QtCore import QObject, QThread, QTimer, Signal, Slot
 from .client import LcuClient
 from .connection import LcuUnavailableError
 from .models import GameState, GameStateSnapshot
+from chibi.riot.game.process import tft_game_process_running
+from chibi.riot.game.state import GameStateResolver
+from chibi.vision.window import find_tft_window
 
 LOGGER = logging.getLogger("chibi.native.lcu")
 
@@ -45,6 +48,7 @@ class _Worker(QObject):
         self.stable: GameStateSnapshot | None = None
         self.candidate: GameStateSnapshot | None = None
         self.candidate_at = 0.0
+        self.resolver = GameStateResolver()
 
     @Slot()
     def start(self) -> None:
@@ -63,6 +67,11 @@ class _Worker(QObject):
             snapshot = normalize(connected=True, phase=phase, response=response, riot_id=player.riot_id, player_puuid=player.puuid, queue_id=session.queue_id if session else None, queue_name=session.queue_name if session else "", details={"game_mode": session.game_mode if session else "", "is_ranked": session.is_ranked if session else False, "player_count": session.player_count if session else 0})
         except LcuUnavailableError:
             snapshot = GameStateSnapshot.offline()
+        try:
+            has_process, has_window = tft_game_process_running(), find_tft_window() is not None
+        except (OSError, RuntimeError):
+            has_process, has_window = False, False
+        snapshot = self.resolver.resolve(snapshot, tft_process=has_process, tft_window=has_window)
         self._publish_stable(snapshot)
 
     def _publish_stable(self, snapshot: GameStateSnapshot) -> None:
@@ -117,4 +126,4 @@ class DemoGameflowMonitor(QObject):
     def emit_state(self) -> None:
         state = self.states[self.index]
         phase = {GameState.LOBBY: "Lobby", GameState.MATCHMAKING: "Matchmaking", GameState.READY_CHECK: "ReadyCheck", GameState.READY_CHECK_ACCEPTED: "ReadyCheck", GameState.PREPARING: "ChampSelect", GameState.IN_GAME: "InProgress", GameState.POST_GAME: "EndOfGame"}[state]
-        self.state_changed.emit(normalize(connected=True, phase=phase, response="Accepted" if state is GameState.READY_CHECK_ACCEPTED else None, riot_id="Demo#CHIBI", player_puuid="demo", queue_id=1100, queue_name="TFT", details={"game_mode": "TFT", "is_ranked": True, "player_count": 8}))
+        self.state_changed.emit(normalize(connected=True, phase=phase, response="Accepted" if state is GameState.READY_CHECK_ACCEPTED else None, queue_id=1100, queue_name="TFT", details={"game_mode": "TFT", "is_ranked": True, "player_count": 8}))
