@@ -1,9 +1,9 @@
 # Codex Handoff — chibi.gg
 
-Checkpoint: 2026-09-28  
+Checkpoint: 2026-09-29  
 Branch principal: `main`
 
-Este arquivo marca o fim da **Etapa 1**. A partir daqui o projeto pode ser continuado no Codex sem precisar reconstruir contexto do zero.
+A **Etapa 1** está estável e a **Etapa 2 / Prioridade 1 (Comps v2 — decisão de spot)** foi concluída. A partir daqui o projeto pode continuar sem reconstruir contexto do zero.
 
 ## 1. Objetivo do produto
 
@@ -22,7 +22,7 @@ O jogador deve conseguir olhar a tela e entender rapidamente:
 
 Evite transformar o produto em uma coleção de gráficos ou uma tier list genérica.
 
-## 2. Estado da Etapa 1
+## 2. Estado atual
 
 A fundação funcional já existe:
 
@@ -46,20 +46,23 @@ A fundação funcional já existe:
 - cache/observações anônimas no Supabase;
 - deploy automático no GitHub Pages.
 
-A página **Comps v1** já está implementada. Não recrie do zero.
+A página **Comps v2 / decisão de spot** já está implementada. Não recrie do zero.
 
 Ela já possui:
 
 - endpoint `public-tft-comps`;
-- agrupamento por traits centrais observadas;
+- agrupamento atual por traits centrais observadas;
 - amostra, média, Top 4, win rate e volatilidade;
-- unidades recorrentes;
-- itens por unidade;
-- augments recorrentes;
+- unidades recorrentes e itens por unidade;
 - confiança da amostra;
-- compatibilidade com o histórico do jogador;
-- integração com Builder e Study Shelf;
+- familiaridade pessoal separada de sinais globais;
+- lentes de Familiaridade / Confiança / Estabilidade / Popularidade;
+- filtro de confiança da amostra;
+- camada **Quando considerar** baseada em traits e unidades recorrentes observáveis;
+- integração com histórico relacionado, Builder e Study Shelf;
 - guardrails para não tratar board final como receita causal.
+
+Importante: **estatísticas globais/recomendações de augments não são publicadas**. Augments podem aparecer apenas no histórico pós-jogo do próprio jogador, conforme os guardrails atuais do produto.
 
 ## 3. Stack
 
@@ -211,27 +214,23 @@ DETALHES
 
 Não colocar detalhes avançados acima da conclusão principal.
 
-## 7. Etapa 2 recomendada para o Codex
+## 7. Etapa 2 — progresso e próxima prioridade
 
-### Prioridade 1 — Comps v2: decisão de spot
+### Prioridade 1 — Comps v2: decisão de spot ✅
 
-Evoluir `CompsPage.tsx` sem transformar a página em tier list.
+Concluída em 29/09/2026.
 
-Objetivo:
+Entregue:
 
-> responder “quando esta comp faz sentido para mim?” em vez de apenas “qual comp tem melhor média?”.
+1. camada **Quando considerar**;
+2. traits/unidades recorrentes que tornam a rota plausível;
+3. familiaridade pessoal separada do desempenho global;
+4. nenhuma mistura de “boa para o seu histórico” com “forte na amostra global”;
+5. lentes/filtros simples de confiança, estabilidade e popularidade;
+6. integração com Builder preservando as unidades;
+7. guardrail explícito de snapshot final / sem shops, timing de roll ou scouting.
 
-Implementar de forma incremental:
-
-1. criar uma camada **Quando considerar**;
-2. mostrar peças/traits que tornam a rota plausível;
-3. mostrar familiaridade pessoal separada de desempenho global;
-4. separar “boa para o seu histórico” de “forte na amostra global”;
-5. adicionar filtros simples por confiança / estabilidade / popularidade;
-6. permitir abrir a comp no Builder preservando as unidades;
-7. manter guardrail: dados são de boards finais e não conhecem toda a sequência de shops.
-
-Não inventar recomendação de early game se os dados atuais não sustentarem isso.
+A página deve continuar tratando familiaridade como **recorrência pessoal**, não como tier.
 
 ### Prioridade 2 — Comps v2: assinatura melhor
 
@@ -244,7 +243,13 @@ Melhoria futura:
 - não fragmentar demais a amostra;
 - preservar compatibilidade com dados históricos existentes.
 
-Antes de trocar o algoritmo, medir quantas comps/grupos resultam na base atual.
+Antes de trocar o algoritmo:
+
+1. medir quantos grupos existem hoje;
+2. medir o tamanho de cada grupo;
+3. estimar quantos grupos seriam criados por uma assinatura híbrida;
+4. evitar fragmentar amostras pequenas;
+5. manter compatibilidade com o frontend atual de Comps v2.
 
 ### Prioridade 3 — Ask Chibi com evidência
 
@@ -286,14 +291,16 @@ Antes de editar:
 5. Não exponha Riot API key nem Supabase service role no frontend.
 6. Não faça afirmações causais que a Riot Match API não suporta.
 
-Comece pela Etapa 2 / Prioridade 1 descrita no handoff:
-Comps v2 — decisão de spot.
+Comece pela Etapa 2 / Prioridade 2 descrita no handoff:
+Comps v2 — assinatura híbrida de traits + core units.
+
+Antes de alterar o agrupamento, meça a base atual e registre o impacto esperado.
 
 Faça mudanças pequenas e verificáveis. Depois de cada bloco relevante, rode typecheck e build.
 ```
 
 ## 10. Checkpoint
 
-A Etapa 1 deve permanecer utilizável mesmo se a Etapa 2 for interrompida no meio.
+A Etapa 1 e a Comps v2 / Prioridade 1 devem permanecer utilizáveis mesmo se a próxima mudança for interrompida.
 
-Se uma mudança grande exigir refatoração, faça de forma incremental e mantenha o build verde entre commits.
+Próximo checkpoint recomendado: medir e testar a assinatura híbrida de comps sem degradar amostras pequenas. Se uma mudança grande exigir refatoração, faça de forma incremental e mantenha o build verde entre commits.
