@@ -122,11 +122,13 @@ export function buildChibiDNA(matches:TftMatch[]):ChibiDNA{
     const t=traitStats[0];
     insights.push({
       id:"best-trait",
-      title:"Melhor média entre linhas repetidas",
+      title:total<8?"Linha recorrente nesta amostra":"Melhor média entre linhas repetidas",
       subject:t.name,
-      body:"Entre as linhas repetidas na amostra, esta foi a que terminou melhor em média.",
+      body:total<8
+        ?"Esta linha apareceu mais de uma vez no recorte atual. Ainda é cedo para tratar a média como padrão estável."
+        :"Entre as linhas repetidas na amostra, esta foi a que terminou melhor em média.",
       evidence:`${t.games} partidas · média ${t.avg.toFixed(2)}`,
-      tone:"positive",
+      tone:total<8?"neutral":"positive",
       confidence:confidenceFor(t.games,total),
     });
   }
