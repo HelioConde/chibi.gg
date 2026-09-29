@@ -5,6 +5,7 @@ import { buildRankedReviewSignals } from "../analysis/chibiReviewRanking";
 import { getJournalEntries, JOURNAL_TAGS } from "../journal";
 import { staticEntry, TftStaticData } from "../tftStatic";
 import DDragonArt from "./DDragonArt";
+import { useI18n } from "../i18n";
 
 type Props={
   matches:TftMatch[];
@@ -38,13 +39,14 @@ function signed(value:number,suffix=""){
   return (rounded>0?"+":"")+rounded+suffix;
 }
 
-function relevanceLabel(priority:number){
-  if(priority>=72)return "relevância alta";
-  if(priority>=52)return "relevância média";
-  return "sinal inicial";
+function relevanceKey(priority:number){
+  if(priority>=72)return "review.relevance.high";
+  if(priority>=52)return "review.relevance.medium";
+  return "review.relevance.initial";
 }
 
 export default function ChibiReview({matches,staticData,journalVersion,onEvidence}:Props){
+  const { t }=useI18n();
   const leaks=useMemo(()=>buildLeakMap(matches),[matches]);
   const session=useMemo(()=>buildSessionCoach(matches),[matches]);
   const rankedSignals=useMemo(()=>buildRankedReviewSignals(matches),[matches]);
@@ -126,64 +128,64 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
 
     if(focus?.id==="conversion-low"){
       return {
-        title:"Converta um Top 4 em vitória",
-        body:"Nas próximas partidas, compare seus Top 4 que viraram 1º com os que pararam em 2º–4º. Observe board final, estrelas, itens e nível antes de mudar sua linha.",
-        metric:"Meta: registrar uma diferença observável entre pelo menos 2 Top 4.",
+        title:t("review.exp.conversion.title"),
+        body:t("review.exp.conversion.body"),
+        metric:t("review.exp.conversion.metric"),
         ids:focus.matchIds,
       };
     }
 
     if(focus?.id==="bottom2-risk"){
       return {
-        title:"Proteja o piso da próxima sessão",
-        body:"Revise primeiro os 7º/8º e procure um padrão repetido no board final. O objetivo não é eliminar toda derrota, mas transformar uma parte dos Bottom 2 em 5º/6º.",
-        metric:"Meta: passar a próxima sessão sem repetir o mesmo padrão em dois Bottom 2.",
+        title:t("review.exp.bottom.title"),
+        body:t("review.exp.bottom.body"),
+        metric:t("review.exp.bottom.metric"),
         ids:focus.matchIds,
       };
     }
 
     if(focus?.id==="bottom2-gold-left"){
       return {
-        title:"Revise onde o ouro deixou de virar força",
-        body:"Abra os Bottom 2 que terminaram com 10g+ e compare com jogos de colocação melhor. O ouro final sozinho não prova erro de economia; ele indica quais partidas revisar primeiro.",
-        metric:"Meta: identificar em 2 partidas se o recurso final tinha uma conversão plausível em board.",
+        title:t("review.exp.gold.title"),
+        body:t("review.exp.gold.body"),
+        metric:t("review.exp.gold.metric"),
         ids:focus.matchIds,
       };
     }
 
     if(focus?.id.startsWith("trait-risk:")){
-      const name=focus.subjectId?traitName(focus.subjectId,staticData):"essa linha";
+      const name=focus.subjectId?traitName(focus.subjectId,staticData):t("comps.observedComp");
       return {
-        title:"Faça uma revisão dirigida de "+name,
-        body:"Compare seus melhores e piores boards nessa mesma identidade. Procure uma diferença observável em unidades, estrelas, itens ou nível antes de concluir que a comp não combina com você.",
-        metric:"Meta: encontrar 1 diferença repetida entre resultados bons e ruins dessa linha.",
+        title:t("review.exp.trait.title",{name}),
+        body:t("review.exp.trait.body"),
+        metric:t("review.exp.trait.metric"),
         ids:focus.matchIds,
       };
     }
 
     if(focus?.id==="level-split"&&focus.tone==="warning"){
       return {
-        title:"Pare de usar nível como explicação única",
-        body:"Compare partidas em que você terminou em nível parecido, mas teve colocações diferentes. Procure qualidade de board, estrelas, itens e traits como explicações alternativas.",
-        metric:"Meta: identificar 2 boards de nível semelhante com resultados diferentes e comparar a composição final.",
+        title:t("review.exp.level.title"),
+        body:t("review.exp.level.body"),
+        metric:t("review.exp.level.metric"),
         ids:focus.matchIds,
       };
     }
 
     if(focus?.id.startsWith("line-dominance:")){
       return {
-        title:"Teste uma segunda linha quando o jogo oferecer",
-        body:"Não abandone sua especialidade. Registre uma partida em que itens e unidades naturalmente apontem para outra identidade e compare o resultado depois.",
-        metric:"Meta: concluir 1 partida com uma segunda identidade de board sem forçar a transição.",
+        title:t("review.exp.line.title"),
+        body:t("review.exp.line.body"),
+        metric:t("review.exp.line.metric"),
         ids:focus.matchIds,
       };
     }
 
     if(focus?.id==="recent-form"&&focus.tone==="warning"){
       return {
-        title:"Descubra o que mudou no bloco recente",
-        body:"Compare as partidas recentes com o bloco anterior e procure apenas uma diferença por vez: linha, nível final, presença de 3★ ou frequência de Bottom 2.",
-        metric:"Meta: encontrar 1 mudança objetiva que apareceu mais no bloco recente.",
+        title:t("review.exp.recent.title"),
+        body:t("review.exp.recent.body"),
+        metric:t("review.exp.recent.metric"),
         ids:focus.matchIds,
       };
     }
@@ -191,9 +193,9 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
     const primary=leaks.primary;
     if(primary?.id==="conversion"){
       return {
-        title:"Converta um Top 4 em vitória",
-        body:"Compare boards finais dos Top 4 e procure uma diferença observável antes de mudar sua linha.",
-        metric:"Meta: registrar uma diferença entre pelo menos 2 Top 4.",
+        title:t("review.exp.conversion.title"),
+        body:t("review.exp.conversionShort.body"),
+        metric:t("review.exp.conversion.metric"),
         ids:top4.map(match=>match.id),
       };
     }
@@ -201,30 +203,30 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
     return {
       title:session.focus,
       body:session.reason,
-      metric:"Use a próxima sessão para testar só uma mudança de cada vez.",
+      metric:t("review.exp.default.metric"),
       ids:focus?.matchIds.length?focus.matchIds:session.matchIds,
     };
-  },[rankedSignals,leaks,session,top4,staticData]);
+  },[rankedSignals,leaks,session,top4,staticData,t]);
 
   return <section className="panel chibi-review coach-review">
     <div className="review-head coach-review-head">
       <div className="coach-review-copy">
         <span>CHIBI REVIEW</span>
-        <h2>Até 3 descobertas sobre o seu jogo</h2>
-        <p>O Chibi compara vários sinais do seu histórico e mostra apenas os 3 mais relevantes agora, sempre com evidência e confiança.</p>
+        <h2>{t("review.title")}</h2>
+        <p>{t("review.desc")}</p>
         <DDragonArt
           staticData={staticData}
           championIds={visualChampionIds}
           variant="compact"
-          label="Seu pool recente · Riot Data Dragon"
+          label={t("review.pool")}
         />
       </div>
-      <small>{matches.length} partidas</small>
+      <small>{t("review.matches",{count:matches.length})}</small>
     </div>
 
     {rankedSignals.length===0&&<div className="coach-review-empty">
-      <strong>Ainda não há partidas suficientes para priorizar sinais.</strong>
-      <span>Assim que o histórico carregar, o Chibi compara os padrões e escolhe o que merece aparecer primeiro.</span>
+      <strong>{t("review.empty.title")}</strong>
+      <span>{t("review.empty.desc")}</span>
     </div>}
 
     <div className="coach-signal-row ranked-review-signals">
@@ -232,7 +234,7 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
         <article className={"coach-signal "+signal.tone} key={signal.id}>
           <div className="review-signal-rank">
             <span>{index+1}</span>
-            <small>{relevanceLabel(signal.priority)}</small>
+            <small>{t(relevanceKey(signal.priority))}</small>
           </div>
           <span>{signal.eyebrow}</span>
           {signal.subjectId&&<strong className="review-signal-subject">{traitName(signal.subjectId,staticData)}</strong>}
@@ -240,11 +242,11 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
           <p>{signal.body}</p>
           <small className="review-signal-evidence">{signal.evidence}</small>
           <div>
-            <em>confiança {signal.confidence}</em>
+            <em>{t("review.confidence",{value:t(signal.confidence==="alta"?"common.confidence.high":signal.confidence==="média"?"common.confidence.medium":"common.confidence.low")})}</em>
             {signal.matchIds.length>0&&<button onClick={()=>onEvidence(
               signal.matchIds,
               "Chibi Review · "+(signal.subjectId?traitName(signal.subjectId,staticData)+" · ":"")+signal.title,
-            )}>Ver evidências</button>}
+            )}>{t("review.viewEvidence")}</button>}
           </div>
         </article>
       ))}
@@ -254,73 +256,73 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
       <div className="coach-session-review-head">
         <div>
           <span>SESSION REVIEW</span>
-          <h3>Últimas {sessionComparison.window} vs {sessionComparison.window} anteriores</h3>
-          <p>Uma leitura rápida para entender se sua sessão mudou de direção — sem esconder a amostra.</p>
+          <h3>{t("review.session.title",{window:sessionComparison.window})}</h3>
+          <p>{t("review.session.desc")}</p>
         </div>
-        <button onClick={()=>onEvidence(sessionComparison.ids,"Session Review · bloco recente vs anterior")}>Ver as {sessionComparison.window*2} partidas</button>
+        <button onClick={()=>onEvidence(sessionComparison.ids,"Session Review · bloco recente vs anterior")}>{t("review.session.view",{count:sessionComparison.window*2})}</button>
       </div>
 
       <div className="coach-session-metrics">
         <article>
-          <span>COLOCAÇÃO MÉDIA</span>
+          <span>{t("review.session.average")}</span>
           <strong>{sessionComparison.current.avg.toFixed(2)}</strong>
-          <small>antes {sessionComparison.before.avg.toFixed(2)} · Δ {signed(sessionComparison.avgDelta)}</small>
+          <small>{t("review.session.before",{value:sessionComparison.before.avg.toFixed(2),delta:signed(sessionComparison.avgDelta)})}</small>
         </article>
         <article>
           <span>TOP 4</span>
           <strong>{sessionComparison.current.top4}%</strong>
-          <small>antes {sessionComparison.before.top4}% · Δ {signed(sessionComparison.current.top4-sessionComparison.before.top4,"%")}</small>
+          <small>{t("review.session.before",{value:sessionComparison.before.top4+"%",delta:signed(sessionComparison.current.top4-sessionComparison.before.top4,"%")})}</small>
         </article>
         <article>
-          <span>1º LUGAR</span>
+          <span>{t("review.session.first")}</span>
           <strong>{sessionComparison.current.wins}%</strong>
-          <small>antes {sessionComparison.before.wins}% · Δ {signed(sessionComparison.current.wins-sessionComparison.before.wins,"%")}</small>
+          <small>{t("review.session.before",{value:sessionComparison.before.wins+"%",delta:signed(sessionComparison.current.wins-sessionComparison.before.wins,"%")})}</small>
         </article>
         <article className={sessionComparison.current.bottom2>sessionComparison.before.bottom2?"warning":""}>
           <span>BOTTOM 2</span>
           <strong>{sessionComparison.current.bottom2}%</strong>
-          <small>antes {sessionComparison.before.bottom2}% · Δ {signed(sessionComparison.current.bottom2-sessionComparison.before.bottom2,"%")}</small>
+          <small>{t("review.session.before",{value:sessionComparison.before.bottom2+"%",delta:signed(sessionComparison.current.bottom2-sessionComparison.before.bottom2,"%")})}</small>
         </article>
       </div>
     </section>}
 
     <article className="coach-experiment">
       <div>
-        <span>PRÓXIMO EXPERIMENTO</span>
+        <span>{t("review.experiment")}</span>
         <h3>{experiment.title}</h3>
         <p>{experiment.body}</p>
       </div>
       <aside>
-        <small>COMO VALIDAR</small>
+        <small>{t("review.validate")}</small>
         <strong>{experiment.metric}</strong>
-        {experiment.ids.length>0&&<button onClick={()=>onEvidence(experiment.ids,"Coach · próximo experimento")}>Abrir partidas relevantes</button>}
+        {experiment.ids.length>0&&<button onClick={()=>onEvidence(experiment.ids,"Coach · próximo experimento")})}>{t("review.openRelevant")}</button>}
       </aside>
     </article>
 
     <details className="coach-evidence-layer">
       <summary>
-        <span><b>Ver sinais de apoio</b><small>Journal, leitura de nível e contexto usado pelo coach</small></span>
-        <em>Evidências</em>
+        <span><b>{t("review.support.title")}</b><small>{t("review.support.desc")}</small></span>
+        <em>{t("review.support.evidence")}</em>
       </summary>
       <div className="review-foot coach-evidence-body">
         <div>
-          <span>SINAL DO JOURNAL</span>
+          <span>{t("review.journal")}</span>
           {journalSignal?(
             <>
               <strong>{journalSignal.label}</strong>
-              <p>Marcado em {journalSignal.games} partidas, com colocação média {journalSignal.avg.toFixed(2)}.</p>
-              <button onClick={()=>onEvidence(journalSignal.ids,"Journal · "+journalSignal.label)}>Ver partidas marcadas</button>
+              <p>{t("review.journal.marked",{games:journalSignal.games,average:journalSignal.avg.toFixed(2)})}</p>
+              <button onClick={()=>onEvidence(journalSignal.ids,"Journal · "+journalSignal.label)}>{t("review.journal.view")}</button>
             </>
           ):(
-            <p>Marque contexto nas partidas para o Chibi cruzar decisões percebidas com seus resultados.</p>
+            <p>{t("review.journal.empty")}</p>
           )}
         </div>
         <div>
-          <span>LEITURA DE NÍVEL</span>
+          <span>{t("review.level")}</span>
           <strong>{top4AvgLevel!=null&&bottom4AvgLevel!=null
-            ? "Top 4 "+top4AvgLevel.toFixed(1)+" · Bottom 4 "+bottom4AvgLevel.toFixed(1)
-            : "Amostra insuficiente"}</strong>
-          <p>Esse indicador descreve o board final; não revela quando você subiu de nível.</p>
+            ? t("review.level.summary",{top:top4AvgLevel.toFixed(1),bottom:bottom4AvgLevel.toFixed(1)})
+            : t("review.level.insufficient")}</strong>
+          <p>{t("review.level.desc")}</p>
         </div>
       </div>
     </details>
