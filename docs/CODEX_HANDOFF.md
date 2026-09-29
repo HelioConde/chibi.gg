@@ -1,9 +1,9 @@
 # Codex Handoff — chibi.gg
 
-Checkpoint: 2026-09-28  
+Checkpoint: 2026-09-29  
 Branch principal: `main`
 
-Este arquivo marca o fim da **Etapa 1**. A partir daqui o projeto pode ser continuado no Codex sem precisar reconstruir contexto do zero.
+A **Etapa 1** está estável e a **Etapa 2 / Prioridade 1 (Comps v2 — decisão de spot)** foi concluída. A partir daqui o projeto pode continuar sem reconstruir contexto do zero.
 
 ## 1. Objetivo do produto
 
@@ -22,7 +22,7 @@ O jogador deve conseguir olhar a tela e entender rapidamente:
 
 Evite transformar o produto em uma coleção de gráficos ou uma tier list genérica.
 
-## 2. Estado da Etapa 1
+## 2. Estado atual
 
 A fundação funcional já existe:
 
@@ -46,20 +46,23 @@ A fundação funcional já existe:
 - cache/observações anônimas no Supabase;
 - deploy automático no GitHub Pages.
 
-A página **Comps v1** já está implementada. Não recrie do zero.
+A página **Comps v2 / decisão de spot** já está implementada. Não recrie do zero.
 
 Ela já possui:
 
 - endpoint `public-tft-comps`;
-- agrupamento por traits centrais observadas;
+- agrupamento atual por traits centrais observadas;
 - amostra, média, Top 4, win rate e volatilidade;
-- unidades recorrentes;
-- itens por unidade;
-- augments recorrentes;
+- unidades recorrentes e itens por unidade;
 - confiança da amostra;
-- compatibilidade com o histórico do jogador;
-- integração com Builder e Study Shelf;
+- familiaridade pessoal separada de sinais globais;
+- lentes de Familiaridade / Confiança / Estabilidade / Popularidade;
+- filtro de confiança da amostra;
+- camada **Quando considerar** baseada em traits e unidades recorrentes observáveis;
+- integração com histórico relacionado, Builder e Study Shelf;
 - guardrails para não tratar board final como receita causal.
+
+Importante: **estatísticas globais/recomendações de augments não são publicadas**. Augments podem aparecer apenas no histórico pós-jogo do próprio jogador, conforme os guardrails atuais do produto.
 
 ## 3. Stack
 
@@ -211,53 +214,71 @@ DETALHES
 
 Não colocar detalhes avançados acima da conclusão principal.
 
-## 7. Etapa 2 recomendada para o Codex
+## 7. Etapa 2 — progresso e próxima prioridade
 
-### Prioridade 1 — Comps v2: decisão de spot
+### Prioridade 1 — Comps v2: decisão de spot ✅
 
-Evoluir `CompsPage.tsx` sem transformar a página em tier list.
+Concluída em 29/09/2026.
 
-Objetivo:
+Entregue:
 
-> responder “quando esta comp faz sentido para mim?” em vez de apenas “qual comp tem melhor média?”.
+1. camada **Quando considerar**;
+2. traits/unidades recorrentes que tornam a rota plausível;
+3. familiaridade pessoal separada do desempenho global;
+4. nenhuma mistura de “boa para o seu histórico” com “forte na amostra global”;
+5. lentes/filtros simples de confiança, estabilidade e popularidade;
+6. integração com Builder preservando as unidades;
+7. guardrail explícito de snapshot final / sem shops, timing de roll ou scouting.
 
-Implementar de forma incremental:
+A página deve continuar tratando familiaridade como **recorrência pessoal**, não como tier.
 
-1. criar uma camada **Quando considerar**;
-2. mostrar peças/traits que tornam a rota plausível;
-3. mostrar familiaridade pessoal separada de desempenho global;
-4. separar “boa para o seu histórico” de “forte na amostra global”;
-5. adicionar filtros simples por confiança / estabilidade / popularidade;
-6. permitir abrir a comp no Builder preservando as unidades;
-7. manter guardrail: dados são de boards finais e não conhecem toda a sequência de shops.
+### Prioridade 2 — Comps v2: assinatura melhor ✅ primeira iteração
 
-Não inventar recomendação de early game se os dados atuais não sustentarem isso.
+Medição realizada no Set 18 / Ranqueada antes de alterar o algoritmo:
 
-### Prioridade 2 — Comps v2: assinatura melhor
+- 176 participantes observados;
+- assinatura rígida de 2 traits: 104 grupos, mediana 1 jogo, apenas 15 grupos com 3+ jogos;
+- adicionar um anchor unit diretamente fragmentou ainda mais a base;
+- assinatura adaptativa por par de traits com fallback para trait principal: 47 grupos, mediana 3 jogos, 35 grupos com 3+ jogos;
+- nos grupos com 3+ jogos, o método adaptativo por traits teve melhor presença média compartilhada de unidades do que o split por anchor unit testado.
 
-Hoje `public-tft-comps` agrupa principalmente pelas duas traits centrais.
+Decisão implementada em `public-tft-comps`:
 
-Melhoria futura:
+- modo `adaptive-traits-v2`;
+- pares de traits só criam identidade própria quando atingem `max(3,minGames)`;
+- pares raros recuam para a trait principal;
+- a API expõe `signatureMode` e `signatureThreshold`;
+- o frontend explica que o agrupamento é adaptativo.
 
-- estudar assinatura híbrida de traits + core units;
-- evitar juntar boards muito diferentes que compartilham apenas duas traits;
-- não fragmentar demais a amostra;
-- preservar compatibilidade com dados históricos existentes.
+A ideia de assinatura híbrida com core unit **não foi descartada**, mas foi adiada porque o teste atual reduziu a coerência média e fragmentou mais a amostra. Reavaliar quando o Chibi Dataset tiver significativamente mais partidas.
 
-Antes de trocar o algoritmo, medir quantas comps/grupos resultam na base atual.
+### Prioridade 3 — Ask Chibi com evidência ✅
 
-### Prioridade 3 — Ask Chibi com evidência
+Concluída em 29/09/2026.
 
-O componente já existe no projeto.
+Entregue:
 
-Qualquer resposta futura deve apontar para:
+- cada resposta mostra base/amostra usada;
+- confiança continua visível;
+- respostas apontam partidas relacionadas quando existem;
+- a UI mostra a origem do contexto e o limite do dado;
+- respostas baseadas em Riot deixam explícito que são snapshot final, sem shops, timing de roll, scouting ou HP por rodada;
+- Journal / Lessons / Session são identificados como contexto local complementar;
+- perguntas sobre Top 4, força de linha, estilo, Bottom 2 e causa principal foram suavizadas quando a amostra é pequena;
+- perguntas genéricas sobre “por que” e “o que fazer agora” não recebem diagnóstico forte com menos de 8 partidas.
 
-- partidas usadas;
-- tamanho da amostra;
-- confiança;
-- limite do dado.
+A regra permanece: se a evidência não sustenta a conclusão, o Ask Chibi deve dizer que ainda não sabe.
 
-Não deixar o chatbot responder TFT genericamente quando a pergunta for sobre o histórico do jogador.
+## 7.1 Próxima etapa recomendada — Riot review readiness
+
+Enquanto a Production Application está pendente, o próximo bloco recomendado é tornar o site explicitamente pronto para revisão:
+
+- página pública **Como o Chibi funciona**;
+- Privacy Policy;
+- Terms / regras do serviço;
+- boilerplate legal obrigatório da Riot em local visível;
+- descrição pública de fontes de dados e limitações;
+- deixar claro que o Chibi não é endossado pela Riot e não oferece scouting/opponent tracking/live decision automation.
 
 ## 8. Critério de conclusão de uma mudança
 
@@ -286,14 +307,16 @@ Antes de editar:
 5. Não exponha Riot API key nem Supabase service role no frontend.
 6. Não faça afirmações causais que a Riot Match API não suporta.
 
-Comece pela Etapa 2 / Prioridade 1 descrita no handoff:
-Comps v2 — decisão de spot.
+Comece pela próxima etapa descrita no handoff:
+Riot review readiness.
+
+Priorize About/How It Works, Privacy, Terms e boilerplate legal visível antes de adicionar novas features live.
 
 Faça mudanças pequenas e verificáveis. Depois de cada bloco relevante, rode typecheck e build.
 ```
 
 ## 10. Checkpoint
 
-A Etapa 1 deve permanecer utilizável mesmo se a Etapa 2 for interrompida no meio.
+A Etapa 1 e a Comps v2 / Prioridade 1 devem permanecer utilizáveis mesmo se a próxima mudança for interrompida.
 
-Se uma mudança grande exigir refatoração, faça de forma incremental e mantenha o build verde entre commits.
+Próximo checkpoint recomendado: tornar o produto publicamente verificável e legível para a revisão da Riot, sem mudar o escopo aprovado. Se uma mudança grande exigir refatoração, faça de forma incremental e mantenha o build verde entre commits.

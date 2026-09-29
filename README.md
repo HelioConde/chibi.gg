@@ -8,7 +8,7 @@ O chibi.gg não tenta ser apenas mais um site de estatísticas ou uma tier list.
 
 ## Estado atual
 
-A **Etapa 1** da base do produto está pronta.
+A **Etapa 1** está estável e a **Etapa 2** está em andamento. A primeira prioridade de Comps v2 — decisão de spot — já foi concluída.
 
 Principais áreas já implementadas:
 
@@ -23,7 +23,7 @@ Principais áreas já implementadas:
 - Lobby Autopsy;
 - Counterfactual usando o próprio histórico;
 - Meta global baseado no Chibi Dataset;
-- Comps observadas;
+- Comps v2 com decisão de spot, familiaridade pessoal separada do sinal global e filtros de confiança/estabilidade/popularidade;
 - Statistics;
 - Leaderboard;
 - Team Builder;
@@ -139,6 +139,10 @@ O checkpoint técnico e o plano da próxima etapa estão em:
 
 Antes de continuar o projeto no Codex, leia esse arquivo inteiro.
 
-A primeira prioridade recomendada da Etapa 2 é:
+As três prioridades atuais da Etapa 2 estão concluídas:
 
-> **Comps v2 — decisão de spot**, evoluindo a página atual sem transformá-la em uma tier list genérica.
+- Comps v2 — decisão de spot;
+- assinatura adaptativa de comps (`adaptive-traits-v2`);
+- Ask Chibi evidence-first.
+
+A próxima frente é **Riot review readiness**: About/How It Works, Privacy, Terms, boilerplate legal visível e explicação pública dos limites de dados e de gameplay.
