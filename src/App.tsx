@@ -1283,11 +1283,11 @@ function App() {
                 <button type="submit" disabled={loading}>{loading ? "Analisando..." : "Buscar jogador →"}</button>
               </form>
               <div className="home-search-note">
-                <span>Sem conta para consultar</span>
+                <span>Protótipo público</span>
                 <i></i>
-                <span>Digite Nome#TAG</span>
+                <span>Busca atual por Nome#TAG</span>
                 <i></i>
-                <span>Resultado em segundos</span>
+                <span>RSO planejado após aprovação</span>
               </div>
 
               <RiotServiceStatus platform={platform}/>
@@ -1320,7 +1320,7 @@ function App() {
                 <div className="home-product-windowbar">
                   <span><i></i><i></i><i></i></span>
                   <small>chibi.gg / player</small>
-                  <b>LIVE</b>
+                  <b>PÓS-JOGO</b>
                 </div>
 
                 <div className="home-product-profile">
