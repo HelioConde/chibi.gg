@@ -14,6 +14,7 @@ export type TftStaticData = {
   items: Record<string,TftStaticEntry>;
   traits: Record<string,TftStaticEntry>;
   augments: Record<string,TftStaticEntry>;
+  tacticians: Record<string,TftStaticEntry>;
   queues: Record<string,TftStaticEntry>;
 };
 
@@ -33,11 +34,12 @@ export function loadTftStaticData():Promise<TftStaticData>{
     const version=Array.isArray(versions)&&versions[0]?String(versions[0]):"16.17.1";
     const base="https://ddragon.leagueoflegends.com/cdn/"+version+"/data/pt_BR/";
 
-    const [champion,item,trait,augment,queues]=await Promise.all([
+    const [champion,item,trait,augment,tactician,queues]=await Promise.all([
       fetchJson(base+"tft-champion.json"),
       fetchJson(base+"tft-item.json"),
       fetchJson(base+"tft-trait.json"),
       fetchJson(base+"tft-augments.json").catch(()=>({data:{}})),
+      fetchJson(base+"tft-tactician.json").catch(()=>({data:{}})),
       fetchJson(base+"tft-queues.json").catch(()=>({data:{}})),
     ]);
 
@@ -47,6 +49,7 @@ export function loadTftStaticData():Promise<TftStaticData>{
       items:item?.data||{},
       traits:trait?.data||{},
       augments:augment?.data||{},
+      tacticians:tactician?.data||{},
       queues:queues?.data||{},
     };
   })();
@@ -67,7 +70,7 @@ export function staticEntry(
   );
 }
 
-export function tftAssetUrl(version:string, kind:"champion"|"item"|"trait"|"augment", entry?:TftStaticEntry){
+export function tftAssetUrl(version:string, kind:"champion"|"item"|"trait"|"augment"|"tactician", entry?:TftStaticEntry){
   const full=entry?.image?.full;
   if(!full) return "";
   return "https://ddragon.leagueoflegends.com/cdn/"+version+"/img/tft-"+kind+"/"+encodeURIComponent(full);
