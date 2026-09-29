@@ -10,6 +10,7 @@ const copy = async (from, to) => {
 
 await copy(resolve(root, "manifest.json"), resolve(dist, "manifest.json"));
 await copy(resolve(root, "index.html"), resolve(dist, "index.html"));
+await copy(resolve(root, "desktop.html"), resolve(dist, "desktop.html"));
 await mkdir(resolve(dist, "debug"), { recursive: true });
 
 const icon = resolve(root, "..", "public", "img", "icon.png");
