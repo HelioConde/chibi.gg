@@ -1582,14 +1582,14 @@ function App() {
         </main>
       ) : (
         <main className="profile-page">
-          <button className="back-search" onClick={resetSearch}>← Nova busca</button>
+          <button className="back-search" onClick={resetSearch}>{t("profile.newSearch")}</button>
           {demoMode&&<section className="review-demo-banner">
             <div>
-              <span>DEMONSTRAÇÃO SINTÉTICA</span>
-              <strong>Fluxo de review totalmente navegável sem depender de uma Riot API key temporária.</strong>
-              <small>Jogador, rank, partidas e lobby abaixo são dados fictícios criados apenas para avaliação do produto.</small>
+              <span>{t("profile.demo.label")}</span>
+              <strong>{t("profile.demo.title")}</strong>
+              <small>{t("profile.demo.desc")}</small>
             </div>
-            <button onClick={resetSearch}>Sair da demo</button>
+            <button onClick={resetSearch}>{t("profile.demo.exit")}</button>
           </section>}
 
           <section className="player-summary-shell player-summary-visual player-summary-compact">
@@ -1614,11 +1614,11 @@ function App() {
               <div className="player-summary-copy">
                 <div className="eyebrow">{profile.player.platform.toUpperCase()} · {currentSet?"SET "+currentSet:"TFT"}</div>
                 {isHistoricalSet&&<div className="historical-set-warning">
-                  Histórico do Set {currentSet} · Set atual {staticCurrentSet}
+                  {t("profile.historicalSet",{current:currentSet||"—",latest:staticCurrentSet||"—"})}
                 </div>}
                 <h1>{profile.player.gameName}<span className="player-tag">#{profile.player.tagLine}</span></h1>
                 <div className="player-rank-line">
-                  <strong>{rank ? rank.tier+" "+rank.rank : "Sem rank atual"}</strong>
+                  <strong>{rank ? rank.tier+" "+rank.rank : t("profile.noRank")}</strong>
                   {rank&&<span>{rank.leaguePoints} LP · {rank.wins}V / {rank.losses}D</span>}
                   <span className={"player-trend "+trendStats.tone}>{trendStats.label}</span>
                 </div>
@@ -1627,27 +1627,27 @@ function App() {
 
             <div className="player-summary-kpis">
               <article>
-                <span>Média</span>
+                <span>{t("profile.average")}</span>
                 <strong>{dna.avgPlacement??"—"}</strong>
-                <small>{headlineStats.total} jogo{headlineStats.total===1?"":"s"} no filtro</small>
+                <small>{t("profile.gamesFilter",{count:headlineStats.total})}</small>
               </article>
               <article>
                 <span>Top 4</span>
                 <strong>{headlineStats.total<8
                   ? headlineStats.top4+"/"+headlineStats.total
                   : dna.top4Rate+"%"}</strong>
-                <small>{headlineStats.total<8?"amostra inicial":"taxa na amostra"}</small>
+                <small>{headlineStats.total<8?t("profile.initialSample"):t("profile.sampleRate")}</small>
               </article>
               <article>
-                <span>Última</span>
-                <strong>{latestPlayedAt?formatWhen(latestPlayedAt):"—"}</strong>
-                <small>{freshnessDays!=null&&freshnessDays>14?"amostra antiga":"partida mais recente"}</small>
+                <span>{t("profile.latest")}</span>
+                <strong>{latestPlayedAt?formatWhen(latestPlayedAt,locale,t):"—"}</strong>
+                <small>{freshnessDays!=null&&freshnessDays>14?t("profile.oldSample"):t("profile.latestMatch")}</small>
               </article>
             </div>
 
             <div className="player-summary-actions">
               <button className="player-coach-button" onClick={()=>changeProfileTab("coach")}>Chibi Review</button>
-              <button className="refresh-button" onClick={searchPlayer} disabled={loading}>{demoMode?"Reiniciar demo":loading?"Atualizando...":"Atualizar"}</button>
+              <button className="refresh-button" onClick={searchPlayer} disabled={loading}>{demoMode?t("profile.restartDemo"):loading?t("profile.updating"):t("profile.update")}</button>
             </div>
 
             <div className="player-summary-source">
@@ -1665,14 +1665,14 @@ function App() {
 
           {error && <div className="profile-error">{error}</div>}
 
-          <nav className="profile-tabs simplified-tabs profile-tabs-clean" aria-label="Seções do perfil">
+          <nav className="profile-tabs simplified-tabs profile-tabs-clean" aria-label={t("profile.tabsAria")}>
             <div className="profile-tab-list">
-              <button className={profileTab==="matches"?"active":""} onClick={()=>changeProfileTab("matches")}>Partidas</button>
-              <button className={profileTab==="overview"?"active":""} onClick={()=>changeProfileTab("overview")}>Resumo</button>
+              <button className={profileTab==="matches"?"active":""} onClick={()=>changeProfileTab("matches")}>{t("profile.matches")}</button>
+              <button className={profileTab==="overview"?"active":""} onClick={()=>changeProfileTab("overview")}>{t("profile.summary")}</button>
               <button className={profileTab==="coach"?"active":""} onClick={()=>changeProfileTab("coach")}>Coach</button>
             </div>
             <div className="profile-tab-actions">
-              {!demoMode&&<button className="share-analysis-button" onClick={()=>changeProfileTab("share")}>Compartilhar</button>}
+              {!demoMode&&<button className="share-analysis-button" onClick={()=>changeProfileTab("share")}>{t("profile.share")}</button>}
             </div>
           </nav>
 
@@ -1708,8 +1708,8 @@ function App() {
 
             <details className="overview-deep-dive">
               <summary>
-                <span><b>Explorar padrões e sinais secundários</b><small>Arquétipo, sessão recente, linhas pessoais e outros sinais</small></span>
-                <em>Ver detalhes</em>
+                <span><b>{t("profile.deep.title")}</b><small>{t("profile.deep.desc")}</small></span>
+                <em>{t("profile.details")}</em>
               </summary>
               <div className="overview-deep-dive-content">
                 <ChibiPool
@@ -1777,10 +1777,10 @@ function App() {
             <details className="coach-secondary-panel coach-learning-layer">
               <summary>
                 <span>
-                  <b>Laboratório de padrões</b>
-                  <small>Aprofunde unidades, itens, augments e outros sinais depois de entender as três descobertas principais.</small>
+                  <b>{t("profile.lab.title")}</b>
+                  <small>{t("profile.lab.desc")}</small>
                 </span>
-                <em>Explorar</em>
+                <em>{t("profile.explore")}</em>
               </summary>
               <div className="coach-secondary-content">
                 <ChibiLearningLab
@@ -1797,8 +1797,8 @@ function App() {
               <details className="coach-secondary-panel">
                 <summary>
                   <span>
-                    <b>Lições que você quer lembrar</b>
-                    <small>Transforme notas de partidas em lembretes revisados ao longo do tempo.</small>
+                    <b>{t("profile.lessons.title")}</b>
+                    <small>{t("profile.lessons.desc")}</small>
                   </span>
                   <em>Lessons</em>
                 </summary>
@@ -1813,8 +1813,8 @@ function App() {
               <details className="coach-secondary-panel">
                 <summary>
                   <span>
-                    <b>Padrões que você registrou</b>
-                    <small>Veja se comportamentos anotados no Journal estão se repetindo nas derrotas ou boas partidas.</small>
+                    <b>{t("profile.journal.title")}</b>
+                    <small>{t("profile.journal.desc")}</small>
                   </span>
                   <em>Journal</em>
                 </summary>
@@ -1830,8 +1830,8 @@ function App() {
               <details className="coach-secondary-panel">
                 <summary>
                   <span>
-                    <b>Treino de leitura de board</b>
-                    <small>Compare dois boards seus e tente prever qual terminou melhor.</small>
+                    <b>{t("profile.drill.title")}</b>
+                    <small>{t("profile.drill.desc")}</small>
                   </span>
                   <em>Drill</em>
                 </summary>
@@ -1847,8 +1847,8 @@ function App() {
               <details className="coach-secondary-panel">
                 <summary>
                   <span>
-                    <b>Memória do seu jogo</b>
-                    <small>Compare a leitura atual com snapshots anteriores salvos neste navegador.</small>
+                    <b>{t("profile.memory.title")}</b>
+                    <small>{t("profile.memory.desc")}</small>
                   </span>
                   <em>Memory</em>
                 </summary>
@@ -1863,10 +1863,10 @@ function App() {
               <details className="coach-secondary-panel">
                 <summary>
                   <span>
-                    <b>Mudança de estilo e adaptação</b>
-                    <small>Use como contexto secundário depois de entender o problema principal.</small>
+                    <b>{t("profile.style.title")}</b>
+                    <small>{t("profile.style.desc")}</small>
                   </span>
-                  <em>Detalhes</em>
+                  <em>{t("profile.details")}</em>
                 </summary>
                 <div className="coach-secondary-content coach-secondary-grid">
                   <StyleShift matches={analysisMatches}/>
