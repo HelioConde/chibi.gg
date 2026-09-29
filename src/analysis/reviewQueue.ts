@@ -16,6 +16,18 @@ export type ReviewQueueItem={
   score:number;
 };
 
+type Translate=(key:string,vars?:Record<string,string|number>)=>string;
+
+function interpolate(value:string,vars?:Record<string,string|number>){
+  if(!vars)return value;
+  return value.replace(/\{\{(\w+)\}\}/g,(_,key)=>Object.prototype.hasOwnProperty.call(vars,key)?String(vars[key]):"{{"+key+"}}");
+}
+
+function translator(t?:Translate){
+  return (key:string,fallback:string,vars?:Record<string,string|number>)=>
+    t?t(key,vars):interpolate(fallback,vars);
+}
+
 function coreTrait(match:TftMatch){
   return match.traits
     .filter(trait=>trait.numUnits>0&&(trait.style>0||trait.numUnits>=2))
@@ -37,89 +49,88 @@ function reviewScore(match:TftMatch){
   return score;
 }
 
-
-function diagnoseMatch(match:TftMatch){
+function diagnoseMatch(match:TftMatch,t?:Translate){
+  const tr=translator(t);
   const stars=threeStars(match);
 
   if(match.placement===1){
     return {
-      signal:"Vitória referência",
-      focus:"Use este board final como baseline para comparar partidas parecidas que terminaram pior.",
+      signal:tr("reviewQueue.signal.win","Vitória referência"),
+      focus:tr("reviewQueue.focus.win","Use este board final como baseline para comparar partidas parecidas que terminaram pior."),
       tone:"good" as const,
     };
   }
 
   if(match.placement>=7&&match.goldLeft>=10){
     return {
-      signal:"Ouro não convertido",
-      focus:"Compare o valor/qualidade do board final com o ouro que terminou guardado.",
+      signal:tr("reviewQueue.signal.gold","Ouro não convertido"),
+      focus:tr("reviewQueue.focus.gold","Compare o valor/qualidade do board final com o ouro que terminou guardado."),
       tone:"danger" as const,
     };
   }
 
   if(match.placement>=7&&match.level>=8){
     return {
-      signal:"Nível sem conversão",
-      focus:"Compare upgrades, estrelas e traits com os jogadores que chegaram ao Top 4.",
+      signal:tr("reviewQueue.signal.level","Nível sem conversão"),
+      focus:tr("reviewQueue.focus.level","Compare upgrades, estrelas e traits com os jogadores que chegaram ao Top 4."),
       tone:"danger" as const,
     };
   }
 
   if(match.placement>=7){
     return {
-      signal:"Bottom 2",
-      focus:"Procure a primeira diferença observável entre este board e seus jogos de 4º–6º.",
+      signal:tr("reviewQueue.signal.bottom","Bottom 2"),
+      focus:tr("reviewQueue.focus.bottom","Procure a primeira diferença observável entre este board e seus jogos de 4º–6º."),
       tone:"danger" as const,
     };
   }
 
   if(match.placement>=5&&match.goldLeft>=10){
     return {
-      signal:"Meio da lobby com ouro",
-      focus:"Veja se o snapshot final mostra força de board abaixo do que seu ouro restante permitiria investigar.",
+      signal:tr("reviewQueue.signal.midGold","Meio da lobby com ouro"),
+      focus:tr("reviewQueue.focus.midGold","Veja se o snapshot final mostra força de board abaixo do que seu ouro restante permitiria investigar."),
       tone:"warning" as const,
     };
   }
 
   if(match.placement>=5&&match.level>=8){
     return {
-      signal:"Nível alto · fora do Top 4",
-      focus:"Compare qualidade do board final, não apenas nível.",
+      signal:tr("reviewQueue.signal.highLevel","Nível alto · fora do Top 4"),
+      focus:tr("reviewQueue.focus.highLevel","Compare qualidade do board final, não apenas nível."),
       tone:"warning" as const,
     };
   }
 
   if(match.placement>1&&match.placement<=4){
     return {
-      signal:"Top 4 sem fechar",
-      focus:"Compare com 1º–2º e procure diferenças finais de estrelas, traits, itens e valor do board.",
+      signal:tr("reviewQueue.signal.top4","Top 4 sem fechar"),
+      focus:tr("reviewQueue.focus.top4","Compare com 1º–2º e procure diferenças finais de estrelas, traits, itens e valor do board."),
       tone:"warning" as const,
     };
   }
 
   if(stars>0){
     return {
-      signal:"Board com 3★",
-      focus:"Use esta partida para entender se o spike de estrelas veio acompanhado de resultado.",
+      signal:tr("reviewQueue.signal.threeStar","Board com 3★"),
+      focus:tr("reviewQueue.focus.threeStar","Use esta partida para entender se o spike de estrelas veio acompanhado de resultado."),
       tone:"neutral" as const,
     };
   }
 
   return {
-    signal:"Partida de contraste",
-    focus:"Compare esta estrutura com a partida principal e procure uma diferença observável por vez.",
+    signal:tr("reviewQueue.signal.contrast","Partida de contraste"),
+    focus:tr("reviewQueue.focus.contrast","Compare esta estrutura com a partida principal e procure uma diferença observável por vez."),
     tone:"neutral" as const,
   };
 }
 
-function describeEvidence(match:TftMatch){
-  const bits=[
-    match.placement+"º lugar",
-    "nível "+match.level,
-    match.goldLeft+"g final",
-    threeStars(match)+" unidade(s) 3★",
-  ];
-  return bits.join(" · ");
+function describeEvidence(match:TftMatch,t?:Translate){
+  const tr=translator(t);
+  return tr(
+    "reviewQueue.evidence",
+    "{{placement}}º lugar · nível {{level}} · {{gold}}g final · {{stars}} unidade(s) 3★",
+    {placement:match.placement,level:match.level,gold:match.goldLeft,stars:threeStars(match)},
+  );
 }
 
 function byMostUseful(a:TftMatch,b:TftMatch){
@@ -128,7 +139,8 @@ function byMostUseful(a:TftMatch,b:TftMatch){
     || (Number(b.playedAt)||0)-(Number(a.playedAt)||0);
 }
 
-export function buildReviewQueue(matches:TftMatch[]):ReviewQueueItem[]{
+export function buildReviewQueue(matches:TftMatch[],t?:Translate):ReviewQueueItem[]{
+  const tr=translator(t);
   const valid=matches
     .filter(match=>match.placement>=1&&match.placement<=8)
     .slice()
@@ -136,7 +148,7 @@ export function buildReviewQueue(matches:TftMatch[]):ReviewQueueItem[]{
 
   if(!valid.length) return [];
 
-  const plan=buildActionPlan(valid);
+  const plan=buildActionPlan(valid,t);
   const planIds=new Set(plan.problem.matchIds);
 
   const priorityPool=valid.filter(match=>planIds.has(match.id));
@@ -168,16 +180,16 @@ export function buildReviewQueue(matches:TftMatch[]):ReviewQueueItem[]{
       || threeStars(b)-threeStars(a)
       || b.level-a.level)[0]||null;
 
-  const priorityDiagnosis=diagnoseMatch(priority);
+  const priorityDiagnosis=diagnoseMatch(priority,t);
 
   const items:ReviewQueueItem[]=[
     {
       kind:"priority",
       matchId:priority.id,
       placement:priority.placement,
-      title:"Revisar primeiro",
+      title:tr("reviewQueue.first","Revisar primeiro"),
       reason:plan.problem.title,
-      evidence:describeEvidence(priority),
+      evidence:describeEvidence(priority,t),
       signal:priorityDiagnosis.signal,
       focus:priorityDiagnosis.focus,
       tone:priorityDiagnosis.tone,
@@ -187,16 +199,16 @@ export function buildReviewQueue(matches:TftMatch[]):ReviewQueueItem[]{
 
   if(compare){
     const same=priorityTrait&&coreTrait(compare)===priorityTrait;
-    const diagnosis=diagnoseMatch(compare);
+    const diagnosis=diagnoseMatch(compare,t);
     items.push({
       kind:"compare",
       matchId:compare.id,
       placement:compare.placement,
-      title:"Comparar depois",
+      title:tr("reviewQueue.compare","Comparar depois"),
       reason:same
-        ?"Board de identidade parecida com resultado diferente."
-        :"Uma partida útil para contrastar com o problema principal.",
-      evidence:describeEvidence(compare),
+        ?tr("reviewQueue.compareSame","Board de identidade parecida com resultado diferente.")
+        :tr("reviewQueue.compareOther","Uma partida útil para contrastar com o problema principal."),
+      evidence:describeEvidence(compare,t),
       signal:diagnosis.signal,
       focus:diagnosis.focus,
       tone:diagnosis.tone,
@@ -205,16 +217,16 @@ export function buildReviewQueue(matches:TftMatch[]):ReviewQueueItem[]{
   }
 
   if(reference){
-    const diagnosis=diagnoseMatch(reference);
+    const diagnosis=diagnoseMatch(reference,t);
     items.push({
       kind:"reference",
       matchId:reference.id,
       placement:reference.placement,
-      title:"Usar como referência",
+      title:tr("reviewQueue.reference","Usar como referência"),
       reason:reference.placement===1
-        ?"Uma vitória ajuda a enxergar o que estava presente quando o resultado fechou."
-        :"Uma das melhores partidas restantes da amostra.",
-      evidence:describeEvidence(reference),
+        ?tr("reviewQueue.referenceWin","Uma vitória ajuda a enxergar o que estava presente quando o resultado fechou.")
+        :tr("reviewQueue.referenceOther","Uma das melhores partidas restantes da amostra."),
+      evidence:describeEvidence(reference,t),
       signal:diagnosis.signal,
       focus:diagnosis.focus,
       tone:diagnosis.tone,
