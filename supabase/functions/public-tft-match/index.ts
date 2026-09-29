@@ -15,7 +15,7 @@ Deno.serve(async (req) => {
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
   const riotApiKey = Deno.env.get("RIOT_API_KEY");
-  if (!riotApiKey) return json({ error: "riot_api_key_not_configured" }, 503);
+  if (!riotApiKey) return json({ error: "riot_api_key_not_configured", message: "A integração com a Riot está temporariamente indisponível." }, 503);
 
   let body: any;
   try { body = await req.json(); }
@@ -25,15 +25,23 @@ Deno.serve(async (req) => {
   if (!matchId) return json({ error: "match_id_required" }, 400);
 
   const region = regionFromMatchId(matchId);
-  const response = await fetch(
-    "https://" + region + ".api.riotgames.com/tft/match/v1/matches/" + encodeURIComponent(matchId),
-    { headers: riotHeaders(riotApiKey) },
-  );
+  let response: Response;
+  try {
+    response = await fetch(
+      "https://" + region + ".api.riotgames.com/tft/match/v1/matches/" + encodeURIComponent(matchId),
+      { headers: riotHeaders(riotApiKey), signal: AbortSignal.timeout(8000) },
+    );
+  } catch {
+    return json({ error: "riot_unreachable", message: "A Riot não respondeu à consulta desta partida." }, 502);
+  }
 
   if (!response.ok) {
-    if (response.status === 404) return json({ error: "match_not_found" }, 404);
-    if (response.status === 429) return json({ error: "rate_limited" }, 429);
-    return json({ error: "match_lookup_failed", status: response.status }, 502);
+    if (response.status === 404) return json({ error: "match_not_found", message: "Partida não encontrada." }, 404);
+    if (response.status === 429) return json({ error: "rate_limited", message: "Limite da Riot atingido. Tente novamente em instantes." }, 429);
+    if (response.status === 401 || response.status === 403) {
+      return json({ error: "riot_api_key_rejected", message: "A integração do Chibi com a Riot precisa ser renovada. Tente novamente mais tarde." }, 503);
+    }
+    return json({ error: "match_lookup_failed", status: response.status, message: "Não foi possível abrir esta partida agora." }, 502);
   }
 
   const match = await response.json();
@@ -62,5 +70,6 @@ Deno.serve(async (req) => {
       setName: String(info?.tft_set_core_name || ""),
       participants,
     },
+    source: { match: "tft-match-v1", retrievedAt: Date.now() },
   });
 });
