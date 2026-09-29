@@ -832,6 +832,7 @@ function App() {
     initialSet:number|null=18,
     updateUrl=true,
   ){
+    const safeTab:ProfileTab=initialTab==="share"?"matches":initialTab;
     setDemoMode(true);
     setSitePage("main");
     setRiotId("Chibi Review Demo#DEMO");
@@ -847,7 +848,7 @@ function App() {
     setMatchError("");
     setSelectedSet(initialSet??18);
     setSelectedQueue(initialQueue);
-    setProfileTab(initialTab);
+    setProfileTab(safeTab);
     setHistoryFilter("all");
     setGuidedReviewIds([]);
     setGuidedReviewIndex(0);
@@ -860,7 +861,7 @@ function App() {
       const url=new URL(window.location.href);
       url.search="";
       url.searchParams.set("demo","review");
-      url.searchParams.set("tab",initialTab);
+      url.searchParams.set("tab",safeTab);
       if(initialQueue!=null)url.searchParams.set("queue",String(initialQueue));
       if(initialSet!=null)url.searchParams.set("set",String(initialSet));
       url.hash="";
