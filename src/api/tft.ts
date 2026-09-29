@@ -185,7 +185,18 @@ async function invoke<T>(name:string, body:Record<string,unknown>):Promise<T>{
   const { data, error } = await supabase.functions.invoke(name, { body });
 
   if (error) {
-    throw new Error(error.message || "Falha ao consultar o backend do chibi.gg.");
+    const context=(error as {context?:unknown})?.context;
+    if(context instanceof Response){
+      try{
+        const detail=await context.clone().json();
+        if(detail?.message) throw new Error(String(detail.message));
+        if(detail?.error) throw new Error(String(detail.error));
+      }catch(parsed){
+        if(parsed instanceof Error && parsed.message!==error.message) throw parsed;
+      }
+    }
+
+    throw new Error(error.message || "Falha ao consultar os dados oficiais da Riot.");
   }
 
   if (data?.error) {
