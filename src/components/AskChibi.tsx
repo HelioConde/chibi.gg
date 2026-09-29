@@ -13,6 +13,19 @@ type ChatItem=
   | {id:number;role:"user";text:string}
   | {id:number;role:"chibi";answer:AskChibiAnswer};
 
+function answerBasis(answer:AskChibiAnswer,contextMatches:number){
+  const sample=answer.matchIds.length||contextMatches;
+  const localIntent=["journal","lesson","session"].includes(answer.intent);
+
+  return {
+    sample,
+    source:localIntent?"Contexto local + histórico":"Histórico Riot carregado",
+    limit:localIntent
+      ?"Sem telemetria live; dados locais complementam o snapshot final."
+      :"Snapshot final: sem shops, timing de roll, scouting ou HP por rodada.",
+  };
+}
+
 const QUICK_QUESTIONS=[
   "Por que estou perdendo?",
   "O que devo fazer agora?",
@@ -149,12 +162,24 @@ export default function AskChibi({playerName,playerKey,matches,onEvidence}:Props
                   {item.answer.bullets.map((bullet,index)=><li key={index}>{bullet}</li>)}
                 </ul>}
 
-                <div className="chibi-evidence-line">
-                  <small>{item.answer.evidence}</small>
-                  {item.answer.matchIds.length>0&&<button onClick={()=>openEvidence(item.answer)}>
-                    Ver {item.answer.matchIds.length} partida{item.answer.matchIds.length===1?"":"s"} →
-                  </button>}
-                </div>
+                {(()=>{
+                  const basis=answerBasis(item.answer,matches.length);
+                  return <>
+                    <div className="chibi-answer-basis">
+                      <span>Base: {basis.sample} partida{basis.sample===1?"":"s"}</span>
+                      <span>{basis.source}</span>
+                    </div>
+
+                    <div className="chibi-evidence-line">
+                      <small>{item.answer.evidence}</small>
+                      {item.answer.matchIds.length>0&&<button onClick={()=>openEvidence(item.answer)}>
+                        Ver {item.answer.matchIds.length} partida{item.answer.matchIds.length===1?"":"s"} →
+                      </button>}
+                    </div>
+
+                    <small className="chibi-answer-limit">{basis.limit}</small>
+                  </>;
+                })()}
               </div>
             </article>
         )}
