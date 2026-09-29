@@ -66,7 +66,6 @@ import DDragonArt from "./components/DDragonArt";
 import MatchBoardMap from "./components/MatchBoardMap";
 import RiotServiceStatus from "./components/RiotServiceStatus";
 import RiotDataBar from "./components/RiotDataBar";
-import RiotRecentPulse from "./components/RiotRecentPulse";
 import { SITE_IMAGES } from "./siteAssets";
 import { markMatchReviewed } from "./reviewProgress";
 import { recordRankSnapshot } from "./rankHistory";
@@ -333,7 +332,6 @@ function App() {
   const [historyFilter,setHistoryFilter]=useState<"all"|"top4"|"bottom2"|"review">("all");
   const [builderPreset,setBuilderPreset]=useState<string[]>([]);
   const [recentPlayers,setRecentPlayers]=useState<RecentPlayer[]>(()=>getRecentPlayers());
-  const [copiedAnalysisLink,setCopiedAnalysisLink]=useState(false);
   const [studyRequest,setStudyRequest]=useState<StudyRequest|null>(()=>readStudyRequest());
   const [studyOpenedMatchId,setStudyOpenedMatchId]=useState("");
   const [studyLookup,setStudyLookup]=useState<"idle"|"searching"|"unavailable">("idle");
@@ -693,17 +691,6 @@ function App() {
   function changeProfileTab(tab:ProfileTab){
     setProfileTab(tab);
     updateProfileUrl(tab,selectedQueue);
-  }
-
-  async function copyCurrentAnalysisLink(){
-    updateProfileUrl(profileTab,selectedQueue);
-    try{
-      await navigator.clipboard.writeText(window.location.href);
-      setCopiedAnalysisLink(true);
-      window.setTimeout(()=>setCopiedAnalysisLink(false),1600);
-    }catch{
-      setCopiedAnalysisLink(false);
-    }
   }
 
   function changeQueue(queue:number|null){
@@ -1383,7 +1370,7 @@ function App() {
         <main className="profile-page">
           <button className="back-search" onClick={resetSearch}>← Nova busca</button>
 
-          <section className="player-summary-shell player-summary-visual">
+          <section className="player-summary-shell player-summary-visual player-summary-compact">
             <div className="player-summary-board-art" aria-hidden="true">
               {analysisMatches[0]?.units.slice(0,5).map((unit,index)=>{
                 const entry=staticEntry(staticData?.champions,unit.characterId);
@@ -1391,6 +1378,7 @@ function App() {
                 return src?<img src={src} alt="" key={unit.characterId+index}/>:null;
               })}
             </div>
+
             <div className="player-summary-main">
               <div className="player-avatar-wrap">
                 <div className="avatar">
@@ -1419,12 +1407,14 @@ function App() {
               <article>
                 <span>Média</span>
                 <strong>{dna.avgPlacement??"—"}</strong>
-                <small>{headlineStats.avgLabel}</small>
+                <small>{headlineStats.total} jogo{headlineStats.total===1?"":"s"} no filtro</small>
               </article>
               <article>
                 <span>Top 4</span>
-                <strong>{dna.top4Rate}%</strong>
-                <small>{headlineStats.top4}/{headlineStats.total}</small>
+                <strong>{headlineStats.total<8
+                  ? headlineStats.top4+"/"+headlineStats.total
+                  : dna.top4Rate+"%"}</strong>
+                <small>{headlineStats.total<8?"amostra inicial":"taxa na amostra"}</small>
               </article>
               <article>
                 <span>Última</span>
@@ -1434,49 +1424,32 @@ function App() {
             </div>
 
             <div className="player-summary-actions">
-              <button className="player-coach-button" onClick={()=>changeProfileTab("coach")}>Ver Chibi Review</button>
+              <button className="player-coach-button" onClick={()=>changeProfileTab("coach")}>Chibi Review</button>
               <button className="refresh-button" onClick={searchPlayer} disabled={loading}>{loading?"Atualizando...":"Atualizar"}</button>
             </div>
-          </section>
 
-          <RiotDataBar
-            profile={profile}
-            matchCount={matches.length}
-            refreshing={loading}
-            onRefresh={searchPlayer}
-          />
-
-          <section className="profile-context-strip">
-            <div className="queue-tabs">
-              {availableQueues.length<=1 ? (
-                availableQueues.map((queueId)=>(
-                  <button className="active" disabled key={queueId}>{queueLabel(staticData,queueId)}</button>
-                ))
-              ) : <>
-                <button className={selectedQueue==null?"active":""} onClick={()=>changeQueue(null)}>Todas</button>
-                {availableQueues.map((queueId)=>(
-                  <button className={selectedQueue===queueId?"active":""} onClick={()=>changeQueue(queueId)} key={queueId}>
-                    {queueLabel(staticData,queueId)}
-                  </button>
-                ))}
-              </>}
+            <div className="player-summary-source">
+              <RiotDataBar
+                profile={profile}
+                matchCount={matches.length}
+                contextCount={analysisMatches.length}
+                refreshing={loading}
+                onRefresh={searchPlayer}
+                compact
+              />
             </div>
-            <span>{analysisMatches.length} partidas no contexto · até 20 por sincronização</span>
           </section>
 
           {error && <div className="profile-error">{error}</div>}
 
-          <nav className="profile-tabs simplified-tabs" aria-label="Seções do perfil">
+          <nav className="profile-tabs simplified-tabs profile-tabs-clean" aria-label="Seções do perfil">
             <div className="profile-tab-list">
               <button className={profileTab==="matches"?"active":""} onClick={()=>changeProfileTab("matches")}>Partidas</button>
-              <button className={profileTab==="overview"?"active":""} onClick={()=>changeProfileTab("overview")}>Agora</button>
+              <button className={profileTab==="overview"?"active":""} onClick={()=>changeProfileTab("overview")}>Resumo</button>
               <button className={profileTab==="coach"?"active":""} onClick={()=>changeProfileTab("coach")}>Coach</button>
             </div>
             <div className="profile-tab-actions">
               <button className="share-analysis-button" onClick={()=>changeProfileTab("share")}>Compartilhar</button>
-              <button className="copy-analysis-link" onClick={copyCurrentAnalysisLink}>
-                {copiedAnalysisLink?"Link copiado ✓":"Copiar link"}
-              </button>
             </div>
           </nav>
 
@@ -1494,6 +1467,20 @@ function App() {
               matches={analysisMatches}
               onEvidence={showEvidence}
               onReviewQueue={openReviewQueue}
+            />
+
+            <ActiveGoalStrip
+              playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
+              matches={analysisMatches}
+              onEvidence={showEvidence}
+              onOpenCoach={()=>changeProfileTab("coach")}
+            />
+
+            <PlayerEvolution
+              playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
+              matches={analysisMatches}
+              staticData={staticData}
+              onEvidence={showEvidence}
             />
 
             <details className="overview-deep-dive">
@@ -1525,6 +1512,12 @@ function App() {
               staticData={staticData}
               journalVersion={journalVersion}
               onEvidence={showEvidence}
+            />
+
+            <ReviewQueue
+              playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
+              matches={analysisMatches}
+              onOpenMatch={openGuidedReview}
             />
 
             <ChibiSessionPlan
@@ -1678,70 +1671,45 @@ function App() {
           </>}
 
           {profileTab==="matches"&&<>
-            <RiotRecentPulse matches={analysisMatches}/>
-
-            <section className={"matches-priority-bar "+(primaryReviewSignal?"tone-"+primaryReviewSignal.tone:"")}>
-              <div className="matches-priority-problem">
-                <span>PRINCIPAL DESCOBERTA DO CHIBI</span>
-                <strong>{primaryReviewSignal
-                  ? (primaryReviewSignal.subjectId
-                    ? (staticEntry(staticData?.traits,primaryReviewSignal.subjectId)?.name||fallbackTraitName(primaryReviewSignal.subjectId))+" · "+primaryReviewSignal.title
-                    : primaryReviewSignal.title)
-                  : "Ainda analisando sua amostra"}</strong>
-                <small>{primaryReviewSignal
-                  ? primaryReviewSignal.evidence+" · confiança "+primaryReviewSignal.confidence
-                  : "Carregue mais partidas para o Chibi priorizar um sinal confiável."}</small>
-              </div>
-              <div className="matches-priority-action">
-                <span>PRÓXIMO TESTE</span>
-                <strong>{quickPlan.action.title}</strong>
-                <small>{quickPlan.action.steps[0]}</small>
-              </div>
-              <div className="matches-priority-cta">
-                {primaryReviewSignal&&primaryReviewSignal.matchIds.length>0&&<button onClick={()=>showEvidence(
-                  primaryReviewSignal.matchIds,
-                  "Chibi Review · "+primaryReviewSignal.title,
-                )}>Ver evidências</button>}
-                <button className="secondary" onClick={()=>changeProfileTab("coach")}>Abrir Chibi Review</button>
-              </div>
-            </section>
-
-            <ActiveGoalStrip
-              playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
-              matches={analysisMatches}
-              onEvidence={showEvidence}
-              onOpenCoach={()=>changeProfileTab("coach")}
-            />
-
-            <div className="content-grid">
+            <div className="content-grid profile-history-first">
             <section className="panel history" id="match-history">
-              <div className="panel-title">
-                <div><span>PARTIDAS RIOT</span><h2>Histórico recente</h2></div>
-                <small>{visibleMatches.length} exibidas</small>
-              </div>
-
-              <div className="history-session-strip">
+              <div className="panel-title profile-history-head">
                 <div>
-                  <span>SESSÃO MAIS RECENTE</span>
-                  <strong>{latestSession.length} partida{latestSession.length===1?"":"s"}</strong>
-                  <small>{latestSession.length
-                    ? "média "+(latestSession.reduce((sum,match)=>sum+match.placement,0)/latestSession.length).toFixed(2)
-                    : "sem amostra"}
-                  </small>
+                  <span>PARTIDAS RIOT</span>
+                  <h2>Histórico recente</h2>
+                  <small>{analysisMatches.length} analisadas · {matches.length} carregadas</small>
                 </div>
-                <div className="history-filter-tabs">
-                  {([
-                    ["all","Todas"],
-                    ["review","Revisar"],
-                    ["top4","Top 4"],
-                    ["bottom2","Bottom 2"],
-                  ] as const).map(([id,label])=>(
-                    <button
-                      className={historyFilter===id?"active":""}
-                      onClick={()=>setHistoryFilter(id)}
-                      key={id}
-                    >{label}</button>
-                  ))}
+
+                <div className="history-head-controls">
+                  <div className="queue-tabs history-queue-tabs">
+                    {availableQueues.length<=1 ? (
+                      availableQueues.map((queueId)=>(
+                        <button className="active" disabled key={queueId}>{queueLabel(staticData,queueId)}</button>
+                      ))
+                    ) : <>
+                      <button className={selectedQueue==null?"active":""} onClick={()=>changeQueue(null)}>Todas</button>
+                      {availableQueues.map((queueId)=>(
+                        <button className={selectedQueue===queueId?"active":""} onClick={()=>changeQueue(queueId)} key={queueId}>
+                          {queueLabel(staticData,queueId)}
+                        </button>
+                      ))}
+                    </>}
+                  </div>
+
+                  <div className="history-filter-tabs">
+                    {([
+                      ["all","Todas"],
+                      ["review","Revisar"],
+                      ["top4","Top 4"],
+                      ["bottom2","Bottom 2"],
+                    ] as const).map(([id,label])=>(
+                      <button
+                        className={historyFilter===id?"active":""}
+                        onClick={()=>setHistoryFilter(id)}
+                        key={id}
+                      >{label}</button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -1804,10 +1772,7 @@ function App() {
                               </div>
                             </div>
 
-                            <div className={"match-fast-read "+cue.tone}>
-                              <span>LEITURA RÁPIDA</span>
-                              <b>{cue.title}</b>
-                            </div>
+                            <p className={"match-card-insight "+cue.tone}>{cue.title}</p>
 
                             <div className="trait-row compact-traits">
                               {activeTraits(match).slice(0,3).map((trait)=>{
@@ -1845,7 +1810,23 @@ function App() {
               {!evidenceIds?.length&&hasMore && <button className="load-more" onClick={loadMore} disabled={loadingMore}>{loadingMore ? "Carregando..." : "Carregar mais partidas"}</button>}
             </section>
 
-            <aside className="panel insights dna-panel dna-panel-v2">
+            <aside className="profile-match-sidebar">
+              <section className={"profile-review-teaser "+(primaryReviewSignal?"tone-"+primaryReviewSignal.tone:"")}>
+                <div>
+                  <span>CHIBI REVIEW</span>
+                  <strong>{primaryReviewSignal
+                    ? (primaryReviewSignal.subjectId
+                      ? (staticEntry(staticData?.traits,primaryReviewSignal.subjectId)?.name||fallbackTraitName(primaryReviewSignal.subjectId))+" · "+primaryReviewSignal.title
+                      : primaryReviewSignal.title)
+                    : "Ainda juntando evidência"}</strong>
+                  <small>{primaryReviewSignal
+                    ? primaryReviewSignal.evidence+" · confiança "+primaryReviewSignal.confidence
+                    : "Mais partidas deixam a leitura mais confiável."}</small>
+                </div>
+                <button onClick={()=>changeProfileTab("coach")}>Abrir Review →</button>
+              </section>
+
+              <aside className="panel insights dna-panel dna-panel-v2">
               <div className="panel-title">
                 <div>
                   <span>PADRÃO RECENTE</span>
@@ -1912,21 +1893,10 @@ function App() {
                     : "Indicadores descritivos da amostra carregada. Não são MMR, elo alternativo nem avaliação oficial da Riot."}</p>
                 </div>
               </details>
+              </aside>
             </aside>
           </div>
 
-          {!evidenceIds?.length&&<PlayerEvolution
-            playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
-            matches={analysisMatches}
-            staticData={staticData}
-            onEvidence={showEvidence}
-          />}
-
-          {!evidenceIds?.length&&<ReviewQueue
-            playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
-            matches={analysisMatches}
-            onOpenMatch={openGuidedReview}
-          />}
           </>}
           <AskChibi
             playerName={profile.player.gameName}
