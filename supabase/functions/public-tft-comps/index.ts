@@ -24,8 +24,25 @@ function activeTraits(row:any){
     .filter(Boolean);
 }
 
-function compSignature(row:any){
+function traitPairSignature(row:any){
   return activeTraits(row).slice(0,2).sort().join("|");
+}
+
+function adaptiveSignature(
+  row:any,
+  pairCounts:Map<string,number>,
+  threshold:number,
+){
+  const traits=activeTraits(row);
+  if(!traits.length)return "";
+
+  const base=traits[0];
+  const pair=traits.slice(0,2).sort().join("|");
+  if(pair&&pairCounts.get(pair)!==undefined&&(pairCounts.get(pair)||0)>=threshold){
+    return pair;
+  }
+
+  return base;
 }
 
 function avg(values:number[]){
@@ -78,9 +95,17 @@ Deno.serve(async(req)=>{
     }
   }
 
+  const signatureThreshold=Math.max(3,minGames);
+
   if(!setNumber){
     return json({
-      context:{setNumber:0,queueId:queueId||null,minGames},
+      context:{
+        setNumber:0,
+        queueId:queueId||null,
+        minGames,
+        signatureMode:"adaptive-traits-v2",
+        signatureThreshold,
+      },
       sampleParticipants:0,
       comps:[],
     });
@@ -103,10 +128,18 @@ Deno.serve(async(req)=>{
   }
 
   const rows=await response.json();
-  const groups=new Map<string,any[]>();
+  const safeRows=Array.isArray(rows)?rows:[];
+  const pairCounts=new Map<string,number>();
 
-  for(const row of Array.isArray(rows)?rows:[]){
-    const signature=compSignature(row);
+  for(const row of safeRows){
+    const pair=traitPairSignature(row);
+    if(!pair)continue;
+    pairCounts.set(pair,(pairCounts.get(pair)||0)+1);
+  }
+
+  const groups=new Map<string,any[]>();
+  for(const row of safeRows){
+    const signature=adaptiveSignature(row,pairCounts,signatureThreshold);
     if(!signature) continue;
     const list=groups.get(signature)||[];
     list.push(row);
@@ -208,8 +241,14 @@ Deno.serve(async(req)=>{
     .slice(0,limit);
 
   return json({
-    context:{setNumber,queueId:queueId||null,minGames},
-    sampleParticipants:Array.isArray(rows)?rows.length:0,
+    context:{
+      setNumber,
+      queueId:queueId||null,
+      minGames,
+      signatureMode:"adaptive-traits-v2",
+      signatureThreshold,
+    },
+    sampleParticipants:safeRows.length,
     comps,
   });
 });
