@@ -16720,3 +16720,204 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
     padding-top:10px;
   }
 }
+
+
+/* -----------------------------------------------------------------------
+   Match cards dense pass — faster scan, less vertical stacking
+   ----------------------------------------------------------------------- */
+.match-row-v2{
+  grid-template-columns:46px minmax(0,1fr) 176px!important;
+  gap:10px!important;
+  align-items:center!important;
+  min-height:92px!important;
+  padding:9px 10px!important;
+}
+.match-row-v2 .placement{
+  width:40px;
+  height:40px;
+  align-self:center;
+}
+.match-row-v2 .match-main{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  align-content:center;
+  min-width:0;
+}
+.match-row-v2 .match-context-line{
+  margin-bottom:3px!important;
+}
+.match-row-v2 .match-row-title{
+  min-height:18px;
+}
+.match-row-v2 .match-row-title>div{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0;
+}
+.match-row-v2 .match-row-title strong{
+  max-width:420px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:10px;
+}
+.match-row-v2 .match-review-label{
+  flex:0 0 auto;
+  cursor:help;
+}
+.match-lineup{
+  display:flex;
+  align-items:flex-end;
+  gap:9px;
+  min-width:0;
+  margin-top:5px;
+}
+.match-lineup .compact-traits{
+  flex:0 0 auto;
+  max-width:205px;
+  margin:0!important;
+  gap:4px!important;
+}
+.match-lineup .compact-traits .trait-chip{
+  max-width:95px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.match-lineup .compact-board{
+  flex:1 1 auto;
+  min-width:0;
+  flex-wrap:nowrap!important;
+  gap:5px!important;
+  margin:0!important;
+  overflow:hidden;
+  padding-bottom:8px;
+}
+.match-lineup .compact-board .unit-card{
+  flex:0 0 39px;
+  width:39px!important;
+}
+.match-lineup .compact-board .unit-portrait{
+  width:39px!important;
+  height:39px!important;
+  border-radius:7px!important;
+}
+.match-lineup .compact-board .item-row{
+  bottom:-7px;
+}
+.match-row-v2 .match-meta-rich{
+  width:176px;
+  align-self:center!important;
+  gap:4px;
+}
+.match-row-v2 .match-value-grid{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:3px;
+}
+.match-row-v2 .match-value-grid>span{
+  min-width:0;
+  min-height:35px;
+  padding:5px 3px;
+}
+.match-row-v2 .match-value-grid b{
+  font-size:8.5px;
+  white-space:nowrap;
+}
+.match-row-v2 .match-value-grid small{
+  overflow:hidden;
+  font-size:5.5px;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.match-row-v2 .match-meta>strong{
+  margin-top:2px;
+  font-size:6px;
+  font-weight:800;
+}
+.match-row-v2 .match-meta>small{
+  color:#8d7fff;
+  font-size:6px;
+  font-weight:900;
+}
+
+@media(max-width:1180px){
+  .match-lineup{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:5px;
+  }
+  .match-lineup .compact-traits{
+    max-width:none;
+  }
+  .match-row-v2{
+    min-height:112px!important;
+  }
+}
+
+@media(max-width:1020px){
+  .match-row-v2{
+    grid-template-columns:42px minmax(0,1fr)!important;
+    min-height:0!important;
+  }
+  .match-row-v2 .match-meta-rich{
+    grid-column:2;
+    width:100%;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto auto;
+    align-items:center!important;
+  }
+  .match-row-v2 .match-value-grid{
+    width:auto;
+  }
+}
+
+@media(max-width:620px){
+  .match-row-v2{
+    grid-template-columns:38px minmax(0,1fr)!important;
+    gap:8px!important;
+    padding:8px!important;
+  }
+  .match-row-v2 .placement{
+    width:36px;
+    height:36px;
+  }
+  .match-row-v2 .match-row-title strong{
+    max-width:220px;
+  }
+  .match-lineup{
+    gap:4px;
+  }
+  .match-lineup .compact-traits{
+    display:flex;
+    overflow-x:auto;
+    flex-wrap:nowrap;
+    max-width:100%;
+    scrollbar-width:none;
+  }
+  .match-lineup .compact-traits::-webkit-scrollbar{display:none}
+  .match-lineup .compact-board{
+    padding-bottom:7px;
+  }
+  .match-lineup .compact-board .unit-card{
+    flex-basis:37px;
+    width:37px!important;
+  }
+  .match-lineup .compact-board .unit-portrait{
+    width:37px!important;
+    height:37px!important;
+  }
+  .match-row-v2 .match-meta-rich{
+    grid-template-columns:1fr;
+    gap:3px;
+  }
+  .match-row-v2 .match-value-grid{
+    width:100%;
+  }
+  .match-row-v2 .match-meta>strong{
+    display:none;
+  }
+  .match-row-v2 .match-meta>small{
+    text-align:right;
+  }
+}
