@@ -134,7 +134,7 @@ export default function GlobalMetaPage({
       </button>
       <button onClick={onOpenStats}>
         <span>STATISTICS</span>
-        <strong>Champions / Traits / Items / Augments</strong>
+        <strong>Champions / Traits / Items</strong>
         <small>números completos e comparação pessoal</small>
       </button>
       <button onClick={onOpenTier}>
