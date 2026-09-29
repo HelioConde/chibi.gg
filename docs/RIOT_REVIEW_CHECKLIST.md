@@ -12,6 +12,8 @@ This checklist tracks the public-facing state of chibi.gg while the Riot product
 
 ## Public product flow
 
+- [x] Synthetic reviewer mode is available at `/?demo=review` and clearly labels all player/match data as fictitious.
+
 - [x] Prototype Riot ID search demonstrates the profile/review flow.
 - [x] Public site explains that self-history production flow is expected to transition to Riot Sign On after production approval.
 - [x] Profile, rank and recent match history are visible.
@@ -68,15 +70,16 @@ The public product must not be changed to provide:
 ## Before responding to Riot
 
 1. Open the production URL in a clean browser session.
-2. Search a valid Riot ID and verify profile/history flow.
-3. Open Chibi Review and one match detail.
-4. Open Comps and confirm sample/confidence labels.
-5. Open Ask Chibi and verify evidence base/limits.
-6. Open How It Works, Privacy and Terms from the footer and also test the direct `.html` URLs.
-7. Confirm the Riot boilerplate is visible.
-8. Confirm `/riot.txt` is still publicly reachable.
-9. Take screenshots of the submitted description and any approval response for the Overwolf follow-up.
-10. If Riot instructs RSO integration, preserve the app message/instructions together with the approval screenshot.
+2. Open `/?demo=review` and verify the full synthetic review flow works without a Riot API call.
+3. Search a valid Riot ID and verify the real profile/history flow when the temporary key is available.
+4. Open Chibi Review and one match detail.
+5. Open Comps and confirm sample/confidence labels.
+6. Open Ask Chibi and verify evidence base/limits.
+7. Open How It Works, Privacy and Terms from the footer and also test the direct `.html` URLs.
+8. Confirm the Riot boilerplate is visible.
+9. Confirm `/riot.txt` is still publicly reachable.
+10. Take screenshots of the submitted description and any approval response for the Overwolf follow-up.
+11. If Riot instructs RSO integration, preserve the app message/instructions together with the approval screenshot.
 
 ## Official references
 
