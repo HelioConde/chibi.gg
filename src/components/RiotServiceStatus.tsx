@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { fetchTftStatus, TftServiceStatus } from "../api/tft";
+import { useI18n } from "../i18n";
 
 type Props={
   platform:string;
 };
 
 export default function RiotServiceStatus({platform}:Props){
+  const { t } = useI18n();
   const [status,setStatus]=useState<TftServiceStatus|null>(null);
   const [failed,setFailed]=useState(false);
 
@@ -31,7 +33,7 @@ export default function RiotServiceStatus({platform}:Props){
     return <div className="riot-service-status unknown">
       <span></span>
       <b>Riot TFT</b>
-      <small>status indisponível</small>
+      <small>{t("status.unavailable")}</small>
     </div>;
   }
 
@@ -39,7 +41,7 @@ export default function RiotServiceStatus({platform}:Props){
     return <div className="riot-service-status loading">
       <span></span>
       <b>Riot TFT</b>
-      <small>verificando serviço...</small>
+      <small>{t("status.checking")}</small>
     </div>;
   }
 
@@ -48,11 +50,11 @@ export default function RiotServiceStatus({platform}:Props){
   return <div
     className={"riot-service-status "+(status.operational?"ok":"warning")}
     title={status.operational
-      ?"Nenhum incidente ou manutenção retornado pelo tft-status-v1."
-      :issueCount+" aviso(s) ativo(s) retornados pelo tft-status-v1."}
+      ?t("status.operationalTitle")
+      :t("status.warningTitle",{count:issueCount})}
   >
     <span></span>
     <b>Riot TFT · {status.platform}</b>
-    <small>{status.operational?"operacional":issueCount+" aviso(s) ativo(s)"}</small>
+    <small>{status.operational?t("status.operational"):t("status.activeWarnings",{count:issueCount})}</small>
   </div>;
 }
