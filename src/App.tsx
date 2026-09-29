@@ -372,6 +372,7 @@ function App() {
   const [matchLoading,setMatchLoading]=useState(false);
   const [matchError,setMatchError]=useState("");
   const [staticData,setStaticData]=useState<TftStaticData|null>(null);
+  const [selectedSet,setSelectedSet]=useState<number|null>(null);
   const [selectedQueue,setSelectedQueue]=useState<number|null>(null);
   const [openedMatch,setOpenedMatch]=useState<TftMatch|null>(null);
   const [guidedReviewIds,setGuidedReviewIds]=useState<string[]>([]);
@@ -478,10 +479,19 @@ function App() {
     [profile]
   );
 
+  const availableSets=useMemo(
+    ()=>[...new Set(
+      matches
+        .map(match=>Number(match.setNumber))
+        .filter(setNumber=>Number.isFinite(setNumber)&&setNumber>0)
+    )].sort((a,b)=>b-a),
+    [matches]
+  );
+
   const currentSet=useMemo(()=>{
-    const found=matches.find((m)=>Number(m.setNumber)>0);
-    return found ? Number(found.setNumber) : null;
-  },[matches]);
+    if(selectedSet!=null&&availableSets.includes(selectedSet))return selectedSet;
+    return availableSets[0]??null;
+  },[availableSets,selectedSet]);
 
   const currentSetMatches=useMemo(()=>{
     if(currentSet==null) return matches;
@@ -730,6 +740,13 @@ function App() {
     updateProfileUrl(tab,selectedQueue);
   }
 
+  function changeSet(setNumber:number){
+    setSelectedSet(setNumber);
+    setSelectedQueue(null);
+    setHistoryFilter("all");
+    clearEvidence();
+  }
+
   function changeQueue(queue:number|null){
     setSelectedQueue(queue);
     clearEvidence();
@@ -782,6 +799,7 @@ function App() {
     setHasMore(true);
     setSelectedMatch(null);
     setOpenedMatch(null);
+    setSelectedSet(null);
     setSelectedQueue(initialQueue);
     setProfileTab(initialTab);
     studyAttempts.current=0;
@@ -1714,10 +1732,20 @@ function App() {
                 <div>
                   <span>PARTIDAS RIOT</span>
                   <h2>Histórico recente</h2>
-                  <small>{analysisMatches.length} analisadas · {matches.length} carregadas</small>
+                  <small>{analysisMatches.length} no Set {currentSet??"—"} · {matches.length} carregadas</small>
                 </div>
 
                 <div className="history-head-controls">
+                  {availableSets.length>1&&<div className="history-set-tabs" aria-label="Conjuntos carregados">
+                    {availableSets.map(setNumber=>(
+                      <button
+                        className={currentSet===setNumber?"active":""}
+                        onClick={()=>changeSet(setNumber)}
+                        key={setNumber}
+                      >Set {setNumber}</button>
+                    ))}
+                  </div>}
+
                   <div className="queue-tabs history-queue-tabs">
                     {availableQueues.length<=1 ? (
                       availableQueues.map((queueId)=>(
