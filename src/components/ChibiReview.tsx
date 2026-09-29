@@ -295,7 +295,7 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
       <aside>
         <small>{t("review.validate")}</small>
         <strong>{experiment.metric}</strong>
-        {experiment.ids.length>0&&<button onClick={()=>onEvidence(experiment.ids,"Coach · próximo experimento")})}>{t("review.openRelevant")}</button>}
+        {experiment.ids.length>0&&<button onClick={()=>onEvidence(experiment.ids,"Coach · próximo experimento")}>{t("review.openRelevant")}</button>}
       </aside>
     </article>
 
