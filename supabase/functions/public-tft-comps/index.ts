@@ -93,7 +93,7 @@ Deno.serve(async(req)=>{
 
   const url=
     supabaseUrl+
-    "/rest/v1/tft_participant_observations?select=placement,level,gold_left,traits,units,augments&"+
+    "/rest/v1/tft_participant_observations?select=placement,level,gold_left,traits,units&"+
     filters.join("&")+
     "&limit=5000";
 
@@ -118,20 +118,12 @@ Deno.serve(async(req)=>{
       const placements=games.map(row=>num(row?.placement)).filter(Boolean);
       const traitCounts=new Map<string,number>();
       const unitCounts=new Map<string,number>();
-      const augmentCounts=new Map<string,number>();
       const itemCounts=new Map<string,number>();
       const unitItemCounts=new Map<string,Map<string,number>>();
 
       for(const row of games){
         for(const trait of activeTraits(row)){
           traitCounts.set(trait,(traitCounts.get(trait)||0)+1);
-        }
-        const seenAugments=new Set<string>();
-        for(const augment of Array.isArray(row?.augments)?row.augments:[]){
-          const id=String(augment||"");
-          if(!id||seenAugments.has(id)) continue;
-          seenAugments.add(id);
-          augmentCounts.set(id,(augmentCounts.get(id)||0)+1);
         }
 
         const seen=new Set<string>();
@@ -173,10 +165,6 @@ Deno.serve(async(req)=>{
         .slice(0,8)
         .map(([id,count])=>({id,rate:round(count/games.length*100,1)}));
 
-      const augments=[...augmentCounts.entries()]
-        .sort((a,b)=>b[1]-a[1])
-        .slice(0,6)
-        .map(([id,count])=>({id,rate:round(count/games.length*100,1)}));
 
       const items=[...itemCounts.entries()]
         .sort((a,b)=>b[1]-a[1])
@@ -207,7 +195,6 @@ Deno.serve(async(req)=>{
         confidence:confidence(games.length),
         traits,
         units,
-        augments,
         items,
         unitItems,
       };
