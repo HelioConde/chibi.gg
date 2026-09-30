@@ -2,7 +2,7 @@ import { corsHeaders, json } from "../_shared/http.ts";
 import { normalizeParticipant, num, riotHeaders } from "../_shared/riot.ts";
 import { observeRawMatches } from "../_shared/observations.ts";
 import { normalizeMatchForCache, readCachedMatches, writeCachedMatches } from "../_shared/matchCache.ts";
-import { recordedMatchMarker } from "../_shared/recordedMatches.ts";
+import { recordedMatchMarker, reconcileRecordedMatches } from "../_shared/recordedMatches.ts";
 
 function regionFromMatchId(matchId: string) {
   const prefix = matchId.split("_")[0]?.toUpperCase() || "";
@@ -61,6 +61,7 @@ Deno.serve(async (req) => {
     return json({error:"match_normalization_failed",message:"Não foi possível interpretar esta partida."},502);
   }
 
+  await reconcileRecordedMatches([normalized]);
   const recordedMarker=await recordedMatchMarker(matchId);
 
   const participants=(Array.isArray(normalized.participants)?normalized.participants:[]).map((participant:any)=>{
