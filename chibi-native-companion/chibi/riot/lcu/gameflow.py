@@ -64,7 +64,7 @@ class _Worker(QObject):
             phase = self.client.phase()
             session = self.client.session()
             response = self.client.ready_response() if phase == "ReadyCheck" else None
-            snapshot = normalize(connected=True, phase=phase, response=response, riot_id=player.riot_id, player_puuid=player.puuid, queue_id=session.queue_id if session else None, queue_name=session.queue_name if session else "", details={"game_mode": session.game_mode if session else "", "is_ranked": session.is_ranked if session else False, "player_count": session.player_count if session else 0})
+            snapshot = normalize(connected=True, phase=phase, response=response, riot_id=player.riot_id, player_puuid=player.puuid, queue_id=session.queue_id if session else None, queue_name=session.queue_name if session else "", details={"game_mode": session.game_mode if session else "", "is_ranked": session.is_ranked if session else False, "player_count": session.player_count if session else 0, "game_id": session.game_id if session else "", "platform": session.platform if session else ""})
         except LcuUnavailableError:
             snapshot = GameStateSnapshot.offline()
         try:
