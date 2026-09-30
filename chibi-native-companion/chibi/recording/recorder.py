@@ -88,6 +88,16 @@ class MatchSessionRecorder:
         self.status=RecorderStatus("recovered_incomplete" if incomplete else "finalized",self.status.session_id,self.status.events,self.status.snapshots,"pending","waiting")
         return target
 
+    def set_upload_status(self, upload: str) -> None:
+        self.status = RecorderStatus(
+            self.status.state,
+            self.status.session_id,
+            self.status.events,
+            self.status.snapshots,
+            upload,
+            self.status.riot_match,
+        )
+
     def recover(self, game_running: bool, current_game_id: str | None = None) -> list[Path]:
         recovered=[]
         for path in (self.root/"active").glob("*.jsonl") if (self.root/"active").exists() else []:
