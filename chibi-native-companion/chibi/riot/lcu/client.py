@@ -19,6 +19,8 @@ class Session:
     game_mode: str
     is_ranked: bool
     player_count: int
+    game_id: str = ""
+    platform: str = ""
 
 
 class LcuClient:
@@ -48,7 +50,17 @@ class LcuClient:
         queue = game_data.get("queue") if isinstance(game_data.get("queue"), dict) else {}
         players = game_data.get("playerChampionSelections") if isinstance(game_data.get("playerChampionSelections"), list) else []
         queue_id = queue.get("id")
-        return Session(queue_id if isinstance(queue_id, int) else None, str(queue.get("shortName") or queue.get("name") or ""), str(queue.get("gameMode") or ""), bool(queue.get("isRanked", False)), len(players))
+        game_id = game_data.get("gameId") or data.get("gameId") or ""
+        platform = game_data.get("platformId") or data.get("platformId") or data.get("platform") or ""
+        return Session(
+            queue_id if isinstance(queue_id, int) else None,
+            str(queue.get("shortName") or queue.get("name") or ""),
+            str(queue.get("gameMode") or ""),
+            bool(queue.get("isRanked", False)),
+            len(players),
+            str(game_id),
+            str(platform),
+        )
 
     def ready_response(self) -> str | None:
         response = self._object("/lol-matchmaking/v1/ready-check").get("playerResponse")
