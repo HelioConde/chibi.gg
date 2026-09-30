@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
-    QDialog, QFormLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QVBoxLayout
+    QDialog, QFormLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QVBoxLayout, QWidget
 )
 
 from chibi.auth.client import ChibiAuthClient, ChibiAuthError
@@ -34,7 +34,7 @@ class CompanionAccountDialog(QDialog):
         root.addWidget(self.title)
         root.addWidget(self.message)
 
-        self.form_widget = QDialog()
+        self.form_widget = QWidget()
         form_layout = QFormLayout(self.form_widget)
         self.email = QLineEdit()
         self.email.setPlaceholderText("seu@email.com")
