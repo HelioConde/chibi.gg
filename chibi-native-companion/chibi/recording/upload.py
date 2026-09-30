@@ -28,6 +28,8 @@ class PostGameUploadQueue:
             target=self.root/"uploaded"/package.name; target.parent.mkdir(parents=True,exist_ok=True); package.replace(target); self.status="uploaded"; self._backoff=5.0
         except HTTPError as error:
             if error.code in {401,403}:
+                invalidate=getattr(self.token_provider,"invalidate",None)
+                if callable(invalidate): invalidate()
                 self.status="auth_required"
                 self._next=monotonic()+30.0
             else:
