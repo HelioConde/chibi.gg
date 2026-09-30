@@ -4,6 +4,7 @@ from types import SimpleNamespace
 
 from chibi.recording.reconcile import reconcile
 from chibi.recording.recorder import MatchSessionRecorder
+from chibi.auth.secure_store import AuthSession, SecureTokenStore
 from chibi.tracker.events import EventType, TFTEvent
 from chibi.tracker.models import BoardPiece, ChibiGameState, ObservedValue
 
@@ -34,3 +35,10 @@ def test_riot_reconciliation_keeps_local_timeline_and_prefers_official_result():
     result=reconcile(package,{"id":"BR1_1","participants":[{"puuid":"owner","level":8,"placement":4}]},"owner")
     assert result["riotMatch"]["participant"]["level"]==8
     assert result["telemetry"]["events"][0]["payload"]["value"]==7
+
+def test_windows_dpapi_store_round_trips_without_plaintext(tmp_path):
+    path=tmp_path/"session.dpapi"; store=SecureTokenStore(path)
+    store.save_session(AuthSession("access-secret","refresh-secret",123,"user"))
+    assert b"access-secret" not in path.read_bytes()
+    assert store.load_session()==AuthSession("access-secret","refresh-secret",123,"user")
+    store.clear_session(); assert not path.exists()

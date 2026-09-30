@@ -23,6 +23,7 @@ class PostGameUploadQueue:
         try:
             data=package.read_bytes(); request=Request(self.base_url+"/telemetry-matches",data=data,method="POST",headers={"Content-Type":"application/gzip","Content-Encoding":"gzip","Authorization":"Bearer "+str(token),"User-Agent":"ChibiNativeCompanion/0.1"})
             with urlopen(request,timeout=15) as response: body=json.load(response)
-            if not isinstance(body,dict) or not body.get("ack"): raise ValueError("invalid_ack")
+            with gzip.open(package,"rt",encoding="utf-8") as source: expected=str(json.load(source).get("session",{}).get("sessionId") or "")
+            if not isinstance(body,dict) or not body.get("ok") or body.get("sessionId")!=expected: raise ValueError("invalid_ack")
             target=self.root/"uploaded"/package.name; target.parent.mkdir(parents=True,exist_ok=True); package.replace(target); self.status="uploaded"; self._backoff=5.0
         except (HTTPError,URLError,OSError,ValueError): self.status="retry_wait"; self._next=monotonic()+self._backoff; self._backoff=min(300.0,self._backoff*2)
