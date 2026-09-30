@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from time import time
 
 from .events import EventType, TFTEvent
@@ -56,9 +57,9 @@ class ChibiStateReducer:
         stars = event.payload.get("stars")
         if not raw_id or not isinstance(stars, int):
             return
-        for piece in self.state.board:
+        for index, piece in enumerate(self.state.board):
             if piece.raw_id == raw_id or piece.champion_id == normalize_champion_id(raw_id):
-                piece.stars = stars
+                self.state.board[index] = replace(piece, stars=stars)
                 return
 
     def _apply_checkpoint(self, event: TFTEvent) -> None:
