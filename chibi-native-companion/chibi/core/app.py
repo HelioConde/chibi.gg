@@ -3,7 +3,7 @@ import argparse
 import sys
 from pathlib import Path
 from time import time
-from PySide6.QtCore import QLockFile, QUrl
+from PySide6.QtCore import QLockFile, QTimer, QUrl
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QApplication
 from chibi.core.context import CompanionContext
@@ -30,6 +30,9 @@ from chibi.tracker.vision import recognize_saved_roi
 from chibi.tracker.monitor import TFTTrackerMonitor
 from chibi.ui.tracker_debug import TrackerDebugPanel
 from chibi.recording.recorder import MatchSessionRecorder
+from chibi.recording.upload import PostGameUploadQueue
+from chibi.auth.secure_store import SecureTokenStore
+from chibi.auth.client import ChibiAuthClient, SessionProvider
 
 def main() -> int:
     parser = argparse.ArgumentParser(); parser.add_argument("--demo", action="store_true"); parser.add_argument("--debug", action="store_true"); parser.add_argument("--tracker-debug", action="store_true"); parser.add_argument("--vision-calibrate", action="store_true"); parser.add_argument("--vision-test", type=Path, metavar="ROI_PNG"); parser.add_argument("--telemetry-report", action="store_true"); parser.add_argument("--discover-game", action="store_true"); parser.add_argument("--investigate", action="store_true"); parser.add_argument("--vision-debug", action="store_true"); parser.add_argument("--vision-capture-field", choices=("gold","level","stage")); parser.add_argument("--vision-label",nargs=2,metavar=("SAMPLE_ID","LABEL")); parser.add_argument("--import-plan"); args = parser.parse_args()
@@ -51,10 +54,16 @@ def main() -> int:
     instance_lock.setStaleLockTime(0)
     if not instance_lock.tryLock(1):
         return 0
-    context, bus, sessions, window = CompanionContext(telemetry=telemetry), EventBus(), SessionManager(), CompanionWindow(plans); window.set_debug(args.debug); window.set_game_plan(plans.load()); window.set_live_telemetry(telemetry)
+    token_store = SecureTokenStore()
+    auth_client = ChibiAuthClient()
+    session_provider = SessionProvider(token_store, auth_client)
+    context, bus, sessions = CompanionContext(telemetry=telemetry), EventBus(), SessionManager()
+    window = CompanionWindow(plans, token_store)
+    window.set_debug(args.debug); window.set_game_plan(plans.load()); window.set_live_telemetry(telemetry)
     postgame = PostGameController()
     tracker = TFTTrackerMonitor(vision_calibrate=args.vision_calibrate)
     recorder = MatchSessionRecorder()
+    upload_queue = PostGameUploadQueue(recorder.root, session_provider)
     debug_panel = TrackerDebugPanel() if args.tracker_debug else None
     if debug_panel: debug_panel.show()
     def update_tracker(state: object) -> None:
@@ -78,11 +87,32 @@ def main() -> int:
         )))
     postgame.completed.connect(lambda _session, result: window.show_result(result))
     window.open_analysis.clicked.connect(lambda: show_analysis(sessions.current, None) if sessions.current else None)
+
+    def poll_upload() -> None:
+        phase = getattr(getattr(context.gameflow, "state", None), "value", "")
+        if phase == "in_game":
+            recorder.set_upload_status("locked_until_game_end")
+            return
+        upload_queue.poll()
+        recorder.set_upload_status(upload_queue.status)
+        if debug_panel and context.tracker is not None:
+            setattr(context.tracker, "recorder", recorder.status)
+            debug_panel.update_state(context.tracker)
+
+    upload_timer = QTimer()
+    upload_timer.setInterval(5000)
+    upload_timer.timeout.connect(poll_upload)
+    upload_timer.start()
+
     def update(snapshot: object) -> None:
         context.gameflow = snapshot  # type: ignore[assignment]
         state=getattr(snapshot,"state",None)
-        if getattr(state,"value","")=="in_game": recorder.start(snapshot)
-        elif recorder.status.state=="recording" and getattr(state,"value","") in {"post_game","lobby","client_offline"}: recorder.finalize(tracker.reducer.state)
+        if getattr(state,"value","")=="in_game":
+            recorder.start(snapshot)
+            recorder.set_upload_status("locked_until_game_end")
+        elif recorder.status.state=="recording" and getattr(state,"value","") in {"post_game","lobby","client_offline"}:
+            recorder.finalize(tracker.reducer.state)
+            QTimer.singleShot(250, poll_upload)
         tracker.set_puuid(getattr(snapshot, "player_puuid", ""))
         session = sessions.on_gameflow(snapshot)  # type: ignore[arg-type]
         if session and getattr(snapshot, "state", None).value == "in_game" and session.id not in captured_sessions:
@@ -93,7 +123,7 @@ def main() -> int:
         bus.publish("gameflow", snapshot)
     monitor = DemoGameflowMonitor() if args.demo else GameflowMonitor(); monitor.state_changed.connect(update); monitor.start()
     tracker.start()
-    tray = create_tray(window, app.quit); app.aboutToQuit.connect(monitor.stop); app.aboutToQuit.connect(tracker.stop); app.aboutToQuit.connect(postgame.stop); app.aboutToQuit.connect(instance_lock.unlock)
+    tray = create_tray(window, app.quit); app.aboutToQuit.connect(upload_timer.stop); app.aboutToQuit.connect(monitor.stop); app.aboutToQuit.connect(tracker.stop); app.aboutToQuit.connect(postgame.stop); app.aboutToQuit.connect(instance_lock.unlock)
     if sessions.current and sessions.current.is_waiting and sessions.current.game_ended_at and time() - sessions.current.game_ended_at < 210:
         postgame.resolve(sessions.current)
     window.show(); return app.exec()
