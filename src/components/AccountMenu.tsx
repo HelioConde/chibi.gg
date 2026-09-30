@@ -54,7 +54,7 @@ export default function AccountMenu(){
 
   async function logout(){
     setBusy(true);
-    try{ await supabase.auth.signOut(); setOpen(false); }
+    try{ await supabase.auth.signOut({scope:"global"}); setOpen(false); }
     finally{ setBusy(false); }
   }
 
