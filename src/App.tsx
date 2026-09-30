@@ -68,6 +68,7 @@ import MatchBoardMap from "./components/MatchBoardMap";
 import RiotServiceStatus from "./components/RiotServiceStatus";
 import RiotDataBar from "./components/RiotDataBar";
 import ChibiRecordedBadge from "./components/ChibiRecordedBadge";
+import AccountMenu from "./components/AccountMenu";
 import { SITE_IMAGES } from "./siteAssets";
 import { LanguageSwitcher, useI18n } from "./i18n";
 import { DEMO_PROFILE, demoMatchDetail, isDemoMatchId } from "./demoProfile";
@@ -1276,6 +1277,7 @@ function App() {
         />
         <div className="topbar-actions">
           <LanguageSwitcher />
+          <AccountMenu />
           <button className="ghost-button" onClick={()=>openInfoPage("about")}>{t("nav.howItWorks")}</button>
         </div>
       </header>
