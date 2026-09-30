@@ -9,6 +9,7 @@ import {
 } from "../_shared/riot.ts";
 import { observeRawMatches } from "../_shared/observations.ts";
 import { getOrFetchMatches } from "../_shared/matchCache.ts";
+import { recordedMatchMarkers } from "../_shared/recordedMatches.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -79,6 +80,8 @@ Deno.serve(async (req) => {
     // Dataset collection is best-effort.
   }
 
+  const recordedMarkers=await recordedMatchMarkers(requestedIds);
+
   const matches=detailResult.matches.map((match:any)=>{
     const me=(Array.isArray(match?.participants)?match.participants:[])
       .find((participant:any)=>participant?.puuid===puuid);
@@ -93,6 +96,8 @@ Deno.serve(async (req) => {
       queueId:num(match?.queueId),
       setNumber:num(match?.setNumber),
       setName:String(match?.setName||""),
+      hasChibiTelemetry:recordedMarkers.get(String(match?.id||""))?.hasChibiTelemetry===true,
+      chibiTelemetryStatus:recordedMarkers.get(String(match?.id||""))?.chibiTelemetryStatus,
       ...normalized,
     };
   }).filter(Boolean);
