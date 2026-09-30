@@ -25,7 +25,14 @@ export default function AccountMenu(){
     setMessage("");
     try{
       if(mode==="signup"){
-        const {data,error}=await supabase.auth.signUp({email,password});
+        const redirect=new URL(window.location.href);
+        redirect.search="";
+        redirect.hash="";
+        const {data,error}=await supabase.auth.signUp({
+          email,
+          password,
+          options:{emailRedirectTo:redirect.toString()},
+        });
         if(error)throw error;
         if(data.session){
           setMessage("Conta criada e conectada.");
