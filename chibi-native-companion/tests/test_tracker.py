@@ -108,6 +108,23 @@ def test_checkpoint_reconciles_local_player_only_and_retries_incomplete_json(tmp
     assert state.augments == ["Augment"]
 
 
+def test_star_up_replaces_frozen_board_piece_without_crashing():
+    reducer = ChibiStateReducer("local")
+    reducer.apply(TFTEvent(
+        EventType.CHECKPOINT_UPDATED,
+        "TFT_CHECKPOINT",
+        {"boardPieces": [{"championName": "DA_18_Cassiopeia", "starLevel": 1}]},
+    ))
+    original = reducer.state.board[0]
+    state = reducer.apply(TFTEvent(
+        EventType.UNIT_STAR_UP,
+        "TFT_LOG",
+        {"rawId": "DA_18_Cassiopeia", "championId": "Cassiopeia", "stars": 2},
+    ))
+    assert state.board[0].stars == 2
+    assert state.board[0] is not original
+
+
 def test_reducer_keeps_speculative_history_and_checkpoint_is_authoritative():
     reducer = ChibiStateReducer("local")
     reducer.apply(TFTEvent(EventType.UNIT_PURCHASED, "TFT_LOG", {"rawId": "DA_18_Varus", "championId": "Varus"}))
