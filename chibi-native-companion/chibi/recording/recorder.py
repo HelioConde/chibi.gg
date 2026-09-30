@@ -49,6 +49,8 @@ class MatchSessionRecorder:
     """Append-only own-player event/snapshot recorder with crash-safe finalization."""
     def __init__(self, root: Path | None = None, snapshot_interval: float = 8.0) -> None:
         self.root = root or app_data_dir() / "sessions"
+        for name in ("active", "pending", "uploaded", "finalized", "recovered"):
+            (self.root / name).mkdir(parents=True, exist_ok=True)
         self.snapshot_interval = snapshot_interval
         self.status = RecorderStatus()
         self._path: Path | None = None
@@ -56,19 +58,34 @@ class MatchSessionRecorder:
         self._last_snapshot = 0.0
         self._started = 0.0
 
-    def start(self, snapshot: object) -> None:
+    def start(self, snapshot: object, fallback: object | None = None) -> None:
         if self.status.state == "recording": return
-        self._owner = str(getattr(snapshot, "player_puuid", "") or "")
+        fallback_player = getattr(fallback, "player", None)
+        self._owner = str(
+            getattr(snapshot, "player_puuid", "")
+            or getattr(getattr(snapshot, "player", None), "puuid", "")
+            or getattr(fallback_player, "puuid", "")
+            or ""
+        )
         session_id = uuid.uuid4().hex
         self._started = time(); self._last_snapshot = 0.0
         self._path = self.root / "active" / f"{session_id}.jsonl"; self._path.parent.mkdir(parents=True, exist_ok=True)
         self.status = RecorderStatus("recording", session_id, upload="locked_until_game_end")
         details = getattr(snapshot, "details", {}) if isinstance(getattr(snapshot, "details", {}), dict) else {}
-        region = str(details.get("platform") or "")
-        game_id = _normalize_game_id(details.get("game_id") or details.get("gameId"), region)
+        fallback_details = getattr(fallback, "details", {}) if fallback is not None and isinstance(getattr(fallback, "details", {}), dict) else {}
+        region = str(details.get("platform") or fallback_details.get("platform") or "")
+        raw_game_id = (
+            details.get("game_id")
+            or details.get("gameId")
+            or getattr(snapshot, "game_id", None)
+            or getattr(fallback, "game_id", None)
+        )
+        game_id = _normalize_game_id(raw_game_id, region)
+        queue_id = getattr(snapshot, "queue_id", None) or getattr(fallback, "queue_id", None)
+        queue_name = getattr(snapshot, "queue_name", "") or getattr(fallback, "queue_name", "")
         self._append({"kind":"session", "schemaVersion":SCHEMA_VERSION, "sessionId":session_id, "ownerPuuid":self._owner,
-                      "gameId":game_id, "startedAt":self._started, "queueId":getattr(snapshot,"queue_id",None),
-                      "queueName":getattr(snapshot,"queue_name", ""), "region":region})
+                      "gameId":game_id, "startedAt":self._started, "queueId":queue_id,
+                      "queueName":queue_name, "region":region})
         self._append({"kind":"event", "eventId":uuid.uuid4().hex, "type":"GAME_STARTED", "observedAt":self._started})
 
     def event(self, event: TFTEvent, state: object) -> None:
