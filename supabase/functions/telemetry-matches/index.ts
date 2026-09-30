@@ -105,7 +105,13 @@ Deno.serve(async (req) => {
   const session = payload?.session ?? {};
   const sessionId = String(session.sessionId ?? "");
   const ownerPuuid = String(session.ownerPuuid ?? "");
-  const gameId = session.gameId == null ? null : String(session.gameId);
+  let gameId = session.gameId == null ? null : String(session.gameId);
+  if (!gameId) {
+    const snapshots = Array.isArray(payload?.telemetry?.snapshots) ? payload.telemetry.snapshots : [];
+    const events = Array.isArray(payload?.telemetry?.events) ? payload.telemetry.events : [];
+    const observed = [...snapshots, ...events].reverse().find((row: any) => row?.gameId);
+    if (observed?.gameId) gameId = String(observed.gameId);
+  }
 
   if (payload?.schemaVersion !== 1 || !sessionId || !ownerPuuid) {
     return json({ error: "invalid_schema" }, 400);
@@ -120,14 +126,22 @@ Deno.serve(async (req) => {
 
   const links = await fetch(
     base +
-      "/rest/v1/chibi_riot_account_links?select=puuid&user_id=eq." +
+      "/rest/v1/chibi_riot_account_links?select=puuid,region&user_id=eq." +
       encodeURIComponent(user.id) +
       "&puuid=eq." +
       encodeURIComponent(ownerPuuid),
     { headers: adminHeaders(key) },
   );
-  if (!links.ok || !(await links.json()).length) {
+  if (!links.ok) {
+    return json({ error: "riot_account_link_lookup_failed" }, 502);
+  }
+  const linkedRows = await links.json();
+  if (!Array.isArray(linkedRows) || !linkedRows.length) {
     return json({ error: "riot_account_not_linked" }, 403);
+  }
+  const linkedRegion = String(linkedRows[0]?.region ?? "").trim().toUpperCase();
+  if (gameId && !gameId.includes("_") && /^\d+$/.test(gameId) && linkedRegion) {
+    gameId = linkedRegion + "_" + gameId;
   }
 
   const existing = await getExisting(base, key, user.id, sessionId, gameId, ownerPuuid);
