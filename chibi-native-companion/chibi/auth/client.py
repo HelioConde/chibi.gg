@@ -32,6 +32,26 @@ class ChibiAuthClient:
         data = self._post("/auth/v1/token?grant_type=refresh_token", {"refresh_token": refresh_token})
         return self._session(data)
 
+    def account_link(self, access_token: str) -> dict[str, object] | None:
+        request = Request(
+            SUPABASE_URL + "/rest/v1/chibi_riot_account_links?select=region,game_name,tag_line,verified_at&limit=1",
+            method="GET",
+            headers={
+                "apikey": SUPABASE_PUBLISHABLE_KEY,
+                "Authorization": "Bearer " + access_token,
+                "User-Agent": "ChibiNativeCompanion/0.1",
+            },
+        )
+        try:
+            with urlopen(request, timeout=self.timeout) as response:
+                data = json.load(response)
+        except Exception:
+            return None
+        if not isinstance(data, list) or not data:
+            return None
+        row = data[0]
+        return row if isinstance(row, dict) else None
+
     def logout(self, access_token: str) -> None:
         request = Request(
             SUPABASE_URL + "/auth/v1/logout?scope=global",
