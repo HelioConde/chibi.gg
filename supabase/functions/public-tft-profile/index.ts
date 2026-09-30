@@ -7,6 +7,7 @@ import {
 } from "../_shared/riot.ts";
 import { observeRawMatches } from "../_shared/observations.ts";
 import { getOrFetchMatches } from "../_shared/matchCache.ts";
+import { recordedMatchMarkers } from "../_shared/recordedMatches.ts";
 
 function percent(n:number,total:number){
   return total?Math.round((n/total)*100):0;
@@ -199,6 +200,8 @@ Deno.serve(async(req)=>{
       );
     }
 
+    const recordedMarkers=await recordedMatchMarkers(requestedIds);
+
     const matches=detailResult.matches.map((match:any)=>{
       const me=(Array.isArray(match?.participants)?match.participants:[])
         .find((participant:any)=>participant?.puuid===puuid);
@@ -213,6 +216,8 @@ Deno.serve(async(req)=>{
         queueId:num(match?.queueId),
         setNumber:num(match?.setNumber),
         setName:String(match?.setName||""),
+        hasChibiTelemetry:recordedMarkers.get(String(match?.id||""))?.hasChibiTelemetry===true,
+        chibiTelemetryStatus:recordedMarkers.get(String(match?.id||""))?.chibiTelemetryStatus,
         ...normalized,
       };
     }).filter(Boolean);
