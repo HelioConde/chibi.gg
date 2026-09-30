@@ -64,11 +64,23 @@ class CompanionAccountDialog(QDialog):
         self.form_widget.setVisible(not connected)
         self.login_button.setVisible(not connected)
         self.logout_button.setVisible(connected)
-        self.message.setText(
-            "Conta conectada. As partidas finalizadas poderão ser enviadas ao seu perfil Chibi."
-            if connected
-            else "Entre com a mesma conta criada no chibi.gg. A senha é usada somente para autenticar e não é salva."
-        )
+        if not connected:
+            self.message.setText(
+                "Entre com a mesma conta criada no chibi.gg. A senha é usada somente para autenticar e não é salva."
+            )
+            return
+        link = self.client.account_link(session.access_token)
+        if link:
+            region = str(link.get("region") or "").upper()
+            suffix = " · " + region if region else ""
+            self.message.setText(
+                "Conta conectada · Riot vinculada" + suffix +
+                ". As partidas finalizadas serão enviadas ao seu perfil Chibi."
+            )
+        else:
+            self.message.setText(
+                "Conta conectada, mas ainda sem Riot Account vinculada. O upload ficará aguardando o vínculo."
+            )
 
     def _login(self) -> None:
         email = self.email.text().strip()
