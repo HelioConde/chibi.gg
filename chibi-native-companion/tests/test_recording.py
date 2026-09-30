@@ -5,6 +5,7 @@ from types import SimpleNamespace
 from chibi.recording.reconcile import reconcile
 from chibi.recording.recorder import MatchSessionRecorder
 from chibi.auth.secure_store import AuthSession, SecureTokenStore
+from chibi.auth.client import SessionProvider
 from chibi.tracker.events import EventType, TFTEvent
 from chibi.tracker.models import BoardPiece, ChibiGameState, ObservedValue
 
@@ -42,3 +43,58 @@ def test_windows_dpapi_store_round_trips_without_plaintext(tmp_path):
     assert b"access-secret" not in path.read_bytes()
     assert store.load_session()==AuthSession("access-secret","refresh-secret",123,"user")
     store.clear_session(); assert not path.exists()
+
+
+class _MemoryStore:
+    def __init__(self, session):
+        self.session=session
+    def load_session(self):
+        return self.session
+    def save_session(self, session):
+        self.session=session
+    def clear_session(self):
+        self.session=None
+
+
+class _RefreshClient:
+    def __init__(self, refreshed):
+        self.refreshed=refreshed
+        self.calls=0
+    def refresh(self, refresh_token):
+        self.calls+=1
+        assert refresh_token=="refresh-old"
+        return self.refreshed
+
+
+def test_session_provider_refreshes_expiring_session():
+    store=_MemoryStore(AuthSession("access-old","refresh-old",0,"user"))
+    client=_RefreshClient(AuthSession("access-new","refresh-new",9999999999,"user"))
+    provider=SessionProvider(store,client)
+    assert provider()=="access-new"
+    assert client.calls==1
+    assert store.session.access_token=="access-new"
+
+
+def test_recorder_finalizes_with_riot_compatible_match_id(tmp_path):
+    class Snapshot:
+        player_puuid="owner"
+        queue_id=1100
+        queue_name="TFT"
+        details={"platform":"br1","game_id":"3288084282"}
+
+    recorder=MatchSessionRecorder(tmp_path)
+    recorder.start(Snapshot())
+
+    class State:
+        game_id="3288084282"
+        round=None
+        player=None
+        board=[]
+        augments=[]
+
+    package_path=recorder.finalize(State())
+    assert package_path is not None
+    import gzip, json
+    with gzip.open(package_path,"rt",encoding="utf-8") as source:
+        payload=json.load(source)
+    assert payload["session"]["gameId"]=="BR1_3288084282"
