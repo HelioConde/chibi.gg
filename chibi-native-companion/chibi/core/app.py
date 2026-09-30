@@ -66,8 +66,27 @@ def main() -> int:
     upload_queue = PostGameUploadQueue(recorder.root, session_provider)
     debug_panel = TrackerDebugPanel() if args.tracker_debug else None
     if debug_panel: debug_panel.show()
+    tracker_finalize_pending = {"scheduled": False}
+
+    def finalize_from_tracker() -> None:
+        tracker_finalize_pending["scheduled"] = False
+        state = context.tracker
+        if state is None or recorder.status.state != "recording":
+            return
+        if getattr(state, "lifecycle", "") == "game_running":
+            return
+        recorder.finalize(state)
+        QTimer.singleShot(250, poll_upload)
+
     def update_tracker(state: object) -> None:
         context.tracker = state
+        lifecycle = getattr(state, "lifecycle", "")
+        if lifecycle == "game_running" and recorder.status.state != "recording":
+            recorder.start(context.gameflow, fallback=state)
+            recorder.set_upload_status("locked_until_game_end")
+        elif lifecycle != "game_running" and recorder.status.state == "recording" and not tracker_finalize_pending["scheduled"]:
+            tracker_finalize_pending["scheduled"] = True
+            QTimer.singleShot(6000, finalize_from_tracker)
         recorder.snapshot(state)
         setattr(state, "recorder", recorder.status)
         bus.publish("tracker_state", state)
@@ -108,7 +127,7 @@ def main() -> int:
         context.gameflow = snapshot  # type: ignore[assignment]
         state=getattr(snapshot,"state",None)
         if getattr(state,"value","")=="in_game":
-            recorder.start(snapshot)
+            recorder.start(snapshot, fallback=tracker.reducer.state)
             recorder.set_upload_status("locked_until_game_end")
         elif recorder.status.state=="recording" and getattr(state,"value","") in {"post_game","lobby","client_offline"}:
             recorder.finalize(tracker.reducer.state)
