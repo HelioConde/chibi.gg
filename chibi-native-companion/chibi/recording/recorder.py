@@ -15,6 +15,18 @@ from chibi.tracker.events import TFTEvent
 SCHEMA_VERSION = 1
 
 
+def _normalize_game_id(value: object, region: object = "") -> str | None:
+    raw = str(value or "").strip()
+    if not raw:
+        return None
+    if "_" in raw:
+        return raw
+    prefix = str(region or "").strip().upper()
+    if prefix and raw.isdigit():
+        return prefix + "_" + raw
+    return raw
+
+
 def _safe(value: object) -> object:
     """Drop adversary-shaped/raw checkpoint payloads before persistence."""
     if isinstance(value, dict):
@@ -51,9 +63,12 @@ class MatchSessionRecorder:
         self._started = time(); self._last_snapshot = 0.0
         self._path = self.root / "active" / f"{session_id}.jsonl"; self._path.parent.mkdir(parents=True, exist_ok=True)
         self.status = RecorderStatus("recording", session_id, upload="locked_until_game_end")
+        details = getattr(snapshot, "details", {}) if isinstance(getattr(snapshot, "details", {}), dict) else {}
+        region = str(details.get("platform") or "")
+        game_id = _normalize_game_id(details.get("game_id") or details.get("gameId"), region)
         self._append({"kind":"session", "schemaVersion":SCHEMA_VERSION, "sessionId":session_id, "ownerPuuid":self._owner,
-                      "gameId":None, "startedAt":self._started, "queueId":getattr(snapshot,"queue_id",None),
-                      "queueName":getattr(snapshot,"queue_name", ""), "region":str(getattr(snapshot,"details",{}).get("platform", ""))})
+                      "gameId":game_id, "startedAt":self._started, "queueId":getattr(snapshot,"queue_id",None),
+                      "queueName":getattr(snapshot,"queue_name", ""), "region":region})
         self._append({"kind":"event", "eventId":uuid.uuid4().hex, "type":"GAME_STARTED", "observedAt":self._started})
 
     def event(self, event: TFTEvent, state: object) -> None:
@@ -81,7 +96,11 @@ class MatchSessionRecorder:
         self.snapshot(state, force=True); ended=time()
         self._append({"kind":"event","eventId":uuid.uuid4().hex,"type":"GAME_ENDED","observedAt":ended,"incomplete":incomplete})
         rows=[json.loads(line) for line in self._path.read_text(encoding="utf-8").splitlines() if line]
-        package={"schemaVersion":SCHEMA_VERSION,"session":rows[0],"telemetry":{"events":[row for row in rows if row.get("kind")=="event"],"snapshots":[row for row in rows if row.get("kind")=="snapshot"]},"quality":self._quality(rows),"riotMatch":None}
+        session=dict(rows[0])
+        if not session.get("gameId"):
+            observed_game_id=next((row.get("gameId") for row in reversed(rows) if row.get("gameId")),None)
+            session["gameId"]=_normalize_game_id(observed_game_id,session.get("region"))
+        package={"schemaVersion":SCHEMA_VERSION,"session":session,"telemetry":{"events":[row for row in rows if row.get("kind")=="event"],"snapshots":[row for row in rows if row.get("kind")=="snapshot"]},"quality":self._quality(rows),"riotMatch":None}
         target=self.root/"pending"/f"{self.status.session_id}.json.gz"; target.parent.mkdir(parents=True,exist_ok=True)
         with gzip.open(target,"wt",encoding="utf-8") as output: json.dump(package,output,separators=(",",":"))
         archived=self.root/("recovered" if incomplete else "finalized")/self._path.name; archived.parent.mkdir(parents=True,exist_ok=True); shutil.move(str(self._path),archived)
