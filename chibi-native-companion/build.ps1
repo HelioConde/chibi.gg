@@ -10,14 +10,19 @@ if (-not $py) {
     throw "Python Launcher (py.exe) não encontrado. Instale Python 3.12 e tente novamente."
 }
 
-$python312 = & py -3.12 -c "import sys; print(sys.executable)" 2>$null
-if ($LASTEXITCODE -ne 0 -or -not $python312) {
+$installed = (& py -0p 2>$null) -join "`n"
+if ($installed -notmatch '3\.12') {
     Write-Host ""
     Write-Host "Python 3.12 não encontrado." -ForegroundColor Yellow
     Write-Host "Versões detectadas:" -ForegroundColor Yellow
     & py -0p
-    throw "O projeto/CI usa Python 3.12. Instale Python 3.12 e execute este script novamente."
+    Write-Host ""
+    Write-Host "Instale com:" -ForegroundColor Cyan
+    Write-Host "winget install -e --id Python.Python.3.12" -ForegroundColor Cyan
+    exit 2
 }
+
+$python312 = & py -3.12 -c "import sys; print(sys.executable)"
 
 $venvPython = Join-Path $Root ".venv\Scripts\python.exe"
 if (-not (Test-Path $venvPython)) {
