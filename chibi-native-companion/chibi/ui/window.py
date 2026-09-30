@@ -11,12 +11,15 @@ from PySide6.QtWidgets import (
 from chibi.assets import TftAssets
 from chibi.comps import ChibiCompsClient, Comp, display_name
 from chibi.core.settings import Settings
+from chibi.auth.secure_store import SecureTokenStore
+from chibi.auth.client import ChibiAuthClient
 from chibi.plan import GamePlan, GamePlanStore
 from chibi.riot.lcu.models import GameState, GameStateSnapshot
 from chibi.telemetry.confidence import DataConfidence
 from chibi.telemetry.models import TelemetrySnapshot
 
 from .status import PRESENTATION
+from .account_dialog import CompanionAccountDialog
 
 
 STYLE = """
@@ -90,9 +93,11 @@ class _Portrait(QLabel):
 class CompanionWindow(QMainWindow):
     plan_changed = Signal(object)
 
-    def __init__(self, plan_store: GamePlanStore | None = None) -> None:
+    def __init__(self, plan_store: GamePlanStore | None = None, token_store: SecureTokenStore | None = None) -> None:
         super().__init__()
         self.plan_store = plan_store or GamePlanStore()
+        self.token_store = token_store or SecureTokenStore()
+        self.auth_client = ChibiAuthClient()
         self.settings = Settings()
         self.plan = GamePlan()
         self.snapshot = GameStateSnapshot.offline()
@@ -110,6 +115,7 @@ class CompanionWindow(QMainWindow):
         self.setMaximumWidth(460)
         self.setStyleSheet(STYLE)
         self._build()
+        self._update_account_button()
         self._restore_window()
         self._render_comps()
         self._load_assets()
@@ -130,6 +136,10 @@ class CompanionWindow(QMainWindow):
         header.addWidget(self.brand)
         header.addStretch(1)
         header.addWidget(self.riot)
+        self.account_button = QPushButton("CONTA")
+        self.account_button.setObjectName("quiet")
+        self.account_button.clicked.connect(self.show_account)
+        header.addWidget(self.account_button)
         self.pin_button = QPushButton("PIN")
         self.pin_button.setObjectName("quiet")
         self.pin_button.clicked.connect(self.toggle_pin)
@@ -279,6 +289,19 @@ class CompanionWindow(QMainWindow):
         layout.addWidget(self.fetch_comps_button)
         layout.addWidget(scroll)
         return page
+
+    def show_account(self) -> None:
+        dialog = CompanionAccountDialog(self.token_store, self.auth_client, self)
+        dialog.session_changed.connect(self._update_account_button)
+        dialog.exec()
+        self._update_account_button()
+
+    def _update_account_button(self) -> None:
+        connected = self.token_store.load_session() is not None
+        self.account_button.setText("CONTA ✓" if connected else "CONTA")
+        self.account_button.setToolTip(
+            "Conta Chibi conectada" if connected else "Entrar na conta Chibi para enviar partidas gravadas"
+        )
 
     def update_gameflow(self, snapshot: GameStateSnapshot) -> None:
         self.snapshot = snapshot
