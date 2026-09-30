@@ -7,7 +7,7 @@ import {
 } from "../_shared/riot.ts";
 import { observeRawMatches } from "../_shared/observations.ts";
 import { getOrFetchMatches } from "../_shared/matchCache.ts";
-import { recordedMatchMarkers } from "../_shared/recordedMatches.ts";
+import { recordedMatchMarkers, reconcileRecordedMatches } from "../_shared/recordedMatches.ts";
 
 function percent(n:number,total:number){
   return total?Math.round((n/total)*100):0;
@@ -200,6 +200,7 @@ Deno.serve(async(req)=>{
       );
     }
 
+    await reconcileRecordedMatches(detailResult.matches);
     const recordedMarkers=await recordedMatchMarkers(requestedIds);
 
     const matches=detailResult.matches.map((match:any)=>{
