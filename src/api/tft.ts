@@ -30,6 +30,8 @@ export type TftMatch = {
   queueId?: number;
   setNumber?: number;
   setName?: string;
+  hasChibiTelemetry?: boolean;
+  chibiTelemetryStatus?: "waiting_riot_match"|"reconciled";
   placement: number;
   level: number;
   goldLeft: number;
@@ -183,6 +185,8 @@ export type TftMatchDetail = {
     queueId: number;
     setNumber: number;
     setName: string;
+    hasChibiTelemetry?: boolean;
+    chibiTelemetryStatus?: "waiting_riot_match"|"reconciled";
     participants: Array<{
       placement: number;
       level: number;
