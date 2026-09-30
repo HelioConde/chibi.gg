@@ -56,6 +56,9 @@ class TrackerDebugPanel(QWidget):
             samples = vision.get("samples")
             if isinstance(samples, dict):
                 lines.append("Samples: " + " · ".join(f"{key}={value}" for key, value in samples.items()))
+        recorder = getattr(state, "recorder", None)
+        if recorder:
+            lines.extend(["", "RECORDER", f"State: {getattr(recorder, 'state', '—')} · Session: {getattr(recorder, 'session_id', None) or '—'}", f"Events: {getattr(recorder, 'events', 0)} · Snapshots: {getattr(recorder, 'snapshots', 0)} · Upload: {getattr(recorder, 'upload', '—')} · Riot Match: {getattr(recorder, 'riot_match', '—')}"])
         lines.extend(["", "Providers:"])
         lines.extend(f"{name}: {status}" for name, status in getattr(state, "providers", {}).items())
         self.output.setPlainText("\n".join(lines))

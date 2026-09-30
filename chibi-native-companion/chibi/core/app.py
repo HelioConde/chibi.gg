@@ -29,6 +29,7 @@ from chibi.vision.pending import create_pending, label_pending
 from chibi.tracker.vision import recognize_saved_roi
 from chibi.tracker.monitor import TFTTrackerMonitor
 from chibi.ui.tracker_debug import TrackerDebugPanel
+from chibi.recording.recorder import MatchSessionRecorder
 
 def main() -> int:
     parser = argparse.ArgumentParser(); parser.add_argument("--demo", action="store_true"); parser.add_argument("--debug", action="store_true"); parser.add_argument("--tracker-debug", action="store_true"); parser.add_argument("--vision-calibrate", action="store_true"); parser.add_argument("--vision-test", type=Path, metavar="ROI_PNG"); parser.add_argument("--telemetry-report", action="store_true"); parser.add_argument("--discover-game", action="store_true"); parser.add_argument("--investigate", action="store_true"); parser.add_argument("--vision-debug", action="store_true"); parser.add_argument("--vision-capture-field", choices=("gold","level","stage")); parser.add_argument("--vision-label",nargs=2,metavar=("SAMPLE_ID","LABEL")); parser.add_argument("--import-plan"); args = parser.parse_args()
@@ -53,14 +54,20 @@ def main() -> int:
     context, bus, sessions, window = CompanionContext(telemetry=telemetry), EventBus(), SessionManager(), CompanionWindow(plans); window.set_debug(args.debug); window.set_game_plan(plans.load()); window.set_live_telemetry(telemetry)
     postgame = PostGameController()
     tracker = TFTTrackerMonitor(vision_calibrate=args.vision_calibrate)
+    recorder = MatchSessionRecorder()
     debug_panel = TrackerDebugPanel() if args.tracker_debug else None
     if debug_panel: debug_panel.show()
     def update_tracker(state: object) -> None:
         context.tracker = state
+        recorder.snapshot(state)
+        setattr(state, "recorder", recorder.status)
         bus.publish("tracker_state", state)
         if debug_panel: debug_panel.update_state(state)
     tracker.state_changed.connect(update_tracker)
-    tracker.event_emitted.connect(lambda event: bus.publish("tft_event", event))
+    def record_event(event: object) -> None:
+        recorder.event(event, tracker.reducer.state)  # type: ignore[arg-type]
+        bus.publish("tft_event", event)
+    tracker.event_emitted.connect(record_event)
     captured_sessions: set[str] = set()
     def show_analysis(session: object, result: object) -> None:
         riot_id = getattr(session, "riot_id", "")
@@ -73,6 +80,9 @@ def main() -> int:
     window.open_analysis.clicked.connect(lambda: show_analysis(sessions.current, None) if sessions.current else None)
     def update(snapshot: object) -> None:
         context.gameflow = snapshot  # type: ignore[assignment]
+        state=getattr(snapshot,"state",None)
+        if getattr(state,"value","")=="in_game": recorder.start(snapshot)
+        elif recorder.status.state=="recording" and getattr(state,"value","") in {"post_game","lobby","client_offline"}: recorder.finalize(tracker.reducer.state)
         tracker.set_puuid(getattr(snapshot, "player_puuid", ""))
         session = sessions.on_gameflow(snapshot)  # type: ignore[arg-type]
         if session and getattr(snapshot, "state", None).value == "in_game" and session.id not in captured_sessions:

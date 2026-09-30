@@ -23,5 +23,8 @@ verify_jwt = false
 [functions.public-tft-leaderboard]
 verify_jwt = false
 
+[functions.telemetry-matches]
+verify_jwt = false
+
 [functions.public-tft-status]
 verify_jwt = false
