@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 from time import time
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 from chibi.auth.secure_store import AuthSession, SecureTokenStore
@@ -117,8 +116,12 @@ class SessionProvider:
             return session.access_token
         try:
             refreshed = self.client.refresh(session.refresh_token)
-        except ChibiAuthError:
-            self.store.clear_session()
+        except ChibiAuthError as error:
+            if error.code not in {"network_error"}:
+                self.store.clear_session()
             return None
         self.store.save_session(refreshed)
         return refreshed.access_token
+
+    def invalidate(self) -> None:
+        self.store.clear_session()
