@@ -67,6 +67,7 @@ import DDragonArt from "./components/DDragonArt";
 import MatchBoardMap from "./components/MatchBoardMap";
 import RiotServiceStatus from "./components/RiotServiceStatus";
 import RiotDataBar from "./components/RiotDataBar";
+import ChibiRecordedBadge from "./components/ChibiRecordedBadge";
 import { SITE_IMAGES } from "./siteAssets";
 import { LanguageSwitcher, useI18n } from "./i18n";
 import { DEMO_PROFILE, demoMatchDetail, isDemoMatchId } from "./demoProfile";
@@ -1999,6 +2000,7 @@ function App() {
                               {matchRoundLabel(match)&&<span>{matchRoundLabel(match)}</span>}
                               {match.duration&&<span>{formatDuration(match.duration)}</span>}
                               <span>{formatClock(match.playedAt,locale)}</span>
+                              {match.hasChibiTelemetry&&<ChibiRecordedBadge status={match.chibiTelemetryStatus}/>}
                             </div>
 
                             <div className="match-row-title">
