@@ -9,7 +9,7 @@ import {
 } from "../_shared/riot.ts";
 import { observeRawMatches } from "../_shared/observations.ts";
 import { getOrFetchMatches } from "../_shared/matchCache.ts";
-import { recordedMatchMarkers } from "../_shared/recordedMatches.ts";
+import { recordedMatchMarkers, reconcileRecordedMatches } from "../_shared/recordedMatches.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -80,6 +80,7 @@ Deno.serve(async (req) => {
     // Dataset collection is best-effort.
   }
 
+  await reconcileRecordedMatches(detailResult.matches);
   const recordedMarkers=await recordedMatchMarkers(requestedIds);
 
   const matches=detailResult.matches.map((match:any)=>{
