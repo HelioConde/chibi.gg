@@ -2040,20 +2040,14 @@ function App() {
           </>}
 
           {profileTab==="matches"&&<>
-            <SectionMarker
-              index="01"
-              kicker={t("profile.history.section.kicker")}
-              title={t("profile.history.section.title")}
-              description={t("profile.history.section.desc")}
-              compact
-            />
             <div className="content-grid profile-history-first history-section-marker">
             <section className="panel history history-with-reference" id="match-history">
               <AdaptiveArtwork className="history-reference-art history-reference-v2" src={SITE_IMAGES.v2.frames.wideSecondary} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
               <div className="panel-title profile-history-head">
-                <div>
+                <div className="profile-history-titlecopy">
                   <span>{t("profile.history.riot")}</span>
                   <h2>{t("profile.history.title")}</h2>
+                  <p>{t("profile.history.section.desc")}</p>
                   <small>{t("profile.history.count",{setCount:analysisMatches.length,set:currentSet??"—",loaded:matches.length})}</small>
                 </div>
 

@@ -24767,3 +24767,95 @@ img[src$="chibi-ui-10.png"],
     font-weight:950!important;
   }
 }
+
+
+/* CHIBI HISTORY AUGMENT LANE v43 */
+
+/* One history header, one purpose. */
+.profile-history-first{
+  margin-top:8px!important;
+}
+.profile-history-head{
+  align-items:flex-end!important;
+}
+.profile-history-titlecopy{
+  min-width:0;
+}
+.profile-history-titlecopy h2{
+  margin-bottom:2px!important;
+}
+.profile-history-titlecopy p{
+  max-width:520px;
+  margin:2px 0 3px;
+  color:#708297;
+  font-size:6.3px;
+  line-height:1.35;
+}
+.profile-history-titlecopy small{
+  color:#52667d!important;
+  font-size:5.5px!important;
+}
+
+@media(min-width:1100px){
+  /* Use the empty center-right area for augments instead of shrinking them under traits. */
+  .profile-history-first .match-lineup{
+    grid-template-columns:minmax(118px,145px) minmax(0,1fr) auto!important;
+    gap:10px!important;
+  }
+  .profile-history-first .match-history-support{
+    display:contents!important;
+  }
+  .profile-history-first .match-history-support .compact-traits{
+    grid-column:1;
+    grid-row:1;
+    align-self:center;
+  }
+  .profile-history-first .match-history-units{
+    grid-column:2;
+    grid-row:1;
+    align-self:center!important;
+  }
+  .profile-history-first .match-history-augments{
+    grid-column:3;
+    grid-row:1;
+    align-self:center;
+    display:flex!important;
+    gap:5px!important;
+    margin-left:2px;
+    padding-left:8px;
+    border-left:1px solid rgba(96,139,178,.10);
+  }
+  .profile-history-first .match-history-augments .match-augment-icon{
+    width:27px!important;
+    height:27px!important;
+    flex-basis:27px!important;
+    border-radius:6px!important;
+    border-color:rgba(120,104,218,.20)!important;
+    box-shadow:0 5px 12px rgba(0,0,0,.10);
+  }
+  .profile-history-first .match-history-augments .match-augment-icon:hover{
+    transform:translateY(-1px);
+    border-color:rgba(139,116,255,.34)!important;
+  }
+
+  /* Slightly reduce the panel chrome now that the standalone marker is gone. */
+  .profile-history-first>.history{
+    padding-top:10px!important;
+  }
+  .profile-history-first .profile-history-head{
+    margin-bottom:7px!important;
+  }
+}
+
+@media(max-width:1099px){
+  .profile-history-titlecopy p{
+    font-size:6px;
+  }
+}
+
+@media(max-width:620px){
+  .profile-history-titlecopy p{
+    max-width:92%;
+    font-size:5.8px;
+  }
+}
