@@ -39,6 +39,7 @@ import BoardCounterfactual from "./components/BoardCounterfactual";
 import LobbyAutopsy from "./components/LobbyAutopsy";
 import MatchScorecard from "./components/MatchScorecard";
 import MatchReviewOverview from "./components/MatchReviewOverview";
+import MatchReviewNavigator from "./components/MatchReviewNavigator";
 import MatchStory from "./components/MatchStory";
 import ChibiShareCard from "./components/ChibiShareCard";
 import PersonalVsGlobalMeta from "./components/PersonalVsGlobalMeta";
@@ -2249,58 +2250,80 @@ function App() {
                 </div>
               </section>}
 
-              {openedMatch&&<MatchReviewOverview
-                target={openedMatch}
-                detail={selectedMatch}
-              />}
+              {openedMatch&&<MatchReviewNavigator placement={openedMatch.placement}/>}
 
-              {openedMatch&&<MatchStory
-                target={openedMatch}
-                detail={selectedMatch}
-              />}
+              {openedMatch&&<section className="match-review-stage" id="match-review-read">
+                <MatchReviewOverview
+                  target={openedMatch}
+                  detail={selectedMatch}
+                />
+              </section>}
 
               {openedMatch&&studyRequest?.matchId===openedMatch.id&&<ChibiStudyReply
                 playerName={profile?.player.gameName||t("match.player")}
                 existingReply={studyRequest.reply}
               />}
 
-              {openedMatch&&<MatchBoardMap
-                match={openedMatch}
-                staticData={staticData}
-              />}
-
-              {openedMatch&&<LobbyAutopsy
-                target={openedMatch}
-                detail={selectedMatch}
-                staticData={staticData}
-              />}
-
-              {openedMatch&&<MatchScorecard
-                target={openedMatch}
-                detail={selectedMatch}
-              />}
-
-              {openedMatch&&<details className="match-detail-layer counter-layer">
-                <summary><span><b>{t("match.compare.title")}</b><small>{t("match.compare.desc")}</small></span><em>Counterfactual</em></summary>
-                <BoardCounterfactual
-                  target={openedMatch}
-                  history={analysisMatches}
-                  staticData={staticData}
-                  onEvidence={showCounterEvidence}
-                />
-              </details>}
-
-              {openedMatch&&<details className="match-detail-layer">
-                <summary><span><b>{t("match.context.title")}</b><small>{t("match.context.desc")}</small></span><em>Journal</em></summary>
-                <MatchJournal
-                  matchId={openedMatch.id}
-                  placement={openedMatch.placement}
-                  playerKey={profile?profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine:""}
+              {openedMatch&&<section className="match-review-stage" id="match-review-why">
+                <LobbyAutopsy
                   target={openedMatch}
                   detail={selectedMatch}
-                  onSaved={()=>setJournalVersion((value)=>value+1)}
+                  staticData={staticData}
                 />
-              </details>}
+              </section>}
+
+              {openedMatch&&<section className="match-review-stage" id="match-review-board">
+                <MatchBoardMap
+                  match={openedMatch}
+                  staticData={staticData}
+                />
+              </section>}
+
+              {openedMatch&&<section className="match-review-more" id="match-review-more">
+                <div className="match-review-more-head">
+                  <span>ANÁLISE COMPLETA</span>
+                  <strong>Abra somente o detalhe que você quer investigar</strong>
+                  <small>Comparações secundárias ficam recolhidas para a revisão continuar rápida.</small>
+                </div>
+
+                <details className="match-detail-layer match-story-layer">
+                  <summary><span><b>História do snapshot</b><small>O que funcionou, o que puniu e qual diferença apareceu</small></span><em>Story</em></summary>
+                  <MatchStory
+                    target={openedMatch}
+                    detail={selectedMatch}
+                  />
+                </details>
+
+                <details className="match-detail-layer match-scorecard-layer">
+                  <summary><span><b>Scorecard da lobby</b><small>Board, upgrades, itens e nível contra os outros jogadores</small></span><em>4 métricas</em></summary>
+                  <MatchScorecard
+                    target={openedMatch}
+                    detail={selectedMatch}
+                  />
+                </details>
+
+                <details className="match-detail-layer counter-layer">
+                  <summary><span><b>{t("match.compare.title")}</b><small>{t("match.compare.desc")}</small></span><em>Counterfactual</em></summary>
+                  <BoardCounterfactual
+                    target={openedMatch}
+                    history={analysisMatches}
+                    staticData={staticData}
+                    onEvidence={showCounterEvidence}
+                  />
+                </details>
+
+                <details className="match-detail-layer">
+                  <summary><span><b>{t("match.context.title")}</b><small>{t("match.context.desc")}</small></span><em>Journal</em></summary>
+                  <MatchJournal
+                    matchId={openedMatch.id}
+                    placement={openedMatch.placement}
+                    playerKey={profile?profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine:""}
+                    target={openedMatch}
+                    detail={selectedMatch}
+                    onSaved={()=>setJournalVersion((value)=>value+1)}
+                  />
+                </details>
+              </section>}
 
               <details className="match-detail-layer lobby-layer">
                 <summary><span><b>{t("match.lobby.title")}</b><small>{t("match.lobby.desc")}</small></span><em>{t("match.players",{count:selectedMatch.match.participants.length})}</em></summary>
