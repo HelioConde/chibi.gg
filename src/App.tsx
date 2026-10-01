@@ -60,6 +60,7 @@ import HomeSessionResume from "./components/HomeSessionResume";
 import HomeStudyShelf from "./components/HomeStudyShelf";
 import HomeVisualShowcase from "./components/HomeVisualShowcase";
 import SiteArtworkBackdrop from "./components/SiteArtworkBackdrop";
+import AdaptiveArtwork from "./components/AdaptiveArtwork";
 import TeamBuilderPage from "./components/TeamBuilderPage";
 import LeaderboardPage from "./components/LeaderboardPage";
 import ProductInfoPage from "./components/ProductInfoPage";
@@ -1417,7 +1418,7 @@ function App() {
               <div className="home-hero-orbit home-hero-orbit-one"></div>
               <div className="home-hero-orbit home-hero-orbit-two"></div>
               <div className="home-product-window">
-                <img className="home-product-reference-art" src={SITE_IMAGES.ui.profile} alt="" aria-hidden="true" decoding="async"/>
+                <AdaptiveArtwork className="home-product-reference-art" src={SITE_IMAGES.ui.profile} alt="" aria-hidden="true" decoding="async"/>
                 <div className="home-product-windowbar">
                   <span><i></i><i></i><i></i></span>
                   <small>chibi.gg / player</small>
@@ -1601,7 +1602,7 @@ function App() {
           </section>}
 
           <section className="player-summary-shell player-summary-visual player-summary-compact">
-            <img className="player-summary-reference-art" src={SITE_IMAGES.ui.profile} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
+            <AdaptiveArtwork className="player-summary-reference-art" src={SITE_IMAGES.ui.profile} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
             <div className="player-summary-board-art" aria-hidden="true">
               {analysisMatches[0]?.units.slice(0,5).map((unit,index)=>{
                 const entry=staticEntry(staticData?.champions,unit.characterId);
@@ -1739,7 +1740,7 @@ function App() {
 
           {profileTab==="coach"&&<>
             <div className="coach-art-banner" aria-hidden="true">
-              <img src={SITE_IMAGES.ui.coach} alt="" loading="lazy" decoding="async"/>
+              <AdaptiveArtwork src={SITE_IMAGES.ui.coach} alt="" loading="lazy" decoding="async"/>
               <span></span>
             </div>
             <ChibiCoachMode />
@@ -1920,7 +1921,7 @@ function App() {
           {profileTab==="matches"&&<>
             <div className="content-grid profile-history-first">
             <section className="panel history history-with-reference" id="match-history">
-              <img className="history-reference-art" src={SITE_IMAGES.ui.history} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
+              <AdaptiveArtwork className="history-reference-art" src={SITE_IMAGES.ui.history} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
               <div className="panel-title profile-history-head">
                 <div>
                   <span>{t("profile.history.riot")}</span>
