@@ -105,6 +105,7 @@ export default function GlobalMetaPage({
 
   return <main className="global-meta-page">
     <div className="global-meta-hero page-hero-with-reference">
+      <AdaptiveArtwork className="v2-hero-emblem v2-hero-emblem-meta" src={SITE_IMAGES.v2.icons[8]} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
       <AdaptiveArtwork className="page-reference-art page-reference-meta" src={SITE_IMAGES.ui.comparison} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>{t("common.backProfile")}</button>}
