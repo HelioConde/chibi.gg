@@ -26431,3 +26431,88 @@ img[src$="chibi-ui-10.png"],
     bottom:18px!important;
   }
 }
+
+
+/* CHIBI REVIEW UNIT LABEL STACK v58 */
+
+/* In match review, named units use normal document flow:
+   portrait -> champion name -> items. Nothing overlaps the label. */
+.match-summary-card-v2 .modal-board .unit-card.compact.named{
+  flex:0 0 72px!important;
+  width:72px!important;
+  max-width:72px!important;
+  min-height:88px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  position:relative!important;
+  padding-bottom:0!important;
+}
+
+.match-summary-card-v2 .modal-board .unit-card.compact.named .unit-portrait{
+  flex:0 0 48px!important;
+  width:48px!important;
+  height:48px!important;
+  margin:0 auto!important;
+}
+
+.match-summary-card-v2 .modal-board .unit-card.compact.named .unit-caption{
+  order:2;
+  width:72px!important;
+  min-height:17px;
+  margin:4px 0 2px!important;
+  display:-webkit-box;
+  overflow:hidden;
+  color:#bdc9d5!important;
+  font-size:6.9px!important;
+  font-weight:800!important;
+  line-height:1.15!important;
+  text-align:center;
+  text-overflow:ellipsis;
+  white-space:normal!important;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+}
+
+.match-summary-card-v2 .modal-board .unit-card.compact.named .item-row{
+  order:3;
+  position:static!important;
+  left:auto!important;
+  right:auto!important;
+  bottom:auto!important;
+  width:auto!important;
+  min-height:14px;
+  margin:1px 0 0!important;
+  transform:none!important;
+  justify-content:center!important;
+}
+
+.match-summary-card-v2 .modal-board .unit-card.compact.named .item-icon{
+  width:14px!important;
+  height:14px!important;
+  border-radius:3px!important;
+}
+
+/* Keep stars on the portrait; items no longer share that space. */
+.match-summary-card-v2 .modal-board .unit-card.compact.named .unit-stars{
+  bottom:1px!important;
+}
+
+@media(max-width:760px){
+  .match-summary-card-v2 .modal-board .unit-card.compact.named{
+    flex-basis:68px!important;
+    width:68px!important;
+    max-width:68px!important;
+    min-height:84px!important;
+  }
+
+  .match-summary-card-v2 .modal-board .unit-card.compact.named .unit-caption{
+    width:68px!important;
+    font-size:6.5px!important;
+  }
+
+  .match-summary-card-v2 .modal-board .unit-card.compact.named .item-icon{
+    width:13px!important;
+    height:13px!important;
+  }
+}
