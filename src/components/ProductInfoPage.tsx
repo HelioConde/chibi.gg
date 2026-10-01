@@ -1,4 +1,5 @@
 import { useI18n } from "../i18n";\nimport { SITE_IMAGES } from "../siteAssets";
+import AdaptiveArtwork from "./AdaptiveArtwork";
 
 type PageKind="about"|"privacy"|"terms";
 
@@ -25,7 +26,7 @@ function About(){
   const { t }=useI18n();
   return <>
     <section className="legal-hero page-hero-with-reference legal-hero-art">
-      <img className="page-reference-art legal-reference-art" src={SITE_IMAGES.ui.all[20]} alt="" aria-hidden="true" loading="eager" decoding="async"/>
+      <AdaptiveArtwork className="page-reference-art legal-reference-art" src={SITE_IMAGES.ui.all[20]} alt="" aria-hidden="true" loading="eager" decoding="async"/>
       <span>{t("legal.about.kicker")}</span>
       <h1>{t("legal.about.title1")}<br/><em>{t("legal.about.title2")}</em></h1>
       <p>{t("legal.about.intro")}</p>
