@@ -59,7 +59,8 @@ export default function LeaderboardPage({staticData,onOpenPlayer}:Props){
   },[data]);
 
   return <main className="leaderboard-page">
-    <section className="leaderboard-hero page-hero-with-reference leaderboard-hero-art">\n      <img className="page-reference-art leaderboard-reference-art" src={SITE_IMAGES.ui.all[14]} alt="" aria-hidden="true" loading="eager" decoding="async"/>
+    <section className="leaderboard-hero page-hero-with-reference leaderboard-hero-art">
+      <img className="page-reference-art leaderboard-reference-art" src={SITE_IMAGES.ui.all[14]} alt="" aria-hidden="true" loading="eager" decoding="async"/>
       <div>
         <span className="eyebrow">TFT LEADERBOARD</span>
         <h1>{t("leaderboard.title1")}<br/><em>{t("leaderboard.title2")}</em></h1>
