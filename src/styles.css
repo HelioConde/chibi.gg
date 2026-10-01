@@ -30161,3 +30161,92 @@ img[src$="chibi-ui-10.png"],
     justify-self:start!important;
   }
 }
+
+
+/* CHIBI REVIEW GRID + SCROLLBAR v76 */
+
+/* Wide desktop: keep all trait groups in one visual row, including "Outros",
+   so the final-board section does not leave a large empty second-row area. */
+@media(min-width:1280px){
+  .match-summary-card-v2 .match-trait-groups{
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    gap:8px!important;
+  }
+
+  .match-summary-card-v2 .match-trait-group-other{
+    grid-column:auto!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:none!important;
+    display:block!important;
+    padding:8px!important;
+  }
+
+  .match-summary-card-v2 .match-trait-group-other .match-trait-group-head{
+    min-height:31px!important;
+  }
+
+  .match-summary-card-v2 .match-trait-group-other .match-trait-group-units{
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    align-items:flex-start!important;
+    gap:5px!important;
+    padding:10px 0 0!important;
+    overflow-x:auto!important;
+    scrollbar-width:none!important;
+  }
+
+  .match-summary-card-v2 .match-trait-group-other .match-trait-group-units::-webkit-scrollbar{
+    display:none!important;
+  }
+
+  .match-summary-card-v2 .match-trait-group-other .unit-card.compact.named{
+    flex:0 0 58px!important;
+    width:58px!important;
+    max-width:58px!important;
+    min-height:80px!important;
+  }
+
+  .match-summary-card-v2 .match-trait-group-other .unit-card.compact.named .unit-portrait{
+    width:40px!important;
+    height:40px!important;
+    flex-basis:40px!important;
+  }
+
+  .match-summary-card-v2 .match-trait-group-other .unit-card.compact.named .unit-caption{
+    width:54px!important;
+    font-size:7px!important;
+  }
+
+  .match-summary-card-v2 .match-trait-group-other .unit-card.compact.named .item-icon{
+    width:12px!important;
+    height:12px!important;
+  }
+}
+
+/* Match review scrollbar should match the dark UI instead of the browser's
+   bright default track. */
+.app-shell>.match-overlay>.match-modal{
+  scrollbar-width:thin;
+  scrollbar-color:#405469 #07111c;
+}
+
+.app-shell>.match-overlay>.match-modal::-webkit-scrollbar{
+  width:9px;
+}
+
+.app-shell>.match-overlay>.match-modal::-webkit-scrollbar-track{
+  background:#07111c;
+  border-left:1px solid rgba(98,139,177,.08);
+}
+
+.app-shell>.match-overlay>.match-modal::-webkit-scrollbar-thumb{
+  min-height:56px;
+  border:2px solid #07111c;
+  border-radius:999px;
+  background:#3a5066;
+}
+
+.app-shell>.match-overlay>.match-modal::-webkit-scrollbar-thumb:hover{
+  background:#506a82;
+}
