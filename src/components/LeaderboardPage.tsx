@@ -101,6 +101,10 @@ export default function LeaderboardPage({staticData,onOpenPlayer}:Props){
     {!loading&&error&&<section className="panel meta-page-state error">{t("leaderboard.loadFailed")}</section>}
 
     {!loading&&!error&&data&&<>
+      <div className="leaderboard-sample-note">
+        <strong>Ranking oficial · recorte exibido</strong>
+        <span>{data.players.length} jogadores carregados · {data.platform.toUpperCase()} · {tier}</span>
+      </div>
       <section className="leaderboard-highlights">
         <article className="panel">
           <span>#1 LP</span>
@@ -110,12 +114,12 @@ export default function LeaderboardPage({staticData,onOpenPlayer}:Props){
         <article className="panel">
           <span>{t("leaderboard.bestWinRate")}</span>
           <strong>{bestWinRate?bestWinRate.winRate+"%":"—"}</strong>
-          <small>{bestWinRate?.gameName||t("leaderboard.unidentified")}</small>
+          <small>{bestWinRate?.gameName||t("leaderboard.unidentified")} · entre {data.players.length} exibidos</small>
         </article>
         <article className="panel">
           <span>{t("leaderboard.mostGames")}</span>
           <strong>{mostGames?.games??"—"}</strong>
-          <small>{mostGames?.gameName||t("leaderboard.unidentified")}</small>
+          <small>{mostGames?.gameName||t("leaderboard.unidentified")} · entre {data.players.length} exibidos</small>
         </article>
       </section>
 
