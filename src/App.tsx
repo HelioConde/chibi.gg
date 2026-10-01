@@ -64,6 +64,7 @@ import PointerAura from "./components/PointerAura";
 import SiteHudOverlay from "./components/SiteHudOverlay";
 import AdaptiveArtwork from "./components/AdaptiveArtwork";
 import ArtworkRibbon from "./components/ArtworkRibbon";
+import SectionMarker from "./components/SectionMarker";
 import TeamBuilderPage from "./components/TeamBuilderPage";
 import LeaderboardPage from "./components/LeaderboardPage";
 import ProductInfoPage from "./components/ProductInfoPage";
@@ -1317,7 +1318,10 @@ function App() {
             aria-label="Abrir navegação"
             aria-expanded={mobileNavOpen}
             onClick={()=>setMobileNavOpen(value=>!value)}
-          >☰</button>
+          >
+            <span>{t("nav.menu")}</span>
+            <b>☰</b>
+          </button>
           {mobileNavOpen&&<div className="mobile-product-menu-panel">
             <button className={sitePage==="meta"?"active":""} onClick={()=>{openMeta();setMobileNavOpen(false);}}>{t("nav.meta")}</button>
             <button className={sitePage==="comps"?"active":""} onClick={()=>{openComps();setMobileNavOpen(false);}}>{t("nav.comps")}</button>
@@ -1571,7 +1575,13 @@ function App() {
             </div>
           </section>
 
-          <section className="home-paths-v2 home-paths-v3" aria-label={t("home.pathsAria")}>
+          <SectionMarker
+            index="01"
+            kicker={t("home.section.paths.kicker")}
+            title={t("home.section.paths.title")}
+            description={t("home.section.paths.desc")}
+          />
+          <section className="home-paths-v2 home-paths-v3 home-section-paths" aria-label={t("home.pathsAria")}>
             <button onClick={openMeta}>
               <span className="home-path-index"><i>✦</i><em>01</em></span>
               <div>
@@ -1610,13 +1620,26 @@ function App() {
             <div><span>04</span><strong>{t("home.proof.4.title")}</strong><small>{t("home.proof.4.desc")}</small></div>
           </section>
 
-          <ArtworkRibbon images={[10,11,12]} className="home-art-ribbon"/>
+          <SectionMarker
+            index="02"
+            kicker={t("home.section.product.kicker")}
+            title={t("home.section.product.title")}
+            description={t("home.section.product.desc")}
+          />
+          <ArtworkRibbon images={[10,11,12]} className="home-art-ribbon home-section-product"/>
 
           <HomeVisualShowcase
             onOpenProfile={()=>document.getElementById("home-riot-id")?.focus()}
             onOpenComps={openComps}
             onOpenStats={()=>openStats("champions")}
             onOpenCoach={()=>openReviewDemo("coach")}
+          />
+
+          <SectionMarker
+            index="03"
+            kicker={t("home.section.meta.kicker")}
+            title={t("home.section.meta.title")}
+            description={t("home.section.meta.desc")}
           />
 
           <HomeMetaPreview
@@ -1626,6 +1649,12 @@ function App() {
             onOpenStats={(category,query="")=>openStats(category,query)}
           />
 
+          <SectionMarker
+            index="04"
+            kicker={t("home.section.builder.kicker")}
+            title={t("home.section.builder.title")}
+            description={t("home.section.builder.desc")}
+          />
           <section className="home-builder-v2">
             <div className="home-builder-copy">
               <span>{t("home.builder.kicker")}</span>
@@ -1994,7 +2023,14 @@ function App() {
           </>}
 
           {profileTab==="matches"&&<>
-            <div className="content-grid profile-history-first">
+            <SectionMarker
+              index="01"
+              kicker={t("profile.history.section.kicker")}
+              title={t("profile.history.section.title")}
+              description={t("profile.history.section.desc")}
+              compact
+            />
+            <div className="content-grid profile-history-first history-section-marker">
             <section className="panel history history-with-reference" id="match-history">
               <AdaptiveArtwork className="history-reference-art" src={SITE_IMAGES.ui.history} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
               <div className="panel-title profile-history-head">
