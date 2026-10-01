@@ -687,6 +687,13 @@ function App() {
   },[currentSetMatches,selectedQueue]);
 
   useEffect(()=>{
+    if(selectedQueue!=null||availableQueues.length<=1)return;
+    const preferred=availableQueues.includes(1100)?1100:availableQueues[0];
+    if(preferred)setSelectedQueue(preferred);
+  },[availableQueues,selectedQueue]);
+
+
+  useEffect(()=>{
     if(!profile||!studyRequest||studyOpenedMatchId===studyRequest.matchId)return;
     const target=matches.find(match=>match.id===studyRequest.matchId);
     if(!target){
@@ -1795,7 +1802,10 @@ function App() {
                     ?<img src={profileIconUrl(staticData.version,profile.player.profileIconId)} alt="" onError={(e)=>{e.currentTarget.style.display="none";}}/>
                     :profile.player.gameName.slice(0,1).toUpperCase()}
                 </div>
-                <span>{profile.player.level}</span>
+                <span className="player-level-badge" title="Nível da conta TFT">
+                  <small>NÍVEL</small>
+                  <b>{profile.player.level}</b>
+                </span>
               </div>
 
               <div className="player-summary-copy">
@@ -1833,7 +1843,6 @@ function App() {
             </div>
 
             <div className="player-summary-actions">
-              <button className="player-coach-button" onClick={()=>changeProfileTab("coach")}>Chibi Review</button>
               <button className="refresh-button" onClick={searchPlayer} disabled={loading}>{demoMode?t("profile.restartDemo"):loading?t("profile.updating"):t("profile.update")}</button>
             </div>
 
@@ -2139,34 +2148,40 @@ function App() {
                     ))}
                   </div>}
 
-                  <div className="queue-tabs history-queue-tabs">
-                    {availableQueues.length<=1 ? (
-                      availableQueues.map((queueId)=>(
-                        <button className="active" disabled key={queueId}>{queueLabel(staticData,queueId)}</button>
-                      ))
-                    ) : <>
-                      <button className={selectedQueue==null?"active":""} onClick={()=>changeQueue(null)}>{t("profile.history.all")}</button>
-                      {availableQueues.map((queueId)=>(
-                        <button className={selectedQueue===queueId?"active":""} onClick={()=>changeQueue(queueId)} key={queueId}>
-                          {queueLabel(staticData,queueId)}
-                        </button>
-                      ))}
-                    </>}
+                  <div className="history-filter-group">
+                    <span>FILA</span>
+                    <div className="queue-tabs history-queue-tabs">
+                      {availableQueues.length<=1 ? (
+                        availableQueues.map((queueId)=>(
+                          <button className="active" disabled key={queueId}>{queueLabel(staticData,queueId)}</button>
+                        ))
+                      ) : <>
+                        <button className={selectedQueue==null?"active":""} onClick={()=>changeQueue(null)}>Todas as filas</button>
+                        {availableQueues.map((queueId)=>(
+                          <button className={selectedQueue===queueId?"active":""} onClick={()=>changeQueue(queueId)} key={queueId}>
+                            {queueLabel(staticData,queueId)}
+                          </button>
+                        ))}
+                      </>}
+                    </div>
                   </div>
 
-                  <div className="history-filter-tabs">
-                    {([
-                      ["all",t("profile.history.all")],
-                      ["review",t("profile.history.review")],
-                      ["top4","Top 4"],
-                      ["bottom2","Bottom 2"],
-                    ] as const).map(([id,label])=>(
-                      <button
-                        className={historyFilter===id?"active":""}
-                        onClick={()=>setHistoryFilter(id)}
-                        key={id}
-                      >{label}</button>
-                    ))}
+                  <div className="history-filter-group">
+                    <span>RESULTADO</span>
+                    <div className="history-filter-tabs">
+                      {([
+                        ["all","Todos"],
+                        ["review",t("profile.history.review")],
+                        ["top4","Top 4"],
+                        ["bottom2","Bottom 2"],
+                      ] as const).map(([id,label])=>(
+                        <button
+                          className={historyFilter===id?"active":""}
+                          onClick={()=>setHistoryFilter(id)}
+                          key={id}
+                        >{label}</button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2193,10 +2208,13 @@ function App() {
                         <strong>{formatDay(session.end,locale)} · {formatClock(session.start,locale)}–{formatClock(session.end,locale)}</strong>
                         <small>{t("profile.history.games",{count:session.games})}</small>
                         {session.wins>0&&<small>{t("profile.history.wins",{count:session.wins})}</small>}
-                        {session.delta!=null&&Math.abs(session.delta)>.25&&<em className={session.delta<0?"better":"worse"}>
+                        {session.delta!=null&&Math.abs(session.delta)>.25&&<em
+                          className={session.delta<0?"better":"worse"}
+                          title={"Variação da colocação média em relação à sessão anterior. Menor é melhor."}
+                        >
                           {session.delta<0
-                            ?t("profile.history.vsPreviousUp",{value:Math.abs(session.delta).toFixed(2)})
-                            :t("profile.history.vsPreviousDown",{value:Math.abs(session.delta).toFixed(2)})}
+                            ? "Média melhorou "+Math.abs(session.delta).toFixed(2)+" vs sessão anterior"
+                            : "Média piorou "+Math.abs(session.delta).toFixed(2)+" vs sessão anterior"}
                         </em>}
                       </div>
 
@@ -2215,7 +2233,7 @@ function App() {
                         const threeStarCount=match.units.filter(unit=>unit.tier>=3).length;
                         const equippedItemCount=match.units.reduce((sum,unit)=>sum+unit.itemNames.length,0);
                         const resultBand=placementBand(match.placement);
-                        return <button type="button" className={"match-row match-button match-row-v2 cue-"+cue.tone+" placement-band-"+resultBand} key={match.id} onClick={()=>void openMatch(match)}>
+                        return <article className={"match-row match-row-v2 cue-"+cue.tone+" placement-band-"+resultBand} key={match.id}>
                           <div className="match-result-rail">
                             <MatchResultAccent placement={match.placement}/>
                             <TacticianVisual companion={match.companion} staticData={staticData}/>
@@ -2243,11 +2261,15 @@ function App() {
 
                             <div className={"match-review-inline "+cue.tone}>
                               <span className="match-review-inline-dot" aria-hidden="true"/>
-                              <span className="match-review-inline-label">{cue.label}</span>
                               <strong>{cue.title}</strong>
                             </div>
 
-                            <div className="match-lineup match-lineup-grouped">
+                            <details className="match-history-details">
+                              <summary>
+                                <span>Board, campeões e itens</span>
+                                <small>{match.units.length} unidades · {equippedItemCount} itens</small>
+                              </summary>
+                              <div className="match-lineup match-lineup-grouped">
                               {(()=>{
                                 const historyTraits=activeTraits(match).slice(0,3);
                                 const groupedIds=new Set(
@@ -2328,7 +2350,8 @@ function App() {
                                   </div>}
                                 </>;
                               })()}
-                            </div>
+                              </div>
+                            </details>
                           </div>
 
                           <div className="match-meta match-meta-rich">
@@ -2339,13 +2362,13 @@ function App() {
                               {threeStarCount>0&&<span className="three-star" title={t("reviewQueue.signal.threeStar")+": "+threeStarCount}><i>3★</i><b>{threeStarCount}</b></span>}
                             </div>
                             <div className="match-value-grid match-value-grid-core">
-                              <span title={t("profile.history.boardEstimateTitle")}><b>~{boardValue(match,staticData)}G</b><small>{t("profile.history.boardEstimate")}</small></span>
+                              <span title="Estimativa do valor das unidades do board final baseada no custo e nas estrelas. Não inclui valor dos itens, economia gasta, posição, shop ou força real de combate."><b>~{boardValue(match,staticData)}G</b><small>{t("profile.history.boardEstimate")}</small></span>
                               <span><b>{match.goldLeft}G</b><small>{t("profile.history.gold")}</small></span>
                               <span><b>Nv {match.level}</b><small>{t("profile.history.level")}</small></span>
                             </div>
-                            <span className="match-meta-open-analysis">{t("profile.history.openAnalysis")} <b>→</b></span>
+                            <button type="button" className="match-meta-open-analysis" onClick={()=>void openMatch(match)}>{t("profile.history.openAnalysis")} <b>→</b></button>
                           </div>
-                        </button>;
+                        </article>;
                       })}
                     </div>
                   </section>
