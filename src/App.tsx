@@ -2160,26 +2160,15 @@ function App() {
                                   title={cue.title}
                                 >{cue.label}</span>
                               </div>
-                              <div className="match-scan-facts" aria-label="Resumo visual da composição">
-                                <span title={t("profile.history.unitsAria",{count:match.units.length})} aria-label={t("profile.history.unitsAria",{count:match.units.length})}>
-                                  <i>U</i><b>{match.units.length}</b>
-                                </span>
-                                <span title={t("profile.history.augmentsAria")} aria-label={t("profile.history.augmentsAria")}>
-                                  <i>AUG</i><b>{match.augments.length}</b>
-                                </span>
-                                <span title={t("stats.category.items")+": "+equippedItemCount} aria-label={t("stats.category.items")+": "+equippedItemCount}>
-                                  <i>IT</i><b>{equippedItemCount}</b>
-                                </span>
-                                {threeStarCount>0&&<span className="three-star" title={t("reviewQueue.signal.threeStar")+": "+threeStarCount} aria-label={t("reviewQueue.signal.threeStar")+": "+threeStarCount}>
-                                  <i>3★</i><b>{threeStarCount}</b>
-                                </span>}
-                              </div>
                             </div>
 
-                            <div className={"match-fast-read match-fast-read-inline "+cue.tone}>
-                              <span>{cue.label}</span>
-                              <strong>{cue.title}</strong>
-                              <small>{t("profile.history.openAnalysis")} →</small>
+                            <div className={"match-review-strip "+cue.tone}>
+                              <span className="match-review-strip-icon" aria-hidden="true">{cue.tone==="bad"?"!":cue.tone==="good"?"✓":"·"}</span>
+                              <div className="match-review-strip-copy">
+                                <span>{cue.label}</span>
+                                <strong>{cue.title}</strong>
+                              </div>
+                              <span className="match-review-strip-action">{t("profile.history.openAnalysis")} →</span>
                             </div>
 
                             <div className="match-lineup">
@@ -2215,6 +2204,12 @@ function App() {
                           </div>
 
                           <div className="match-meta match-meta-rich">
+                            <div className="match-scan-facts match-scan-facts-rail" aria-label="Resumo visual da composição">
+                              <span title={t("profile.history.unitsAria",{count:match.units.length})}><i>U</i><b>{match.units.length}</b></span>
+                              <span title={t("profile.history.augmentsAria")}><i>AUG</i><b>{match.augments.length}</b></span>
+                              <span title={t("stats.category.items")+": "+equippedItemCount}><i>IT</i><b>{equippedItemCount}</b></span>
+                              {threeStarCount>0&&<span className="three-star" title={t("reviewQueue.signal.threeStar")+": "+threeStarCount}><i>3★</i><b>{threeStarCount}</b></span>}
+                            </div>
                             <div className="match-value-grid match-value-grid-core">
                               <span title={t("profile.history.boardEstimateTitle")}><b>~{boardValue(match,staticData)}G</b><small>{t("profile.history.boardEstimate")}</small></span>
                               <span><b>{match.goldLeft}G</b><small>{t("profile.history.gold")}</small></span>

@@ -25601,3 +25601,174 @@ img[src$="chibi-ui-10.png"],
     color:#8bcfb4!important;
   }
 }
+
+
+/* CHIBI MATCH REVIEW STRIP v51 */
+
+/* A dedicated review strip reads as guidance, not as another form field. */
+.match-review-strip{
+  width:min(100%,600px);
+  min-height:34px;
+  display:grid;
+  grid-template-columns:24px minmax(0,1fr) auto;
+  align-items:center;
+  gap:8px;
+  margin:4px 0 3px;
+  padding:5px 7px 5px 6px;
+  border:1px solid rgba(105,139,173,.13);
+  border-left-width:3px;
+  border-radius:7px;
+  background:linear-gradient(90deg,rgba(10,24,36,.94),rgba(8,18,29,.76));
+  text-align:left;
+}
+.match-review-strip-icon{
+  width:22px;
+  height:22px;
+  display:grid;
+  place-items:center;
+  border-radius:6px;
+  background:rgba(111,132,158,.08);
+  color:#8ea0b4;
+  font-size:9px;
+  font-weight:950;
+}
+.match-review-strip-copy{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:1px;
+}
+.match-review-strip-copy>span{
+  color:#798da2;
+  font-size:5.4px;
+  font-weight:950;
+  letter-spacing:.55px;
+  text-transform:uppercase;
+}
+.match-review-strip-copy>strong{
+  overflow:hidden;
+  color:#c7d3df;
+  font-size:8.4px;
+  font-weight:850;
+  line-height:1.25;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.match-review-strip-action{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:24px;
+  padding:0 8px;
+  border:1px solid rgba(111,144,177,.14);
+  border-radius:6px;
+  background:rgba(11,25,38,.70);
+  color:#8ea1b5;
+  font-size:5.4px;
+  font-weight:850;
+  white-space:nowrap;
+}
+.match-review-strip.bad{
+  border-color:rgba(239,113,126,.18);
+  border-left-color:#ef7180;
+  background:linear-gradient(90deg,rgba(239,113,126,.045),rgba(8,18,29,.80) 42%);
+}
+.match-review-strip.bad .match-review-strip-icon{
+  background:rgba(239,113,126,.10);
+  color:#f08b97;
+}
+.match-review-strip.bad .match-review-strip-copy>span,
+.match-review-strip.bad .match-review-strip-copy>strong{
+  color:#ef9aa4;
+}
+.match-review-strip.bad .match-review-strip-action{
+  border-color:rgba(239,113,126,.16);
+  color:#dca0a7;
+}
+.match-review-strip.good{
+  border-color:rgba(78,216,171,.14);
+  border-left-color:#50d7ad;
+  background:linear-gradient(90deg,rgba(78,216,171,.035),rgba(8,18,29,.80) 42%);
+}
+.match-review-strip.good .match-review-strip-icon{
+  background:rgba(78,216,171,.09);
+  color:#7dddbb;
+}
+.match-review-strip.good .match-review-strip-copy>span,
+.match-review-strip.good .match-review-strip-copy>strong{
+  color:#86d8ba;
+}
+
+/* Quick facts now live in the factual rail, freeing the comp title from noise. */
+.match-scan-facts-rail{
+  width:100%;
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:3px!important;
+  margin-bottom:4px;
+}
+.match-scan-facts-rail>span{
+  min-width:0!important;
+  height:19px!important;
+  padding:0 3px!important;
+}
+.match-scan-facts-rail i{
+  font-size:4.6px!important;
+}
+.match-scan-facts-rail b{
+  font-size:5.7px!important;
+}
+
+@media(min-width:1100px){
+  .profile-history-first .match-row-v2{
+    grid-template-columns:46px minmax(0,1fr) 152px!important;
+  }
+  .profile-history-first .match-main{
+    grid-template-rows:auto auto auto 1fr!important;
+  }
+  .profile-history-first .match-meta-rich{
+    width:152px!important;
+    min-width:152px!important;
+    align-self:center!important;
+    gap:4px!important;
+  }
+  .profile-history-first .match-row-title{
+    margin-bottom:1px!important;
+  }
+  .profile-history-first .match-review-strip{
+    width:min(100%,620px)!important;
+  }
+}
+
+@media(max-width:1099px){
+  .match-review-strip{
+    width:100%;
+    max-width:none;
+  }
+  .match-review-strip-copy>strong{
+    white-space:normal;
+  }
+}
+
+@media(max-width:760px){
+  .match-review-strip{
+    grid-template-columns:22px minmax(0,1fr);
+    grid-template-areas:
+      "icon copy"
+      "action action";
+    gap:5px 7px;
+    padding:6px;
+  }
+  .match-review-strip-icon{grid-area:icon}
+  .match-review-strip-copy{grid-area:copy}
+  .match-review-strip-action{
+    grid-area:action;
+    justify-self:start;
+  }
+  .match-review-strip-copy>strong{
+    font-size:8px;
+  }
+  .match-scan-facts-rail{
+    grid-template-columns:repeat(4,minmax(38px,1fr));
+  }
+}
