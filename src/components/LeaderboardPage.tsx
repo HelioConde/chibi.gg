@@ -63,6 +63,7 @@ export default function LeaderboardPage({staticData,onOpenPlayer}:Props){
 
   return <main className="leaderboard-page">
     <section className="leaderboard-hero page-hero-with-reference leaderboard-hero-art">
+      <AdaptiveArtwork className="v2-hero-emblem v2-hero-emblem-ranking" src={SITE_IMAGES.v2.badges.rank} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
       <AdaptiveArtwork className="page-reference-art leaderboard-reference-art" src={SITE_IMAGES.ui.all[14]} alt="" aria-hidden="true" loading="eager" decoding="async"/>
       <div>
         <span className="eyebrow">TFT LEADERBOARD</span>
