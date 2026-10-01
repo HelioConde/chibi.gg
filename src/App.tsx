@@ -456,6 +456,8 @@ function sessionFocusLabel(value:string,t:Translate){
 }
 
 type ProfileTab = "overview"|"coach"|"matches"|"share";
+type HistoryDensity="compact"|"detailed";
+type HistorySort="date"|"placement"|"stage";
 
 function parseProfileTab(value:string|null):ProfileTab{
   if(value==="review"||value==="meta"||value==="coach") return "coach";
@@ -509,6 +511,15 @@ function App() {
   const [journalVersion,setJournalVersion]=useState(0);
   const [profileTab,setProfileTab]=useState<ProfileTab>("matches");
   const [historyFilter,setHistoryFilter]=useState<"all"|"top4"|"bottom2"|"review">("all");
+  const [historyDensity,setHistoryDensity]=useState<HistoryDensity>(()=>{
+    try{return localStorage.getItem("chibi.history.density")==="detailed"?"detailed":"compact";}catch{return "compact";}
+  });
+  const [historySort,setHistorySort]=useState<HistorySort>(()=>{
+    try{
+      const value=localStorage.getItem("chibi.history.sort");
+      return value==="placement"||value==="stage"?value:"date";
+    }catch{return "date";}
+  });
   const [builderPreset,setBuilderPreset]=useState<string[]>([]);
   const [recentPlayers,setRecentPlayers]=useState<RecentPlayer[]>(()=>getRecentPlayers());
   const [studyRequest,setStudyRequest]=useState<StudyRequest|null>(()=>readStudyRequest());
@@ -549,6 +560,14 @@ function App() {
                       ?"terms"
                       :"main"
   );
+
+  useEffect(()=>{
+    try{localStorage.setItem("chibi.history.density",historyDensity);}catch{}
+  },[historyDensity]);
+
+  useEffect(()=>{
+    try{localStorage.setItem("chibi.history.sort",historySort);}catch{}
+  },[historySort]);
 
   useEffect(()=>{
     const mobileMedia=window.matchMedia("(max-width: 820px)");
@@ -786,6 +805,14 @@ function App() {
     return historyBaseMatches;
   },[historyBaseMatches,historyFilter]);
 
+  const visibleHistorySummary=useMemo(()=>{
+    const total=visibleMatches.length;
+    const average=total?visibleMatches.reduce((sum,match)=>sum+match.placement,0)/total:null;
+    const top4=visibleMatches.filter(match=>match.placement<=4).length;
+    const bottom2=visibleMatches.filter(match=>match.placement>=7).length;
+    return {total,average,top4,bottom2};
+  },[visibleMatches]);
+
   const historySessions=useMemo(()=>{
     const sorted=historyBaseMatches
       .slice()
@@ -826,7 +853,14 @@ function App() {
 
       return {
         ...session,
-        displayMatches:session.matches.filter(match=>visibleIds.has(match.id)),
+        displayMatches:session.matches
+          .filter(match=>visibleIds.has(match.id))
+          .slice()
+          .sort((a,b)=>{
+            if(historySort==="placement")return a.placement-b.placement||(b.playedAt||0)-(a.playedAt||0);
+            if(historySort==="stage")return (Number(b.lastRound)||0)-(Number(a.lastRound)||0)||(b.playedAt||0)-(a.playedAt||0);
+            return (b.playedAt||0)-(a.playedAt||0);
+          }),
         index,
         games,
         average,
@@ -842,7 +876,7 @@ function App() {
     }
 
     return enriched.filter(session=>session.displayMatches.length>0);
-  },[historyBaseMatches,visibleMatches]);
+  },[historyBaseMatches,visibleMatches,historySort]);
 
   const openedMatchNavigation=useMemo(()=>{
     if(!openedMatch)return {newer:null as TftMatch|null,older:null as TftMatch|null,index:-1};
@@ -2187,7 +2221,32 @@ function App() {
                       ))}
                     </div>
                   </div>
+
+                  <div className="history-filter-group">
+                    <span>VISUAL</span>
+                    <div className="history-density-tabs" aria-label="Densidade do histórico">
+                      <button className={historyDensity==="compact"?"active":""} onClick={()=>setHistoryDensity("compact")}>Compacto</button>
+                      <button className={historyDensity==="detailed"?"active":""} onClick={()=>setHistoryDensity("detailed")}>Detalhado</button>
+                    </div>
+                  </div>
+
+                  <div className="history-filter-group">
+                    <span>ORDEM</span>
+                    <div className="history-sort-tabs" aria-label="Ordenar partidas">
+                      <button className={historySort==="date"?"active":""} onClick={()=>setHistorySort("date")}>Recentes</button>
+                      <button className={historySort==="placement"?"active":""} onClick={()=>setHistorySort("placement")}>Colocação</button>
+                      <button className={historySort==="stage"?"active":""} onClick={()=>setHistorySort("stage")}>Estágio</button>
+                    </div>
+                  </div>
                 </div>
+              </div>
+
+              <div className="history-filter-summary" aria-live="polite">
+                <span><b>{visibleHistorySummary.total}</b> partidas visíveis</span>
+                <span><b>{visibleHistorySummary.average==null?"—":visibleHistorySummary.average.toFixed(2)}</b> média</span>
+                <span><b>{visibleHistorySummary.top4}</b> Top 4</span>
+                <span><b>{visibleHistorySummary.bottom2}</b> Bottom 2</span>
+                <em>{selectedQueue==null?"Todas as filas":queueLabel(staticData,selectedQueue)}</em>
               </div>
 
               {evidenceIds?.length&&<div className="evidence-banner">
@@ -2199,7 +2258,7 @@ function App() {
                 <button onClick={clearEvidence}>{t("profile.history.fullContext")}</button>
               </div>}
 
-              <div className="match-list match-list-v2 match-session-list">
+              <div className={"match-list match-list-v2 match-session-list history-density-"+historyDensity}>
                 {!visibleMatches.length&&<div className="history-empty-filter">
                   {t("profile.history.empty")}
                 </div>}
@@ -2246,10 +2305,11 @@ function App() {
 
                           <div className="match-main">
                             <div className="match-context-line">
-                              <span>{queueLabel(staticData,match.queueId||0)}</span>
-                              {matchRoundLabel(match)&&<span>{matchRoundLabel(match)}</span>}
-                              {match.duration&&<span>{formatDuration(match.duration)}</span>}
-                              <span>{formatClock(match.playedAt,locale)}</span>
+                              <b className="data-origin-badge riot">RIOT</b>
+                              <span className="match-context-chip">{queueLabel(staticData,match.queueId||0)}</span>
+                              {matchRoundLabel(match)&&<span className="match-context-chip">{matchRoundLabel(match)}</span>}
+                              {match.duration&&<span className="match-context-chip">{formatDuration(match.duration)}</span>}
+                              <span className="match-context-chip">{formatClock(match.playedAt,locale)}</span>
                               {match.hasChibiTelemetry&&<ChibiRecordedBadge status={match.chibiTelemetryStatus}/>}
                             </div>
 
@@ -2264,11 +2324,11 @@ function App() {
                             </div>
 
                             <div className={"match-review-inline "+cue.tone}>
-                              <span className="match-review-inline-dot" aria-hidden="true"/>
+                              <b className="data-origin-badge chibi">CHIBI</b>
                               <strong>{cue.title}</strong>
                             </div>
 
-                            <details className="match-history-details">
+                            <details className="match-history-details" open={historyDensity==="detailed"?true:undefined}>
                               <summary>
                                 <span>Board, campeões e itens</span>
                                 <small>{match.units.length} unidades · {equippedItemCount} itens</small>
