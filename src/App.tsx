@@ -2139,14 +2139,17 @@ function App() {
                 </div>
 
                 <div className="history-head-controls">
-                  {availableSets.length>1&&<div className="history-set-tabs" aria-label={t("profile.history.setsAria")}>
-                    {availableSets.map(setNumber=>(
-                      <button
-                        className={currentSet===setNumber?"active":""}
-                        onClick={()=>changeSet(setNumber)}
-                        key={setNumber}
-                      >Set {setNumber}</button>
-                    ))}
+                  {availableSets.length>1&&<div className="history-filter-group">
+                    <span>SET</span>
+                    <div className="history-set-tabs" aria-label={t("profile.history.setsAria")}>
+                      {availableSets.map(setNumber=>(
+                        <button
+                          className={currentSet===setNumber?"active":""}
+                          onClick={()=>changeSet(setNumber)}
+                          key={setNumber}
+                        >Set {setNumber}</button>
+                      ))}
+                    </div>
                   </div>}
 
                   <div className="history-filter-group">
