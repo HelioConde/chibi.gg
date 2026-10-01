@@ -77,6 +77,13 @@ export default function ChibiToday({
     [activeSession,valid],
   );
 
+  const problemGuidance=useMemo(()=>{
+    const id=problemKey(problem?.id);
+    if(!problem)return t("today.problem.noData");
+    const actionKey="today.action."+id+"Body";
+    return problem.evidence+" · "+t(actionKey);
+  },[problem,t]);
+
   const action=useMemo(()=>{
     if(activeSession){
       return {
@@ -123,20 +130,19 @@ export default function ChibiToday({
               games:best.games,
             })
           : t("today.strength.noData")}</p>
-        {best&&<button onClick={()=>onEvidence(best.matchIds,t("today.strength.evidence"))}>{t("today.viewEvidence")}</button>}
+        {best&&<button className="today-evidence-link" onClick={()=>onEvidence(best.matchIds,t("today.strength.evidence"))}>
+          {t("today.viewEvidence")}
+        </button>}
       </article>
 
       <article className={"today-card attention "+(problem?"warning":"neutral")}>
         <V2PanelAccent kind={problem?"danger":"meta"} className="today-card-accent"/>
         <span>{t("today.problem.label")}</span>
         <h3>{problemName}</h3>
-        <p>{problem
-          ? t("today.problem.detail",{
-              count:problem.matchIds.length,
-              confidence:t("today.confidence."+problem.confidence),
-            })
-          : t("today.problem.noData")}</p>
-        {problem&&problem.matchIds.length>0&&<button onClick={()=>onEvidence(problem.matchIds,t("today.problem.evidence"))}>{t("today.investigate")}</button>}
+        <p>{problem?problemGuidance:t("today.problem.noData")}</p>
+        {problem&&problem.matchIds.length>0&&<button className="today-evidence-link" onClick={()=>onEvidence(problem.matchIds,t("today.problem.evidence"))}>
+          Evidência · confiança {t("today.confidence."+problem.confidence)}
+        </button>}
       </article>
 
       <article className={"today-card next "+(activeSession?"active":"")}>
@@ -150,7 +156,7 @@ export default function ChibiToday({
 
     <div className="today-tft-foot">
       <span>{t("today.foot")}</span>
-      <button onClick={onOpenCoach}>{t("today.openFullReview")}</button>
+      <small>Uma ação principal por vez; evidências ficam nos links secundários.</small>
     </div>
   </section>;
 }
