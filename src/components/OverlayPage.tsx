@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { SITE_IMAGES } from "../siteAssets";
+import AdaptiveArtwork from "./AdaptiveArtwork";
 import { TftMatch } from "../api/tft";
 import { getActiveSession, sessionProgress } from "../sessionMode";
 import { useI18n } from "../i18n";
@@ -180,7 +181,7 @@ export default function OverlayPage({
 
   return <main className="overlay-page">
     <section className="overlay-page-hero overlay-page-hero-art">
-      <img className="overlay-page-art" src={SITE_IMAGES.ui.all[15]} alt="" aria-hidden="true" loading="eager" decoding="async"/>
+      <AdaptiveArtwork className="overlay-page-art" src={SITE_IMAGES.ui.all[15]} alt="" aria-hidden="true" loading="eager" decoding="async"/>
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>{t("common.backProfile")}</button>}
         <span className="eyebrow">CHIBI COMPANION · REVIEW FIRST</span>
