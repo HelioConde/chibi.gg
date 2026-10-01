@@ -1,4 +1,5 @@
-import { useI18n } from "../i18n";\nimport { SITE_IMAGES } from "../siteAssets";
+import { useI18n } from "../i18n";
+import { SITE_IMAGES } from "../siteAssets";
 import AdaptiveArtwork from "./AdaptiveArtwork";
 
 type PageKind="about"|"privacy"|"terms";
