@@ -1128,6 +1128,7 @@ export default function TeamBuilderPage({
 
   return <main className="builder-page builder-v2 builder-v3 builder-v4 builder-v5 builder-v6 builder-v7 builder-v8">
     <section className="builder-hero page-hero-with-reference builder-hero-art">
+      <AdaptiveArtwork className="v2-hero-emblem v2-hero-emblem-builder" src={SITE_IMAGES.v2.icons[7]} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
       <AdaptiveArtwork className="page-reference-art builder-reference-art" src={SITE_IMAGES.ui.all[13]} alt="" aria-hidden="true" loading="eager" decoding="async"/>
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>{t("common.backProfile")}</button>}
