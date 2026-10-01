@@ -26924,3 +26924,313 @@ img[src$="chibi-ui-10.png"],
     font-size:9px;
   }
 }
+
+
+/* CHIBI MATCH TRAIT RELATIONS v61 */
+
+/* Composition title no longer implies trait-to-trait flow. */
+.match-comp-title{
+  margin-bottom:9px!important;
+}
+.match-comp-title-separator{
+  margin:0 2px;
+  color:#586b7d;
+  font-size:13px;
+  font-weight:900;
+}
+
+/* Trait -> champions relationship lanes. */
+.match-trait-relations{
+  display:grid;
+  gap:7px;
+  margin:6px 0 10px;
+}
+
+.match-trait-link-row{
+  display:grid;
+  grid-template-columns:minmax(150px,auto) 38px minmax(0,1fr);
+  align-items:center;
+  gap:7px;
+  min-width:0;
+}
+
+.match-trait-link-chip{
+  min-width:0;
+  min-height:34px;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:6px 9px 6px 7px;
+  border:1px solid rgba(95,139,177,.18);
+  border-radius:9px;
+  background:linear-gradient(180deg,rgba(12,25,39,.96),rgba(8,18,29,.96));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.018);
+}
+
+.match-trait-link-chip.style-1{border-color:rgba(112,151,188,.20)}
+.match-trait-link-chip.style-2{border-color:rgba(84,205,155,.25)}
+.match-trait-link-chip.style-3{border-color:rgba(235,190,91,.28)}
+.match-trait-link-chip.style-4{border-color:rgba(183,132,255,.29)}
+
+.match-trait-link-chip-icon{
+  position:relative;
+  width:22px;
+  height:22px;
+  flex:0 0 22px;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  border-radius:6px;
+  background:#101c2a;
+  color:#d2dfeb;
+  font-size:8px;
+  font-weight:950;
+}
+
+.match-trait-link-chip-icon>span{
+  position:relative;
+  z-index:1;
+}
+
+.match-trait-link-chip-icon img{
+  position:absolute;
+  inset:2px;
+  z-index:2;
+  width:calc(100% - 4px);
+  height:calc(100% - 4px);
+  object-fit:contain;
+}
+
+.match-trait-link-chip-copy{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.match-trait-link-chip-copy strong{
+  min-width:0;
+  overflow:hidden;
+  color:#dfe9f1;
+  font-size:9.5px;
+  font-weight:900;
+  line-height:1.1;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.match-trait-link-chip-copy b{
+  min-width:18px;
+  height:18px;
+  display:grid;
+  place-items:center;
+  flex:0 0 18px;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:5px;
+  background:rgba(255,255,255,.04);
+  color:#fff;
+  font-size:9px;
+  font-weight:950;
+  line-height:1;
+}
+
+/* A line physically connects the trait to the champions in that lane. */
+.match-trait-link-arrow{
+  position:relative;
+  width:38px;
+  height:20px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  color:#61c9f6;
+}
+
+.match-trait-link-arrow i{
+  position:absolute;
+  left:0;
+  right:8px;
+  top:50%;
+  height:1px;
+  background:linear-gradient(90deg,rgba(92,198,244,.20),rgba(92,198,244,.82));
+  transform:translateY(-50%);
+}
+
+.match-trait-link-arrow b{
+  position:relative;
+  z-index:1;
+  font-size:12px;
+  font-weight:950;
+  line-height:1;
+}
+
+.match-trait-unit-row{
+  min-width:0;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-start;
+  gap:5px;
+}
+
+/* Mini champion nodes used only for trait relationships. */
+.trait-unit-mini{
+  width:58px;
+  min-width:58px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:3px;
+}
+
+.trait-unit-mini-portrait{
+  position:relative;
+  width:34px;
+  height:34px;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  border:1.5px solid #4a5870;
+  border-radius:8px;
+  background:#121b27;
+  color:#cdd9e4;
+  font-size:7px;
+  font-weight:900;
+}
+
+.trait-unit-mini-portrait img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.trait-unit-mini-portrait em{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:1px;
+  z-index:3;
+  color:#ffd86b;
+  font-size:6px;
+  font-style:normal;
+  font-weight:900;
+  line-height:1;
+  text-align:center;
+  text-shadow:0 1px 2px #000;
+}
+
+.trait-unit-mini strong{
+  width:58px;
+  overflow:hidden;
+  color:#aebdca;
+  font-size:6.6px;
+  font-weight:800;
+  line-height:1.05;
+  text-align:center;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* Final board stays unique, but is reordered by the active trait priority. */
+.match-board-order-note{
+  min-height:20px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:8px 0 4px;
+  padding-top:7px;
+  border-top:1px solid rgba(95,139,177,.10);
+}
+
+.match-board-order-note>span{
+  color:#6fcdf5;
+  font-size:5.5px;
+  font-weight:950;
+  letter-spacing:.75px;
+}
+
+.match-board-order-note>small{
+  color:#607389;
+  font-size:6px;
+  font-weight:700;
+}
+
+.match-summary-card-v2 .match-board-class-order{
+  margin-top:4px!important;
+}
+
+/* Old v60 trait-to-trait chain is obsolete once relationship lanes are rendered. */
+.match-summary-card-v2 .match-trait-flow{
+  display:none!important;
+}
+
+@media(max-width:760px){
+  .match-trait-link-row{
+    grid-template-columns:minmax(128px,auto) 28px minmax(0,1fr);
+    gap:5px;
+  }
+
+  .match-trait-link-chip{
+    min-height:31px;
+    padding:5px 7px 5px 6px;
+  }
+
+  .match-trait-link-chip-copy strong{
+    font-size:8.5px;
+  }
+
+  .match-trait-link-arrow{
+    width:28px;
+  }
+
+  .match-trait-unit-row{
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    padding:2px 0 4px;
+    scrollbar-width:none;
+  }
+  .match-trait-unit-row::-webkit-scrollbar{display:none}
+
+  .trait-unit-mini{
+    flex:0 0 54px;
+    width:54px;
+    min-width:54px;
+  }
+
+  .trait-unit-mini-portrait{
+    width:32px;
+    height:32px;
+  }
+
+  .trait-unit-mini strong{
+    width:54px;
+    font-size:6.2px;
+  }
+
+  .match-board-order-note{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:2px;
+  }
+}
+
+@media(max-width:520px){
+  .match-trait-link-row{
+    grid-template-columns:1fr;
+    gap:4px;
+  }
+
+  .match-trait-link-arrow{
+    width:100%;
+    height:10px;
+    justify-content:flex-start;
+  }
+
+  .match-trait-link-arrow i{
+    right:14px;
+  }
+
+  .match-trait-link-arrow b{
+    margin-left:auto;
+  }
+}
