@@ -1325,7 +1325,7 @@ function App() {
             <button className={sitePage==="leaderboard"?"active":""} onClick={()=>{openLeaderboard();setMobileNavOpen(false);}}>{t("nav.leaderboard")}</button>
             <button className={sitePage==="overlay"?"active":""} onClick={()=>{openOverlay();setMobileNavOpen(false);}}>{t("nav.companion")}</button>
           </div>}
-        </div>
+        </div>}
         <div className="topbar-actions">
           <LanguageSwitcher />
           <AccountMenu />
