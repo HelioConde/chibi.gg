@@ -7,20 +7,20 @@ type Props={
   hasProfile:boolean;
 };
 
-const map:Record<string,number[]>={
-  home:[0,10,11],
-  profile:[1,12,16],
-  matches:[2,11,17],
-  overview:[6,13,18],
-  coach:[8,16,21],
-  share:[14,20,12],
-  meta:[7,12,18],
-  comps:[3,19,20],
-  stats:[4,10,18],
-  builder:[5,13,16],
-  leaderboard:[14,17,21],
-  overlay:[15,19,21],
-  legal:[10,20,21],
+const map:Record<string,string[]>={
+  home:[SITE_IMAGES.v2.frames.portraitAlt,SITE_IMAGES.v2.mascots.board,SITE_IMAGES.v2.decor.corner],
+  profile:[SITE_IMAGES.v2.frames.wide,SITE_IMAGES.v2.mascots.scout,SITE_IMAGES.v2.badges.sword],
+  matches:[SITE_IMAGES.v2.frames.portrait,SITE_IMAGES.v2.icons[5],SITE_IMAGES.v2.badges.sword],
+  overview:[SITE_IMAGES.v2.mascots.scout,SITE_IMAGES.v2.icons[6],SITE_IMAGES.v2.frames.square],
+  coach:[SITE_IMAGES.v2.mascots.board,SITE_IMAGES.v2.badges.heart,SITE_IMAGES.v2.frames.landscape],
+  share:[SITE_IMAGES.v2.icons[10],SITE_IMAGES.v2.frames.portraitAlt,SITE_IMAGES.v2.decor.corner],
+  meta:[SITE_IMAGES.v2.icons[8],SITE_IMAGES.v2.frames.landscape,SITE_IMAGES.v2.mascots.scout],
+  comps:[SITE_IMAGES.v2.icons[0],SITE_IMAGES.v2.frames.square,SITE_IMAGES.v2.mascots.board],
+  stats:[SITE_IMAGES.v2.icons[6],SITE_IMAGES.v2.frames.landscape,SITE_IMAGES.v2.badges.rank],
+  builder:[SITE_IMAGES.v2.icons[7],SITE_IMAGES.v2.mascots.board,SITE_IMAGES.v2.frames.landscape],
+  leaderboard:[SITE_IMAGES.v2.badges.rank,SITE_IMAGES.v2.icons[2],SITE_IMAGES.v2.frames.square],
+  overlay:[SITE_IMAGES.v2.mascots.scout,SITE_IMAGES.v2.frames.landscape,SITE_IMAGES.v2.icons[8]],
+  legal:[SITE_IMAGES.v2.frames.portraitAlt,SITE_IMAGES.v2.decor.corner,SITE_IMAGES.v2.icons[3]],
 };
 
 export default function SiteArtworkBackdrop({page,profileTab,hasProfile}:Props){
@@ -31,11 +31,11 @@ export default function SiteArtworkBackdrop({page,profileTab,hasProfile}:Props){
     key="legal";
   }
 
-  const ids=map[key]||map.home;
+  const sources=map[key]||map.home;
   return <div className={"site-art-backdrop site-art-"+key} aria-hidden="true">
-    {ids.map((index,position)=>(
-      <span className={"site-art-frame site-art-frame-"+position} key={key+":"+index}>
-        <AdaptiveArtwork src={SITE_IMAGES.ui.all[index]} alt="" loading={position===0?"eager":"lazy"} decoding="async"/>
+    {sources.map((src,position)=>(
+      <span className={"site-art-frame site-art-frame-"+position} key={key+":"+src}>
+        <AdaptiveArtwork src={src} alt="" loading={position===0?"eager":"lazy"} decoding="async"/>
       </span>
     ))}
   </div>;
