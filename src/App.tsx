@@ -57,6 +57,7 @@ import GlobalSearch from "./components/GlobalSearch";
 import HomeMetaPreview from "./components/HomeMetaPreview";
 import HomeSessionResume from "./components/HomeSessionResume";
 import HomeStudyShelf from "./components/HomeStudyShelf";
+import HomeVisualShowcase from "./components/HomeVisualShowcase";
 import TeamBuilderPage from "./components/TeamBuilderPage";
 import LeaderboardPage from "./components/LeaderboardPage";
 import ProductInfoPage from "./components/ProductInfoPage";
@@ -1412,6 +1413,7 @@ function App() {
               <div className="home-hero-orbit home-hero-orbit-one"></div>
               <div className="home-hero-orbit home-hero-orbit-two"></div>
               <div className="home-product-window">
+                <img className="home-product-reference-art" src={SITE_IMAGES.ui.profile} alt="" aria-hidden="true" decoding="async"/>
                 <div className="home-product-windowbar">
                   <span><i></i><i></i><i></i></span>
                   <small>chibi.gg / player</small>
@@ -1542,6 +1544,13 @@ function App() {
             <div><span>03</span><strong>{t("home.proof.3.title")}</strong><small>{t("home.proof.3.desc")}</small></div>
             <div><span>04</span><strong>{t("home.proof.4.title")}</strong><small>{t("home.proof.4.desc")}</small></div>
           </section>
+
+          <HomeVisualShowcase
+            onOpenProfile={()=>document.getElementById("home-riot-id")?.focus()}
+            onOpenComps={openComps}
+            onOpenStats={()=>openStats("champions")}
+            onOpenCoach={()=>openReviewDemo("coach")}
+          />
 
           <HomeMetaPreview
             staticData={staticData}
