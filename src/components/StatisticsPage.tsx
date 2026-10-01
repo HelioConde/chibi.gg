@@ -236,6 +236,15 @@ export default function StatisticsPage({
     [selectedEntityId,rows],
   );
 
+  const quickRows=useMemo(()=>rows.slice(0,3),[rows]);
+
+  function openQuickRow(id:string){
+    setSelectedEntityId(id);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>
+      document.getElementById("statistics-detail")?.scrollIntoView({behavior:"smooth",block:"start"})
+    ));
+  }
+
   const selectedInterpretation=useMemo(()=>{
     if(!selectedRow)return null;
     const personalRow=selectedRow.personal;
@@ -369,6 +378,44 @@ export default function StatisticsPage({
       <span>{stats?.context.setNumber?"Set "+stats.context.setNumber:t("stats.currentSet")}</span>
     </section>
 
+    {!loading&&!error&&stats&&quickRows.length>0&&<section className="statistics-quick-read">
+      <div className="statistics-quick-head">
+        <div>
+          <span>CHIBI QUICK READ</span>
+          <h2>{t("stats.quick.title")}</h2>
+          <p>{t("stats.quick.desc")}</p>
+        </div>
+      </div>
+
+      <div className="statistics-quick-grid">
+        {quickRows.map((row,index)=>{
+          const label=labelFor(category,row.id,staticData);
+          const image=imageFor(category,row.id,staticData);
+          return <button
+            className={"statistics-quick-card "+(selectedEntityId===row.id?"active":"")}
+            type="button"
+            onClick={()=>openQuickRow(row.id)}
+            key={row.id}
+          >
+            <span className="statistics-quick-rank">{String(index+1).padStart(2,"0")}</span>
+            <span className={"statistics-quick-icon "+category}>
+              {image&&<img src={image} alt="" loading="lazy" decoding="async"/>}
+            </span>
+            <span className="statistics-quick-copy">
+              <small>{categoryLabel}</small>
+              <strong>{label}</strong>
+              <em>{t("stats.quick.sample",{games:row.games})} · {t("stats.quick.average",{average:row.averagePlacement})}</em>
+            </span>
+            <span className="statistics-quick-metrics">
+              <b>Top 4 {row.top4Rate}%</b>
+              <small>Pick {row.pickRate}%</small>
+            </span>
+            <i>{t("stats.quick.open")} →</i>
+          </button>;
+        })}
+      </div>
+    </section>}
+
     <details className="statistics-sample-guide">
       <summary>
         <span><b>{t("stats.sampleGuide.title")}</b><small>{t("stats.sampleGuide.subtitle")}</small></span>
@@ -398,7 +445,7 @@ export default function StatisticsPage({
       </div>
     </details>
 
-    {!loading&&!error&&selectedRow&&<section className={"panel statistics-entity-detail "+(selectedInterpretation?.tone||"neutral")}>
+    {!loading&&!error&&selectedRow&&<section className={"panel statistics-entity-detail "+(selectedInterpretation?.tone||"neutral")} id="statistics-detail">
       <div className="statistics-detail-head">
         <div className="statistics-detail-identity">
           <span className={"statistics-detail-icon "+category}>
