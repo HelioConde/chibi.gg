@@ -45,11 +45,66 @@ function relevanceKey(priority:number){
   return "review.relevance.initial";
 }
 
+function unitCopies(tier:number){
+  return tier>=3?9:tier===2?3:1;
+}
+
+function estimatedBoardValue(match:TftMatch,staticData:TftStaticData|null){
+  return match.units.reduce((sum,unit)=>{
+    const entry=staticEntry(staticData?.champions,unit.characterId);
+    const cost=Math.max(1,Math.min(5,Number(entry?.tier||unit.rarity+1||1)));
+    return sum+cost*unitCopies(Math.max(1,Number(unit.tier)||1));
+  },0);
+}
+
+function equippedItems(match:TftMatch){
+  return match.units.reduce((sum,unit)=>sum+(unit.itemNames?.length||0),0);
+}
+
 export default function ChibiReview({matches,staticData,journalVersion,onEvidence}:Props){
   const { t }=useI18n();
   const leaks=useMemo(()=>buildLeakMap(matches),[matches]);
   const session=useMemo(()=>buildSessionCoach(matches),[matches]);
   const rankedSignals=useMemo(()=>buildRankedReviewSignals(matches),[matches]);
+
+  const signalImpacts=useMemo(()=>{
+    const byId=new Map<string,{label:string;tone:"good"|"warning"|"neutral"}>();
+    for(const signal of rankedSignals){
+      const ids=new Set(signal.matchIds);
+      const related=matches.filter(match=>ids.has(match.id));
+      const rest=matches.filter(match=>!ids.has(match.id));
+      if(related.length<2||rest.length<2)continue;
+      const relatedAvg=avg(related.map(match=>match.placement));
+      const restAvg=avg(rest.map(match=>match.placement));
+      if(relatedAvg==null||restAvg==null)continue;
+      const delta=relatedAvg-restAvg;
+      const magnitude=Math.abs(delta);
+      if(magnitude<.25)continue;
+      byId.set(signal.id,{
+        label:"Impacto observado: "+magnitude.toFixed(2)+" posição "+(delta<0?"melhor":"pior")+" que o restante da amostra",
+        tone:delta<0?"good":"warning",
+      });
+    }
+    return byId;
+  },[rankedSignals,matches]);
+
+  const topBottomComparison=useMemo(()=>{
+    const top=matches.filter(match=>match.placement<=4);
+    const bottom=matches.filter(match=>match.placement>=7);
+    if(top.length<2||bottom.length<2)return null;
+    const summarize=(list:TftMatch[])=>({
+      games:list.length,
+      level:avg(list.map(match=>match.level))??0,
+      gold:avg(list.map(match=>match.goldLeft))??0,
+      board:avg(list.map(match=>estimatedBoardValue(match,staticData)))??0,
+      items:avg(list.map(match=>equippedItems(match)))??0,
+    });
+    return {
+      top:summarize(top),
+      bottom:summarize(bottom),
+      ids:[...top,...bottom].map(match=>match.id),
+    };
+  },[matches,staticData]);
 
   const visualChampionIds=useMemo(()=>{
     const scores=new Map<string,number>();
@@ -241,6 +296,9 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
           <h3>{signal.title}</h3>
           <p>{signal.body}</p>
           <small className="review-signal-evidence">{signal.evidence}</small>
+          {signalImpacts.get(signal.id)&&<small className={"review-signal-impact "+signalImpacts.get(signal.id)!.tone}>
+            {signalImpacts.get(signal.id)!.label}
+          </small>}
           <div>
             <em>{t("review.confidence",{value:t(signal.confidence==="alta"?"common.confidence.high":signal.confidence==="média"?"common.confidence.medium":"common.confidence.low")})}</em>
             {signal.matchIds.length>0&&<button onClick={()=>onEvidence(
@@ -251,6 +309,23 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
         </article>
       ))}
     </div>
+
+    {topBottomComparison&&<section className="coach-outcome-compare">
+      <div className="coach-outcome-compare-head">
+        <div>
+          <span>TOP 4 × BOTTOM 2</span>
+          <h3>O que muda entre suas partidas que convertem e as que quebram</h3>
+          <p>Comparação automática do snapshot final. Diferenças observadas não provam causalidade.</p>
+        </div>
+        <button onClick={()=>onEvidence(topBottomComparison.ids,"Coach · Top 4 vs Bottom 2")}>Ver partidas comparadas</button>
+      </div>
+      <div className="coach-outcome-compare-grid">
+        <article><span>NÍVEL FINAL</span><strong>{topBottomComparison.top.level.toFixed(1)} <i>vs</i> {topBottomComparison.bottom.level.toFixed(1)}</strong><small>Top 4 · Bottom 2</small></article>
+        <article><span>OURO FINAL</span><strong>{topBottomComparison.top.gold.toFixed(1)}g <i>vs</i> {topBottomComparison.bottom.gold.toFixed(1)}g</strong><small>Top 4 · Bottom 2</small></article>
+        <article><span>BOARD EST.</span><strong>{topBottomComparison.top.board.toFixed(0)}g <i>vs</i> {topBottomComparison.bottom.board.toFixed(0)}g</strong><small>custo + estrelas</small></article>
+        <article><span>ITENS EQUIPADOS</span><strong>{topBottomComparison.top.items.toFixed(1)} <i>vs</i> {topBottomComparison.bottom.items.toFixed(1)}</strong><small>{topBottomComparison.top.games} Top 4 · {topBottomComparison.bottom.games} Bottom 2</small></article>
+      </div>
+    </section>}
 
     {sessionComparison&&<section className={"coach-session-review "+sessionComparison.tone}>
       <div className="coach-session-review-head">
