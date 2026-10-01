@@ -97,8 +97,8 @@ export default function LeaderboardPage({staticData,onOpenPlayer}:Props){
       </div>
     </section>
 
-    {loading&&<section className="panel meta-page-state">{t("leaderboard.loading")}</section>}
-    {!loading&&error&&<section className="panel meta-page-state error">{t("leaderboard.loadFailed")}</section>}
+    {loading&&<section className="panel meta-page-state" role="status" aria-live="polite">{t("leaderboard.loading")}</section>}
+    {!loading&&error&&<section className="panel meta-page-state error" role="alert" aria-live="assertive">{t("leaderboard.loadFailed")}</section>}
 
     {!loading&&!error&&data&&<>
       <div className="leaderboard-sample-note">
