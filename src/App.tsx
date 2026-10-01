@@ -1761,28 +1761,39 @@ function App() {
               onOpenBuilder={openBuilder}
             />
 
-            <ChibiLearningPath
-              playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
-              matches={analysisMatches}
-              onEvidence={showEvidence}
-            />
+            <details className="coach-strategy-layer">
+              <summary>
+                <span>
+                  <b>{t("profile.coach.more.title")}</b>
+                  <small>{t("profile.coach.more.desc")}</small>
+                </span>
+                <em>{t("profile.coach.more.action")}</em>
+              </summary>
+              <div className="coach-strategy-content">
+                <ChibiLearningPath
+                  playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
+                  matches={analysisMatches}
+                  onEvidence={showEvidence}
+                />
 
-            <PersonalVsGlobalMeta
-              matches={analysisMatches}
-              setNumber={currentSet}
-              queueId={metaQueueId}
-              staticData={staticData}
-              onEvidence={showEvidence}
-            />
+                <PersonalVsGlobalMeta
+                  matches={analysisMatches}
+                  setNumber={currentSet}
+                  queueId={metaQueueId}
+                  staticData={staticData}
+                  onEvidence={showEvidence}
+                />
 
-            <ChibiFlex
-              matches={analysisMatches}
-              setNumber={currentSet}
-              queueId={metaQueueId}
-              staticData={staticData}
-              onEvidence={showEvidence}
-              onOpenBuilder={openBuilder}
-            />
+                <ChibiFlex
+                  matches={analysisMatches}
+                  setNumber={currentSet}
+                  queueId={metaQueueId}
+                  staticData={staticData}
+                  onEvidence={showEvidence}
+                  onOpenBuilder={openBuilder}
+                />
+              </div>
+            </details>
 
             <details className="coach-secondary-panel coach-learning-layer">
               <summary>
