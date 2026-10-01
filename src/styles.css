@@ -20032,3 +20032,342 @@ body::before{
     background:linear-gradient(180deg,rgba(8,17,28,.52),rgba(8,17,28,.95) 78%);
   }
 }
+
+/* CHIBI MATCH REVIEW FLOW v16 */
+
+/* Larger workspace for post-game review, while keeping the modal readable */
+.match-modal{
+  width:min(1160px,calc(100vw - 32px));
+  padding:20px;
+  scroll-padding-top:82px;
+}
+.match-modal-head{
+  margin-bottom:10px;
+}
+.match-summary-card{
+  margin-bottom:10px!important;
+}
+
+/* Four-step guided review rail */
+.match-review-navigator{
+  position:sticky;
+  top:-1px;
+  z-index:35;
+  display:grid;
+  grid-template-columns:86px minmax(0,1fr);
+  gap:7px;
+  margin:0 0 11px;
+  padding:6px;
+  border:1px solid rgba(91,145,177,.2);
+  border-radius:11px;
+  background:rgba(6,14,23,.93);
+  box-shadow:0 12px 34px rgba(0,0,0,.2);
+  backdrop-filter:blur(16px) saturate(125%);
+}
+.match-review-navigator-result{
+  display:grid;
+  place-content:center;
+  text-align:center;
+  border:1px solid rgba(69,230,223,.16);
+  border-radius:8px;
+  background:rgba(69,230,223,.045);
+}
+.match-review-navigator-result small{
+  color:#6b8196;
+  font-size:6px;
+  font-weight:950;
+  letter-spacing:.8px;
+}
+.match-review-navigator-result strong{
+  margin-top:1px;
+  color:#ecfbff;
+  font-size:18px;
+  line-height:1;
+}
+.match-review-navigator-stages{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:4px;
+}
+.match-review-navigator-stages button{
+  min-width:0;
+  display:grid;
+  grid-template-columns:23px minmax(0,1fr);
+  grid-template-areas:
+    "index label"
+    "index desc";
+  column-gap:7px;
+  align-items:center;
+  padding:7px 8px;
+  border:1px solid transparent;
+  border-radius:8px;
+  background:transparent;
+  color:#8b9aae;
+  text-align:left;
+  transition:background .16s ease,border-color .16s ease,color .16s ease;
+}
+.match-review-navigator-stages button:hover{
+  border-color:rgba(69,230,223,.17);
+  background:rgba(69,230,223,.04);
+  color:#e4f8fa;
+}
+.match-review-navigator-stages button>span{
+  grid-area:index;
+  width:22px;
+  height:22px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(106,144,180,.18);
+  border-radius:7px;
+  background:#0d1a27;
+  color:#64dcd8;
+  font-size:6px;
+  font-weight:950;
+}
+.match-review-navigator-stages b{
+  grid-area:label;
+  overflow:hidden;
+  color:#d7e2ef;
+  font-size:8px;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.match-review-navigator-stages small{
+  grid-area:desc;
+  overflow:hidden;
+  color:#64758a;
+  font-size:6px;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* Each primary stage is one clear answer block */
+.match-review-stage{
+  position:relative;
+  scroll-margin-top:76px;
+  margin:0 0 10px;
+}
+.match-review-stage>.match-review-overview,
+.match-review-stage>.lobby-autopsy,
+.match-review-stage>.match-board-map{
+  margin:0!important;
+}
+.match-stage-with-art{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+}
+.match-stage-with-art>*:not(.match-stage-art){
+  position:relative;
+  z-index:2;
+}
+.match-stage-with-art::before{
+  content:"";
+  position:absolute;
+  z-index:1;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg,rgba(7,15,24,.97) 0%,rgba(7,15,24,.9) 52%,rgba(7,15,24,.58) 100%),
+    linear-gradient(180deg,transparent 35%,rgba(7,15,24,.78) 100%);
+}
+.match-stage-art{
+  position:absolute;
+  z-index:0;
+  top:0;
+  right:0;
+  width:min(46%,500px);
+  height:190px;
+  object-fit:cover;
+  object-position:center top;
+  opacity:.11;
+  filter:saturate(.9) contrast(1.08) brightness(.75);
+  pointer-events:none;
+  mask-image:linear-gradient(90deg,transparent 0%,black 36%);
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,black 36%);
+}
+.match-stage-art-economy{
+  object-position:center 18%;
+}
+.match-stage-art-board{
+  object-position:center 22%;
+}
+.match-stage-art-lobby{
+  object-position:center 14%;
+}
+
+/* Primary cards feel connected rather than separate widgets */
+.match-review-overview,
+.lobby-autopsy-v2,
+.match-board-map{
+  border-color:rgba(95,141,180,.17)!important;
+  border-radius:13px!important;
+  background:
+    linear-gradient(180deg,rgba(13,25,39,.96),rgba(7,16,27,.97))!important;
+  box-shadow:0 14px 36px rgba(0,0,0,.09);
+}
+.match-review-overview-head,
+.autopsy-head,
+.match-board-map-head{
+  position:relative;
+  z-index:3;
+}
+.match-review-priority{
+  border-color:rgba(69,230,223,.18)!important;
+  background:linear-gradient(135deg,rgba(69,230,223,.055),rgba(13,25,39,.56))!important;
+}
+.autopsy-diagnosis{
+  background:rgba(9,20,31,.82)!important;
+}
+.autopsy-priority{
+  border-color:rgba(69,230,223,.14)!important;
+  background:rgba(69,230,223,.035)!important;
+}
+.match-board-confirmed{
+  background:rgba(8,18,29,.74)!important;
+}
+
+/* Secondary analysis stays available but no longer dominates the first screen */
+.match-review-more{
+  scroll-margin-top:76px;
+  margin:0 0 10px;
+  padding:12px;
+  border:1px solid rgba(96,139,178,.16);
+  border-radius:13px;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(148,112,255,.035),transparent 27%),
+    #08131f;
+}
+.match-review-more-head{
+  display:grid;
+  gap:3px;
+  padding:3px 4px 10px;
+}
+.match-review-more-head>span{
+  color:#72e8e3;
+  font-size:7px;
+  font-weight:950;
+  letter-spacing:1px;
+}
+.match-review-more-head>strong{
+  color:#e4edf7;
+  font-size:12px;
+}
+.match-review-more-head>small{
+  color:#6e7e92;
+  font-size:7px;
+  line-height:1.45;
+}
+.match-review-more .match-detail-layer{
+  margin:5px 0 0!important;
+  border-color:rgba(95,137,175,.15)!important;
+  background:#0a1723!important;
+}
+.match-review-more .match-detail-layer>summary{
+  min-height:48px;
+}
+.match-review-more .match-detail-layer[open]{
+  border-color:rgba(69,230,223,.19)!important;
+}
+.match-story-layer .match-story,
+.match-scorecard-layer .match-scorecard{
+  margin:0!important;
+  border:0!important;
+  border-top:1px solid rgba(94,136,175,.12)!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+
+/* Existing lobby detail remains clearly secondary */
+.lobby-layer{
+  margin-top:6px!important;
+  border-color:rgba(96,138,176,.14)!important;
+  background:#08131f!important;
+}
+
+/* Make key readouts more glanceable */
+.match-review-facts{
+  gap:6px!important;
+}
+.match-review-facts article,
+.autopsy-facts-v2>div{
+  border-color:rgba(98,139,177,.14)!important;
+  background:#0b1825!important;
+}
+.match-review-facts article.warning,
+.autopsy-signal.warning{
+  border-color:rgba(255,126,138,.18)!important;
+}
+.match-review-facts article.good,
+.autopsy-signal.good{
+  border-color:rgba(84,216,164,.18)!important;
+}
+
+/* Mobile review becomes a nearly full-screen vertical flow */
+@media(max-width:760px){
+  .match-overlay{
+    padding:0!important;
+    align-items:stretch!important;
+  }
+  .match-modal{
+    width:100%;
+    max-height:100dvh;
+    border-width:0!important;
+    border-radius:0!important;
+    padding:12px;
+    scroll-padding-top:70px;
+  }
+  .match-close{
+    position:fixed;
+    z-index:120;
+    top:9px;
+    right:9px;
+  }
+  .match-review-navigator{
+    top:-1px;
+    grid-template-columns:54px minmax(0,1fr);
+    margin-inline:-3px;
+  }
+  .match-review-navigator-result strong{
+    font-size:14px;
+  }
+  .match-review-navigator-stages{
+    display:flex;
+    overflow-x:auto;
+    gap:3px;
+    scrollbar-width:none;
+  }
+  .match-review-navigator-stages::-webkit-scrollbar{display:none}
+  .match-review-navigator-stages button{
+    flex:0 0 82px;
+    grid-template-columns:18px 1fr;
+    padding:6px;
+  }
+  .match-review-navigator-stages button>span{
+    width:18px;
+    height:18px;
+  }
+  .match-review-navigator-stages small{
+    display:none;
+  }
+  .match-review-stage,
+  .match-review-more{
+    scroll-margin-top:66px;
+  }
+  .match-stage-art{
+    width:100%;
+    height:120px;
+    opacity:.045;
+    mask-image:linear-gradient(180deg,black,transparent 95%);
+    -webkit-mask-image:linear-gradient(180deg,black,transparent 95%);
+  }
+  .match-stage-with-art::before{
+    background:linear-gradient(180deg,rgba(7,15,24,.44),rgba(7,15,24,.96) 86%);
+  }
+  .match-review-more{
+    padding:9px;
+  }
+  .match-review-facts{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+}
