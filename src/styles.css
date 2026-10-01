@@ -22880,3 +22880,247 @@ img[src$="chibi-ui-10.png"],
   border-top:1px solid rgba(100,141,178,.08);
   padding-top:6px!important;
 }
+
+/* CHIBI OUTPUT V2 UI KIT v31 */
+
+/* Organized output-v2 icon set */
+.chibi-nav-icon{
+  width:18px;
+  height:18px;
+  flex:0 0 18px;
+  display:block;
+  object-fit:contain;
+  filter:drop-shadow(0 3px 8px rgba(0,0,0,.24));
+}
+.topbar .product-nav button{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:6px!important;
+}
+.topbar .product-nav button .chibi-nav-icon{
+  width:17px;
+  height:17px;
+  opacity:.72;
+  transition:opacity .16s ease,transform .16s ease,filter .16s ease;
+}
+.topbar .product-nav button:hover .chibi-nav-icon,
+.topbar .product-nav button.active .chibi-nav-icon{
+  opacity:1;
+  transform:translateY(-1px);
+  filter:drop-shadow(0 0 8px rgba(88,231,224,.24));
+}
+.mobile-product-menu-panel button{
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+}
+.mobile-product-menu-panel .chibi-nav-icon{
+  width:24px;
+  height:24px;
+  flex-basis:24px;
+}
+.home-path-index{
+  overflow:visible!important;
+}
+.home-path-index>.chibi-nav-icon{
+  width:29px;
+  height:29px;
+  margin:auto;
+  object-fit:contain;
+}
+.home-path-index>em{
+  position:absolute;
+  right:-5px;
+  bottom:-4px;
+  min-width:18px;
+  height:18px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(69,230,223,.20);
+  border-radius:999px;
+  background:#081522;
+  color:#78e6e1!important;
+  font-size:5.5px!important;
+  font-style:normal;
+}
+
+/* Global desktop HUD now uses the organized transparent pieces */
+.site-hud-v2-rail{
+  position:absolute;
+  z-index:1;
+  top:6px;
+  left:50%;
+  width:min(760px,58vw)!important;
+  height:116px!important;
+  transform:translateX(-50%);
+  object-fit:contain!important;
+  opacity:.075;
+  filter:saturate(.8) brightness(.88);
+  pointer-events:none;
+}
+.site-hud-v2-emblem{
+  position:absolute;
+  z-index:2;
+  width:70px!important;
+  height:70px!important;
+  object-fit:contain!important;
+  opacity:.055;
+  filter:saturate(.8) brightness(.9);
+  pointer-events:none;
+}
+.site-hud-v2-emblem-left{
+  left:18px;
+  bottom:24px;
+}
+.site-hud-v2-emblem-right{
+  right:18px;
+  bottom:24px;
+}
+
+/* Profile: use the wide output-v2 HUD only as a bottom rail */
+.player-v2-hud-rail{
+  position:absolute!important;
+  z-index:1!important;
+  left:50%!important;
+  bottom:-16px!important;
+  width:min(96%,1180px)!important;
+  height:105px!important;
+  transform:translateX(-50%);
+  object-fit:cover!important;
+  object-position:center bottom!important;
+  opacity:.15!important;
+  filter:saturate(.86) brightness(.76);
+  mask-image:linear-gradient(180deg,transparent 0%,black 54%);
+  -webkit-mask-image:linear-gradient(180deg,transparent 0%,black 54%);
+  pointer-events:none!important;
+}
+.player-summary-shell>*:not(.player-summary-reference-art):not(.player-v2-hud-rail){
+  position:relative;
+  z-index:3;
+}
+
+/* Coach uses an actual organized frame + mascot instead of a full screenshot */
+.coach-art-banner-v2{
+  min-height:176px;
+  background:
+    radial-gradient(circle at 74% 48%,rgba(120,84,255,.12),transparent 26%),
+    linear-gradient(135deg,#081522,#0a1725 55%,#07111c)!important;
+}
+.coach-art-banner-v2 .coach-v2-frame{
+  position:absolute!important;
+  z-index:0!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  object-position:center!important;
+  padding:0!important;
+  opacity:.36!important;
+  filter:saturate(.86) brightness(.76);
+}
+.coach-art-banner-v2 .coach-v2-mascot{
+  position:absolute!important;
+  z-index:2!important;
+  right:3%!important;
+  bottom:-12%!important;
+  width:min(330px,34%)!important;
+  height:auto!important;
+  max-height:118%!important;
+  object-fit:contain!important;
+  padding:0!important;
+  opacity:.92!important;
+  filter:drop-shadow(0 18px 35px rgba(0,0,0,.36));
+}
+.coach-art-banner-v2>span{
+  z-index:1!important;
+  background:
+    linear-gradient(90deg,rgba(5,13,22,.92) 0%,rgba(5,13,22,.62) 38%,rgba(5,13,22,.10) 72%,rgba(5,13,22,.24) 100%),
+    linear-gradient(180deg,transparent,rgba(5,13,22,.44))!important;
+}
+.coach-art-banner-v2::after{
+  z-index:4!important;
+}
+
+/* Page heroes get one small semantic emblem from output-v2 */
+.page-hero-with-reference,
+.overlay-page-hero-art{
+  position:relative;
+}
+.v2-hero-emblem{
+  position:absolute!important;
+  z-index:4!important;
+  right:18px!important;
+  bottom:14px!important;
+  width:72px!important;
+  height:72px!important;
+  object-fit:contain!important;
+  padding:0!important;
+  opacity:.82!important;
+  filter:drop-shadow(0 12px 24px rgba(0,0,0,.36));
+  pointer-events:none!important;
+}
+.v2-hero-emblem-ranking{
+  width:86px!important;
+  height:86px!important;
+  opacity:.88!important;
+}
+.v2-hero-emblem-companion{
+  width:94px!important;
+  height:94px!important;
+}
+.v2-hero-emblem-builder{
+  opacity:.9!important;
+}
+
+/* Subtle organized corner language on major cards */
+.player-summary-shell,
+.comp-answer-card-v2,
+.statistics-quick-read,
+.meta-explorer,
+.builder-decision-strip,
+.leaderboard-table-panel,
+.overlay-demo-shell{
+  border-top-color:rgba(118,87,255,.17)!important;
+}
+
+/* Compact client: keep icons, drop large decorative kit pieces */
+.app-shell.compact-layout .site-hud-v2-rail,
+.app-shell.compact-layout .site-hud-v2-emblem,
+.app-shell.compact-layout .player-v2-hud-rail{
+  display:none!important;
+}
+.app-shell.compact-layout .coach-art-banner-v2{
+  display:block!important;
+  height:92px!important;
+  min-height:92px!important;
+  max-height:92px!important;
+}
+.app-shell.compact-layout .coach-art-banner-v2 .coach-v2-frame{
+  display:block!important;
+  opacity:.20!important;
+}
+.app-shell.compact-layout .coach-art-banner-v2 .coach-v2-mascot{
+  display:block!important;
+  width:112px!important;
+  height:112px!important;
+  right:4px!important;
+  bottom:-20px!important;
+  opacity:.78!important;
+}
+.app-shell.compact-layout .v2-hero-emblem{
+  display:block!important;
+  width:46px!important;
+  height:46px!important;
+  right:9px!important;
+  bottom:9px!important;
+  opacity:.62!important;
+}
+.app-shell.compact-layout .v2-hero-emblem-ranking,
+.app-shell.compact-layout .v2-hero-emblem-companion{
+  width:52px!important;
+  height:52px!important;
+}
+.app-shell.compact-layout .home-path-index>.chibi-nav-icon{
+  width:25px;
+  height:25px;
+}
