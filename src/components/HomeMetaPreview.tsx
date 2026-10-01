@@ -84,8 +84,11 @@ export default function HomeMetaPreview({
 
   return <section className="home-meta-preview home-meta-preview-v2">
     <div className="home-meta-intro-v2">
-      <div>
-        <span>{t("metaPreview.kicker")}</span>
+      <div className="home-meta-titleblock">
+        <div className="home-meta-kickerline">
+          <span className="home-section-index">03</span>
+          <span>{t("metaPreview.kicker")}</span>
+        </div>
         <h2>{t("metaPreview.title")}</h2>
         <p>{t("metaPreview.desc")}</p>
       </div>

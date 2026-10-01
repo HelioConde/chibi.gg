@@ -1653,13 +1653,6 @@ function App() {
             onOpenCoach={()=>openReviewDemo("coach")}
           />
 
-          <SectionMarker
-            index="03"
-            kicker={t("home.section.meta.kicker")}
-            title={t("home.section.meta.title")}
-            description={t("home.section.meta.desc")}
-          />
-
           <HomeMetaPreview
             staticData={staticData}
             onOpenMeta={openMeta}
@@ -1667,15 +1660,12 @@ function App() {
             onOpenStats={(category,query="")=>openStats(category,query)}
           />
 
-          <SectionMarker
-            index="04"
-            kicker={t("home.section.builder.kicker")}
-            title={t("home.section.builder.title")}
-            description={t("home.section.builder.desc")}
-          />
           <section className="home-builder-v2">
             <div className="home-builder-copy">
-              <span>{t("home.builder.kicker")}</span>
+              <div className="home-builder-kickerline">
+                <span className="home-section-index">04</span>
+                <span className="home-builder-kicker">{t("home.builder.kicker")}</span>
+              </div>
               <h2>{t("home.builder.title")}</h2>
               <p>{t("home.builder.desc")}</p>
               <button onClick={()=>openBuilder([])}>{t("home.builder.explore")}</button>

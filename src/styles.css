@@ -24475,3 +24475,86 @@ img[src$="chibi-ui-10.png"],
     padding:16px!important;
   }
 }
+
+
+/* CHIBI INTEGRATED SECTION HEADERS v41 */
+
+/* Meta and Builder own their chapter labels so each idea has only one headline. */
+.home-section-index{
+  flex:0 0 auto;
+  width:28px;
+  height:28px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(69,230,223,.18);
+  border-radius:8px;
+  background:linear-gradient(180deg,rgba(69,230,223,.075),rgba(69,230,223,.025));
+  color:#74e5df!important;
+  font-size:7px!important;
+  font-weight:950!important;
+  letter-spacing:.4px!important;
+  box-shadow:inset 0 0 16px rgba(69,230,223,.025);
+}
+
+.home-meta-preview-v2{
+  position:relative;
+  margin-top:28px!important;
+}
+.home-meta-preview-v2::before{
+  content:"";
+  position:absolute;
+  top:-14px;
+  left:0;
+  right:0;
+  height:1px;
+  background:linear-gradient(90deg,rgba(69,230,223,.18),rgba(96,137,177,.05) 42%,transparent 82%);
+}
+.home-meta-titleblock{
+  min-width:0;
+  max-width:720px;
+}
+.home-meta-kickerline,
+.home-builder-kickerline{
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+.home-meta-kickerline>span:not(.home-section-index),
+.home-builder-kicker{
+  color:#72ddd8!important;
+  font-size:6.5px!important;
+  font-weight:950!important;
+  letter-spacing:1px!important;
+  text-transform:uppercase;
+}
+.home-meta-intro-v2 h2{
+  margin-left:0!important;
+}
+
+.home-builder-v2{
+  margin-top:30px!important;
+}
+.home-builder-copy>span{
+  display:none;
+}
+.home-builder-kickerline{
+  margin-bottom:4px;
+}
+.home-builder-kicker{
+  display:block!important;
+}
+
+@media(max-width:640px){
+  .home-section-index{
+    width:25px;
+    height:25px;
+    border-radius:7px;
+    font-size:6px!important;
+  }
+  .home-meta-preview-v2{
+    margin-top:22px!important;
+  }
+  .home-builder-v2{
+    margin-top:24px!important;
+  }
+}
