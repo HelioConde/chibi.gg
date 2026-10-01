@@ -29278,3 +29278,233 @@ img[src$="chibi-ui-10.png"],
     display:none;
   }
 }
+
+
+/* CHIBI TYPOGRAPHY READABILITY v70 */
+
+/* Desktop readability pass: several late density passes pushed supporting text
+   below a comfortable size. Restore a clear type scale without increasing the
+   overall component heights too much. */
+@media(min-width:1100px){
+  /* Player identity */
+  .player-summary-compact .player-summary-copy .eyebrow{
+    font-size:7px!important;
+    letter-spacing:.75px!important;
+  }
+  .player-summary-compact .player-summary-copy h1{
+    font-size:22px!important;
+    line-height:1.04!important;
+  }
+  .player-summary-compact .player-tag{
+    font-size:.62em!important;
+  }
+  .player-summary-compact .player-rank-line strong,
+  .player-summary-compact .player-rank-line span{
+    font-size:7.2px!important;
+    line-height:1.2!important;
+  }
+  .player-summary-compact .player-avatar-wrap>span{
+    font-size:6.6px!important;
+  }
+
+  /* KPI cards */
+  .player-kpi-card>span{
+    font-size:6.5px!important;
+    letter-spacing:.4px!important;
+  }
+  .player-kpi-card>strong{
+    font-size:13.5px!important;
+  }
+  .player-kpi-card>small{
+    font-size:6.3px!important;
+    line-height:1.2!important;
+  }
+
+  /* Riot provenance/status line */
+  .player-summary-compact .riot-data-bar.compact .riot-data-title strong{
+    font-size:6.8px!important;
+  }
+  .player-summary-compact .riot-data-bar.compact .riot-data-title small{
+    font-size:6.3px!important;
+  }
+  .player-summary-compact .riot-data-bar.compact .riot-service-status b{
+    font-size:6.4px!important;
+  }
+  .player-summary-compact .riot-partial-warning{
+    font-size:6.2px!important;
+  }
+
+  /* Today in TFT */
+  .today-tft-head>div>span{
+    font-size:6.8px!important;
+    letter-spacing:.85px!important;
+  }
+  .today-tft-head h2{
+    font-size:18.5px!important;
+  }
+  .today-tft-head p{
+    font-size:7.4px!important;
+    line-height:1.4!important;
+  }
+  .today-tft-head>small{
+    font-size:6.4px!important;
+  }
+
+  .today-card>span:not(.today-card-accent){
+    font-size:6.2px!important;
+  }
+  .today-card h3{
+    font-size:10.5px!important;
+  }
+  .today-card p{
+    font-size:7px!important;
+    line-height:1.35!important;
+  }
+  .today-card>button{
+    min-height:28px!important;
+    font-size:6.6px!important;
+  }
+  .today-tft-foot span,
+  .today-tft-foot button{
+    font-size:6.5px!important;
+  }
+
+  /* Main profile tabs */
+  .profile-tabs-clean .profile-tab-list button,
+  .profile-tabs-clean .profile-tab-actions button{
+    font-size:7.5px!important;
+  }
+
+  /* History section header */
+  .history-section-marker>div>span,
+  .history-section-marker .eyebrow{
+    font-size:7px!important;
+    letter-spacing:.9px!important;
+  }
+  .history-section-marker h2{
+    font-size:20px!important;
+    line-height:1.08!important;
+  }
+  .history-section-marker p{
+    font-size:7.2px!important;
+    line-height:1.4!important;
+  }
+
+  /* Set / queue / filter controls */
+  .history-set-tabs button,
+  .history-queue-tabs button,
+  .history-filter-tabs button{
+    min-height:29px!important;
+    padding:5px 9px!important;
+    font-size:7px!important;
+    line-height:1!important;
+  }
+
+  /* Session header */
+  .profile-history-first .history-session-titleline>span{
+    font-size:8px!important;
+  }
+  .profile-history-first .history-session-titleline>strong{
+    font-size:9.5px!important;
+  }
+  .profile-history-first .history-session-titleline>small{
+    font-size:7px!important;
+  }
+  .profile-history-first .history-session-stats small{
+    font-size:7px!important;
+  }
+  .profile-history-first .history-session-stats b{
+    font-size:10px!important;
+  }
+
+  /* Match metadata */
+  .profile-history-first .match-context-line span{
+    font-size:7.8px!important;
+  }
+  .profile-history-first .match-row-title>div:first-child>strong{
+    font-size:11px!important;
+  }
+  .profile-history-first .match-review-label{
+    font-size:6.7px!important;
+  }
+  .profile-history-first .match-review-inline-label{
+    font-size:8.3px!important;
+  }
+  .profile-history-first .match-review-inline>strong{
+    font-size:9.4px!important;
+  }
+
+  /* Trait group cards */
+  .profile-history-first .match-history-class-copy strong{
+    font-size:8.7px!important;
+  }
+  .profile-history-first .match-history-class-copy small{
+    font-size:6.6px!important;
+  }
+  .profile-history-first .match-history-class-head>b{
+    font-size:8.4px!important;
+  }
+  .profile-history-first .match-history-class-units .unit-card.compact.named .unit-caption{
+    font-size:7.2px!important;
+  }
+
+  /* Augment marker */
+  .profile-history-first .match-history-grouped-augments>span:first-child{
+    font-size:6.5px!important;
+  }
+
+  /* Right-side factual rail */
+  .profile-history-first .match-scan-facts-rail i{
+    font-size:6.3px!important;
+  }
+  .profile-history-first .match-scan-facts-rail b{
+    font-size:7.6px!important;
+  }
+  .profile-history-first .match-value-grid-core b{
+    font-size:9.2px!important;
+  }
+  .profile-history-first .match-value-grid-core small{
+    font-size:6.4px!important;
+  }
+  .profile-history-first .match-meta-open-analysis{
+    font-size:8.2px!important;
+  }
+}
+
+/* Keep tablet text readable too; do not inherit the old 5px-scale typography. */
+@media(min-width:761px) and (max-width:1099px){
+  .player-summary-copy .eyebrow,
+  .today-tft-head>div>span,
+  .history-section-marker>div>span,
+  .history-section-marker .eyebrow{
+    font-size:7px!important;
+  }
+
+  .player-rank-line strong,
+  .player-rank-line span,
+  .today-tft-head p,
+  .today-card p,
+  .history-section-marker p{
+    font-size:7.2px!important;
+  }
+
+  .today-card h3{
+    font-size:10px!important;
+  }
+
+  .history-set-tabs button,
+  .history-queue-tabs button,
+  .history-filter-tabs button{
+    font-size:7px!important;
+  }
+
+  .profile-history-first .match-history-class-copy strong{
+    font-size:8px!important;
+  }
+  .profile-history-first .match-history-class-copy small{
+    font-size:6.3px!important;
+  }
+  .profile-history-first .match-history-class-units .unit-caption{
+    font-size:6.8px!important;
+  }
+}
