@@ -2325,9 +2325,43 @@ function App() {
                 <MatchResultAccent placement={openedMatch.placement} className="match-summary-result-art"/>
                 <div className="match-summary-main">
                   <span>{t("match.finalBoard")}</span>
-                  <h3>{activeTraits(openedMatch).slice(0,2).map((t)=>traitLabel(t,staticData)).filter(Boolean).join(" · ") || "Board TFT"}</h3>
-                  <div className="trait-row">
-                    {activeTraits(openedMatch).slice(0,4).map((trait)=><span className={"trait-chip style-"+Math.max(0,trait.style)} key={trait.name}>{traitLabel(trait,staticData)} {trait.numUnits}</span>)}
+                  <h3 className="match-comp-title" aria-label="Sinergias principais da composição">
+                    {activeTraits(openedMatch).slice(0,2).length
+                      ? activeTraits(openedMatch).slice(0,2).map((trait,index)=>{
+                          const entry=staticEntry(staticData?.traits,trait.name);
+                          const image=staticData?tftAssetUrl(staticData.version,"trait",entry):"";
+                          const label=traitLabel(trait,staticData);
+                          return <span className="match-comp-title-node" key={trait.name}>
+                            {index>0&&<span className="match-comp-title-arrow" aria-hidden="true">→</span>}
+                            <span className={"match-comp-title-icon style-"+Math.max(0,trait.style)} aria-hidden="true">
+                              <span>{label.slice(0,1)}</span>
+                              {image&&<img src={image} alt="" onError={(e)=>{e.currentTarget.style.display="none";}}/>}
+                            </span>
+                            <strong>{label}</strong>
+                          </span>;
+                        })
+                      : "Board TFT"}
+                  </h3>
+                  <div className="match-trait-flow" aria-label="Sinergias ativas da composição">
+                    {activeTraits(openedMatch).slice(0,4).map((trait,index)=>{
+                      const traits=activeTraits(openedMatch).slice(0,4);
+                      const entry=staticEntry(staticData?.traits,trait.name);
+                      const image=staticData?tftAssetUrl(staticData.version,"trait",entry):"";
+                      const label=traitLabel(trait,staticData);
+                      return <span className="match-trait-flow-item" key={trait.name}>
+                        <span className={"match-trait-flow-chip style-"+Math.max(0,trait.style)}>
+                          <span className="match-trait-flow-icon" aria-hidden="true">
+                            <span>{label.slice(0,1)}</span>
+                            {image&&<img src={image} alt="" onError={(e)=>{e.currentTarget.style.display="none";}}/>}
+                          </span>
+                          <span className="match-trait-flow-copy">
+                            <strong>{label}</strong>
+                            <b>{trait.numUnits}</b>
+                          </span>
+                        </span>
+                        {index<traits.length-1&&<span className="match-trait-flow-arrow" aria-hidden="true">→</span>}
+                      </span>;
+                    })}
                   </div>
                   <div className="board-row modal-board">
                     {openedMatch.units.map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact showName key={unit.characterId+index}/>)}
