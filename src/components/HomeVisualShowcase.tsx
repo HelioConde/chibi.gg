@@ -1,4 +1,5 @@
 import { SITE_IMAGES } from "../siteAssets";
+import AdaptiveArtwork from "./AdaptiveArtwork";
 
 type Props={
   onOpenProfile:()=>void;
@@ -31,7 +32,7 @@ export default function HomeVisualShowcase({onOpenProfile,onOpenComps,onOpenStat
         <p>As novas artes viraram direção visual do produto: menos ruído, contexto mais claro e cada tela com um objetivo principal.</p>
       </div>
       <div className="home-visual-showcase-mobile">
-        <img src={SITE_IMAGES.ui.mobile} alt="" loading="lazy" decoding="async"/>
+        <AdaptiveArtwork src={SITE_IMAGES.ui.mobile} alt="" loading="lazy" decoding="async"/>
         <span>Mobile first</span>
       </div>
     </header>
@@ -39,7 +40,7 @@ export default function HomeVisualShowcase({onOpenProfile,onOpenComps,onOpenStat
     <div className="home-visual-showcase-grid">
       {cards.map((card)=>(
         <button className={"home-visual-card home-visual-"+card.key} type="button" onClick={actions[card.action]} key={card.key}>
-          <img src={card.image} alt="" loading="lazy" decoding="async"/>
+          <AdaptiveArtwork src={card.image} alt="" loading="lazy" decoding="async"/>
           <span className="home-visual-card-shade"></span>
           <span className="home-visual-card-copy">
             <small>{card.label}</small>
