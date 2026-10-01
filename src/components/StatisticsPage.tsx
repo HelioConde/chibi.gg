@@ -12,6 +12,7 @@ import {
 } from "../tftStatic";
 import DDragonArt from "./DDragonArt";
 import { useI18n } from "../i18n";
+import { SITE_IMAGES } from "../siteAssets";
 import { saveStudyShelfItem } from "../studyShelf";
 
 export type StatisticsCategory="champions"|"traits"|"items";
@@ -313,7 +314,8 @@ export default function StatisticsPage({
   }
 
   return <main className="statistics-page">
-    <section className="statistics-hero">
+    <section className="statistics-hero page-hero-with-reference">
+      <img className="page-reference-art page-reference-stats" src={SITE_IMAGES.ui.augments} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>{t("common.backProfile")}</button>}
         <span className="eyebrow">CHIBI STATISTICS</span>
