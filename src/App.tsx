@@ -2248,35 +2248,87 @@ function App() {
                               <span className="match-review-inline-action">{t("profile.history.openAnalysis")} →</span>
                             </div>
 
-                            <div className="match-lineup">
-                              <div className="match-history-support">
-                                <div className="trait-row compact-traits">
-                                  {activeTraits(match).slice(0,3).map((trait)=>{
-                                    const entry=staticEntry(staticData?.traits,trait.name);
-                                    const image=staticData?tftAssetUrl(staticData.version,"trait",entry):"";
-                                    return <span className={"trait-chip style-"+Math.max(0,trait.style)} key={trait.name}>
-                                      {image&&<img src={image} alt=""/>}
-                                      {traitLabel(trait,staticData)} {trait.numUnits}
-                                    </span>;
-                                  })}
-                                </div>
+                            <div className="match-lineup match-lineup-grouped">
+                              {(()=>{
+                                const historyTraits=activeTraits(match).slice(0,3);
+                                const groupedIds=new Set(
+                                  historyTraits.flatMap((trait)=>
+                                    match.units
+                                      .filter((unit)=>unitHasTrait(unit,trait,staticData))
+                                      .map((unit)=>unit.characterId)
+                                  )
+                                );
+                                const otherUnits=match.units.filter((unit)=>!groupedIds.has(unit.characterId));
 
-                                {match.augments.length>0&&<div className="match-history-augments" aria-label={t("profile.history.augmentsAria")}>
-                                  {match.augments.slice(0,3).map((augment)=>(
-                                    <AugmentIcon id={augment} staticData={staticData} key={augment}/>
-                                  ))}
-                                </div>}
-                              </div>
+                                return <>
+                                  <div className="match-history-class-groups" aria-label="Campeões organizados por sinergia">
+                                    {historyTraits.map((trait)=>{
+                                      const entry=staticEntry(staticData?.traits,trait.name);
+                                      const image=staticData?tftAssetUrl(staticData.version,"trait",entry):"";
+                                      const label=traitLabel(trait,staticData);
+                                      const relatedUnits=match.units.filter((unit)=>unitHasTrait(unit,trait,staticData));
 
-                              <div className={"board-row compact-board match-history-units "+(
-                                match.units.length>=11
-                                  ?"units-extra"
-                                  :match.units.length>=9
-                                    ?"units-many"
-                                    :""
-                              )} aria-label={t("profile.history.unitsAria",{count:match.units.length})}>
-                                {match.units.map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact showName key={unit.characterId+index}/>)}
-                              </div>
+                                      if(!relatedUnits.length)return null;
+
+                                      return <section className={"match-history-class-group style-"+Math.max(0,trait.style)} key={trait.name}>
+                                        <header className="match-history-class-head">
+                                          <span className="match-history-class-icon" aria-hidden="true">
+                                            <span>{label.slice(0,1)}</span>
+                                            {image&&<img src={image} alt="" onError={(e)=>{e.currentTarget.style.display="none";}}/>}
+                                          </span>
+                                          <span className="match-history-class-copy">
+                                            <strong>{label}</strong>
+                                            <small>{relatedUnits.length} {relatedUnits.length===1?"campeão":"campeões"}</small>
+                                          </span>
+                                          <b>{trait.numUnits}</b>
+                                        </header>
+
+                                        <div className="match-history-class-units">
+                                          {relatedUnits.map((unit,index)=>(
+                                            <UnitVisual
+                                              unit={unit}
+                                              staticData={staticData}
+                                              compact
+                                              showName
+                                              key={trait.name+"-"+unit.characterId+"-"+index}
+                                            />
+                                          ))}
+                                        </div>
+                                      </section>;
+                                    })}
+
+                                    {otherUnits.length>0&&<section className="match-history-class-group match-history-class-group-other">
+                                      <header className="match-history-class-head">
+                                        <span className="match-history-class-icon" aria-hidden="true">+</span>
+                                        <span className="match-history-class-copy">
+                                          <strong>Outros do board</strong>
+                                          <small>fora das principais</small>
+                                        </span>
+                                        <b>{otherUnits.length}</b>
+                                      </header>
+
+                                      <div className="match-history-class-units">
+                                        {otherUnits.map((unit,index)=>(
+                                          <UnitVisual
+                                            unit={unit}
+                                            staticData={staticData}
+                                            compact
+                                            showName
+                                            key={"other-"+unit.characterId+"-"+index}
+                                          />
+                                        ))}
+                                      </div>
+                                    </section>}
+                                  </div>
+
+                                  {match.augments.length>0&&<div className="match-history-grouped-augments" aria-label={t("profile.history.augmentsAria")}>
+                                    <span>AUG</span>
+                                    {match.augments.slice(0,3).map((augment)=>(
+                                      <AugmentIcon id={augment} staticData={staticData} key={augment}/>
+                                    ))}
+                                  </div>}
+                                </>;
+                              })()}
                             </div>
                           </div>
 
