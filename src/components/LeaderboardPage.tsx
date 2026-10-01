@@ -78,7 +78,7 @@ export default function LeaderboardPage({staticData,onOpenPlayer}:Props){
       </div>
     </section>
 
-    <ArtworkRibbon images={[17,21,10]} className="leaderboard-art-ribbon"/>
+    <ArtworkRibbon sources={[SITE_IMAGES.v2.badges.rank,SITE_IMAGES.v2.icons[2],SITE_IMAGES.v2.frames.square]} className="leaderboard-art-ribbon"/>
 
     <section className="leaderboard-toolbar">
       <div className="leaderboard-regions">
