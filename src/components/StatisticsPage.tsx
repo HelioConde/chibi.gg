@@ -326,6 +326,7 @@ export default function StatisticsPage({
 
   return <main className="statistics-page">
     <section className="statistics-hero page-hero-with-reference">
+      <AdaptiveArtwork className="v2-hero-emblem v2-hero-emblem-stats" src={SITE_IMAGES.v2.icons[6]} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
       <AdaptiveArtwork className="page-reference-art page-reference-stats" src={SITE_IMAGES.ui.augments} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>{t("common.backProfile")}</button>}
