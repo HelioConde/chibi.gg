@@ -6,6 +6,7 @@ export type BuilderPreset={
   targetLevel:number;
   units:HexBoardUnit[];
   augments?:string[];
+  note?:string;
   createdAt:number;
 };
 
@@ -23,6 +24,7 @@ export function getBuilderPresets():BuilderPreset[]{
       .map(row=>({
         ...row,
         augments:Array.isArray(row.augments)?row.augments.slice(0,3).map(String):[],
+        note:typeof row.note==="string"?row.note.slice(0,280):"",
         units:row.units.map((unit:HexBoardUnit)=>({
           ...unit,
           role:unit.role==="carry"||unit.role==="tank"||unit.role==="utility"?unit.role:undefined,
@@ -41,6 +43,7 @@ export function saveBuilderPreset(input:Omit<BuilderPreset,"id"|"createdAt">){
     id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),
     createdAt:Date.now(),
     augments:[...(input.augments||[])].slice(0,3),
+    note:String(input.note||"").slice(0,280),
     units:input.units.map(unit=>({...unit,items:[...(unit.items||[])].slice(0,3)})),
   };
 
