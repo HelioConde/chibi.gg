@@ -1,4 +1,5 @@
 import { SITE_IMAGES } from "../siteAssets";
+import AdaptiveArtwork from "./AdaptiveArtwork";
 
 type Props={
   page:string;
@@ -12,13 +13,13 @@ const map:Record<string,number[]>={
   matches:[2,11,17],
   overview:[6,13,18],
   coach:[8,16,21],
-  share:[9,14,20],
+  share:[14,20,12],
   meta:[7,12,18],
   comps:[3,19,20],
   stats:[4,10,18],
   builder:[5,13,16],
   leaderboard:[14,17,21],
-  overlay:[9,15,19],
+  overlay:[15,19,21],
   legal:[10,20,21],
 };
 
@@ -34,7 +35,7 @@ export default function SiteArtworkBackdrop({page,profileTab,hasProfile}:Props){
   return <div className={"site-art-backdrop site-art-"+key} aria-hidden="true">
     {ids.map((index,position)=>(
       <span className={"site-art-frame site-art-frame-"+position} key={key+":"+index}>
-        <img src={SITE_IMAGES.ui.all[index]} alt="" loading={position===0?"eager":"lazy"} decoding="async"/>
+        <AdaptiveArtwork src={SITE_IMAGES.ui.all[index]} alt="" loading={position===0?"eager":"lazy"} decoding="async"/>
       </span>
     ))}
   </div>;
