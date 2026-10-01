@@ -167,6 +167,10 @@ export default function GlobalMetaPage({
     {!loading&&error&&<section className="panel meta-page-state error">{t("meta.loadFailed")}</section>}
 
     {!loading&&!error&&meta&&<>
+      <div className="meta-ranking-sample-note">
+        <strong>Amostra do ranking</strong>
+        <span>{meta.sampleParticipants} participantes observados · Set {meta.context.setNumber??"—"} · {queueId===1100?"Ranqueada":"todas as filas"}</span>
+      </div>
       <section className="meta-signal-grid">
         <article className="panel">
           <span>{t("meta.mostObserved")}</span>
@@ -193,7 +197,7 @@ export default function GlobalMetaPage({
             <span>{t("meta.explorer")}</span>
             <h2>{t("meta.observedTraits")}</h2>
           </div>
-          <small>{t("meta.sortedComposite")}</small>
+          <small>{t("meta.sortedComposite")} · amostra {meta.sampleParticipants}</small>
         </div>
 
         <div className="meta-table-head">
