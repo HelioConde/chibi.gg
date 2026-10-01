@@ -88,6 +88,17 @@ import {
   RecentPlayer,
 } from "./recentPlayers";
 
+function isCompactClient(){
+  if(typeof window==="undefined")return false;
+  const viewport=window.matchMedia("(max-width: 820px)").matches;
+  const coarse=window.matchMedia("(pointer: coarse)").matches;
+  const touch=(navigator.maxTouchPoints||0)>0;
+  const mobileUa=/Android|iPhone|iPad|iPod|Mobile|Silk|Kindle/i.test(navigator.userAgent);
+  const physicalShortSide=Math.min(window.screen?.width||9999,window.screen?.height||9999);
+  const phoneLikeScreen=physicalShortSide<=900;
+  return viewport||mobileUa||(phoneLikeScreen&&(coarse||touch));
+}
+
 function cleanName(value:string){
   return value
     .replace(/^TFT\d+_/i,"")
@@ -420,7 +431,7 @@ function App() {
     query:"",
     view:"stats",
   });
-  const [compactViewport,setCompactViewport]=useState(()=>window.matchMedia("(max-width: 820px)").matches);
+  const [compactViewport,setCompactViewport]=useState(()=>isCompactClient());
   const [mobileNavOpen,setMobileNavOpen]=useState(false);
   const [sitePage,setSitePage]=useState<
     "main"|"meta"|"comps"|"stats"|"builder"|"leaderboard"|"overlay"|"about"|"privacy"|"terms"
@@ -448,13 +459,25 @@ function App() {
 
   useEffect(()=>{
     const mobileMedia=window.matchMedia("(max-width: 820px)");
+    const pointerMedia=window.matchMedia("(pointer: coarse)");
     const syncViewport=()=>{
-      setCompactViewport(mobileMedia.matches);
-      if(!mobileMedia.matches)setMobileNavOpen(false);
+      const next=isCompactClient();
+      setCompactViewport(next);
+      document.documentElement.classList.toggle("chibi-compact-client",next);
+      if(!next)setMobileNavOpen(false);
     };
     syncViewport();
     mobileMedia.addEventListener("change",syncViewport);
-    return ()=>mobileMedia.removeEventListener("change",syncViewport);
+    pointerMedia.addEventListener("change",syncViewport);
+    window.addEventListener("resize",syncViewport,{passive:true});
+    window.addEventListener("orientationchange",syncViewport,{passive:true});
+    return ()=>{
+      document.documentElement.classList.remove("chibi-compact-client");
+      mobileMedia.removeEventListener("change",syncViewport);
+      pointerMedia.removeEventListener("change",syncViewport);
+      window.removeEventListener("resize",syncViewport);
+      window.removeEventListener("orientationchange",syncViewport);
+    };
   },[]);
 
   useEffect(()=>{
@@ -1264,7 +1287,7 @@ function App() {
   }
 
   return (
-    <div className="app-shell">
+    <div className={"app-shell"+(compactViewport?" compact-layout":"")}>
       <header className="topbar">
         <button className="brand brand-button" onClick={resetSearch}>
           <span className="brand-mark brand-mark-image"><img src={SITE_IMAGES.icon} alt=""/></span>
