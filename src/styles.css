@@ -22741,3 +22741,142 @@ img[src$="chibi-ui-10.png"],
     display:none;
   }
 }
+
+/* CHIBI PROFILE SCAN POLISH v30 */
+
+/* Profile tabs feel like one compact control instead of loose buttons */
+.profile-tabs-clean{
+  border:1px solid rgba(96,139,178,.15)!important;
+  border-radius:11px!important;
+  background:rgba(7,16,26,.82)!important;
+  box-shadow:0 10px 30px rgba(0,0,0,.08);
+  backdrop-filter:blur(12px);
+}
+.profile-tabs-clean .profile-tab-list{
+  gap:3px!important;
+}
+.profile-tabs-clean button{
+  position:relative;
+  border-radius:8px!important;
+  transition:background .16s ease,color .16s ease,border-color .16s ease;
+}
+.profile-tabs-clean .profile-tab-list button.active{
+  border-color:rgba(69,230,223,.18)!important;
+  background:rgba(69,230,223,.055)!important;
+  color:#e6ffff!important;
+}
+.profile-tabs-clean .profile-tab-list button.active::after{
+  content:"";
+  position:absolute;
+  left:10px;
+  right:10px;
+  bottom:3px;
+  height:1px;
+  border-radius:999px;
+  background:linear-gradient(90deg,transparent,#64e3de,transparent);
+}
+
+/* Session facts become easier to scan */
+.history-session-stats{
+  gap:5px!important;
+}
+.history-session-stats>span{
+  min-width:54px;
+  padding:6px 8px!important;
+  border:1px solid rgba(98,139,177,.10);
+  border-radius:8px;
+  background:#0b1723;
+}
+.history-session-stats small{
+  color:#66788d!important;
+  font-size:5.5px!important;
+  font-weight:850;
+  letter-spacing:.45px;
+}
+.history-session-stats b{
+  color:#dce7f3!important;
+  font-size:9px!important;
+}
+.history-session-stats .warning{
+  border-color:rgba(255,126,138,.16)!important;
+  background:rgba(255,126,138,.025)!important;
+}
+
+/* Match cues: only a subtle tint, never a full-color card */
+.match-row-v2.cue-good{
+  background:
+    linear-gradient(90deg,rgba(84,216,164,.035),transparent 26%),
+    #091622!important;
+}
+.match-row-v2.cue-bad{
+  background:
+    linear-gradient(90deg,rgba(255,126,138,.035),transparent 26%),
+    #091622!important;
+}
+.match-row-v2.cue-neutral{
+  background:
+    linear-gradient(90deg,rgba(85,168,255,.025),transparent 26%),
+    #091622!important;
+}
+.match-row-v2.cue-good .placement{
+  border-color:rgba(84,216,164,.18);
+}
+.match-row-v2.cue-bad .placement{
+  border-color:rgba(255,126,138,.18);
+}
+.match-row-v2.cue-neutral .placement{
+  border-color:rgba(85,168,255,.15);
+}
+.match-row-v2.cue-good:hover{
+  border-color:rgba(84,216,164,.22)!important;
+}
+.match-row-v2.cue-bad:hover{
+  border-color:rgba(255,126,138,.22)!important;
+}
+
+/* Clearer separation between facts and action */
+.match-meta-rich{
+  border-left:1px solid rgba(100,141,178,.09);
+  padding-left:8px!important;
+}
+.match-fast-read{
+  transition:border-color .16s ease,background .16s ease;
+}
+.match-row-v2:hover .match-fast-read{
+  border-color:rgba(69,230,223,.20)!important;
+}
+
+/* Mobile keeps the same hierarchy without squeezing */
+.app-shell.compact-layout .profile-tabs-clean{
+  top:58px!important;
+  margin-inline:0!important;
+  padding:4px!important;
+}
+.app-shell.compact-layout .profile-tabs-clean .profile-tab-list{
+  width:max-content!important;
+  min-width:100%!important;
+}
+.app-shell.compact-layout .profile-tabs-clean button{
+  min-height:36px!important;
+}
+.app-shell.compact-layout .history-session-head{
+  gap:7px!important;
+}
+.app-shell.compact-layout .history-session-stats{
+  display:flex!important;
+  width:100%!important;
+  overflow-x:auto!important;
+  scrollbar-width:none;
+}
+.app-shell.compact-layout .history-session-stats::-webkit-scrollbar{
+  display:none;
+}
+.app-shell.compact-layout .history-session-stats>span{
+  flex:0 0 auto;
+}
+.app-shell.compact-layout .match-meta-rich{
+  border-left:0;
+  padding-left:0!important;
+  border-top:1px solid rgba(100,141,178,.08);
+  padding-top:6px!important;
+}
