@@ -255,27 +255,14 @@ function normalizeTraitMatchValue(value:string){
     .toLowerCase();
 }
 
-/* Data Dragon occasionally exposes a different trait identifier/name shape than
-   the match payload. Keep a tiny current-set fallback so grouping never becomes
-   an empty visual when the Riot static-data naming drifts. */
-const SET18_TRAIT_MEMBERS:Record<string,string[]>={
-  "congregacao das bruxas":["camille","caitlyn","elise","cassiopeia","morgana"],
-  "coven":["camille","caitlyn","elise","cassiopeia","morgana"],
-  "vanguarda":["rakan","elise","hecarim","diana","azupora","taric"],
-  "vanguard":["rakan","elise","hecarim","diana","azupora","taric"],
-  "devastador":["akali","camille","lobo trevoguari","warwick","diana","rubrivira"],
-  "ravager":["akali","camille","murkwolf","warwick","diana","brambleback"],
-  "slayer":["akali","camille","murkwolf","warwick","diana","brambleback"],
-  "flora fatalis":["soraka","fiddlesticks"],
-};
-
 function unitDisplayName(unit:TftUnit,staticData:TftStaticData|null){
   return staticEntry(staticData?.champions,unit.characterId)?.name||cleanName(unit.characterId);
 }
 
 function unitTraitValues(unit:TftUnit,staticData:TftStaticData|null){
   const entry=staticEntry(staticData?.champions,unit.characterId);
-  const values=Array.isArray(entry?.traits)?entry!.traits!:[];
+  const values=Array.isArray(entry?.traits)?entry.traits:[];
+
   return values.flatMap((value)=>{
     const resolved=staticEntry(staticData?.traits,String(value))?.name||"";
     return [
@@ -292,12 +279,7 @@ function unitHasTrait(unit:TftUnit,trait:TftTrait,staticData:TftStaticData|null)
     normalizeTraitMatchValue(traitLabel(trait,staticData)),
   ].filter(Boolean);
 
-  if(targets.some((value)=>unitValues.has(value)))return true;
-
-  const unitName=normalizeTraitMatchValue(unitDisplayName(unit,staticData));
-  return targets.some((target)=>
-    (SET18_TRAIT_MEMBERS[target]||[]).some((member)=>normalizeTraitMatchValue(member)===unitName)
-  );
+  return targets.some((value)=>unitValues.has(value));
 }
 
 function unitTraitPriority(unit:TftUnit,traits:TftTrait[],staticData:TftStaticData|null){
