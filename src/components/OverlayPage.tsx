@@ -180,7 +180,7 @@ export default function OverlayPage({
 
   return <main className="overlay-page">
     <section className="overlay-page-hero overlay-page-hero-art">
-      <img className="overlay-page-art" src={SITE_IMAGES.art} alt="" aria-hidden="true"/>
+      <img className="overlay-page-art" src={SITE_IMAGES.ui.all[15]} alt="" aria-hidden="true" loading="eager" decoding="async"/>
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>{t("common.backProfile")}</button>}
         <span className="eyebrow">CHIBI COMPANION · REVIEW FIRST</span>
