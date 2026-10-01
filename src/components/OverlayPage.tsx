@@ -199,7 +199,7 @@ export default function OverlayPage({
       </div>
     </section>
 
-    <ArtworkRibbon images={[19,21,11]} className="overlay-art-ribbon"/>
+    <ArtworkRibbon sources={[SITE_IMAGES.v2.mascots.scout,SITE_IMAGES.v2.icons[8],SITE_IMAGES.v2.frames.landscape]} className="overlay-art-ribbon"/>
 
     {activeSession&&<section className="panel overlay-session-focus">
       <div className="overlay-session-focus-head">
