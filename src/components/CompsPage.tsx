@@ -280,6 +280,14 @@ export default function CompsPage({
     return t("comps.spot.fallback");
   }
 
+  function selectDecisionComp(comp:typeof enriched[number] | null){
+    if(!comp)return;
+    setSelectedCompId(comp.id);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>
+      document.getElementById("comp-guide")?.scrollIntoView({behavior:"smooth",block:"start"})
+    ));
+  }
+
   return <main className="comps-page comps-page-v2">
     <section className="comps-hero page-hero-with-reference">
       <img className="page-reference-art page-reference-comps" src={SITE_IMAGES.ui.comps} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
@@ -358,7 +366,37 @@ export default function CompsPage({
         </div>
       </section>}
 
-      {selectedComp&&<section className="panel comp-guide-panel comp-guide-panel-v2">
+      <section className="comp-decision-strip" aria-label={t("comps.quick.title")}>
+        <div className="comp-decision-strip-head">
+          <div>
+            <span>CHIBI QUICK READ</span>
+            <h2>{t("comps.quick.title")}</h2>
+            <p>{t("comps.quick.desc")}</p>
+          </div>
+        </div>
+        <div className="comp-decision-cards">
+          {([
+            {id:"stable",label:t("comps.quick.stable"),comp:mostStable,metric:mostStable?mostStable.volatility.toFixed(2):"—",hint:t("comps.stability")},
+            {id:"popular",label:t("comps.quick.popular"),comp:mostPopular,metric:mostPopular?String(mostPopular.games):"—",hint:t("comps.games")},
+            {id:"emerging",label:t("comps.quick.emerging"),comp:emerging,metric:emerging?String(emerging.averagePlacement):"—",hint:t("common.average")},
+          ] as const).map(card=>(
+            <button
+              className={"comp-decision-card "+card.id+(selectedComp?.id===card.comp?.id?" active":"")}
+              type="button"
+              onClick={()=>selectDecisionComp(card.comp)}
+              disabled={!card.comp}
+              key={card.id}
+            >
+              <span>{card.label}</span>
+              <strong>{card.comp?compLabel(card.comp):t("comps.noSignal")}</strong>
+              <div><b>{card.metric}</b><small>{card.hint}</small></div>
+              <em>{t("comps.quick.open")} →</em>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {selectedComp&&<section className="panel comp-guide-panel comp-guide-panel-v2" id="comp-guide">
         <div className="comp-guide-head">
           <div>
             <span>{t("comps.guide")}</span>
@@ -470,26 +508,6 @@ export default function CompsPage({
           </article>
         </div>
       </section>}
-
-      <section className="comp-signal-grid">
-        <article className="panel">
-          <span>{t("comps.mostStable")}</span>
-          <h3>{mostStable?compLabel(mostStable):t("comps.noSignal")}</h3>
-          <p>{mostStable
-            ?t("comps.stableSummary",{volatility:mostStable.volatility,games:mostStable.games,confidence:confidenceText(mostStable.confidence)})
-            :t("comps.waitSample")}</p>
-        </article>
-        <article className="panel">
-          <span>{t("comps.mostObserved")}</span>
-          <h3>{mostPopular?compLabel(mostPopular):t("comps.noSignal")}</h3>
-          <p>{mostPopular?t("comps.popularSummary",{games:mostPopular.games,average:mostPopular.averagePlacement,confidence:confidenceText(mostPopular.confidence)}):t("comps.waitSample")}</p>
-        </article>
-        <article className="panel">
-          <span>{t("comps.emerging")}</span>
-          <h3>{emerging?compLabel(emerging):t("common.notAvailableYet")}</h3>
-          <p>{emerging?t("comps.emergingSummary",{games:emerging.games,average:emerging.averagePlacement,confidence:confidenceText(emerging.confidence)}):t("comps.noEmerging")}</p>
-        </article>
-      </section>
 
       <section className="panel comp-explorer comp-explorer-v2">
         <div className="meta-explorer-head">
