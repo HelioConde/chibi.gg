@@ -16,6 +16,7 @@ import {
 import { useI18n } from "../i18n";
 import { SITE_IMAGES } from "../siteAssets";
 import AdaptiveArtwork from "./AdaptiveArtwork";
+import ArtworkRibbon from "./ArtworkRibbon";
 
 type Props={
   staticData:TftStaticData|null;
@@ -1181,6 +1182,8 @@ export default function TeamBuilderPage({
         </div>
       </div>
     </section>
+
+    <ArtworkRibbon images={[16,5,12]} className="builder-art-ribbon"/>
 
     <section className="builder-decision-strip">
       <div className={"builder-decision-card "+decision.tone}>
