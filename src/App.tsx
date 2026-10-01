@@ -2182,10 +2182,10 @@ function App() {
                                 <span title={t("profile.history.augmentsAria")} aria-label={t("profile.history.augmentsAria")}>
                                   <i>✦</i><b>{match.augments.length}</b>
                                 </span>
-                                <span title="Itens equipados" aria-label={"Itens equipados: "+equippedItemCount}>
+                                <span title={t("stats.category.items")+": "+equippedItemCount} aria-label={t("stats.category.items")+": "+equippedItemCount}>
                                   <i>◇</i><b>{equippedItemCount}</b>
                                 </span>
-                                {threeStarCount>0&&<span className="three-star" title="Unidades 3 estrelas" aria-label={"Unidades 3 estrelas: "+threeStarCount}>
+                                {threeStarCount>0&&<span className="three-star" title={t("reviewQueue.signal.threeStar")+": "+threeStarCount} aria-label={t("reviewQueue.signal.threeStar")+": "+threeStarCount}>
                                   <i>★</i><b>{threeStarCount}</b>
                                 </span>}
                               </div>
