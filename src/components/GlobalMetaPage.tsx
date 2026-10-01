@@ -5,6 +5,7 @@ import DDragonArt from "./DDragonArt";
 import { useI18n } from "../i18n";
 import { SITE_IMAGES } from "../siteAssets";
 import AdaptiveArtwork from "./AdaptiveArtwork";
+import ArtworkRibbon from "./ArtworkRibbon";
 
 type Props={
   staticData:TftStaticData|null;
@@ -125,6 +126,8 @@ export default function GlobalMetaPage({
         <b>{t(maturity==="robusta"?"common.maturity.robust":maturity==="crescendo"?"common.maturity.growing":"common.maturity.initial")}</b>
       </div>
     </div>
+
+    <ArtworkRibbon images={[10,12,17]} className="meta-art-ribbon"/>
 
     <section className="meta-hub-links">
       <button className="active">
