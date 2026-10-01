@@ -350,7 +350,7 @@ export default function StatisticsPage({
       </div>
     </section>
 
-    <ArtworkRibbon images={[10,18,4]} className="stats-art-ribbon"/>
+    <ArtworkRibbon sources={[SITE_IMAGES.v2.icons[6],SITE_IMAGES.v2.badges.rank,SITE_IMAGES.v2.frames.landscape]} className="stats-art-ribbon"/>
 
     <section className="statistics-toolbar">
       <div className="statistics-categories">
