@@ -765,9 +765,10 @@ function App() {
     const recentAvg=avg(recent);
     const previousAvg=avg(previous);
     const delta=recentAvg-previousAvg;
-    if(delta<=-.45) return {label:t("profile.trend.improving"),detail:t("profile.trend.vsBefore",{recent:recentAvg.toFixed(2),previous:previousAvg.toFixed(2)}),tone:"good"};
-    if(delta>=.45) return {label:t("profile.trend.worsening"),detail:t("profile.trend.vsBefore",{recent:recentAvg.toFixed(2),previous:previousAvg.toFixed(2)}),tone:"warning"};
-    return {label:t("profile.trend.stable"),detail:t("profile.trend.vsBefore",{recent:recentAvg.toFixed(2),previous:previousAvg.toFixed(2)}),tone:""};
+    const detail="Últimas "+window+": "+recentAvg.toFixed(2)+" · "+window+" anteriores: "+previousAvg.toFixed(2)+" · referência Top 4 ≤ 4.00";
+    if(delta<=-.45) return {label:t("profile.trend.improving"),detail,tone:"good"};
+    if(delta>=.45) return {label:t("profile.trend.worsening"),detail,tone:"warning"};
+    return {label:t("profile.trend.stable"),detail,tone:""};
   },[analysisMatches,t]);
 
   const historyBaseMatches=useMemo(()=>{
