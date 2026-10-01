@@ -4,7 +4,17 @@ import { supabase } from "../supabase";
 
 type Mode="login"|"signup";
 
-export default function AccountMenu(){
+type Props={
+  riotGameName?:string;
+  riotTagLine?:string;
+  riotProfileIcon?:string;
+};
+
+export default function AccountMenu({
+  riotGameName,
+  riotTagLine,
+  riotProfileIcon,
+}:Props){
   const [session,setSession]=useState<Session|null>(null);
   const [open,setOpen]=useState(false);
   const [mode,setMode]=useState<Mode>("login");
@@ -54,78 +64,96 @@ export default function AccountMenu(){
 
   async function logout(){
     setBusy(true);
-    try{ await supabase.auth.signOut({scope:"global"}); setOpen(false); }
-    finally{ setBusy(false); }
+    try{
+      await supabase.auth.signOut({scope:"global"});
+      setOpen(false);
+    }finally{
+      setBusy(false);
+    }
   }
 
-  const userLabel=session?.user?.email||"Conta";
+  const hasRiotIdentity=Boolean(riotGameName);
+  const primaryLabel=riotGameName|| (session?"Minha conta":"Entrar");
+  const secondaryLabel=hasRiotIdentity
+    ? (riotTagLine?"#"+riotTagLine:"Riot ID")
+    : (session?"Chibi conectado":"Conta Chibi");
 
-  return <div style={{position:"relative"}}>
+  return <div className="account-menu">
     <button
-      className="ghost-button"
+      className={"account-menu-trigger"+(hasRiotIdentity?" has-riot-id":"")}
       onClick={()=>setOpen(value=>!value)}
       aria-expanded={open}
-      title={session?"Conta Chibi":"Entrar no Chibi"}
+      title={hasRiotIdentity
+        ? "Riot ID: "+riotGameName+(riotTagLine?"#"+riotTagLine:"")
+        : session?"Conta Chibi":"Entrar no Chibi"}
+      type="button"
     >
-      {session?"● "+userLabel.split("@")[0]:"Conta"}
+      <span className="account-menu-avatar" aria-hidden="true">
+        {riotProfileIcon
+          ?<img src={riotProfileIcon} alt="" onError={(event)=>{event.currentTarget.style.display="none";}}/>
+          :<span>{primaryLabel.slice(0,1).toUpperCase()}</span>}
+      </span>
+      <span className="account-menu-copy">
+        <strong>{primaryLabel}</strong>
+        <small>{secondaryLabel}</small>
+      </span>
+      <span className="account-menu-chevron" aria-hidden="true">⌄</span>
     </button>
 
     {open&&<div
+      className="account-menu-panel"
       role="dialog"
       aria-label="Conta Chibi"
-      style={{
-        position:"absolute",
-        right:0,
-        top:"calc(100% + 12px)",
-        width:320,
-        maxWidth:"calc(100vw - 28px)",
-        zIndex:80,
-        padding:18,
-        border:"1px solid #2a3042",
-        borderRadius:14,
-        background:"#101522",
-        boxShadow:"0 18px 55px rgba(0,0,0,.45)",
-      }}
     >
+      {hasRiotIdentity&&<div className="account-riot-identity">
+        <span className="account-riot-avatar" aria-hidden="true">
+          {riotProfileIcon
+            ?<img src={riotProfileIcon} alt="" onError={(event)=>{event.currentTarget.style.display="none";}}/>
+            :riotGameName?.slice(0,1).toUpperCase()}
+        </span>
+        <span>
+          <small>RIOT ID EM USO</small>
+          <strong>{riotGameName}<em>{riotTagLine?"#"+riotTagLine:""}</em></strong>
+        </span>
+      </div>}
+
       {session?<>
-        <div style={{display:"grid",gap:8}}>
-          <strong>Conta Chibi</strong>
-          <small style={{color:"#9ca5b8",wordBreak:"break-all"}}>{session.user.email}</small>
-          <small style={{color:"#7f8aa3"}}>Seu Companion poderá usar esta conta para enviar partidas gravadas após o jogo.</small>
-          <button className="ghost-button" disabled={busy} onClick={logout} style={{marginLeft:0}}>
-            Sair
-          </button>
+        <div className="account-session-block">
+          <span>CONTA CHIBI</span>
+          <strong>{session.user.email?.split("@")[0]||"Conta conectada"}</strong>
+          <small>{session.user.email}</small>
+          <p>Seu Companion pode usar esta conta para enviar partidas gravadas após o jogo.</p>
         </div>
+        <button className="ghost-button account-menu-action" disabled={busy} onClick={logout}>
+          {busy?"Saindo...":"Sair da conta"}
+        </button>
       </>:<>
-        <div style={{display:"flex",gap:8,marginBottom:14}}>
+        <div className="account-auth-tabs">
           <button
             className={mode==="login"?"ghost-button active":"ghost-button"}
             onClick={()=>{setMode("login");setMessage("");}}
             type="button"
-            style={{marginLeft:0,flex:1}}
           >Entrar</button>
           <button
             className={mode==="signup"?"ghost-button active":"ghost-button"}
             onClick={()=>{setMode("signup");setMessage("");}}
             type="button"
-            style={{marginLeft:0,flex:1}}
           >Criar conta</button>
         </div>
 
-        <form onSubmit={submit} style={{display:"grid",gap:10}}>
-          <label style={{display:"grid",gap:5,fontSize:12,color:"#aab2c4"}}>
-            E-mail
+        <form onSubmit={submit} className="account-auth-form">
+          <label>
+            <span>E-mail</span>
             <input
               type="email"
               autoComplete="email"
               required
               value={email}
               onChange={event=>setEmail(event.target.value)}
-              style={{padding:"10px 11px",borderRadius:9,border:"1px solid #2a3042",background:"#0b0f19",color:"#f5f7ff"}}
             />
           </label>
-          <label style={{display:"grid",gap:5,fontSize:12,color:"#aab2c4"}}>
-            Senha
+          <label>
+            <span>Senha</span>
             <input
               type="password"
               autoComplete={mode==="signup"?"new-password":"current-password"}
@@ -133,14 +161,13 @@ export default function AccountMenu(){
               minLength={8}
               value={password}
               onChange={event=>setPassword(event.target.value)}
-              style={{padding:"10px 11px",borderRadius:9,border:"1px solid #2a3042",background:"#0b0f19",color:"#f5f7ff"}}
             />
           </label>
-          <button className="ghost-button" disabled={busy} type="submit" style={{marginLeft:0}}>
+          <button className="ghost-button account-menu-action" disabled={busy} type="submit">
             {busy?"Aguarde...":mode==="signup"?"Criar conta":"Entrar"}
           </button>
         </form>
-        {message&&<small style={{display:"block",marginTop:10,color:"#b8c1d6"}}>{message}</small>}
+        {message&&<small className="account-auth-message">{message}</small>}
       </>}
     </div>}
   </div>;
