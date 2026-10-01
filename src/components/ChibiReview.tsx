@@ -266,7 +266,7 @@ export default function ChibiReview({matches,staticData,journalVersion,onEvidenc
   return <section className="panel chibi-review coach-review">
     <div className="review-head coach-review-head">
       <div className="coach-review-copy">
-        <span>CHIBI REVIEW</span>
+        <span>COACH · REVISÃO PRIORIZADA</span>
         <h2>{t("review.title")}</h2>
         <p>{t("review.desc")}</p>
         <DDragonArt
