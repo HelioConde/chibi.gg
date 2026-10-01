@@ -25512,3 +25512,40 @@ img[src$="chibi-ui-10.png"],
     justify-self:start;
   }
 }
+
+
+/* CHIBI MATCH TIP READABILITY v49 */
+
+.match-fast-read-inline{
+  min-height:30px!important;
+  padding:5px 8px!important;
+  gap:8px!important;
+}
+
+.match-fast-read-inline>span{
+  font-size:5.6px!important;
+  padding:3px 6px!important;
+}
+
+.match-fast-read-inline>strong{
+  font-size:7.8px!important;
+  line-height:1.3!important;
+  letter-spacing:.01em;
+}
+
+.match-fast-read-inline>small{
+  font-size:5.4px!important;
+}
+
+@media(max-width:760px){
+  .match-fast-read-inline>span{
+    font-size:6px!important;
+  }
+  .match-fast-read-inline>strong{
+    font-size:8.5px!important;
+    line-height:1.35!important;
+  }
+  .match-fast-read-inline>small{
+    font-size:5.8px!important;
+  }
+}
