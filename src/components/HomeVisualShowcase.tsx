@@ -10,7 +10,8 @@ type Props={
 const cards=[
   {key:"history",label:"Match History",title:"Leia a partida sem caçar informação",image:SITE_IMAGES.ui.history,action:"profile"},
   {key:"comps",label:"Comps",title:"Composição, itens e plano no mesmo contexto",image:SITE_IMAGES.ui.comps,action:"comps"},
-  {key:"positioning",label:"Board Review",title:"Posicionamento visual para entender a luta",image:SITE_IMAGES.ui.positioning,action:"stats"},
+  {key:"augments",label:"Augments & Items",title:"Escolhas com contexto, taxa e sinergia",image:SITE_IMAGES.ui.augments,action:"stats"},
+  {key:"positioning",label:"Board Review",title:"Posicionamento visual para entender a luta",image:SITE_IMAGES.ui.positioning,action:"profile"},
   {key:"coach",label:"Chibi Coach",title:"Insights transformados em próxima ação",image:SITE_IMAGES.ui.coach,action:"coach"},
 ] as const;
 
