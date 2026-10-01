@@ -163,8 +163,8 @@ export default function GlobalMetaPage({
       <span>{meta?.context.setNumber?("Set "+meta.context.setNumber):t("common.waitingData")}</span>
     </div>
 
-    {loading&&<section className="panel meta-page-state">{t("meta.loading")}</section>}
-    {!loading&&error&&<section className="panel meta-page-state error">{t("meta.loadFailed")}</section>}
+    {loading&&<section className="panel meta-page-state" role="status" aria-live="polite">{t("meta.loading")}</section>}
+    {!loading&&error&&<section className="panel meta-page-state error" role="alert" aria-live="assertive">{t("meta.loadFailed")}</section>}
 
     {!loading&&!error&&meta&&<>
       <div className="meta-ranking-sample-note">
