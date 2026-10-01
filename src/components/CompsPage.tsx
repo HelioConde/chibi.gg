@@ -6,6 +6,7 @@ import { saveStudyShelfItem } from "../studyShelf";
 import { useI18n } from "../i18n";
 import { SITE_IMAGES } from "../siteAssets";
 import AdaptiveArtwork from "./AdaptiveArtwork";
+import ArtworkRibbon from "./ArtworkRibbon";
 
 type Props={
   staticData:TftStaticData|null;
@@ -313,6 +314,8 @@ export default function CompsPage({
         <b>{t(maturity==="robusta"?"common.maturity.robust":maturity==="crescendo"?"common.maturity.growing":"common.maturity.initial")}</b>
       </div>
     </section>
+
+    <ArtworkRibbon images={[19,20,11]} className="comps-art-ribbon"/>
 
     <div className="meta-toolbar">
       <div>
