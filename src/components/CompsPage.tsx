@@ -292,6 +292,7 @@ export default function CompsPage({
 
   return <main className="comps-page comps-page-v2">
     <section className="comps-hero page-hero-with-reference">
+      <AdaptiveArtwork className="v2-hero-emblem v2-hero-emblem-comps" src={SITE_IMAGES.v2.icons[0]} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
       <AdaptiveArtwork className="page-reference-art page-reference-comps" src={SITE_IMAGES.ui.comps} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>{t("common.backProfile")}</button>}
