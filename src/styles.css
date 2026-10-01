@@ -23450,3 +23450,146 @@ img[src$="chibi-ui-10.png"],
     height:31px!important;
   }
 }
+
+
+/* CHIBI SEMANTIC V2 ACCENTS v34 */
+
+/* Small semantic pieces from output-v2 now identify page context without taking layout space. */
+.meta-dataset-card,
+.builder-summary-v2,
+.leaderboard-context,
+.overlay-beta-card,
+.comp-answer-card-v2,
+.statistics-quick-read,
+.overlay-session-focus{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+}
+
+.v2-panel-accent{
+  position:absolute!important;
+  z-index:0!important;
+  right:-10px!important;
+  bottom:-14px!important;
+  width:86px!important;
+  height:86px!important;
+  display:block!important;
+  pointer-events:none!important;
+  user-select:none!important;
+  opacity:.18!important;
+  transform:rotate(-4deg);
+}
+.v2-panel-accent>.adaptive-artwork{
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  padding:0!important;
+  opacity:1!important;
+  filter:saturate(.98) contrast(1.04) brightness(.9) drop-shadow(0 12px 26px rgba(0,0,0,.24))!important;
+}
+.v2-panel-accent-meta{opacity:.13!important}
+.v2-panel-accent-comps{opacity:.16!important}
+.v2-panel-accent-stats,
+.v2-panel-accent-ranking{
+  opacity:.20!important;
+  filter:drop-shadow(0 0 12px rgba(236,190,85,.08));
+}
+.v2-panel-accent-builder{opacity:.16!important}
+.v2-panel-accent-companion{opacity:.19!important}
+.v2-panel-accent-positive{opacity:.16!important}
+
+.v2-panel-accent-feature{
+  right:10px!important;
+  bottom:8px!important;
+  width:108px!important;
+  height:108px!important;
+  opacity:.10!important;
+}
+
+.meta-dataset-card>*:not(.v2-panel-accent),
+.builder-summary-v2>*:not(.v2-panel-accent),
+.leaderboard-context>*:not(.v2-panel-accent),
+.overlay-beta-card>*:not(.v2-panel-accent),
+.comp-answer-card-v2>*:not(.v2-panel-accent),
+.statistics-quick-read>*:not(.v2-panel-accent),
+.overlay-session-focus>*:not(.v2-panel-accent){
+  position:relative;
+  z-index:1;
+}
+
+/* Page hero references are now transparent output-v2 pieces instead of old full mockups. */
+.page-reference-v2-piece{
+  object-fit:contain!important;
+  object-position:right center!important;
+  padding:10px!important;
+  opacity:.20!important;
+  filter:saturate(.92) contrast(1.05) brightness(.78) drop-shadow(0 16px 32px rgba(0,0,0,.20))!important;
+  mask-image:linear-gradient(90deg,transparent 5%,black 42%,black 100%)!important;
+  -webkit-mask-image:linear-gradient(90deg,transparent 5%,black 42%,black 100%)!important;
+}
+.builder-reference-art.page-reference-v2-piece{
+  object-position:right bottom!important;
+  opacity:.16!important;
+}
+.leaderboard-reference-art.page-reference-v2-piece{
+  opacity:.18!important;
+}
+.overlay-page-art.page-reference-v2-piece{
+  object-fit:contain!important;
+  opacity:.18!important;
+}
+
+/* Companion demo now uses the transparent v2 HUD piece as a lower frame. */
+.overlay-hud-art-v2{
+  inset:auto 0 0!important;
+  width:100%!important;
+  height:150px!important;
+  object-fit:contain!important;
+  object-position:center bottom!important;
+  opacity:.20!important;
+  filter:saturate(.92) brightness(.84) drop-shadow(0 -12px 30px rgba(0,0,0,.20))!important;
+}
+.overlay-brand-image img{
+  object-fit:contain!important;
+  transform:scale(1.06);
+}
+
+@media(max-width:820px){
+  .v2-panel-accent{
+    right:-8px!important;
+    bottom:-9px!important;
+    width:58px!important;
+    height:58px!important;
+    opacity:.11!important;
+  }
+  .v2-panel-accent-feature{
+    right:4px!important;
+    bottom:4px!important;
+    width:72px!important;
+    height:72px!important;
+    opacity:.075!important;
+  }
+  .page-reference-v2-piece{
+    opacity:.10!important;
+    max-width:42%!important;
+    padding:4px!important;
+  }
+  .overlay-hud-art-v2{
+    height:92px!important;
+    opacity:.11!important;
+  }
+}
+
+@media(max-width:420px){
+  .v2-panel-accent{
+    width:48px!important;
+    height:48px!important;
+    opacity:.09!important;
+  }
+  .v2-panel-accent-feature{
+    width:60px!important;
+    height:60px!important;
+  }
+}

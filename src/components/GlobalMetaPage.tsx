@@ -6,6 +6,7 @@ import { useI18n } from "../i18n";
 import { SITE_IMAGES } from "../siteAssets";
 import AdaptiveArtwork from "./AdaptiveArtwork";
 import ArtworkRibbon from "./ArtworkRibbon";
+import V2PanelAccent from "./V2PanelAccent";
 
 type Props={
   staticData:TftStaticData|null;
@@ -106,7 +107,7 @@ export default function GlobalMetaPage({
   return <main className="global-meta-page">
     <div className="global-meta-hero page-hero-with-reference">
       <AdaptiveArtwork className="v2-hero-emblem v2-hero-emblem-meta" src={SITE_IMAGES.v2.icons[8]} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
-      <AdaptiveArtwork className="page-reference-art page-reference-meta" src={SITE_IMAGES.ui.comparison} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
+      <AdaptiveArtwork className="page-reference-art page-reference-meta page-reference-v2-piece" src={SITE_IMAGES.v2.frames.landscapeSecondary} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>{t("common.backProfile")}</button>}
         <span className="eyebrow">CHIBI DATASET</span>
@@ -121,6 +122,7 @@ export default function GlobalMetaPage({
       </div>
 
       <div className={"meta-dataset-card "+maturity}>
+        <V2PanelAccent kind="meta"/>
         <span>{t("meta.currentBase")}</span>
         <strong>{meta?.sampleParticipants??0}</strong>
         <small>{t("meta.observedParticipants")}</small>
@@ -128,7 +130,7 @@ export default function GlobalMetaPage({
       </div>
     </div>
 
-    <ArtworkRibbon sources={[SITE_IMAGES.v2.icons[8],SITE_IMAGES.v2.mascots.scout,SITE_IMAGES.v2.frames.landscape]} className="meta-art-ribbon"/>
+    <ArtworkRibbon sources={[SITE_IMAGES.v2.decor.cornerAlt,SITE_IMAGES.v2.mascots.scoutAlt,SITE_IMAGES.v2.frames.landscapeSecondary]} className="meta-art-ribbon"/>
 
     <section className="meta-hub-links">
       <button className="active">

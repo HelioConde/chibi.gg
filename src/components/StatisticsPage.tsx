@@ -15,6 +15,7 @@ import { useI18n } from "../i18n";
 import { SITE_IMAGES } from "../siteAssets";
 import AdaptiveArtwork from "./AdaptiveArtwork";
 import ArtworkRibbon from "./ArtworkRibbon";
+import V2PanelAccent from "./V2PanelAccent";
 import { saveStudyShelfItem } from "../studyShelf";
 
 export type StatisticsCategory="champions"|"traits"|"items";
@@ -327,7 +328,7 @@ export default function StatisticsPage({
   return <main className="statistics-page">
     <section className="statistics-hero page-hero-with-reference">
       <AdaptiveArtwork className="v2-hero-emblem v2-hero-emblem-stats" src={SITE_IMAGES.v2.icons[6]} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
-      <AdaptiveArtwork className="page-reference-art page-reference-stats" src={SITE_IMAGES.ui.augments} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
+      <AdaptiveArtwork className="page-reference-art page-reference-stats page-reference-v2-piece" src={SITE_IMAGES.v2.frames.landscapeSecondary} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>{t("common.backProfile")}</button>}
         <span className="eyebrow">CHIBI STATISTICS</span>
@@ -343,6 +344,7 @@ export default function StatisticsPage({
       </div>
 
       <div className={"meta-dataset-card "+maturity}>
+        <V2PanelAccent kind="stats"/>
         <span>{t("meta.currentBase")}</span>
         <strong>{stats?.sampleParticipants??0}</strong>
         <small>{t("meta.observedParticipants")}</small>
@@ -350,7 +352,7 @@ export default function StatisticsPage({
       </div>
     </section>
 
-    <ArtworkRibbon sources={[SITE_IMAGES.v2.icons[6],SITE_IMAGES.v2.badges.rank,SITE_IMAGES.v2.frames.landscape]} className="stats-art-ribbon"/>
+    <ArtworkRibbon sources={[SITE_IMAGES.v2.icons[6],SITE_IMAGES.v2.badges.rankAlt,SITE_IMAGES.v2.frames.landscapeSecondary]} className="stats-art-ribbon"/>
 
     <section className="statistics-toolbar">
       <div className="statistics-categories">
@@ -384,6 +386,7 @@ export default function StatisticsPage({
     </section>
 
     {!loading&&!error&&stats&&quickRows.length>0&&<section className="statistics-quick-read">
+      <V2PanelAccent kind="stats" className="v2-panel-accent-feature"/>
       <div className="statistics-quick-head">
         <div>
           <span>CHIBI QUICK READ</span>

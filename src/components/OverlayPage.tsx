@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { SITE_IMAGES } from "../siteAssets";
 import AdaptiveArtwork from "./AdaptiveArtwork";
 import ArtworkRibbon from "./ArtworkRibbon";
+import V2PanelAccent from "./V2PanelAccent";
 import { TftMatch } from "../api/tft";
 import { getActiveSession, sessionProgress } from "../sessionMode";
 import { useI18n } from "../i18n";
@@ -182,8 +183,8 @@ export default function OverlayPage({
 
   return <main className="overlay-page">
     <section className="overlay-page-hero overlay-page-hero-art">
-      <AdaptiveArtwork className="v2-hero-emblem v2-hero-emblem-companion" src={SITE_IMAGES.v2.mascots.scout} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
-      <AdaptiveArtwork className="overlay-page-art" src={SITE_IMAGES.ui.all[15]} alt="" aria-hidden="true" loading="eager" decoding="async"/>
+      <AdaptiveArtwork className="v2-hero-emblem v2-hero-emblem-companion" src={SITE_IMAGES.v2.mascots.scoutAlt} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
+      <AdaptiveArtwork className="overlay-page-art page-reference-v2-piece" src={SITE_IMAGES.v2.frames.landscapeSecondary} alt="" aria-hidden="true" loading="eager" decoding="async"/>
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>{t("common.backProfile")}</button>}
         <span className="eyebrow">CHIBI COMPANION · REVIEW FIRST</span>
@@ -192,6 +193,7 @@ export default function OverlayPage({
       </div>
 
       <div className="overlay-beta-card">
+        <V2PanelAccent kind="companion"/>
         <span>{t("overlay.currentPhase")}</span>
         <strong>Python Desktop v1</strong>
         <small>{t("overlay.localWindow")}</small>
@@ -199,9 +201,10 @@ export default function OverlayPage({
       </div>
     </section>
 
-    <ArtworkRibbon sources={[SITE_IMAGES.v2.mascots.scout,SITE_IMAGES.v2.icons[8],SITE_IMAGES.v2.frames.landscape]} className="overlay-art-ribbon"/>
+    <ArtworkRibbon sources={[SITE_IMAGES.v2.mascots.scoutAlt,SITE_IMAGES.v2.icons[8],SITE_IMAGES.v2.frames.landscapeSecondary]} className="overlay-art-ribbon"/>
 
     {activeSession&&<section className="panel overlay-session-focus">
+      <V2PanelAccent kind="positive" className="v2-panel-accent-feature"/>
       <div className="overlay-session-focus-head">
         <div>
           <span>{t("overlay.fixedFocus")}</span>
@@ -251,10 +254,10 @@ export default function OverlayPage({
       </div>
 
       <div className={"overlay-live-demo "+(compact?"compact":"")+" tone-"+scenario.tone}>
-        <img className="overlay-hud-art" src={SITE_IMAGES.hud} alt="" aria-hidden="true"/>
+        <img className="overlay-hud-art overlay-hud-art-v2" src={SITE_IMAGES.v2.hud[3]} alt="" aria-hidden="true"/>
         <header className="overlay-live-head">
           <div className="overlay-live-brand">
-            <span className="overlay-brand-image"><img src={SITE_IMAGES.icon} alt=""/></span>
+            <span className="overlay-brand-image"><img src={SITE_IMAGES.v2.icon} alt=""/></span>
             <div>
               <strong>Chibi Review HUD</strong>
               <small>{hasProfile&&playerName?playerName:t("overlay.localDemo")} · {t("overlay.postReview")}</small>

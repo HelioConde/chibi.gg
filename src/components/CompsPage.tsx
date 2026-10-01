@@ -7,6 +7,7 @@ import { useI18n } from "../i18n";
 import { SITE_IMAGES } from "../siteAssets";
 import AdaptiveArtwork from "./AdaptiveArtwork";
 import ArtworkRibbon from "./ArtworkRibbon";
+import V2PanelAccent from "./V2PanelAccent";
 
 type Props={
   staticData:TftStaticData|null;
@@ -293,7 +294,7 @@ export default function CompsPage({
   return <main className="comps-page comps-page-v2">
     <section className="comps-hero page-hero-with-reference">
       <AdaptiveArtwork className="v2-hero-emblem v2-hero-emblem-comps" src={SITE_IMAGES.v2.icons[0]} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
-      <AdaptiveArtwork className="page-reference-art page-reference-comps" src={SITE_IMAGES.ui.comps} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
+      <AdaptiveArtwork className="page-reference-art page-reference-comps page-reference-v2-piece" src={SITE_IMAGES.v2.frames.squareSecondary} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>{t("common.backProfile")}</button>}
         <span className="eyebrow">{t("comps.eyebrow")}</span>
@@ -309,6 +310,7 @@ export default function CompsPage({
       </div>
 
       <div className={"meta-dataset-card "+maturity}>
+        <V2PanelAccent kind="comps"/>
         <span>{t("meta.currentBase")}</span>
         <strong>{data?.sampleParticipants??0}</strong>
         <small>{t("meta.observedParticipants")}</small>
@@ -316,7 +318,7 @@ export default function CompsPage({
       </div>
     </section>
 
-    <ArtworkRibbon sources={[SITE_IMAGES.v2.icons[0],SITE_IMAGES.v2.mascots.board,SITE_IMAGES.v2.frames.square]} className="comps-art-ribbon"/>
+    <ArtworkRibbon sources={[SITE_IMAGES.v2.icons[0],SITE_IMAGES.v2.mascots.boardAlt,SITE_IMAGES.v2.frames.squareSecondary]} className="comps-art-ribbon"/>
 
     <div className="meta-toolbar">
       <div>
@@ -333,6 +335,7 @@ export default function CompsPage({
 
     {!loading&&!error&&data&&<>
       {hero&&<section className="panel comp-answer-card comp-answer-card-v2">
+        <V2PanelAccent kind="comps" className="v2-panel-accent-feature"/>
         <div className="comp-answer-copy">
           <span>{hasProfile?t("comps.mostFamiliar"):t("comps.mostObserved")}</span>
           <h2>{compLabel(hero)}</h2>

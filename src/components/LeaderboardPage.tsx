@@ -9,6 +9,7 @@ import { useI18n } from "../i18n";
 import { SITE_IMAGES } from "../siteAssets";
 import AdaptiveArtwork from "./AdaptiveArtwork";
 import ArtworkRibbon from "./ArtworkRibbon";
+import V2PanelAccent from "./V2PanelAccent";
 
 type Tier="challenger"|"grandmaster"|"master";
 
@@ -63,8 +64,8 @@ export default function LeaderboardPage({staticData,onOpenPlayer}:Props){
 
   return <main className="leaderboard-page">
     <section className="leaderboard-hero page-hero-with-reference leaderboard-hero-art">
-      <AdaptiveArtwork className="v2-hero-emblem v2-hero-emblem-ranking" src={SITE_IMAGES.v2.badges.rank} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
-      <AdaptiveArtwork className="page-reference-art leaderboard-reference-art" src={SITE_IMAGES.ui.all[14]} alt="" aria-hidden="true" loading="eager" decoding="async"/>
+      <AdaptiveArtwork className="v2-hero-emblem v2-hero-emblem-ranking" src={SITE_IMAGES.v2.badges.rankAlt} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
+      <AdaptiveArtwork className="page-reference-art leaderboard-reference-art page-reference-v2-piece" src={SITE_IMAGES.v2.frames.squareSecondary} alt="" aria-hidden="true" loading="eager" decoding="async"/>
       <div>
         <span className="eyebrow">TFT LEADERBOARD</span>
         <h1>{t("leaderboard.title1")}<br/><em>{t("leaderboard.title2")}</em></h1>
@@ -72,13 +73,14 @@ export default function LeaderboardPage({staticData,onOpenPlayer}:Props){
       </div>
 
       <div className="leaderboard-context">
+        <V2PanelAccent kind="ranking"/>
         <span>{t("leaderboard.region")}</span>
         <strong>{platform.toUpperCase()}</strong>
         <small>{tier}</small>
       </div>
     </section>
 
-    <ArtworkRibbon sources={[SITE_IMAGES.v2.badges.rank,SITE_IMAGES.v2.icons[2],SITE_IMAGES.v2.frames.square]} className="leaderboard-art-ribbon"/>
+    <ArtworkRibbon sources={[SITE_IMAGES.v2.badges.rankAlt,SITE_IMAGES.v2.icons[2],SITE_IMAGES.v2.frames.squareSecondary]} className="leaderboard-art-ribbon"/>
 
     <section className="leaderboard-toolbar">
       <div className="leaderboard-regions">

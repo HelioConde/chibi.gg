@@ -17,6 +17,7 @@ import { useI18n } from "../i18n";
 import { SITE_IMAGES } from "../siteAssets";
 import AdaptiveArtwork from "./AdaptiveArtwork";
 import ArtworkRibbon from "./ArtworkRibbon";
+import V2PanelAccent from "./V2PanelAccent";
 
 type Props={
   staticData:TftStaticData|null;
@@ -1129,7 +1130,7 @@ export default function TeamBuilderPage({
   return <main className="builder-page builder-v2 builder-v3 builder-v4 builder-v5 builder-v6 builder-v7 builder-v8">
     <section className="builder-hero page-hero-with-reference builder-hero-art">
       <AdaptiveArtwork className="v2-hero-emblem v2-hero-emblem-builder" src={SITE_IMAGES.v2.icons[7]} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
-      <AdaptiveArtwork className="page-reference-art builder-reference-art" src={SITE_IMAGES.ui.all[13]} alt="" aria-hidden="true" loading="eager" decoding="async"/>
+      <AdaptiveArtwork className="page-reference-art builder-reference-art page-reference-v2-piece" src={SITE_IMAGES.v2.decor.railAlt} alt="" aria-hidden="true" loading="eager" decoding="async"/>
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>{t("common.backProfile")}</button>}
         <span className="eyebrow">CHIBI LAB · TEAM BUILDER V8</span>
@@ -1144,6 +1145,7 @@ export default function TeamBuilderPage({
       </div>
 
       <div className="builder-summary builder-summary-v2">
+        <V2PanelAccent kind="builder"/>
         <div><span>{t("builder.targetLevel")}</span><strong>{targetLevel}</strong></div>
         <div><span>{t("builder.units")}</span><strong className={overSlots>0?"warning":""}>{units.length}/{targetLevel}</strong></div>
         <div><span>BOARD VALUE</span><strong>{boardValue}G</strong></div>
