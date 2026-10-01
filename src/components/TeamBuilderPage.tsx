@@ -1124,7 +1124,8 @@ export default function TeamBuilderPage({
   }
 
   return <main className="builder-page builder-v2 builder-v3 builder-v4 builder-v5 builder-v6 builder-v7 builder-v8">
-    <section className="builder-hero page-hero-with-reference builder-hero-art">\n      <img className="page-reference-art builder-reference-art" src={SITE_IMAGES.ui.all[13]} alt="" aria-hidden="true" loading="eager" decoding="async"/>
+    <section className="builder-hero page-hero-with-reference builder-hero-art">
+      <img className="page-reference-art builder-reference-art" src={SITE_IMAGES.ui.all[13]} alt="" aria-hidden="true" loading="eager" decoding="async"/>
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>{t("common.backProfile")}</button>}
         <span className="eyebrow">CHIBI LAB · TEAM BUILDER V8</span>
