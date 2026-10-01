@@ -1184,7 +1184,7 @@ export default function TeamBuilderPage({
       </div>
     </section>
 
-    <ArtworkRibbon images={[16,5,12]} className="builder-art-ribbon"/>
+    <ArtworkRibbon sources={[SITE_IMAGES.v2.icons[7],SITE_IMAGES.v2.mascots.board,SITE_IMAGES.v2.frames.landscape]} className="builder-art-ribbon"/>
 
     <section className="builder-decision-strip">
       <div className={"builder-decision-card "+decision.tone}>
