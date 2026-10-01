@@ -25549,3 +25549,55 @@ img[src$="chibi-ui-10.png"],
     font-size:5.8px!important;
   }
 }
+
+
+/* CHIBI MATCH TIP BALANCE v50 */
+
+@media(min-width:1100px){
+  .match-fast-read-inline{
+    width:min(100%,520px)!important;
+    max-width:520px!important;
+    min-height:32px!important;
+    margin:4px 0 3px!important;
+    padding:5px 7px 5px 8px!important;
+    grid-template-columns:auto minmax(0,1fr) auto!important;
+    gap:8px!important;
+  }
+
+  .match-fast-read-inline>span{
+    font-size:5.8px!important;
+    padding:3px 6px!important;
+  }
+
+  .match-fast-read-inline>strong{
+    font-size:8.2px!important;
+    line-height:1.25!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+
+  .match-fast-read-inline>small{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    min-height:22px!important;
+    padding:0 7px!important;
+    border:1px solid rgba(112,145,179,.15);
+    border-radius:5px;
+    background:rgba(12,26,39,.72);
+    color:#8fa2b7!important;
+    font-size:5.3px!important;
+    font-weight:850;
+  }
+
+  .match-fast-read-inline.bad>small{
+    border-color:rgba(239,113,126,.18);
+    color:#d99aa2!important;
+  }
+
+  .match-fast-read-inline.good>small{
+    border-color:rgba(78,216,171,.16);
+    color:#8bcfb4!important;
+  }
+}
