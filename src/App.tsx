@@ -20,7 +20,6 @@ import {
   latestTftSetNumber,
 } from "./tftStatic";
 import { buildChibiDNA } from "./analysis/chibiInsights";
-import { buildRankedReviewSignals } from "./analysis/chibiReviewRanking";
 import ChibiInnovations from "./components/ChibiInnovations";
 import ChibiReview from "./components/ChibiReview";
 import ChibiSessionPlan from "./components/ChibiSessionPlan";
@@ -63,7 +62,6 @@ import SiteArtworkBackdrop from "./components/SiteArtworkBackdrop";
 import PointerAura from "./components/PointerAura";
 import SiteHudOverlay from "./components/SiteHudOverlay";
 import AdaptiveArtwork from "./components/AdaptiveArtwork";
-import ArtworkRibbon from "./components/ArtworkRibbon";
 import SectionMarker from "./components/SectionMarker";
 import ChibiNavIcon from "./components/ChibiNavIcon";
 import TeamBuilderPage from "./components/TeamBuilderPage";
@@ -669,8 +667,6 @@ function App() {
   );
 
   const dna=useMemo(()=>buildChibiDNA(analysisMatches),[analysisMatches]);
-  const reviewSignals=useMemo(()=>buildRankedReviewSignals(analysisMatches),[analysisMatches]);
-  const primaryReviewSignal=reviewSignals[0]||null;
 
   const headlineStats=useMemo(()=>{
     const total=analysisMatches.length;
@@ -717,11 +713,6 @@ function App() {
     );
     return historyBaseMatches;
   },[historyBaseMatches,historyFilter]);
-
-  const visibleDna=useMemo(
-    ()=>evidenceIds?.length||historyFilter!=="all" ? buildChibiDNA(visibleMatches) : dna,
-    [evidenceIds,historyFilter,visibleMatches,dna]
-  );
 
   const historySessions=useMemo(()=>{
     const sorted=historyBaseMatches
@@ -1655,8 +1646,6 @@ function App() {
             title={t("home.section.product.title")}
             description={t("home.section.product.desc")}
           />
-          <ArtworkRibbon sources={[SITE_IMAGES.v2.mascots.board,SITE_IMAGES.v2.badges.rank,SITE_IMAGES.v2.frames.landscape]} className="home-art-ribbon home-section-product"/>
-
           <HomeVisualShowcase
             onOpenProfile={()=>document.getElementById("home-riot-id")?.focus()}
             onOpenComps={openComps}
@@ -1803,19 +1792,6 @@ function App() {
             onEvidence={showEvidence}
             onOpenCoach={()=>changeProfileTab("coach")}
             onOpenOverview={()=>changeProfileTab("overview")}
-          />
-
-          <ArtworkRibbon
-            sources={
-              profileTab==="matches"
-                ?[SITE_IMAGES.v2.badges.sword,SITE_IMAGES.v2.mascots.scout,SITE_IMAGES.v2.frames.wide]
-                :profileTab==="overview"
-                  ?[SITE_IMAGES.v2.mascots.scout,SITE_IMAGES.v2.icons[6],SITE_IMAGES.v2.frames.landscape]
-                  :profileTab==="coach"
-                    ?[SITE_IMAGES.v2.mascots.board,SITE_IMAGES.v2.badges.heart,SITE_IMAGES.v2.frames.square]
-                    :[SITE_IMAGES.v2.icons[10],SITE_IMAGES.v2.frames.portraitAlt,SITE_IMAGES.v2.decor.corner]
-            }
-            className="profile-art-ribbon"
           />
 
           <nav className="profile-tabs simplified-tabs profile-tabs-clean" aria-label={t("profile.tabsAria")}>
@@ -2272,68 +2248,6 @@ function App() {
               {!evidenceIds?.length&&hasMore && <button className="load-more" onClick={loadMore} disabled={loadingMore}>{loadingMore ? t("profile.history.loadingMore") : t("profile.history.loadMore")}</button>}
             </section>
 
-            <aside className="profile-match-sidebar">
-              <section className={"profile-insight-card "+(primaryReviewSignal?"tone-"+primaryReviewSignal.tone:"")}>
-                <div className="profile-insight-head">
-                  <div>
-                    <span>CHIBI SNAPSHOT</span>
-                    <strong>{analysisMatches.length<8
-                      ? t("profile.snapshot.initial",{top4:headlineStats.top4,total:headlineStats.total})
-                      : primaryReviewSignal
-                        ? (primaryReviewSignal.subjectId
-                          ? (staticEntry(staticData?.traits,primaryReviewSignal.subjectId)?.name||fallbackTraitName(primaryReviewSignal.subjectId))+" · "+primaryReviewSignal.title
-                          : primaryReviewSignal.title)
-                        : t("profile.snapshot.gathering")}</strong>
-                  </div>
-                  <small>{t("profile.snapshot.matches",{count:visibleDna.sampleSize})}</small>
-                </div>
-
-                <div className="placement-strip profile-insight-placements" aria-label={t("profile.snapshot.placementsAria")}>
-                  {visibleDna.placements.slice(0,8).map((p,index)=>(
-                    <span className={placementClass(p)} key={index} title={t("profile.snapshot.placementTitle",{index:index+1,placement:p})}>{p}</span>
-                  ))}
-                </div>
-
-                <div className="profile-insight-metrics">
-                  <span>
-                    <small>{visibleDna.sampleSize<8?t("profile.snapshot.sample"):t("profile.snapshot.consistency")}</small>
-                    <b>{visibleDna.sampleSize<8?t("profile.snapshot.games",{count:visibleDna.sampleSize}):visibleDna.consistency+"%"}</b>
-                  </span>
-                  <span>
-                    <small>Bottom 2</small>
-                    <b>{analysisMatches.filter(match=>match.placement>=7).length}</b>
-                  </span>
-                </div>
-
-                {visibleDna.insights[0]&&(()=>{
-                  const insight=visibleDna.insights[0];
-                  const subject=insight.subject
-                    ? staticEntry(staticData?.traits,insight.subject)?.name || fallbackTraitName(insight.subject)
-                    : "";
-                  return <div className={"profile-insight-signal "+insight.tone}>
-                    <span>{insight.confidence}</span>
-                    <strong>{subject||insight.title}</strong>
-                    {subject&&<small>{insight.title}</small>}
-                  </div>;
-                })()}
-
-                <div className="profile-insight-actions">
-                  <button onClick={()=>changeProfileTab("coach")}>{t("profile.snapshot.openReview")}</button>
-                  <button className="secondary" onClick={()=>changeProfileTab("overview")}>{t("profile.snapshot.viewSummary")}</button>
-                </div>
-
-                <details className="profile-insight-more">
-                  <summary>{t("profile.snapshot.more")}</summary>
-                  <div>
-                    <span><small>{t("profile.snapshot.flexibility")}</small><b>{visibleDna.sampleSize<8?"—":visibleDna.flexibility+"%"}</b></span>
-                    <span><small>{t("profile.snapshot.conversion")}</small><b>{visibleDna.sampleSize<8?"—":visibleDna.conversion+"%"}</b></span>
-                    <p>{evidenceIds?.length
-                      ? t("profile.snapshot.activeEvidence")
-                      : t("profile.snapshot.disclaimer")}</p>
-                  </div>
-                </details>
-              </section>
-            </aside>
           </div>
 
           </>}

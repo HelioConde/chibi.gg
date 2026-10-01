@@ -24233,3 +24233,80 @@ img[src$="chibi-ui-10.png"],
     opacity:.055!important;
   }
 }
+
+
+/* CHIBI SCREENSHOT CLEANUP v39 */
+
+/* The product already has contextual art inside real UI. Decorative ribbons were
+   creating a second visual layer between sections, so the main flow stays data-first. */
+.home-section-product + .home-visual-showcase,
+.section-marker + .home-visual-showcase{
+  margin-top:8px!important;
+}
+.home-visual-showcase{
+  margin-bottom:24px!important;
+}
+
+/* History is the primary profile surface: use the full content width. */
+.profile-history-first{
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:0!important;
+}
+.profile-history-first>.history{
+  width:100%!important;
+  max-width:none!important;
+}
+.history-section-marker{
+  width:100%;
+}
+.profile-history-first .match-row-v2{
+  grid-template-columns:48px minmax(0,1fr) minmax(176px,196px)!important;
+}
+.profile-history-first .match-history-units{
+  min-width:0;
+}
+.profile-history-first .match-history-units .unit-card{
+  flex:0 0 auto;
+}
+
+/* With the sidebar gone, allow cards to breathe instead of stretching text lines. */
+@media(min-width:1180px){
+  .profile-history-first .match-row-v2{
+    grid-template-columns:50px minmax(0,1fr) 198px!important;
+    padding:10px 12px!important;
+  }
+  .profile-history-first .match-history-units .unit-card{
+    width:40px!important;
+    max-width:40px!important;
+  }
+  .profile-history-first .match-history-units .unit-portrait{
+    width:40px!important;
+    height:40px!important;
+  }
+}
+
+/* Keep the full-width history safe on tablet/mobile; earlier compact rules still apply. */
+@media(max-width:980px){
+  .profile-history-first .match-row-v2{
+    grid-template-columns:46px minmax(0,1fr)!important;
+  }
+  .profile-history-first .match-meta-rich{
+    grid-column:2;
+  }
+}
+
+@media(max-width:620px){
+  .profile-history-first .match-row-v2{
+    grid-template-columns:42px minmax(0,1fr)!important;
+  }
+}
+
+/* The contextual backdrop should never compete with match content on the profile page. */
+.site-art-profile,
+.site-art-matches{
+  opacity:.62;
+}
+.site-art-profile .site-art-frame-2,
+.site-art-matches .site-art-frame-2{
+  opacity:.45!important;
+}
