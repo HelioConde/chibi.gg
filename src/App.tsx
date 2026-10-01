@@ -2136,7 +2136,7 @@ function App() {
                         const threeStarCount=match.units.filter(unit=>unit.tier>=3).length;
                         const equippedItemCount=match.units.reduce((sum,unit)=>sum+unit.itemNames.length,0);
                         const resultBand=placementBand(match.placement);
-                        return <button className={"match-row match-button match-row-v2 cue-"+cue.tone+" placement-band-"+resultBand} key={match.id} onClick={()=>openMatch(match)}>
+                        return <button type="button" className={"match-row match-button match-row-v2 cue-"+cue.tone+" placement-band-"+resultBand} key={match.id} onClick={()=>void openMatch(match)}>
                           <div className="match-result-rail">
                             <MatchResultAccent placement={match.placement}/>
                             <TacticianVisual companion={match.companion} staticData={staticData}/>

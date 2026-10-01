@@ -25965,3 +25965,42 @@ img[src$="chibi-ui-10.png"],
     padding-left:12px;
   }
 }
+
+
+/* CHIBI MATCH OVERLAY FIX v54 */
+
+/* Critical: an older grouped rule changed the review overlay to position:relative.
+   Keep the review modal attached to the viewport so history clicks open visibly. */
+.app-shell>.match-overlay{
+  position:fixed!important;
+  inset:0!important;
+  z-index:1000!important;
+  width:100vw!important;
+  height:100dvh!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:24px!important;
+  overflow:hidden!important;
+  pointer-events:auto!important;
+}
+
+.app-shell>.match-overlay>.match-modal{
+  position:relative!important;
+  z-index:1001!important;
+  max-height:calc(100dvh - 48px)!important;
+  overflow:auto!important;
+}
+
+@media(max-width:760px){
+  .app-shell>.match-overlay{
+    align-items:stretch!important;
+    padding:0!important;
+  }
+
+  .app-shell>.match-overlay>.match-modal{
+    width:100vw!important;
+    max-height:100dvh!important;
+    min-height:100dvh!important;
+  }
+}
