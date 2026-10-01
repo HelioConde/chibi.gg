@@ -128,7 +128,7 @@ export default function GlobalMetaPage({
       </div>
     </div>
 
-    <ArtworkRibbon images={[10,12,17]} className="meta-art-ribbon"/>
+    <ArtworkRibbon sources={[SITE_IMAGES.v2.icons[8],SITE_IMAGES.v2.mascots.scout,SITE_IMAGES.v2.frames.landscape]} className="meta-art-ribbon"/>
 
     <section className="meta-hub-links">
       <button className="active">
