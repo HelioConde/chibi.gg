@@ -30535,3 +30535,229 @@ img[src$="chibi-ui-10.png"],
     font-size:7.5px;
   }
 }
+
+
+/* CHIBI PRIORITY UX v78 */
+
+/* Coach: impact + automatic Top 4 vs Bottom 2 comparison. */
+.review-signal-impact{
+  display:block;
+  margin-top:6px;
+  padding:6px 8px;
+  border:1px solid rgba(106,145,181,.14);
+  border-radius:7px;
+  background:rgba(8,18,29,.52);
+  color:#8fa0b3;
+  font-size:7px;
+  font-weight:800;
+  line-height:1.35;
+}
+.review-signal-impact.good{
+  border-color:rgba(72,209,153,.18);
+  color:#7ccfa9;
+}
+.review-signal-impact.warning{
+  border-color:rgba(231,165,107,.20);
+  color:#d5a57c;
+}
+
+.coach-outcome-compare{
+  margin:10px 0;
+  padding:12px;
+  border:1px solid rgba(95,141,180,.17);
+  border-radius:12px;
+  background:linear-gradient(180deg,rgba(10,23,36,.92),rgba(7,17,28,.94));
+}
+.coach-outcome-compare-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:9px;
+}
+.coach-outcome-compare-head>div{
+  min-width:0;
+}
+.coach-outcome-compare-head span{
+  color:#6fd6d7;
+  font-size:7px;
+  font-weight:950;
+  letter-spacing:.8px;
+}
+.coach-outcome-compare-head h3{
+  margin:4px 0 3px;
+  color:#e6eef6;
+  font-size:14px;
+  line-height:1.15;
+}
+.coach-outcome-compare-head p{
+  margin:0;
+  color:#718399;
+  font-size:7.5px;
+  line-height:1.4;
+}
+.coach-outcome-compare-head button{
+  flex:0 0 auto;
+  min-height:32px;
+  padding:7px 10px;
+  border:1px solid rgba(91,211,207,.20);
+  border-radius:8px;
+  background:rgba(91,211,207,.045);
+  color:#9edbd9;
+  font-size:7.2px;
+  font-weight:850;
+  cursor:pointer;
+}
+.coach-outcome-compare-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:6px;
+}
+.coach-outcome-compare-grid article{
+  min-width:0;
+  padding:8px 9px;
+  border:1px solid rgba(96,139,178,.12);
+  border-radius:8px;
+  background:rgba(8,18,29,.54);
+}
+.coach-outcome-compare-grid span{
+  display:block;
+  color:#687e93;
+  font-size:6.2px;
+  font-weight:900;
+}
+.coach-outcome-compare-grid strong{
+  display:block;
+  margin-top:4px;
+  color:#e2ebf3;
+  font-size:11px;
+}
+.coach-outcome-compare-grid strong i{
+  margin:0 3px;
+  color:#63778d;
+  font-size:7px;
+  font-style:normal;
+}
+.coach-outcome-compare-grid small{
+  display:block;
+  margin-top:2px;
+  color:#63778d;
+  font-size:6.2px;
+}
+
+/* Meta/leaderboard rankings always expose their sample context. */
+.meta-ranking-sample-note,
+.leaderboard-sample-note{
+  min-height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:0 0 8px;
+  padding:7px 10px;
+  border:1px solid rgba(95,141,180,.13);
+  border-radius:8px;
+  background:rgba(8,18,29,.54);
+}
+.meta-ranking-sample-note strong,
+.leaderboard-sample-note strong{
+  color:#aebdcc;
+  font-size:7.5px;
+}
+.meta-ranking-sample-note span,
+.leaderboard-sample-note span{
+  color:#6f8498;
+  font-size:7px;
+  text-align:right;
+}
+
+/* Builder version rationale: saved with presets and shown during A/B comparison. */
+.builder-version-rationale{
+  grid-column:1/-1;
+  display:grid;
+  gap:5px;
+  margin-top:7px;
+  padding-top:8px;
+  border-top:1px solid rgba(96,139,178,.10);
+}
+.builder-version-rationale>span{
+  color:#7189a0;
+  font-size:6.5px;
+  font-weight:950;
+  letter-spacing:.75px;
+}
+.builder-version-rationale textarea{
+  width:100%;
+  min-height:64px;
+  resize:vertical;
+  padding:8px 10px;
+  border:1px solid rgba(100,140,178,.16);
+  border-radius:8px;
+  outline:0;
+  background:#08131f;
+  color:#dce7ef;
+  font:inherit;
+  font-size:8px;
+  line-height:1.4;
+}
+.builder-version-rationale textarea:focus{
+  border-color:rgba(80,217,211,.30);
+  box-shadow:0 0 0 3px rgba(80,217,211,.035);
+}
+.builder-version-rationale>small{
+  color:#60758a;
+  font-size:6px;
+}
+.builder-version-note{
+  margin:6px 0 0!important;
+  padding:6px 7px;
+  border-left:2px solid rgba(102,207,211,.35);
+  background:rgba(102,207,211,.035);
+  color:#7f93a7!important;
+  font-size:7px!important;
+  line-height:1.4!important;
+}
+.builder-saved-note{
+  display:block;
+  max-width:360px;
+  margin-top:3px;
+  overflow:hidden;
+  color:#72869a;
+  font-size:6.5px;
+  font-style:normal;
+  line-height:1.25;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* Keep labelled history filter groups compact. */
+.history-filter-group{
+  min-width:max-content;
+}
+.history-filter-group>span{
+  text-transform:uppercase;
+}
+
+@media(max-width:900px){
+  .coach-outcome-compare-head{
+    flex-direction:column;
+  }
+  .coach-outcome-compare-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .meta-ranking-sample-note,
+  .leaderboard-sample-note{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .meta-ranking-sample-note span,
+  .leaderboard-sample-note span{
+    text-align:left;
+  }
+}
+
+@media(max-width:560px){
+  .coach-outcome-compare-grid{
+    grid-template-columns:1fr;
+  }
+}
