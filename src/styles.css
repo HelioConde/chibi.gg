@@ -25049,3 +25049,138 @@ img[src$="chibi-ui-10.png"],
     width:100%!important;
   }
 }
+
+
+/* CHIBI TODAY COMPACT DECISION ROW v45 */
+
+@media(min-width:1100px){
+  /* The player page inherited 90px of bottom padding from the original layout.
+     Keep only enough breathing room before the legal footer. */
+  .profile-page{
+    padding-bottom:18px!important;
+  }
+  .profile-page + .site-footer,
+  .site-footer{
+    margin-top:12px!important;
+  }
+
+  /* Today becomes a compact decision row instead of three tall mini-panels. */
+  .today-tft{
+    margin:5px 0 4px!important;
+    padding:9px 10px!important;
+    border-radius:11px!important;
+  }
+  .today-tft-head{
+    align-items:center!important;
+    margin-bottom:6px!important;
+    gap:10px!important;
+  }
+  .today-tft-head>div>span{
+    font-size:5.2px!important;
+    letter-spacing:.8px!important;
+  }
+  .today-tft-head h2{
+    margin:2px 0 1px!important;
+    font-size:17px!important;
+    line-height:1.02!important;
+  }
+  .today-tft-head p{
+    max-width:720px!important;
+    font-size:5.8px!important;
+    line-height:1.3!important;
+  }
+  .today-tft-head>small{
+    font-size:5px!important;
+    white-space:nowrap;
+  }
+
+  .today-tft-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:5px!important;
+  }
+  .today-card{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    grid-template-areas:
+      "label action"
+      "title action"
+      "text action"!important;
+    align-items:center!important;
+    min-height:82px!important;
+    padding:8px 9px!important;
+    column-gap:8px!important;
+    row-gap:1px!important;
+    border-radius:8px!important;
+  }
+  .today-card>span:not(.today-card-accent){
+    grid-area:label;
+    align-self:end;
+    font-size:4.8px!important;
+    letter-spacing:.65px!important;
+  }
+  .today-card h3{
+    grid-area:title;
+    align-self:center;
+    max-width:none!important;
+    margin:2px 0!important;
+    font-size:9.5px!important;
+    line-height:1.15!important;
+  }
+  .today-card p{
+    grid-area:text;
+    align-self:start;
+    max-width:none!important;
+    margin:0!important;
+    font-size:5.5px!important;
+    line-height:1.3!important;
+  }
+  .today-card>button{
+    grid-area:action;
+    align-self:center!important;
+    min-width:68px!important;
+    min-height:25px!important;
+    margin:0!important;
+    padding:5px 7px!important;
+    border-radius:6px!important;
+    font-size:5px!important;
+    white-space:nowrap;
+  }
+  .today-card-accent{
+    right:1px!important;
+    bottom:-10px!important;
+    width:54px!important;
+    height:54px!important;
+    opacity:.045!important;
+  }
+
+  .today-tft-foot{
+    margin-top:5px!important;
+    padding-top:5px!important;
+    min-height:18px;
+  }
+  .today-tft-foot span,
+  .today-tft-foot button{
+    font-size:5px!important;
+  }
+  .today-tft-foot button{
+    padding:2px 0!important;
+  }
+
+  /* Tabs and history now follow immediately after the decision row. */
+  .profile-tabs-clean{
+    min-height:36px!important;
+    margin:4px 0 6px!important;
+    padding:3px 4px!important;
+  }
+  .profile-tabs-clean .profile-tab-list button,
+  .profile-tabs-clean .profile-tab-actions button{
+    min-height:27px!important;
+    padding-top:5px!important;
+    padding-bottom:5px!important;
+  }
+
+  .load-more{
+    margin-top:8px!important;
+    padding:10px 14px!important;
+  }
+}
