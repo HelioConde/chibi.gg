@@ -28623,3 +28623,334 @@ img[src$="chibi-ui-10.png"],
     font-size:6.5px!important;
   }
 }
+
+
+/* CHIBI HISTORY GROUPED TRAITS v68 */
+
+/* Recent history now mirrors the review structure:
+   compact trait block -> champions that belong to it. */
+.profile-history-first .match-lineup-grouped{
+  display:block!important;
+  margin-top:6px!important;
+  min-width:0!important;
+}
+
+.profile-history-first .match-history-class-groups{
+  display:flex;
+  align-items:stretch;
+  gap:7px;
+  min-width:0;
+  max-width:100%;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:1px 0 4px;
+  scrollbar-width:none;
+}
+.profile-history-first .match-history-class-groups::-webkit-scrollbar{
+  display:none;
+}
+
+.profile-history-first .match-history-class-group{
+  position:relative;
+  flex:0 0 auto;
+  min-width:148px;
+  padding:6px 7px 7px;
+  border:1px solid rgba(100,141,177,.15);
+  border-radius:9px;
+  background:
+    linear-gradient(180deg,rgba(11,24,37,.86),rgba(7,17,28,.88));
+  overflow:hidden;
+}
+
+.profile-history-first .match-history-class-group.style-2{
+  border-color:rgba(84,205,155,.18);
+}
+.profile-history-first .match-history-class-group.style-3{
+  border-color:rgba(235,190,91,.20);
+}
+.profile-history-first .match-history-class-group.style-4{
+  border-color:rgba(183,132,255,.20);
+}
+
+.profile-history-first .match-history-class-group-other{
+  border-style:dashed;
+  border-color:rgba(104,132,158,.15);
+  background:rgba(7,17,28,.48);
+}
+
+.profile-history-first .match-history-class-head{
+  min-height:24px;
+  display:grid;
+  grid-template-columns:20px minmax(0,1fr) 20px;
+  align-items:center;
+  gap:5px;
+  padding-bottom:5px;
+  border-bottom:1px solid rgba(94,201,245,.16);
+}
+
+.profile-history-first .match-history-class-icon{
+  position:relative;
+  width:20px;
+  height:20px;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  border:1px solid rgba(108,156,194,.20);
+  border-radius:6px;
+  background:#0d1b29;
+  color:#dce7f0;
+  font-size:7px;
+  font-weight:950;
+}
+
+.profile-history-first .match-history-class-icon>span{
+  position:relative;
+  z-index:1;
+}
+
+.profile-history-first .match-history-class-icon img{
+  position:absolute;
+  inset:2px;
+  z-index:2;
+  width:calc(100% - 4px);
+  height:calc(100% - 4px);
+  object-fit:contain;
+}
+
+.profile-history-first .match-history-class-copy{
+  min-width:0;
+  display:grid;
+  gap:1px;
+  text-align:left;
+}
+
+.profile-history-first .match-history-class-copy strong{
+  min-width:0;
+  overflow:hidden;
+  color:#e2ebf3;
+  font-size:7.2px;
+  font-weight:900;
+  line-height:1.05;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.profile-history-first .match-history-class-copy small{
+  color:#687c90;
+  font-size:4.8px;
+  font-weight:700;
+  line-height:1.1;
+  white-space:nowrap;
+}
+
+.profile-history-first .match-history-class-head>b{
+  width:20px;
+  height:20px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:6px;
+  background:rgba(255,255,255,.035);
+  color:#fff;
+  font-size:7px;
+  font-weight:950;
+}
+
+/* Compact connector rail, matching the visual grammar of the opened review. */
+.profile-history-first .match-history-class-units{
+  position:relative;
+  display:flex;
+  align-items:flex-start;
+  gap:5px;
+  width:max-content;
+  min-width:100%;
+  padding:10px 0 0;
+}
+
+.profile-history-first .match-history-class-units::before{
+  content:"";
+  position:absolute;
+  left:16px;
+  right:16px;
+  top:4px;
+  height:1px;
+  background:linear-gradient(
+    90deg,
+    rgba(94,201,245,.18),
+    rgba(94,201,245,.62) 15%,
+    rgba(94,201,245,.62) 85%,
+    rgba(94,201,245,.18)
+  );
+}
+
+.profile-history-first .match-history-class-units .unit-card.compact.named{
+  position:relative!important;
+  flex:0 0 48px!important;
+  width:48px!important;
+  max-width:48px!important;
+  min-height:72px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  padding:3px 2px!important;
+  border:1px solid rgba(101,141,177,.13)!important;
+  border-radius:8px!important;
+  background:rgba(7,17,28,.68)!important;
+}
+
+.profile-history-first .match-history-class-units .unit-card.compact.named::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:-7px;
+  width:1px;
+  height:7px;
+  background:rgba(94,201,245,.62);
+  transform:translateX(-50%);
+}
+
+.profile-history-first .match-history-class-units .unit-card.compact.named::after{
+  content:"↓";
+  position:absolute;
+  left:50%;
+  top:-7px;
+  color:#62caf5;
+  font-size:5px;
+  font-weight:950;
+  line-height:1;
+  transform:translate(-50%,-35%);
+}
+
+.profile-history-first .match-history-class-units .unit-card.compact.named .unit-portrait{
+  flex:0 0 38px!important;
+  width:38px!important;
+  height:38px!important;
+  margin:0!important;
+  border-radius:7px!important;
+}
+
+.profile-history-first .match-history-class-units .unit-card.compact.named .unit-caption{
+  order:2!important;
+  width:44px!important;
+  min-height:14px!important;
+  margin:3px 0 1px!important;
+  padding:0 1px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  overflow:hidden!important;
+  color:#d9e4ed!important;
+  font-size:5.8px!important;
+  font-weight:850!important;
+  line-height:1.05!important;
+  text-align:center!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+
+.profile-history-first .match-history-class-units .unit-card.compact.named .item-row{
+  order:3!important;
+  position:static!important;
+  left:auto!important;
+  right:auto!important;
+  bottom:auto!important;
+  width:auto!important;
+  min-height:11px!important;
+  margin:1px 0 0!important;
+  transform:none!important;
+  justify-content:center!important;
+}
+
+.profile-history-first .match-history-class-units .unit-card.compact.named .item-icon{
+  width:11px!important;
+  height:11px!important;
+  border-radius:3px!important;
+}
+
+/* "Other" is intentionally flatter: no connector suggests a trait relation. */
+.profile-history-first .match-history-class-group-other .match-history-class-head{
+  border-bottom-color:rgba(104,132,158,.10);
+}
+.profile-history-first .match-history-class-group-other .match-history-class-units{
+  padding-top:5px;
+}
+.profile-history-first .match-history-class-group-other .match-history-class-units::before,
+.profile-history-first .match-history-class-group-other .unit-card.compact.named::before,
+.profile-history-first .match-history-class-group-other .unit-card.compact.named::after{
+  display:none!important;
+}
+
+/* Augments remain available but visually secondary to trait membership. */
+.profile-history-first .match-history-grouped-augments{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  min-height:18px;
+  margin-top:3px;
+  color:#667b91;
+}
+.profile-history-first .match-history-grouped-augments>span:first-child{
+  margin-right:2px;
+  color:#61778d;
+  font-size:4.7px;
+  font-weight:950;
+  letter-spacing:.45px;
+}
+.profile-history-first .match-history-grouped-augments .match-augment-icon{
+  width:16px!important;
+  height:16px!important;
+  flex-basis:16px!important;
+  border-radius:4px!important;
+}
+
+/* The grouped history card needs a little more vertical room, but still stays
+   much more compact than the full review. */
+@media(min-width:1100px){
+  .profile-history-first .match-row-v2{
+    min-height:142px!important;
+  }
+
+  .profile-history-first .match-main{
+    grid-template-rows:auto auto auto auto!important;
+    align-content:center!important;
+  }
+}
+
+@media(min-width:761px) and (max-width:1099px){
+  .profile-history-first .match-history-class-group{
+    min-width:142px;
+  }
+
+  .profile-history-first .match-history-class-units .unit-card.compact.named{
+    flex-basis:46px!important;
+    width:46px!important;
+    max-width:46px!important;
+  }
+}
+
+@media(max-width:760px){
+  .profile-history-first .match-history-class-groups{
+    gap:6px;
+  }
+
+  .profile-history-first .match-history-class-group{
+    min-width:136px;
+    padding:6px;
+  }
+
+  .profile-history-first .match-history-class-copy strong{
+    font-size:6.8px;
+  }
+
+  .profile-history-first .match-history-class-units .unit-card.compact.named{
+    flex-basis:45px!important;
+    width:45px!important;
+    max-width:45px!important;
+  }
+
+  .profile-history-first .match-history-class-units .unit-card.compact.named .unit-portrait{
+    width:36px!important;
+    height:36px!important;
+    flex-basis:36px!important;
+  }
+}
