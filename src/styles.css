@@ -28354,3 +28354,95 @@ img[src$="chibi-ui-10.png"],
     display:none!important;
   }
 }
+
+
+/* CHIBI HISTORY CHAMPION LABELS v66 */
+
+/* Recent history uses the same readable champion identity language as the
+   opened review: portrait -> name -> items. */
+.profile-history-first .match-history-units .unit-card.compact.named{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  position:relative!important;
+  min-height:70px!important;
+  padding-bottom:0!important;
+}
+
+.profile-history-first .match-history-units .unit-card.compact.named .unit-caption{
+  order:2!important;
+  width:100%!important;
+  min-height:12px!important;
+  margin:3px 0 1px!important;
+  padding:0 1px!important;
+  overflow:hidden!important;
+  color:#c7d4df!important;
+  font-size:6.2px!important;
+  font-weight:850!important;
+  line-height:1.05!important;
+  text-align:center!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+
+.profile-history-first .match-history-units .unit-card.compact.named .item-row{
+  order:3!important;
+  position:static!important;
+  left:auto!important;
+  right:auto!important;
+  bottom:auto!important;
+  width:auto!important;
+  min-height:11px!important;
+  margin:1px 0 0!important;
+  transform:none!important;
+  justify-content:center!important;
+}
+
+.profile-history-first .match-history-units .unit-card.compact.named .item-icon{
+  width:12px!important;
+  height:12px!important;
+  border-radius:3px!important;
+}
+
+/* Give the card just enough height for labels without making history bulky. */
+@media(min-width:1100px){
+  .profile-history-first .match-row-v2{
+    min-height:108px!important;
+  }
+
+  .profile-history-first .match-history-units{
+    align-items:flex-start!important;
+    padding-top:1px!important;
+  }
+
+  .profile-history-first .match-history-units .unit-card.compact.named{
+    min-height:72px!important;
+  }
+
+  .profile-history-first .match-history-units.units-many .unit-card.compact.named,
+  .profile-history-first .match-history-units.units-extra .unit-card.compact.named{
+    min-height:68px!important;
+  }
+
+  .profile-history-first .match-history-units.units-many .unit-caption,
+  .profile-history-first .match-history-units.units-extra .unit-caption{
+    font-size:5.8px!important;
+  }
+}
+
+@media(max-width:1099px){
+  .profile-history-first .match-history-units .unit-card.compact.named{
+    min-height:66px!important;
+  }
+
+  .profile-history-first .match-history-units .unit-caption{
+    font-size:5.8px!important;
+  }
+}
+
+@media(max-width:620px){
+  .profile-history-first .match-history-units .unit-caption{
+    max-width:44px!important;
+    font-size:5.5px!important;
+  }
+}
