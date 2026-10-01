@@ -20371,3 +20371,89 @@ body::before{
     grid-template-columns:repeat(2,minmax(0,1fr))!important;
   }
 }
+
+/* CHIBI HISTORY ANSWER-FIRST v17 */
+.match-value-grid-core{
+  grid-template-columns:repeat(3,42px)!important;
+}
+.match-meta-rich .match-fast-read{
+  width:100%;
+  max-width:154px;
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:2px!important;
+  margin:0!important;
+  padding:7px 8px!important;
+  border:1px solid rgba(99,140,178,.16);
+  border-radius:8px;
+  background:#0b1723;
+  text-align:left;
+}
+.match-meta-rich .match-fast-read>span{
+  width:max-content;
+  margin:0!important;
+  padding:2px 5px!important;
+  border-radius:999px;
+  background:rgba(111,129,157,.09)!important;
+  color:#7d8ca0!important;
+  font-size:5.5px!important;
+  font-weight:950;
+  letter-spacing:.55px;
+  text-transform:uppercase;
+}
+.match-meta-rich .match-fast-read>strong{
+  display:-webkit-box;
+  overflow:hidden;
+  color:#cbd6e4;
+  font-size:7px!important;
+  font-weight:760;
+  line-height:1.35;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+}
+.match-meta-rich .match-fast-read>small{
+  margin-top:2px!important;
+  color:#66788d!important;
+  font-size:5.5px!important;
+}
+.match-meta-rich .match-fast-read.good{
+  border-color:rgba(84,216,164,.18);
+  background:rgba(84,216,164,.035);
+}
+.match-meta-rich .match-fast-read.good>span,
+.match-meta-rich .match-fast-read.good>strong{
+  color:#79dcb3!important;
+}
+.match-meta-rich .match-fast-read.bad{
+  border-color:rgba(255,126,138,.18);
+  background:rgba(255,126,138,.035);
+}
+.match-meta-rich .match-fast-read.bad>span,
+.match-meta-rich .match-fast-read.bad>strong{
+  color:#f0949d!important;
+}
+.match-meta-rich .match-fast-read.neutral{
+  border-color:rgba(97,126,160,.17);
+}
+.match-meta-rich .match-value-grid>span{
+  border:1px solid rgba(93,134,173,.1);
+  background:#0d1926;
+}
+.match-meta-rich .match-value-grid b{
+  color:#dce7f3;
+}
+
+@media(max-width:760px){
+  .match-row-v2>.match-meta-rich{
+    grid-template-columns:1fr!important;
+    align-items:stretch!important;
+  }
+  .match-value-grid-core{
+    width:100%;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    margin-bottom:5px!important;
+  }
+  .match-meta-rich .match-fast-read{
+    max-width:none;
+  }
+}
