@@ -65,6 +65,7 @@ import SiteHudOverlay from "./components/SiteHudOverlay";
 import AdaptiveArtwork from "./components/AdaptiveArtwork";
 import ArtworkRibbon from "./components/ArtworkRibbon";
 import SectionMarker from "./components/SectionMarker";
+import ChibiNavIcon from "./components/ChibiNavIcon";
 import TeamBuilderPage from "./components/TeamBuilderPage";
 import LeaderboardPage from "./components/LeaderboardPage";
 import ProductInfoPage from "./components/ProductInfoPage";
@@ -1296,12 +1297,12 @@ function App() {
           <span>chibi<span>.gg</span></span>
         </button>
         {!compactViewport&&<nav className="product-nav" aria-label="Chibi">
-          <button className={sitePage==="meta"?"active":""} onClick={openMeta}>{t("nav.meta")}</button>
-          <button className={sitePage==="comps"?"active":""} onClick={openComps}>{t("nav.comps")}</button>
-          <button className={sitePage==="stats"?"active":""} onClick={()=>openStats()}>{t("nav.statistics")}</button>
-          <button className={"builder-nav-button "+(sitePage==="builder"?"active":"")} onClick={()=>openBuilder([])}>{t("nav.builder")}</button>
-          <button className={sitePage==="leaderboard"?"active":""} onClick={openLeaderboard}>{t("nav.leaderboard")}</button>
-          <button className={"companion-nav-button "+(sitePage==="overlay"?"active":"")} onClick={openOverlay}>{t("nav.companion")}</button>
+          <button className={sitePage==="meta"?"active":""} onClick={openMeta}><ChibiNavIcon kind="meta"/><span>{t("nav.meta")}</span></button>
+          <button className={sitePage==="comps"?"active":""} onClick={openComps}><ChibiNavIcon kind="comps"/><span>{t("nav.comps")}</span></button>
+          <button className={sitePage==="stats"?"active":""} onClick={()=>openStats()}><ChibiNavIcon kind="statistics"/><span>{t("nav.statistics")}</span></button>
+          <button className={"builder-nav-button "+(sitePage==="builder"?"active":"")} onClick={()=>openBuilder([])}><ChibiNavIcon kind="builder"/><span>{t("nav.builder")}</span></button>
+          <button className={sitePage==="leaderboard"?"active":""} onClick={openLeaderboard}><ChibiNavIcon kind="ranking"/><span>{t("nav.leaderboard")}</span></button>
+          <button className={"companion-nav-button "+(sitePage==="overlay"?"active":"")} onClick={openOverlay}><ChibiNavIcon kind="companion"/><span>{t("nav.companion")}</span></button>
         </nav>}
         <GlobalSearch
           staticData={staticData}
@@ -1323,12 +1324,12 @@ function App() {
             <b>☰</b>
           </button>
           {mobileNavOpen&&<div className="mobile-product-menu-panel">
-            <button className={sitePage==="meta"?"active":""} onClick={()=>{openMeta();setMobileNavOpen(false);}}>{t("nav.meta")}</button>
-            <button className={sitePage==="comps"?"active":""} onClick={()=>{openComps();setMobileNavOpen(false);}}>{t("nav.comps")}</button>
-            <button className={sitePage==="stats"?"active":""} onClick={()=>{openStats();setMobileNavOpen(false);}}>{t("nav.statistics")}</button>
-            <button className={sitePage==="builder"?"active":""} onClick={()=>{openBuilder([]);setMobileNavOpen(false);}}>{t("nav.builder")}</button>
-            <button className={sitePage==="leaderboard"?"active":""} onClick={()=>{openLeaderboard();setMobileNavOpen(false);}}>{t("nav.leaderboard")}</button>
-            <button className={sitePage==="overlay"?"active":""} onClick={()=>{openOverlay();setMobileNavOpen(false);}}>{t("nav.companion")}</button>
+            <button className={sitePage==="meta"?"active":""} onClick={()=>{openMeta();setMobileNavOpen(false);}}><ChibiNavIcon kind="meta"/><span>{t("nav.meta")}</span></button>
+            <button className={sitePage==="comps"?"active":""} onClick={()=>{openComps();setMobileNavOpen(false);}}><ChibiNavIcon kind="comps"/><span>{t("nav.comps")}</span></button>
+            <button className={sitePage==="stats"?"active":""} onClick={()=>{openStats();setMobileNavOpen(false);}}><ChibiNavIcon kind="statistics"/><span>{t("nav.statistics")}</span></button>
+            <button className={sitePage==="builder"?"active":""} onClick={()=>{openBuilder([]);setMobileNavOpen(false);}}><ChibiNavIcon kind="builder"/><span>{t("nav.builder")}</span></button>
+            <button className={sitePage==="leaderboard"?"active":""} onClick={()=>{openLeaderboard();setMobileNavOpen(false);}}><ChibiNavIcon kind="ranking"/><span>{t("nav.leaderboard")}</span></button>
+            <button className={sitePage==="overlay"?"active":""} onClick={()=>{openOverlay();setMobileNavOpen(false);}}><ChibiNavIcon kind="companion"/><span>{t("nav.companion")}</span></button>
           </div>}
         </div>}
         <div className="topbar-actions">
@@ -1583,7 +1584,7 @@ function App() {
           />
           <section className="home-paths-v2 home-paths-v3 home-section-paths" aria-label={t("home.pathsAria")}>
             <button onClick={openMeta}>
-              <span className="home-path-index"><i>✦</i><em>01</em></span>
+              <span className="home-path-index"><ChibiNavIcon kind="meta"/><em>01</em></span>
               <div>
                 <small>META</small>
                 <h2>{t("home.path.meta.title")}</h2>
@@ -1593,7 +1594,7 @@ function App() {
             </button>
 
             <button onClick={()=>document.getElementById("home-riot-id")?.focus()}>
-              <span className="home-path-index"><i>◎</i><em>02</em></span>
+              <span className="home-path-index"><ChibiNavIcon kind="profile"/><em>02</em></span>
               <div>
                 <small>{t("home.path.game.label")}</small>
                 <h2>{t("home.path.game.title")}</h2>
@@ -1603,7 +1604,7 @@ function App() {
             </button>
 
             <button onClick={()=>openBuilder([])}>
-              <span className="home-path-index"><i>◇</i><em>03</em></span>
+              <span className="home-path-index"><ChibiNavIcon kind="builder"/><em>03</em></span>
               <div>
                 <small>BUILDER</small>
                 <h2>{t("home.path.builder.title")}</h2>
