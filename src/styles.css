@@ -22489,3 +22489,255 @@ img[src$="chibi-ui-10.png"],
 .app-shell.compact-layout .profile-art-ribbon .artwork-ribbon-card .adaptive-artwork{
   max-height:84px!important;
 }
+
+/* CHIBI EDITORIAL HIERARCHY v29 */
+
+/* Editorial section dividers */
+.section-marker{
+  width:100%;
+  max-width:100%;
+  display:grid;
+  grid-template-columns:42px minmax(0,760px) minmax(60px,1fr);
+  gap:12px;
+  align-items:end;
+  margin:30px 0 12px;
+  min-width:0;
+}
+.section-marker-index{
+  width:38px;
+  height:38px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(69,230,223,.19);
+  border-radius:10px;
+  background:
+    linear-gradient(145deg,rgba(69,230,223,.07),rgba(151,119,255,.035)),
+    #091622;
+  color:#77e7e2;
+  font-size:8px;
+  font-weight:950;
+  letter-spacing:.9px;
+  box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+.section-marker>div{
+  min-width:0;
+}
+.section-marker small{
+  display:block;
+  margin-bottom:3px;
+  color:#6fded9;
+  font-size:6.5px;
+  font-weight:950;
+  letter-spacing:1.2px;
+}
+.section-marker h2{
+  margin:0;
+  color:#e8f1fb;
+  font-size:clamp(17px,2.2vw,23px);
+  line-height:1.08;
+  letter-spacing:-.55px;
+}
+.section-marker p{
+  max-width:680px;
+  margin:5px 0 0;
+  color:#73849a;
+  font-size:8px;
+  line-height:1.55;
+}
+.section-marker>i{
+  align-self:center;
+  height:1px;
+  min-width:40px;
+  background:linear-gradient(90deg,rgba(69,230,223,.22),rgba(151,119,255,.10),transparent);
+}
+.section-marker.compact{
+  grid-template-columns:34px minmax(0,620px) 1fr;
+  margin:12px 0 8px;
+}
+.section-marker.compact .section-marker-index{
+  width:30px;
+  height:30px;
+  border-radius:8px;
+  font-size:6px;
+}
+.section-marker.compact h2{
+  font-size:14px;
+}
+.section-marker.compact p{
+  font-size:7px;
+}
+
+/* Home gains a clearer chapter rhythm without adding extra cards */
+.home-section-paths{
+  margin-top:0!important;
+}
+.home-proof-strip{
+  margin-bottom:22px!important;
+}
+.home-art-ribbon.home-section-product{
+  margin-top:0!important;
+}
+.home-meta-preview,
+.home-builder-v2{
+  position:relative;
+}
+.home-meta-preview::before,
+.home-builder-v2::before{
+  content:"";
+  position:absolute;
+  top:-8px;
+  left:0;
+  width:44px;
+  height:2px;
+  border-radius:999px;
+  background:linear-gradient(90deg,#54e4de,transparent);
+  opacity:.65;
+}
+
+/* History reads as sessions, not a wall of cards */
+.history-section-marker{
+  align-items:start;
+}
+.history-session{
+  position:relative;
+  overflow:hidden;
+  border-color:rgba(100,141,177,.15)!important;
+  background:
+    linear-gradient(180deg,rgba(11,24,37,.82),rgba(7,16,26,.92))!important;
+}
+.history-session::after{
+  content:"";
+  position:absolute;
+  z-index:0;
+  left:0;
+  top:0;
+  width:2px;
+  height:100%;
+  background:linear-gradient(180deg,rgba(69,230,223,.42),rgba(151,119,255,.12),transparent 88%);
+  pointer-events:none;
+}
+.history-session>*{
+  position:relative;
+  z-index:1;
+}
+.history-session-head{
+  border-bottom:1px solid rgba(96,138,177,.10)!important;
+  background:linear-gradient(90deg,rgba(69,230,223,.025),transparent 58%)!important;
+}
+.history-session-titleline>span{
+  color:#6fded9!important;
+  letter-spacing:.8px;
+}
+.match-row-v2{
+  position:relative;
+  border-color:rgba(93,134,173,.11)!important;
+}
+.match-row-v2:hover{
+  border-color:rgba(69,230,223,.22)!important;
+}
+.match-row-v2 .match-result-rail{
+  position:relative;
+}
+.match-row-v2 .match-result-rail::after{
+  content:"";
+  position:absolute;
+  right:-1px;
+  top:10px;
+  bottom:10px;
+  width:1px;
+  background:linear-gradient(180deg,transparent,rgba(102,146,184,.16),transparent);
+}
+.match-row-v2 .placement{
+  min-width:36px;
+  min-height:30px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(104,145,181,.15);
+  border-radius:8px;
+  background:#0d1a27;
+  font-weight:950!important;
+  letter-spacing:-.3px;
+}
+.match-row-v2 .match-row-title strong{
+  color:#e5edf7!important;
+}
+.match-row-v2 .match-context-line{
+  color:#67798f;
+}
+.match-row-v2 .match-review-label{
+  box-shadow:none!important;
+}
+
+/* Compact mobile navigation label */
+.app-shell.compact-layout .mobile-product-menu-trigger{
+  width:auto!important;
+  min-width:60px!important;
+  height:40px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  padding:0 8px!important;
+}
+.mobile-product-menu-trigger>span{
+  color:#8da0b4;
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.65px;
+  text-transform:uppercase;
+}
+.mobile-product-menu-trigger>b{
+  color:#79e7e2;
+  font-size:14px;
+  font-weight:800;
+  line-height:1;
+}
+
+/* Compact layout keeps chapter markers useful but lightweight */
+.app-shell.compact-layout .section-marker{
+  grid-template-columns:30px minmax(0,1fr);
+  gap:9px;
+  margin:18px 0 8px!important;
+  align-items:start;
+}
+.app-shell.compact-layout .section-marker>i{
+  display:none;
+}
+.app-shell.compact-layout .section-marker-index{
+  width:28px;
+  height:28px;
+  border-radius:8px;
+  font-size:6px;
+}
+.app-shell.compact-layout .section-marker h2{
+  font-size:15px!important;
+  line-height:1.12;
+}
+.app-shell.compact-layout .section-marker p{
+  margin-top:3px;
+  font-size:7px;
+  line-height:1.45;
+}
+.app-shell.compact-layout .section-marker.compact{
+  margin-top:8px!important;
+}
+.app-shell.compact-layout .section-marker.compact p{
+  display:none;
+}
+.app-shell.compact-layout .history-session::after{
+  width:1px;
+}
+.app-shell.compact-layout .match-row-v2 .match-result-rail::after{
+  display:none;
+}
+
+@media(max-width:390px){
+  .app-shell.compact-layout .mobile-product-menu-trigger{
+    width:37px!important;
+    min-width:37px!important;
+    padding:0!important;
+  }
+  .app-shell.compact-layout .mobile-product-menu-trigger>span{
+    display:none;
+  }
+}
