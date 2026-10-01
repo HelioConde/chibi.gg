@@ -22442,3 +22442,50 @@ img[src$="chibi-ui-10.png"],
     max-height:102px!important;
   }
 }
+
+/* CHIBI HOME PROFILE ART RIBBONS v28 */
+
+.home-art-ribbon{
+  margin-top:14px;
+  margin-bottom:24px;
+}
+.home-art-ribbon .artwork-ribbon-card{
+  height:146px;
+}
+.home-art-ribbon .artwork-ribbon-card:first-child{
+  height:164px;
+}
+
+.profile-art-ribbon{
+  margin-top:8px;
+  margin-bottom:8px;
+  grid-template-columns:minmax(0,1.1fr) minmax(0,.95fr) minmax(0,.95fr);
+}
+.profile-art-ribbon .artwork-ribbon-card,
+.profile-art-ribbon .artwork-ribbon-card:first-child{
+  height:92px;
+}
+.profile-art-ribbon .artwork-ribbon-card .adaptive-artwork{
+  object-position:center 24%;
+}
+.profile-art-ribbon .artwork-ribbon-card>span{
+  background:
+    linear-gradient(180deg,transparent 44%,rgba(5,12,20,.68)),
+    linear-gradient(90deg,rgba(5,12,20,.08),transparent 56%);
+}
+
+.app-shell.compact-layout .home-art-ribbon{
+  margin:6px 0 14px!important;
+}
+.app-shell.compact-layout .profile-art-ribbon{
+  margin:6px 0 7px!important;
+}
+.app-shell.compact-layout .profile-art-ribbon .artwork-ribbon-card,
+.app-shell.compact-layout .profile-art-ribbon .artwork-ribbon-card:first-child{
+  flex:0 0 min(68vw,240px)!important;
+  width:min(68vw,240px)!important;
+  height:84px!important;
+}
+.app-shell.compact-layout .profile-art-ribbon .artwork-ribbon-card .adaptive-artwork{
+  max-height:84px!important;
+}
