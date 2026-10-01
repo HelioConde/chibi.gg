@@ -23124,3 +23124,133 @@ img[src$="chibi-ui-10.png"],
   width:25px;
   height:25px;
 }
+
+/* CHIBI OUTPUT V2 TRANSPARENT PIECES v32 */
+
+/* output-v2 ribbons are transparent UI pieces, not full-bleed screenshots */
+.artwork-ribbon{
+  align-items:stretch;
+}
+.artwork-ribbon-card{
+  display:grid;
+  place-items:center;
+  background:
+    radial-gradient(circle at 50% 45%,rgba(96,71,255,.075),transparent 45%),
+    linear-gradient(180deg,#0a1724,#07121d);
+}
+.artwork-ribbon-card .adaptive-artwork,
+.artwork-ribbon-card .adaptive-artwork.art-landscape,
+.artwork-ribbon-card .adaptive-artwork.art-square,
+.artwork-ribbon-card .adaptive-artwork.art-portrait{
+  width:100%!important;
+  height:100%!important;
+  padding:8px!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  opacity:.88!important;
+  background:transparent!important;
+  filter:saturate(.96) contrast(1.03) brightness(.9) drop-shadow(0 12px 24px rgba(0,0,0,.22));
+}
+.artwork-ribbon-card>span{
+  background:
+    linear-gradient(180deg,rgba(5,12,20,.02),rgba(5,12,20,.26)),
+    linear-gradient(90deg,rgba(5,12,20,.10),transparent 48%,rgba(5,12,20,.08));
+}
+.artwork-ribbon-card:hover .adaptive-artwork{
+  transform:translateY(-2px) scale(1.015);
+  opacity:1!important;
+}
+
+/* Desktop ambient backdrop now uses isolated transparent pieces */
+.site-art-frame{
+  overflow:visible!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.site-art-frame::after{
+  display:none!important;
+}
+.site-art-frame>.adaptive-artwork{
+  width:100%!important;
+  height:100%!important;
+  padding:8px!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  opacity:.24!important;
+  background:transparent!important;
+  filter:saturate(.84) brightness(.76) drop-shadow(0 24px 48px rgba(0,0,0,.22));
+}
+.site-art-frame-0{
+  width:min(24vw,380px)!important;
+  height:min(44vh,470px)!important;
+  left:-4vw!important;
+  top:14vh!important;
+  opacity:.7!important;
+}
+.site-art-frame-1{
+  width:min(22vw,330px)!important;
+  height:min(32vh,350px)!important;
+  right:-3vw!important;
+  top:10vh!important;
+  opacity:.66!important;
+}
+.site-art-frame-2{
+  width:min(20vw,300px)!important;
+  height:min(30vh,320px)!important;
+  right:-3vw!important;
+  bottom:7vh!important;
+  opacity:.58!important;
+}
+
+/* Wide frames should read like rails, while icons/mascots stay centered */
+.site-art-profile .site-art-frame-0,
+.site-art-matches .site-art-frame-0{
+  width:min(36vw,560px)!important;
+  height:150px!important;
+  left:-8vw!important;
+  top:18vh!important;
+}
+.site-art-coach .site-art-frame-0,
+.site-art-builder .site-art-frame-1,
+.site-art-comps .site-art-frame-2{
+  width:min(23vw,350px)!important;
+  height:min(34vh,360px)!important;
+}
+
+/* Keep output-v2 semantic emblems crisp inside page heroes */
+.v2-hero-emblem,
+.chibi-nav-icon{
+  image-rendering:auto;
+}
+.v2-hero-emblem{
+  filter:saturate(.98) contrast(1.03) drop-shadow(0 14px 30px rgba(0,0,0,.34))!important;
+}
+.page-hero-with-reference .v2-hero-emblem{
+  mask-image:none!important;
+  -webkit-mask-image:none!important;
+}
+
+/* The organized frame rail is decorative only; never affects layout */
+.player-v2-hud-rail,
+.coach-v2-frame,
+.coach-v2-mascot,
+.site-hud-v2-rail,
+.site-hud-v2-emblem{
+  pointer-events:none!important;
+  user-select:none!important;
+}
+
+/* Compact layout: transparent pieces stay bounded */
+.app-shell.compact-layout .artwork-ribbon-card .adaptive-artwork,
+.app-shell.compact-layout .artwork-ribbon-card .adaptive-artwork.art-landscape,
+.app-shell.compact-layout .artwork-ribbon-card .adaptive-artwork.art-square,
+.app-shell.compact-layout .artwork-ribbon-card .adaptive-artwork.art-portrait{
+  position:static!important;
+  width:100%!important;
+  height:100%!important;
+  max-height:108px!important;
+  padding:5px!important;
+  object-fit:contain!important;
+  opacity:.9!important;
+}
