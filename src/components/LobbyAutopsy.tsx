@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { TftMatch, TftMatchDetail } from "../api/tft";
 import { buildLobbyAutopsy } from "../analysis/lobbyAutopsy";
 import { staticEntry, TftStaticData } from "../tftStatic";
+import { SITE_IMAGES } from "../siteAssets";
 
 type Props={
   target:TftMatch;
@@ -30,7 +31,8 @@ function traitName(id:string,staticData:TftStaticData|null){
 export default function LobbyAutopsy({target,detail,staticData}:Props){
   const autopsy=useMemo(()=>buildLobbyAutopsy(target,detail),[target,detail]);
 
-  return <section className="lobby-autopsy lobby-autopsy-v2">
+  return <section className="lobby-autopsy lobby-autopsy-v2 match-stage-with-art">
+    <img className="match-stage-art match-stage-art-lobby" src={SITE_IMAGES.ui.comparison} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
     <div className="autopsy-head">
       <div>
         <span>POR QUE EU PERDI? · LOBBY AUTOPSY</span>
