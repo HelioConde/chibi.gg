@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { SITE_IMAGES } from "../siteAssets";
 import AdaptiveArtwork from "./AdaptiveArtwork";
+import ArtworkRibbon from "./ArtworkRibbon";
 import { TftMatch } from "../api/tft";
 import { getActiveSession, sessionProgress } from "../sessionMode";
 import { useI18n } from "../i18n";
@@ -196,6 +197,8 @@ export default function OverlayPage({
         <b>{t("overlay.localPrototype")}</b>
       </div>
     </section>
+
+    <ArtworkRibbon images={[19,21,11]} className="overlay-art-ribbon"/>
 
     {activeSession&&<section className="panel overlay-session-focus">
       <div className="overlay-session-focus-head">
