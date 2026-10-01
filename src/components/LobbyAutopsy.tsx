@@ -64,19 +64,28 @@ export default function LobbyAutopsy({target,detail,staticData}:Props){
       <strong>{autopsy.priority}</strong>
     </div>
 
-    <div className="autopsy-grid">
-      {autopsy.signals.slice(0,3).map(signal=>(
-        <article className={"autopsy-signal "+signal.tone} key={signal.id}>
-          <div className="autopsy-signal-kicker">
-            <span>{signal.tone==="warning"?"ATENÇÃO":signal.tone==="good"?"FUNCIONOU":"OBSERVADO"}</span>
-            <em>{signal.strength}% · {signal.confidence}</em>
-          </div>
-          <h4>{signal.title}</h4>
-          <p>{signal.body}</p>
-          <small>{signal.evidence}</small>
-        </article>
-      ))}
-    </div>
+    {autopsy.signals.length>0&&<details className="autopsy-primary-signals">
+      <summary>
+        <span>
+          <b>Sinais observados nesta lobby</b>
+          <small>{autopsy.signals.slice(0,3).map(signal=>signal.title).join(" · ")}</small>
+        </span>
+        <em>{Math.min(3,autopsy.signals.length)} sinais +</em>
+      </summary>
+      <div className="autopsy-grid">
+        {autopsy.signals.slice(0,3).map(signal=>(
+          <article className={"autopsy-signal "+signal.tone} key={signal.id}>
+            <div className="autopsy-signal-kicker">
+              <span>{signal.tone==="warning"?"ATENÇÃO":signal.tone==="good"?"FUNCIONOU":"OBSERVADO"}</span>
+              <em>{signal.strength}% · {signal.confidence}</em>
+            </div>
+            <h4>{signal.title}</h4>
+            <p>{signal.body}</p>
+            <small>{signal.evidence}</small>
+          </article>
+        ))}
+      </div>
+    </details>}
 
     <div className="autopsy-facts autopsy-facts-v2">
       <div>

@@ -34,10 +34,10 @@ export default function MatchBoardMap({match,staticData}:Props){
         })}
       </div>
 
-      <div className="match-board-map-note">
-        <strong>Por que não estimar?</strong>
+      <details className="match-board-map-note">
+        <summary>Por que não estimar a posição?</summary>
         <p>Porque posição altera o significado da análise. Um hex inventado seria pior do que admitir que o dado não existe.</p>
-      </div>
+      </details>
     </div>
 
     <details className="match-board-placeholder">
