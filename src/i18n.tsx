@@ -698,6 +698,10 @@ const messages: Record<Language, Record<string, string>> = {
     "profile.footer.tagline": "TFT explicado com dados e revisão pós-partida.",
     "profile.footer.aria": "Informações do Chibi",
 
+    "profile.pulse.aria": "Resumo rápido do jogador",
+    "profile.pulse.average": "MÉDIA",
+    "profile.pulse.form": "MOMENTO",
+    "profile.pulse.top4Detail": "{{top4}} de {{total}} partidas",
     "profile.avg.insufficient": "amostra insuficiente",
     "profile.avg.above": "acima do meio da lobby",
     "profile.avg.near": "próximo do meio da lobby",
@@ -2188,6 +2192,10 @@ const messages: Record<Language, Record<string, string>> = {
     "profile.footer.tagline": "TFT explained with data and post-game review.",
     "profile.footer.aria": "Chibi information",
 
+    "profile.pulse.aria": "Player quick summary",
+    "profile.pulse.average": "AVERAGE",
+    "profile.pulse.form": "FORM",
+    "profile.pulse.top4Detail": "{{top4}} of {{total}} matches",
     "profile.avg.insufficient": "insufficient sample",
     "profile.avg.above": "above the middle of the lobby",
     "profile.avg.near": "near the middle of the lobby",

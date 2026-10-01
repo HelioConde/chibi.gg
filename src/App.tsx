@@ -1751,9 +1751,29 @@ function App() {
                 <div className="player-rank-line">
                   <strong>{rank ? rank.tier+" "+rank.rank : t("profile.noRank")}</strong>
                   {rank&&<span>{rank.leaguePoints} LP · {rank.wins}V / {rank.losses}D</span>}
-                  <span className={"player-trend "+trendStats.tone}>{trendStats.label}</span>
                 </div>
               </div>
+            </div>
+
+            <div className="player-summary-kpis" aria-label={t("profile.pulse.aria")}>
+              <article className="player-kpi-card">
+                <AdaptiveArtwork className="player-kpi-art" src={SITE_IMAGES.v2.badges.rankAlt} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
+                <span>{t("profile.pulse.average")}</span>
+                <strong>{dna.avgPlacement==null?"—":dna.avgPlacement.toFixed(2)}</strong>
+                <small>{headlineStats.avgLabel}</small>
+              </article>
+              <article className="player-kpi-card">
+                <AdaptiveArtwork className="player-kpi-art" src={SITE_IMAGES.v2.badges.heartAlt} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
+                <span>TOP 4</span>
+                <strong>{dna.sampleSize?dna.top4Rate+"%":"—"}</strong>
+                <small>{t("profile.pulse.top4Detail",{top4:headlineStats.top4,total:headlineStats.total})}</small>
+              </article>
+              <article className={"player-kpi-card player-kpi-trend "+(trendStats.tone||"neutral")}>
+                <AdaptiveArtwork className="player-kpi-art" src={SITE_IMAGES.v2.mascots.scoutAlt} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
+                <span>{t("profile.pulse.form")}</span>
+                <strong>{trendStats.label}</strong>
+                <small>{trendStats.detail}</small>
+              </article>
             </div>
 
             <div className="player-summary-actions">
