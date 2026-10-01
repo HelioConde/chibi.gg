@@ -21640,3 +21640,272 @@ img[src$="chibi-ui-10.png"],
     display:none!important;
   }
 }
+
+/* CHIBI MOBILE ART HOTFIX v24 */
+
+/*
+  Mobile safety pass based on real device screenshots:
+  - global artwork must never become page content
+  - desktop product navigation stays hidden
+  - artwork remains only inside bounded components
+*/
+@media(max-width:760px){
+  html,
+  body,
+  #root,
+  .app-shell{
+    max-width:100%;
+    overflow-x:hidden!important;
+  }
+
+  /* The fixed full-site art was visually taking over the page on phones. */
+  .site-art-backdrop{
+    display:none!important;
+  }
+
+  /* Keep HUD details, but never large decorative raster art on the viewport. */
+  .site-hud-texture,
+  .site-hud-icons{
+    display:none!important;
+  }
+  .site-hud-overlay{
+    inset:58px 0 0!important;
+    opacity:.55;
+  }
+
+  /* Mobile header must be one compact row. */
+  .topbar{
+    position:sticky!important;
+    top:0!important;
+    z-index:100!important;
+    display:flex!important;
+    align-items:center!important;
+    width:100%!important;
+    height:58px!important;
+    min-height:58px!important;
+    padding:8px 12px!important;
+    gap:8px!important;
+    overflow:visible!important;
+    background:rgba(5,11,19,.96)!important;
+    backdrop-filter:blur(18px) saturate(125%)!important;
+  }
+  .topbar .brand{
+    flex:0 0 auto!important;
+    min-width:0;
+  }
+  .topbar .brand-mark{
+    width:36px!important;
+    height:36px!important;
+  }
+  .topbar .brand>span:last-child{
+    font-size:18px!important;
+    white-space:nowrap;
+  }
+
+  /* Never render desktop nav under the header on phones. */
+  .topbar .product-nav{
+    display:none!important;
+  }
+
+  .topbar .global-search-trigger{
+    flex:0 0 42px!important;
+    width:42px!important;
+    min-width:42px!important;
+    height:42px!important;
+    margin-left:auto!important;
+    padding:0!important;
+  }
+  .topbar-actions{
+    flex:0 0 auto!important;
+    gap:5px!important;
+  }
+  .topbar-actions .ghost-button,
+  .topbar .account-menu-trigger{
+    display:none!important;
+  }
+  .language-switcher{
+    min-width:52px!important;
+    height:42px!important;
+  }
+
+  /* No decorative image is allowed to define a component's height. */
+  .adaptive-artwork[aria-hidden="true"],
+  .player-summary-reference-art,
+  .history-reference-art,
+  .page-reference-art,
+  .match-stage-art,
+  .overlay-page-art,
+  .home-product-reference-art{
+    position:absolute!important;
+    max-height:100%!important;
+    pointer-events:none!important;
+  }
+
+  /* Profile art stays INSIDE the player card. */
+  .player-summary-shell{
+    position:relative!important;
+    overflow:hidden!important;
+  }
+  .player-summary-reference-art{
+    inset:0 0 auto auto!important;
+    width:44%!important;
+    height:100%!important;
+    max-height:100%!important;
+    padding:0!important;
+    opacity:.12!important;
+    object-fit:cover!important;
+    object-position:center top!important;
+    mask-image:linear-gradient(90deg,transparent,black 48%)!important;
+    -webkit-mask-image:linear-gradient(90deg,transparent,black 48%)!important;
+  }
+
+  /* History art is just a header texture, never a tall standalone image. */
+  .history-with-reference{
+    position:relative!important;
+    overflow:hidden!important;
+  }
+  .history-reference-art{
+    top:0!important;
+    right:0!important;
+    width:46%!important;
+    height:96px!important;
+    padding:0!important;
+    opacity:.10!important;
+    object-fit:cover!important;
+    object-position:center top!important;
+  }
+
+  /* Page hero art has a strict viewport-bound height. */
+  .page-hero-with-reference{
+    min-height:0!important;
+    overflow:hidden!important;
+  }
+  .page-reference-art{
+    top:0!important;
+    right:0!important;
+    bottom:auto!important;
+    left:auto!important;
+    width:48%!important;
+    height:100%!important;
+    max-height:220px!important;
+    padding:0!important;
+    opacity:.13!important;
+    object-fit:cover!important;
+    object-position:center top!important;
+    mask-image:linear-gradient(90deg,transparent,black 48%)!important;
+    -webkit-mask-image:linear-gradient(90deg,transparent,black 48%)!important;
+  }
+  .page-reference-art.art-portrait,
+  .page-reference-art.art-square{
+    width:40%!important;
+    height:100%!important;
+    max-height:220px!important;
+    padding:6px!important;
+    object-fit:contain!important;
+  }
+
+  /* Companion art remains bounded by its hero. */
+  .overlay-page-hero-art{
+    min-height:0!important;
+    overflow:hidden!important;
+  }
+  .overlay-page-art{
+    top:0!important;
+    right:0!important;
+    bottom:auto!important;
+    left:auto!important;
+    width:50%!important;
+    height:100%!important;
+    max-height:230px!important;
+    padding:0!important;
+    opacity:.13!important;
+    object-fit:cover!important;
+  }
+
+  /* Review artwork cannot grow the modal. */
+  .match-stage-with-art{
+    position:relative!important;
+    overflow:hidden!important;
+  }
+  .match-stage-art{
+    top:0!important;
+    right:0!important;
+    width:42%!important;
+    height:100%!important;
+    max-height:130px!important;
+    padding:0!important;
+    opacity:.08!important;
+  }
+
+  /* Home reference image is only a texture behind the fake product window. */
+  .home-product-window{
+    position:relative!important;
+    overflow:hidden!important;
+  }
+  .home-product-reference-art{
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    max-height:none!important;
+    padding:0!important;
+    opacity:.08!important;
+    object-fit:cover!important;
+  }
+
+  /* Coach keeps a short cinematic banner, not a full-screen art block. */
+  .coach-art-banner{
+    position:relative!important;
+    height:112px!important;
+    max-height:112px!important;
+    overflow:hidden!important;
+  }
+  .coach-art-banner .adaptive-artwork{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    max-height:112px!important;
+    padding:0!important;
+    object-fit:cover!important;
+    opacity:.28!important;
+  }
+
+  /* Content must begin immediately below the compact header. */
+  .landing-v2,
+  .profile-page,
+  .global-meta-page,
+  .comps-page,
+  .statistics-page,
+  .builder-page,
+  .team-builder-page,
+  .leaderboard-page,
+  .overlay-page,
+  .legal-page{
+    margin-top:0!important;
+    padding-top:16px!important;
+  }
+}
+
+/* Small phones: protect the logo/search/language row. */
+@media(max-width:390px){
+  .topbar{
+    padding-inline:9px!important;
+    gap:6px!important;
+  }
+  .topbar .brand>span:last-child{
+    font-size:16px!important;
+  }
+  .topbar .brand-mark{
+    width:34px!important;
+    height:34px!important;
+  }
+  .topbar .global-search-trigger{
+    width:38px!important;
+    min-width:38px!important;
+    height:38px!important;
+  }
+  .language-switcher{
+    min-width:48px!important;
+    height:38px!important;
+  }
+}
