@@ -8,6 +8,7 @@ import { profileIconUrl, TftStaticData } from "../tftStatic";
 import { useI18n } from "../i18n";
 import { SITE_IMAGES } from "../siteAssets";
 import AdaptiveArtwork from "./AdaptiveArtwork";
+import ArtworkRibbon from "./ArtworkRibbon";
 
 type Tier="challenger"|"grandmaster"|"master";
 
@@ -75,6 +76,8 @@ export default function LeaderboardPage({staticData,onOpenPlayer}:Props){
         <small>{tier}</small>
       </div>
     </section>
+
+    <ArtworkRibbon images={[17,21,10]} className="leaderboard-art-ribbon"/>
 
     <section className="leaderboard-toolbar">
       <div className="leaderboard-regions">
