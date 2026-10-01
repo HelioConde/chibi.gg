@@ -246,6 +246,43 @@ function traitLabel(trait:TftTrait, staticData:TftStaticData|null){
   return staticEntry(staticData?.traits,trait.name)?.name || fallbackTraitName(trait.name);
 }
 
+function normalizeTraitMatchValue(value:string){
+  return fallbackTraitName(String(value||""))
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-zA-Z0-9]+/g," ")
+    .trim()
+    .toLowerCase();
+}
+
+function unitTraitValues(unit:TftUnit,staticData:TftStaticData|null){
+  const entry=staticEntry(staticData?.champions,unit.characterId);
+  const values=entry?.traits||[];
+
+  return values.flatMap((value)=>{
+    const resolved=staticEntry(staticData?.traits,value)?.name||"";
+    return [
+      normalizeTraitMatchValue(value),
+      normalizeTraitMatchValue(resolved),
+    ].filter(Boolean);
+  });
+}
+
+function unitHasTrait(unit:TftUnit,trait:TftTrait,staticData:TftStaticData|null){
+  const unitValues=new Set(unitTraitValues(unit,staticData));
+  const targets=[
+    normalizeTraitMatchValue(trait.name),
+    normalizeTraitMatchValue(traitLabel(trait,staticData)),
+  ].filter(Boolean);
+
+  return targets.some((value)=>unitValues.has(value));
+}
+
+function unitTraitPriority(unit:TftUnit,traits:TftTrait[],staticData:TftStaticData|null){
+  const index=traits.findIndex((trait)=>unitHasTrait(unit,trait,staticData));
+  return index<0 ? Number.MAX_SAFE_INTEGER : index;
+}
+
 function UnitVisual({
   unit,
   staticData,
@@ -275,6 +312,25 @@ function UnitVisual({
       })}
     </div>
   </div>;
+}
+
+
+function TraitUnitMini({
+  unit,
+  staticData,
+}:{unit:TftUnit;staticData:TftStaticData|null}){
+  const entry=staticEntry(staticData?.champions,unit.characterId);
+  const name=entry?.name||cleanName(unit.characterId);
+  const image=staticData?tftAssetUrl(staticData.version,"champion",entry):"";
+
+  return <span className="trait-unit-mini" title={name}>
+    <span className={"trait-unit-mini-portrait cost-"+Math.max(1,Math.min(5,Number(entry?.tier||unit.rarity||1)))}>
+      <span>{name.slice(0,2)}</span>
+      {image&&<img src={image} alt={name} onError={(e)=>{e.currentTarget.style.display="none";}}/>}
+      <em>{"★".repeat(Math.max(1,Math.min(3,unit.tier||1)))}</em>
+    </span>
+    <strong>{name}</strong>
+  </span>;
 }
 
 
@@ -2325,47 +2381,94 @@ function App() {
                 <MatchResultAccent placement={openedMatch.placement} className="match-summary-result-art"/>
                 <div className="match-summary-main">
                   <span>{t("match.finalBoard")}</span>
-                  <h3 className="match-comp-title" aria-label="Sinergias principais da composição">
-                    {activeTraits(openedMatch).slice(0,2).length
-                      ? activeTraits(openedMatch).slice(0,2).map((trait,index)=>{
+                  {(()=>{
+                    const summaryTraits=activeTraits(openedMatch).slice(0,4);
+                    const sortedUnits=[...openedMatch.units].sort((a,b)=>{
+                      const byTrait=unitTraitPriority(a,summaryTraits,staticData)-unitTraitPriority(b,summaryTraits,staticData);
+                      if(byTrait!==0)return byTrait;
+                      const byTier=(b.tier||0)-(a.tier||0);
+                      if(byTier!==0)return byTier;
+                      const aName=staticEntry(staticData?.champions,a.characterId)?.name||cleanName(a.characterId);
+                      const bName=staticEntry(staticData?.champions,b.characterId)?.name||cleanName(b.characterId);
+                      return aName.localeCompare(bName,locale);
+                    });
+
+                    return <>
+                      <h3 className="match-comp-title" aria-label="Sinergias principais da composição">
+                        {summaryTraits.slice(0,2).length
+                          ? summaryTraits.slice(0,2).map((trait,index)=>{
+                              const entry=staticEntry(staticData?.traits,trait.name);
+                              const image=staticData?tftAssetUrl(staticData.version,"trait",entry):"";
+                              const label=traitLabel(trait,staticData);
+                              return <span className="match-comp-title-node" key={trait.name}>
+                                {index>0&&<span className="match-comp-title-separator" aria-hidden="true">·</span>}
+                                <span className={"match-comp-title-icon style-"+Math.max(0,trait.style)} aria-hidden="true">
+                                  <span>{label.slice(0,1)}</span>
+                                  {image&&<img src={image} alt="" onError={(e)=>{e.currentTarget.style.display="none";}}/>}
+                                </span>
+                                <strong>{label}</strong>
+                              </span>;
+                            })
+                          : "Board TFT"}
+                      </h3>
+
+                      <div className="match-trait-relations" aria-label="Relação entre sinergias e campeões">
+                        {summaryTraits.map((trait)=>{
                           const entry=staticEntry(staticData?.traits,trait.name);
                           const image=staticData?tftAssetUrl(staticData.version,"trait",entry):"";
                           const label=traitLabel(trait,staticData);
-                          return <span className="match-comp-title-node" key={trait.name}>
-                            {index>0&&<span className="match-comp-title-arrow" aria-hidden="true">→</span>}
-                            <span className={"match-comp-title-icon style-"+Math.max(0,trait.style)} aria-hidden="true">
-                              <span>{label.slice(0,1)}</span>
-                              {image&&<img src={image} alt="" onError={(e)=>{e.currentTarget.style.display="none";}}/>}
+                          const relatedUnits=sortedUnits.filter((unit)=>unitHasTrait(unit,trait,staticData));
+
+                          if(!relatedUnits.length)return null;
+
+                          return <div className="match-trait-link-row" key={trait.name}>
+                            <div className={"match-trait-link-chip style-"+Math.max(0,trait.style)}>
+                              <span className="match-trait-link-chip-icon" aria-hidden="true">
+                                <span>{label.slice(0,1)}</span>
+                                {image&&<img src={image} alt="" onError={(e)=>{e.currentTarget.style.display="none";}}/>}
+                              </span>
+                              <span className="match-trait-link-chip-copy">
+                                <strong>{label}</strong>
+                                <b>{trait.numUnits}</b>
+                              </span>
+                            </div>
+
+                            <span className="match-trait-link-arrow" aria-hidden="true">
+                              <i/>
+                              <b>→</b>
                             </span>
-                            <strong>{label}</strong>
-                          </span>;
-                        })
-                      : "Board TFT"}
-                  </h3>
-                  <div className="match-trait-flow" aria-label="Sinergias ativas da composição">
-                    {activeTraits(openedMatch).slice(0,4).map((trait,index)=>{
-                      const traits=activeTraits(openedMatch).slice(0,4);
-                      const entry=staticEntry(staticData?.traits,trait.name);
-                      const image=staticData?tftAssetUrl(staticData.version,"trait",entry):"";
-                      const label=traitLabel(trait,staticData);
-                      return <span className="match-trait-flow-item" key={trait.name}>
-                        <span className={"match-trait-flow-chip style-"+Math.max(0,trait.style)}>
-                          <span className="match-trait-flow-icon" aria-hidden="true">
-                            <span>{label.slice(0,1)}</span>
-                            {image&&<img src={image} alt="" onError={(e)=>{e.currentTarget.style.display="none";}}/>}
-                          </span>
-                          <span className="match-trait-flow-copy">
-                            <strong>{label}</strong>
-                            <b>{trait.numUnits}</b>
-                          </span>
-                        </span>
-                        {index<traits.length-1&&<span className="match-trait-flow-arrow" aria-hidden="true">→</span>}
-                      </span>;
-                    })}
-                  </div>
-                  <div className="board-row modal-board">
-                    {openedMatch.units.map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact showName key={unit.characterId+index}/>)}
-                  </div>
+
+                            <div className="match-trait-unit-row">
+                              {relatedUnits.map((unit,index)=>(
+                                <TraitUnitMini
+                                  unit={unit}
+                                  staticData={staticData}
+                                  key={trait.name+"-"+unit.characterId+"-"+index}
+                                />
+                              ))}
+                            </div>
+                          </div>;
+                        })}
+                      </div>
+
+                      <div className="match-board-order-note">
+                        <span>BOARD ORGANIZADO</span>
+                        <small>campeões ordenados pela prioridade das sinergias acima</small>
+                      </div>
+
+                      <div className="board-row modal-board match-board-class-order">
+                        {sortedUnits.map((unit,index)=>(
+                          <UnitVisual
+                            unit={unit}
+                            staticData={staticData}
+                            compact
+                            showName
+                            key={unit.characterId+index}
+                          />
+                        ))}
+                      </div>
+                    </>;
+                  })()}
                   {openedMatch.augments.length>0&&<div className="augment-row match-summary-augments">
                     {openedMatch.augments.slice(0,3).map((augment)=><AugmentVisual id={augment} staticData={staticData} key={augment}/>)}
                   </div>}
