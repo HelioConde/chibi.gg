@@ -26516,3 +26516,172 @@ img[src$="chibi-ui-10.png"],
     height:13px!important;
   }
 }
+
+
+/* CHIBI REVIEW CLOSE + READABLE UNIT NAMES v59 */
+
+/* Close control: always anchored to the upper-right corner.
+   This overrides the older sticky/float mobile rule that could leave the X on the left. */
+.app-shell>.match-overlay>.match-modal>.match-close{
+  position:absolute!important;
+  top:12px!important;
+  right:12px!important;
+  left:auto!important;
+  z-index:140!important;
+  float:none!important;
+  width:38px!important;
+  height:38px!important;
+  margin:0!important;
+  display:grid!important;
+  place-items:center!important;
+  padding:0!important;
+  border:1px solid rgba(125,151,181,.28)!important;
+  border-radius:11px!important;
+  background:rgba(9,20,32,.94)!important;
+  color:#d8e3ee!important;
+  font-size:24px!important;
+  font-weight:500!important;
+  line-height:1!important;
+  box-shadow:0 10px 26px rgba(0,0,0,.28)!important;
+  backdrop-filter:blur(12px)!important;
+  -webkit-backdrop-filter:blur(12px)!important;
+  cursor:pointer!important;
+}
+.app-shell>.match-overlay>.match-modal>.match-close:hover{
+  border-color:rgba(109,205,255,.48)!important;
+  background:#10263a!important;
+  color:#fff!important;
+}
+.app-shell>.match-overlay>.match-modal>.match-close:focus-visible{
+  outline:2px solid rgba(108,207,255,.78)!important;
+  outline-offset:2px!important;
+}
+
+/* Give the header a protected lane so the close control never covers text. */
+.match-modal-head{
+  padding-right:54px!important;
+}
+
+/* Final board: champion identity is part of the card instead of tiny helper text. */
+.match-summary-card-v2 .modal-board{
+  gap:7px!important;
+  row-gap:9px!important;
+}
+.match-summary-card-v2 .modal-board .unit-card.compact.named{
+  flex:0 0 78px!important;
+  width:78px!important;
+  max-width:78px!important;
+  min-height:101px!important;
+  gap:0!important;
+  padding:4px 3px 5px!important;
+  border:1px solid rgba(104,139,173,.14)!important;
+  border-radius:9px!important;
+  background:rgba(7,17,28,.58)!important;
+}
+.match-summary-card-v2 .modal-board .unit-card.compact.named .unit-portrait{
+  flex:0 0 52px!important;
+  width:52px!important;
+  height:52px!important;
+  border-radius:9px!important;
+}
+.match-summary-card-v2 .modal-board .unit-card.compact.named .unit-caption{
+  order:2!important;
+  width:72px!important;
+  min-height:24px!important;
+  margin:4px 0 2px!important;
+  padding:2px 2px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  overflow:visible!important;
+  color:#e0e8f0!important;
+  font-size:9px!important;
+  font-weight:850!important;
+  line-height:1.08!important;
+  letter-spacing:-.08px!important;
+  text-align:center!important;
+  text-overflow:clip!important;
+  white-space:normal!important;
+  overflow-wrap:normal!important;
+  word-break:normal!important;
+  -webkit-line-clamp:unset!important;
+}
+.match-summary-card-v2 .modal-board .unit-card.compact.named .item-row{
+  order:3!important;
+  min-height:16px!important;
+  margin:2px 0 0!important;
+}
+.match-summary-card-v2 .modal-board .unit-card.compact.named .item-icon{
+  width:16px!important;
+  height:16px!important;
+}
+
+/* Board confirmation uses the same readable naming language. */
+.match-board-bench .match-board-unit{
+  flex-basis:80px!important;
+  width:80px!important;
+}
+.match-board-bench .match-board-unit>strong{
+  width:80px!important;
+  min-height:20px!important;
+  margin-top:5px!important;
+  color:#d5e0ea!important;
+  font-size:8.5px!important;
+  font-weight:850!important;
+  line-height:1.12!important;
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+}
+
+@media(max-width:760px){
+  .app-shell>.match-overlay>.match-modal>.match-close{
+    position:fixed!important;
+    top:max(10px,env(safe-area-inset-top))!important;
+    right:10px!important;
+    left:auto!important;
+    width:42px!important;
+    height:42px!important;
+    font-size:26px!important;
+  }
+
+  .match-modal-head{
+    padding-right:52px!important;
+  }
+
+  .match-summary-card-v2 .modal-board{
+    flex-wrap:nowrap!important;
+    overflow-x:auto!important;
+    gap:7px!important;
+    padding:2px 2px 8px!important;
+    scroll-snap-type:x proximity;
+    scrollbar-width:none;
+  }
+  .match-summary-card-v2 .modal-board::-webkit-scrollbar{display:none}
+
+  .match-summary-card-v2 .modal-board .unit-card.compact.named{
+    flex:0 0 76px!important;
+    width:76px!important;
+    max-width:76px!important;
+    min-height:99px!important;
+    scroll-snap-align:start;
+  }
+  .match-summary-card-v2 .modal-board .unit-card.compact.named .unit-portrait{
+    width:50px!important;
+    height:50px!important;
+    flex-basis:50px!important;
+  }
+  .match-summary-card-v2 .modal-board .unit-card.compact.named .unit-caption{
+    width:70px!important;
+    font-size:8.7px!important;
+  }
+
+  .match-board-bench .match-board-unit{
+    flex-basis:76px!important;
+    width:76px!important;
+  }
+  .match-board-bench .match-board-unit>strong{
+    width:76px!important;
+    font-size:8.2px!important;
+  }
+}
