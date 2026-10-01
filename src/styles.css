@@ -29969,3 +29969,195 @@ img[src$="chibi-ui-10.png"],
     max-height:none!important;
   }
 }
+
+
+/* CHIBI MATCH REVIEW READABILITY v75 */
+
+/* Desktop review: use more of the viewport and restore readable supporting text.
+   The review had become too narrow and several labels had fallen into 5-7px territory. */
+@media(min-width:1100px){
+  .app-shell>.match-overlay>.match-modal{
+    width:min(1360px,calc(100vw - 36px))!important;
+    max-width:none!important;
+  }
+
+  .match-modal-head{
+    padding-right:58px!important;
+  }
+
+  .match-modal-head h2{
+    max-width:940px!important;
+    font-size:clamp(24px,2.3vw,32px)!important;
+    line-height:1.05!important;
+  }
+
+  .match-modal-head p{
+    font-size:9px!important;
+  }
+
+  .match-summary-card.match-summary-card-v2{
+    padding:13px!important;
+  }
+
+  .match-summary-card-v2 .match-comp-title-node strong{
+    font-size:15px!important;
+  }
+
+  .match-trait-group-head strong{
+    font-size:10px!important;
+  }
+
+  .match-trait-group-head small{
+    font-size:6.4px!important;
+  }
+
+  .match-trait-group-units .unit-card.compact.named .unit-caption{
+    font-size:7.6px!important;
+  }
+
+  .match-summary-card-v2 .match-summary-stats small{
+    font-size:7px!important;
+  }
+
+  .match-summary-card-v2 .match-summary-stats b{
+    font-size:14px!important;
+  }
+
+  .match-review-navigator{
+    min-height:48px!important;
+    padding:6px!important;
+  }
+
+  .match-review-navigator small,
+  .match-review-navigator span{
+    font-size:7px!important;
+  }
+
+  .match-review-navigator b,
+  .match-review-navigator strong{
+    font-size:8.5px!important;
+  }
+
+  /* Overview */
+  .match-review-overview-head>div:first-child>span{
+    font-size:8.5px!important;
+  }
+
+  .match-review-overview-head h3{
+    font-size:19px!important;
+  }
+
+  .match-review-overview-head p{
+    font-size:9px!important;
+  }
+
+  .match-cache-badge span{
+    font-size:7.8px!important;
+  }
+
+  .match-cache-badge small{
+    font-size:6.8px!important;
+  }
+
+  .match-review-priority>span{
+    font-size:7.8px!important;
+  }
+
+  .match-review-priority>strong{
+    font-size:12.8px!important;
+  }
+
+  .match-review-priority>p{
+    font-size:9.2px!important;
+  }
+
+  .match-review-facts span{
+    font-size:7px!important;
+  }
+
+  .match-review-facts strong{
+    font-size:14.5px!important;
+  }
+
+  .match-review-facts small{
+    font-size:7px!important;
+  }
+
+  .match-review-reference span{
+    font-size:7px!important;
+  }
+
+  .match-review-reference strong{
+    font-size:9.5px!important;
+  }
+
+  .match-review-limit{
+    font-size:7.6px!important;
+  }
+
+  /* Autopsy */
+  .autopsy-head>span,
+  .autopsy-head small,
+  .autopsy-diagnosis>span,
+  .autopsy-priority>span{
+    font-size:7.5px!important;
+  }
+
+  .autopsy-head p,
+  .autopsy-diagnosis p,
+  .autopsy-priority p{
+    font-size:8.5px!important;
+    line-height:1.4!important;
+  }
+
+  .autopsy-diagnosis strong,
+  .autopsy-priority strong{
+    font-size:12px!important;
+  }
+
+  .autopsy-evidence-line>span,
+  .autopsy-above-inline>span{
+    font-size:6.8px!important;
+  }
+
+  .autopsy-evidence-line>strong,
+  .autopsy-above-inline>small{
+    font-size:7.5px!important;
+  }
+
+  .autopsy-above-inline>strong{
+    font-size:10.5px!important;
+  }
+
+  .autopsy-primary-signals>summary b{
+    font-size:9.5px!important;
+  }
+
+  .autopsy-primary-signals>summary small{
+    font-size:7.3px!important;
+  }
+
+  .autopsy-primary-signals>summary em{
+    font-size:7px!important;
+  }
+
+  /* Details */
+  .match-review-more-head>span{
+    font-size:7.8px!important;
+  }
+
+  .match-review-more-head>strong{
+    font-size:13px!important;
+  }
+
+  .match-review-more-head>small{
+    font-size:7.8px!important;
+  }
+
+  /* "Outros do board" should not stretch into an empty full-width desert when
+     only one or two units are outside the main traits. */
+  .match-trait-group-other{
+    width:min(100%,560px)!important;
+    justify-self:start!important;
+  }
+}
