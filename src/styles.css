@@ -22060,3 +22060,256 @@ img[src$="chibi-ui-10.png"],
     height:37px!important;
   }
 }
+
+/* CHIBI COMPACT CLIENT FORCE v26 */
+
+/*
+  Force the mobile layout from React/device detection even when the browser
+  reports a desktop-like CSS viewport (common with desktop-site / zoom states).
+*/
+.chibi-compact-client,
+.chibi-compact-client body,
+.chibi-compact-client #root{
+  max-width:100%!important;
+  overflow-x:hidden!important;
+}
+.app-shell.compact-layout{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  overflow-x:hidden!important;
+}
+.app-shell.compact-layout .site-art-backdrop,
+.app-shell.compact-layout .site-hud-overlay,
+.app-shell.compact-layout .pointer-aura,
+.app-shell.compact-layout .pointer-core,
+.app-shell.compact-layout .topbar .product-nav{
+  display:none!important;
+}
+
+/* Decorative art never participates in compact layout. */
+.app-shell.compact-layout .adaptive-artwork[aria-hidden="true"],
+.app-shell.compact-layout .player-summary-reference-art,
+.app-shell.compact-layout .history-reference-art,
+.app-shell.compact-layout .page-reference-art,
+.app-shell.compact-layout .match-stage-art,
+.app-shell.compact-layout .overlay-page-art,
+.app-shell.compact-layout .home-product-reference-art{
+  display:none!important;
+}
+.app-shell.compact-layout .coach-art-banner{
+  display:none!important;
+}
+
+/* Compact topbar is enforced independently from media queries. */
+.app-shell.compact-layout .topbar{
+  position:sticky!important;
+  top:0!important;
+  z-index:220!important;
+  display:flex!important;
+  align-items:center!important;
+  width:100%!important;
+  max-width:100%!important;
+  height:58px!important;
+  min-height:58px!important;
+  padding:8px 10px!important;
+  gap:7px!important;
+  overflow:visible!important;
+  background:rgba(5,11,19,.97)!important;
+  backdrop-filter:blur(18px) saturate(125%)!important;
+}
+.app-shell.compact-layout .topbar .brand{
+  flex:0 1 auto!important;
+  min-width:0!important;
+}
+.app-shell.compact-layout .topbar .brand-mark{
+  width:36px!important;
+  height:36px!important;
+  flex:0 0 36px!important;
+}
+.app-shell.compact-layout .topbar .brand>span:last-child{
+  font-size:17px!important;
+  white-space:nowrap!important;
+}
+.app-shell.compact-layout .topbar .global-search-trigger{
+  flex:0 0 40px!important;
+  width:40px!important;
+  min-width:40px!important;
+  height:40px!important;
+  margin-left:auto!important;
+  padding:0!important;
+}
+.app-shell.compact-layout .topbar-actions{
+  flex:0 0 auto!important;
+  gap:4px!important;
+}
+.app-shell.compact-layout .topbar-actions>.ghost-button,
+.app-shell.compact-layout .topbar-actions>div:has(.ghost-button){
+  display:none!important;
+}
+.app-shell.compact-layout .language-switcher{
+  min-width:48px!important;
+  height:40px!important;
+}
+.app-shell.compact-layout .mobile-product-menu{
+  display:block!important;
+}
+
+/* Every primary page becomes one normal-width column. */
+.app-shell.compact-layout .landing-v2,
+.app-shell.compact-layout .profile-page,
+.app-shell.compact-layout .global-meta-page,
+.app-shell.compact-layout .comps-page,
+.app-shell.compact-layout .statistics-page,
+.app-shell.compact-layout .builder-page,
+.app-shell.compact-layout .team-builder-page,
+.app-shell.compact-layout .leaderboard-page,
+.app-shell.compact-layout .overlay-page,
+.app-shell.compact-layout .legal-page{
+  width:min(100% - 20px,680px)!important;
+  max-width:680px!important;
+  min-width:0!important;
+  margin:0 auto!important;
+  padding-top:14px!important;
+  overflow:visible!important;
+}
+
+/* Home */
+.app-shell.compact-layout .home-hero-v2{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  min-height:0!important;
+  gap:18px!important;
+  padding:24px 0 18px!important;
+  overflow:hidden!important;
+}
+.app-shell.compact-layout .home-hero-copy{
+  min-width:0!important;
+  max-width:100%!important;
+  padding-left:0!important;
+}
+.app-shell.compact-layout .home-hero-copy h1{
+  max-width:100%!important;
+  font-size:clamp(36px,10vw,52px)!important;
+  line-height:.98!important;
+  letter-spacing:-2px!important;
+}
+.app-shell.compact-layout .home-hero-visual-v3{
+  width:100%!important;
+  min-width:0!important;
+  min-height:280px!important;
+  margin:0!important;
+}
+.app-shell.compact-layout .home-product-window{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  transform:none!important;
+}
+.app-shell.compact-layout .home-paths-v2,
+.app-shell.compact-layout .home-paths-v3,
+.app-shell.compact-layout .home-proof-strip,
+.app-shell.compact-layout .home-builder-v2{
+  grid-template-columns:1fr!important;
+}
+
+/* Profile */
+.app-shell.compact-layout .profile-page{
+  padding-top:14px!important;
+}
+.app-shell.compact-layout .player-summary-shell{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:9px!important;
+  width:100%!important;
+  min-width:0!important;
+  padding:12px!important;
+  overflow:hidden!important;
+}
+.app-shell.compact-layout .player-summary-main,
+.app-shell.compact-layout .player-summary-actions,
+.app-shell.compact-layout .player-summary-source{
+  width:100%!important;
+  min-width:0!important;
+}
+.app-shell.compact-layout .player-summary-actions{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:7px!important;
+}
+.app-shell.compact-layout .profile-tabs-clean{
+  position:sticky!important;
+  top:58px!important;
+  z-index:80!important;
+  width:100%!important;
+  max-width:100%!important;
+  overflow-x:auto!important;
+}
+.app-shell.compact-layout .profile-tab-list{
+  display:flex!important;
+  min-width:max-content!important;
+}
+.app-shell.compact-layout .profile-history-first,
+.app-shell.compact-layout .content-grid,
+.app-shell.compact-layout .history-layout{
+  grid-template-columns:1fr!important;
+}
+.app-shell.compact-layout .history-session,
+.app-shell.compact-layout .match-row-v2,
+.app-shell.compact-layout .panel{
+  min-width:0!important;
+  max-width:100%!important;
+}
+.app-shell.compact-layout .match-row-v2{
+  width:100%!important;
+  overflow:hidden!important;
+}
+
+/* Public data / utility pages */
+.app-shell.compact-layout .page-hero-with-reference,
+.app-shell.compact-layout .overlay-page-hero-art{
+  min-height:0!important;
+  width:100%!important;
+  max-width:100%!important;
+  padding:16px!important;
+  overflow:hidden!important;
+}
+.app-shell.compact-layout .comp-decision-cards,
+.app-shell.compact-layout .statistics-quick-grid{
+  display:flex!important;
+  width:100%!important;
+  overflow-x:auto!important;
+}
+.app-shell.compact-layout .comp-decision-card{
+  flex:0 0 min(82vw,310px)!important;
+}
+.app-shell.compact-layout .statistics-quick-card{
+  flex:0 0 min(86vw,330px)!important;
+}
+
+/* Never allow a child to establish a desktop minimum width. */
+.app-shell.compact-layout main *,
+.app-shell.compact-layout section *,
+.app-shell.compact-layout article *{
+  min-width:0;
+}
+.app-shell.compact-layout img{
+  max-width:100%;
+}
+
+/* Horizontal tables can scroll inside themselves, never the whole page. */
+.app-shell.compact-layout .statistics-table,
+.app-shell.compact-layout .leaderboard-table,
+.app-shell.compact-layout .table-wrap,
+.app-shell.compact-layout [class*="table-scroll"]{
+  max-width:100%!important;
+  overflow-x:auto!important;
+}
+
+/* Small phone header. */
+@supports(selector(:has(*))){
+  .app-shell.compact-layout .topbar-actions:has(.language-switcher){
+    margin-left:0!important;
+  }
+}
