@@ -3,6 +3,7 @@ import { fetchTftMeta, TftGlobalMeta, TftGlobalTraitStat } from "../api/tft";
 import { staticEntry, TftStaticData } from "../tftStatic";
 import DDragonArt from "./DDragonArt";
 import { useI18n } from "../i18n";
+import { SITE_IMAGES } from "../siteAssets";
 
 type Props={
   staticData:TftStaticData|null;
@@ -101,7 +102,8 @@ export default function GlobalMetaPage({
     : "inicial";
 
   return <main className="global-meta-page">
-    <div className="global-meta-hero">
+    <div className="global-meta-hero page-hero-with-reference">
+      <img className="page-reference-art page-reference-meta" src={SITE_IMAGES.ui.comparison} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>{t("common.backProfile")}</button>}
         <span className="eyebrow">CHIBI DATASET</span>
