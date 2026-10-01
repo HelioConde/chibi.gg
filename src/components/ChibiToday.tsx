@@ -4,6 +4,7 @@ import { buildLeakMap, buildPersonalMeta } from "../analysis/chibiProduct";
 import { useI18n } from "../i18n";
 import { getActiveSession, sessionProgress } from "../sessionMode";
 import { staticEntry, TftStaticData } from "../tftStatic";
+import V2PanelAccent from "./V2PanelAccent";
 
 type Props={
   playerKey:string;
@@ -13,10 +14,6 @@ type Props={
   onOpenCoach:()=>void;
   onOpenOverview:()=>void;
 };
-
-function avg(values:number[]){
-  return values.length?values.reduce((sum,value)=>sum+value,0)/values.length:null;
-}
 
 function clean(value:string){
   return String(value||"")
@@ -65,32 +62,6 @@ export default function ChibiToday({
   );
   const meta=useMemo(()=>buildPersonalMeta(valid),[valid]);
   const leaks=useMemo(()=>buildLeakMap(valid),[valid]);
-
-  const moment=useMemo(()=>{
-    const recent=valid.slice(0,Math.min(5,valid.length));
-    const recentAvg=avg(recent.map(match=>match.placement));
-    const recentTop4=recent.filter(match=>match.placement<=4).length;
-    const previous=valid.slice(recent.length,recent.length*2);
-    const previousAvg=previous.length>=3?avg(previous.map(match=>match.placement)):null;
-    const delta=recentAvg!=null&&previousAvg!=null?recentAvg-previousAvg:null;
-    const tone=delta==null?"neutral":delta<-.25?"good":delta>.25?"bad":"neutral";
-    const title=delta==null
-      ? t("today.moment.initial")
-      : delta<-.25
-        ? t("today.moment.better")
-        : delta>.25
-          ? t("today.moment.worse")
-          : t("today.moment.stable");
-    return {
-      title,
-      tone,
-      avg:recentAvg,
-      top4:recentTop4,
-      games:recent.length,
-      ids:[...recent,...previous].map(match=>match.id),
-      comparable:previousAvg!=null,
-    };
-  },[valid,t]);
 
   const best=meta[0]||null;
   const problem=leaks.primary;
@@ -141,22 +112,8 @@ export default function ChibiToday({
     </div>
 
     <div className="today-tft-grid">
-      <article className={"today-card moment "+moment.tone}>
-        <span>{t("today.moment.label")}</span>
-        <h3>{moment.title}</h3>
-        <p>{moment.avg==null
-          ? t("today.moment.noData")
-          : t("today.moment.detail",{
-              average:moment.avg.toFixed(2),
-              top4:moment.top4,
-              games:moment.games,
-            })}</p>
-        {moment.ids.length>0&&<button onClick={()=>onEvidence(moment.ids,t("today.moment.evidence"))}>
-          {moment.comparable?t("today.compareBlocks"):t("today.viewRecent")}
-        </button>}
-      </article>
-
       <article className="today-card strength">
+        <V2PanelAccent kind="positive" className="today-card-accent"/>
         <span>{t("today.strength.label")}</span>
         <h3>{best?traitName(best.id,staticData):t("today.strength.initial")}</h3>
         <p>{best
@@ -170,6 +127,7 @@ export default function ChibiToday({
       </article>
 
       <article className={"today-card attention "+(problem?"warning":"neutral")}>
+        <V2PanelAccent kind={problem?"danger":"meta"} className="today-card-accent"/>
         <span>{t("today.problem.label")}</span>
         <h3>{problemName}</h3>
         <p>{problem
@@ -182,6 +140,7 @@ export default function ChibiToday({
       </article>
 
       <article className={"today-card next "+(activeSession?"active":"")}>
+        <V2PanelAccent kind="companion" className="today-card-accent"/>
         <span>{activeSession?t("today.action.activeLabel"):t("today.action.label")}</span>
         <h3>{action.title}</h3>
         <p>{action.body}</p>

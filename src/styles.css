@@ -24096,3 +24096,140 @@ img[src$="chibi-ui-10.png"],
     right:-7px!important;
   }
 }
+
+
+/* CHIBI TODAY FOCUS v38 */
+
+/* Player Pulse owns recent form now; Today focuses on insight + action only. */
+.today-tft{
+  padding:13px!important;
+  border-color:rgba(99,139,177,.17)!important;
+  background:
+    radial-gradient(circle at 88% -18%,rgba(92,79,193,.055),transparent 30%),
+    linear-gradient(180deg,#0b1622,#08121d)!important;
+}
+.today-tft-head{
+  margin-bottom:9px!important;
+}
+.today-tft-head h2{
+  font-size:clamp(17px,2vw,22px)!important;
+}
+.today-tft-head p{
+  max-width:700px;
+  color:#708196!important;
+  font-size:7.5px!important;
+}
+.today-tft-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:7px!important;
+}
+.today-card{
+  position:relative;
+  isolation:isolate;
+  min-height:128px!important;
+  overflow:hidden;
+  padding:11px!important;
+  border-color:rgba(96,138,176,.13)!important;
+  border-radius:10px!important;
+  background:#091622!important;
+}
+.today-card>*:not(.today-card-accent){
+  position:relative;
+  z-index:2;
+}
+.today-card-accent{
+  right:-13px!important;
+  bottom:-14px!important;
+  width:82px!important;
+  height:82px!important;
+  opacity:.075!important;
+}
+.today-card>span{
+  color:#71859a!important;
+  font-size:6px!important;
+}
+.today-card h3{
+  max-width:82%;
+  margin:6px 0 5px!important;
+  color:#e2ebf5;
+  font-size:12px!important;
+  line-height:1.2!important;
+}
+.today-card p{
+  max-width:90%;
+  color:#77889b!important;
+  font-size:7.2px!important;
+  line-height:1.45!important;
+}
+.today-card button{
+  margin-top:auto!important;
+  padding:6px 8px!important;
+  font-size:6.5px!important;
+}
+.today-card.strength{
+  border-color:rgba(76,211,166,.14)!important;
+  background:
+    linear-gradient(135deg,rgba(76,211,166,.03),transparent 40%),
+    #091622!important;
+}
+.today-card.attention.warning{
+  border-color:rgba(235,112,126,.15)!important;
+  background:
+    linear-gradient(135deg,rgba(235,112,126,.025),transparent 40%),
+    #091622!important;
+}
+.today-card.next{
+  border-color:rgba(107,91,207,.17)!important;
+  background:
+    linear-gradient(135deg,rgba(107,91,207,.035),transparent 42%),
+    #091622!important;
+}
+.today-card.next.active{
+  border-color:rgba(76,211,166,.17)!important;
+}
+.today-tft-foot{
+  margin-top:8px!important;
+  padding-top:8px!important;
+  border-top-color:rgba(95,137,175,.10)!important;
+}
+.today-tft-foot span,
+.today-tft-foot button{
+  font-size:6.5px!important;
+}
+
+@media(max-width:900px){
+  .today-tft-grid{
+    grid-template-columns:1fr 1fr!important;
+  }
+  .today-card.next{
+    grid-column:1/-1;
+  }
+}
+
+@media(max-width:620px){
+  .today-tft{
+    padding:10px!important;
+  }
+  .today-tft-grid{
+    grid-template-columns:1fr!important;
+  }
+  .today-card,
+  .today-card.next{
+    grid-column:auto;
+    min-height:0!important;
+  }
+  .today-card h3,
+  .today-card p{
+    max-width:calc(100% - 54px);
+  }
+  .today-card button{
+    width:auto!important;
+    min-width:130px;
+    margin-top:9px!important;
+  }
+  .today-card-accent{
+    width:64px!important;
+    height:64px!important;
+    opacity:.055!important;
+  }
+}
