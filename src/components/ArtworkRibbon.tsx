@@ -2,20 +2,24 @@ import { SITE_IMAGES } from "../siteAssets";
 import AdaptiveArtwork from "./AdaptiveArtwork";
 
 type Props={
-  images:number[];
+  images?:number[];
+  sources?:string[];
   className?:string;
 };
 
-export default function ArtworkRibbon({images,className=""}:Props){
-  const unique=[...new Set(images)].filter(index=>index>=0&&index<SITE_IMAGES.ui.all.length).slice(0,3);
+export default function ArtworkRibbon({images=[],sources=[],className=""}:Props){
+  const legacy=images
+    .filter(index=>index>=0&&index<SITE_IMAGES.ui.all.length)
+    .map(index=>SITE_IMAGES.ui.all[index]);
+  const unique=[...new Set([...sources,...legacy])].filter(Boolean).slice(0,3);
 
   if(!unique.length)return null;
 
   return <section className={"artwork-ribbon "+className} aria-hidden="true">
-    {unique.map((index,position)=>(
-      <figure className={"artwork-ribbon-card artwork-ribbon-card-"+position} key={index}>
+    {unique.map((src,position)=>(
+      <figure className={"artwork-ribbon-card artwork-ribbon-card-"+position} key={src}>
         <AdaptiveArtwork
-          src={SITE_IMAGES.ui.all[index]}
+          src={src}
           alt=""
           loading="lazy"
           decoding="async"
