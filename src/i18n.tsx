@@ -33,6 +33,7 @@ const messages: Record<Language, Record<string, string>> = {
     "nav.builder": "Builder",
     "nav.leaderboard": "Ranking",
     "nav.companion": "Companion",
+    "nav.menu": "Menu",
     "nav.howItWorks": "Como funciona",
 
     "home.loading.title": "Preparando sua revisão...",
@@ -1522,6 +1523,7 @@ const messages: Record<Language, Record<string, string>> = {
     "nav.builder": "Builder",
     "nav.leaderboard": "Leaderboard",
     "nav.companion": "Companion",
+    "nav.menu": "Menu",
     "nav.howItWorks": "How it works",
 
     "home.loading.title": "Preparing your review...",
