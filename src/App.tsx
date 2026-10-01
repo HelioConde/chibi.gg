@@ -1627,7 +1627,7 @@ function App() {
             title={t("home.section.product.title")}
             description={t("home.section.product.desc")}
           />
-          <ArtworkRibbon images={[10,11,12]} className="home-art-ribbon home-section-product"/>
+          <ArtworkRibbon sources={[SITE_IMAGES.v2.mascots.board,SITE_IMAGES.v2.badges.rank,SITE_IMAGES.v2.frames.landscape]} className="home-art-ribbon home-section-product"/>
 
           <HomeVisualShowcase
             onOpenProfile={()=>document.getElementById("home-riot-id")?.focus()}
@@ -1758,14 +1758,14 @@ function App() {
           />
 
           <ArtworkRibbon
-            images={
+            sources={
               profileTab==="matches"
-                ?[11,17,2]
+                ?[SITE_IMAGES.v2.badges.sword,SITE_IMAGES.v2.mascots.scout,SITE_IMAGES.v2.frames.wide]
                 :profileTab==="overview"
-                  ?[13,18,6]
+                  ?[SITE_IMAGES.v2.mascots.scout,SITE_IMAGES.v2.icons[6],SITE_IMAGES.v2.frames.landscape]
                   :profileTab==="coach"
-                    ?[16,21,8]
-                    :[14,20,9]
+                    ?[SITE_IMAGES.v2.mascots.board,SITE_IMAGES.v2.badges.heart,SITE_IMAGES.v2.frames.square]
+                    :[SITE_IMAGES.v2.icons[10],SITE_IMAGES.v2.frames.portraitAlt,SITE_IMAGES.v2.decor.corner]
             }
             className="profile-art-ribbon"
           />
