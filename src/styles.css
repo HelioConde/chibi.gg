@@ -31216,3 +31216,110 @@ button.secondary,
   from{opacity:0;transform:translateY(-3px)}
   to{opacity:1;transform:translateY(0)}
 }
+
+
+/* CHIBI HISTORY HEADER FIX v80 */
+
+/* The sticky history title combined with decorative art was reserving a large
+   empty band before the filters. Keep the global/profile navigation sticky,
+   but let the history title flow naturally inside its panel. */
+@media(min-width:1100px){
+  .profile-history-first>.history.history-with-reference{
+    padding:12px!important;
+  }
+
+  .history-with-reference .profile-history-head,
+  .profile-history-first .profile-history-head{
+    position:relative!important;
+    top:auto!important;
+    z-index:4!important;
+    min-height:0!important;
+    margin:0 0 8px!important;
+    padding:0 0 9px!important;
+    display:grid!important;
+    grid-template-columns:minmax(250px,.72fr) minmax(0,1.7fr)!important;
+    align-items:end!important;
+    gap:14px!important;
+    background:transparent!important;
+    border-bottom:1px solid rgba(104,145,181,.10)!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+  }
+
+  .profile-history-titlecopy{
+    align-self:end!important;
+  }
+
+  .profile-history-titlecopy h2{
+    margin:3px 0 2px!important;
+  }
+
+  .history-head-controls{
+    width:100%!important;
+    display:flex!important;
+    flex-direction:row!important;
+    justify-content:flex-end!important;
+    align-items:flex-end!important;
+    flex-wrap:wrap!important;
+    gap:7px!important;
+  }
+
+  .history-filter-group{
+    gap:3px!important;
+  }
+
+  .history-filter-group>span{
+    font-size:8px!important;
+    letter-spacing:.65px!important;
+  }
+
+  .history-set-tabs button,
+  .history-queue-tabs button,
+  .history-filter-tabs button,
+  .history-density-tabs button,
+  .history-sort-tabs button{
+    min-height:32px!important;
+    padding:6px 9px!important;
+    font-size:9px!important;
+  }
+
+  /* Decorative history artwork is a subtle header texture only. */
+  .history-reference-art{
+    top:0!important;
+    right:0!important;
+    width:42%!important;
+    height:76px!important;
+    opacity:.065!important;
+    object-fit:cover!important;
+    object-position:center 18%!important;
+    pointer-events:none!important;
+  }
+
+  .history-with-reference::before{
+    top:0!important;
+    right:0!important;
+    width:48%!important;
+    height:82px!important;
+    background:
+      linear-gradient(90deg,transparent,rgba(7,15,24,.08) 42%,rgba(7,15,24,.28)),
+      linear-gradient(180deg,rgba(7,15,24,.02),rgba(7,15,24,.42))!important;
+  }
+
+  .history-filter-summary{
+    margin:0 0 8px!important;
+  }
+}
+
+/* At narrower desktop widths, allow the filter groups to take a second line
+   instead of increasing the entire title row height. */
+@media(min-width:821px) and (max-width:1220px){
+  .history-with-reference .profile-history-head,
+  .profile-history-first .profile-history-head{
+    grid-template-columns:1fr!important;
+    align-items:start!important;
+  }
+
+  .history-head-controls{
+    justify-content:flex-start!important;
+  }
+}
