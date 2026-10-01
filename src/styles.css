@@ -24558,3 +24558,212 @@ img[src$="chibi-ui-10.png"],
     margin-top:24px!important;
   }
 }
+
+
+/* CHIBI HISTORY DENSITY v42 */
+
+/* Desktop history uses the full-width canvas for information, not empty card height. */
+@media(min-width:1100px){
+  .profile-history-first .history-session-games{
+    gap:4px!important;
+  }
+  .profile-history-first .match-row-v2{
+    grid-template-columns:46px minmax(0,1fr) 172px!important;
+    min-height:104px!important;
+    padding:8px 10px!important;
+    column-gap:10px!important;
+    border-radius:9px!important;
+  }
+  .profile-history-first .match-result-rail{
+    gap:4px!important;
+  }
+  .profile-history-first .match-tactician{
+    width:38px!important;
+    height:38px!important;
+    border-radius:8px!important;
+  }
+  .profile-history-first .match-result-rail .placement{
+    width:38px!important;
+    min-width:38px!important;
+    height:27px!important;
+    min-height:27px!important;
+    font-size:10px!important;
+  }
+
+  .profile-history-first .match-main{
+    grid-template-rows:auto auto 1fr!important;
+    gap:0!important;
+    align-content:center!important;
+  }
+  .profile-history-first .match-context-line{
+    margin:0 0 2px!important;
+    gap:4px!important;
+  }
+  .profile-history-first .match-context-line span{
+    font-size:5.5px!important;
+  }
+  .profile-history-first .match-row-title{
+    min-height:16px!important;
+    gap:6px!important;
+  }
+  .profile-history-first .match-row-title>div:first-child{
+    gap:5px!important;
+  }
+  .profile-history-first .match-row-title>div:first-child>strong{
+    max-width:360px!important;
+    font-size:9px!important;
+  }
+  .profile-history-first .match-review-label{
+    padding:2px 5px!important;
+    font-size:5px!important;
+  }
+
+  /* Translate the quick facts into readable compact labels. */
+  .profile-history-first .match-scan-facts{
+    gap:3px!important;
+  }
+  .profile-history-first .match-scan-facts>span{
+    min-width:auto!important;
+    height:18px!important;
+    padding:0 5px!important;
+    gap:3px!important;
+    border-radius:5px!important;
+  }
+  .profile-history-first .match-scan-facts i{
+    color:#66829d!important;
+    font-size:4.8px!important;
+    font-weight:950!important;
+    letter-spacing:.25px;
+  }
+  .profile-history-first .match-scan-facts b{
+    font-size:6px!important;
+  }
+  .profile-history-first .match-scan-facts .three-star i,
+  .profile-history-first .match-scan-facts .three-star b{
+    color:#e3bd62!important;
+  }
+
+  .profile-history-first .match-lineup{
+    grid-template-columns:minmax(118px,148px) minmax(0,1fr)!important;
+    align-items:center!important;
+    gap:10px!important;
+    margin-top:3px!important;
+  }
+  .profile-history-first .match-history-support{
+    gap:3px!important;
+  }
+  .profile-history-first .match-lineup .compact-traits{
+    max-width:148px!important;
+    gap:3px!important;
+  }
+  .profile-history-first .match-lineup .compact-traits .trait-chip{
+    max-width:72px!important;
+    padding:2px 4px!important;
+    font-size:5.3px!important;
+  }
+  .profile-history-first .match-history-augments{
+    gap:3px!important;
+  }
+  .profile-history-first .match-history-augments .match-augment-icon{
+    width:20px!important;
+    height:20px!important;
+    flex-basis:20px!important;
+    border-radius:5px!important;
+  }
+
+  /* Larger champion portraits use the previously empty horizontal area. */
+  .profile-history-first .match-history-units{
+    flex-wrap:nowrap!important;
+    align-items:flex-start!important;
+    gap:6px!important;
+    padding:0 0 3px!important;
+    overflow:visible!important;
+  }
+  .profile-history-first .match-history-units .unit-card{
+    flex:0 0 44px!important;
+    width:44px!important;
+    max-width:44px!important;
+  }
+  .profile-history-first .match-history-units .unit-portrait{
+    width:44px!important;
+    height:44px!important;
+    border-radius:7px!important;
+  }
+  .profile-history-first .match-history-units.units-many .unit-card{
+    flex-basis:40px!important;
+    width:40px!important;
+    max-width:40px!important;
+  }
+  .profile-history-first .match-history-units.units-many .unit-portrait{
+    width:40px!important;
+    height:40px!important;
+  }
+  .profile-history-first .match-history-units.units-extra{
+    gap:4px!important;
+  }
+  .profile-history-first .match-history-units.units-extra .unit-card{
+    flex-basis:36px!important;
+    width:36px!important;
+    max-width:36px!important;
+  }
+  .profile-history-first .match-history-units.units-extra .unit-portrait{
+    width:36px!important;
+    height:36px!important;
+  }
+  .profile-history-first .match-history-units .item-row{
+    margin-top:1px!important;
+  }
+
+  /* Right rail is deliberately narrow and answer-first. */
+  .profile-history-first .match-meta-rich{
+    width:172px!important;
+    min-width:172px!important;
+    padding-left:7px!important;
+    justify-content:center!important;
+    gap:4px!important;
+  }
+  .profile-history-first .match-value-grid-core{
+    width:100%!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:3px!important;
+  }
+  .profile-history-first .match-value-grid-core>span{
+    min-height:29px!important;
+    padding:3px 2px!important;
+  }
+  .profile-history-first .match-value-grid-core b{
+    font-size:7px!important;
+  }
+  .profile-history-first .match-value-grid-core small{
+    font-size:4.6px!important;
+  }
+  .profile-history-first .match-meta-rich .match-fast-read{
+    max-width:none!important;
+    padding:5px 6px!important;
+    gap:1px!important;
+    border-radius:7px!important;
+  }
+  .profile-history-first .match-fast-read>span{
+    font-size:4.7px!important;
+  }
+  .profile-history-first .match-fast-read>strong{
+    font-size:6px!important;
+    line-height:1.25!important;
+  }
+  .profile-history-first .match-fast-read>small{
+    font-size:4.7px!important;
+  }
+
+  .profile-history-first .history-session-head-compact{
+    min-height:34px!important;
+    padding:5px 8px!important;
+  }
+}
+
+/* Tablet keeps the existing stacked layout; only the cryptic labels stay readable. */
+@media(min-width:821px) and (max-width:1099px){
+  .profile-history-first .match-scan-facts i{
+    font-size:5px!important;
+    font-weight:950!important;
+  }
+}

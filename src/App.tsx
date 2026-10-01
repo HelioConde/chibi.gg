@@ -2170,16 +2170,16 @@ function App() {
                               </div>
                               <div className="match-scan-facts" aria-label="Resumo visual da composição">
                                 <span title={t("profile.history.unitsAria",{count:match.units.length})} aria-label={t("profile.history.unitsAria",{count:match.units.length})}>
-                                  <i>◆</i><b>{match.units.length}</b>
+                                  <i>U</i><b>{match.units.length}</b>
                                 </span>
                                 <span title={t("profile.history.augmentsAria")} aria-label={t("profile.history.augmentsAria")}>
-                                  <i>✦</i><b>{match.augments.length}</b>
+                                  <i>AUG</i><b>{match.augments.length}</b>
                                 </span>
                                 <span title={t("stats.category.items")+": "+equippedItemCount} aria-label={t("stats.category.items")+": "+equippedItemCount}>
-                                  <i>◇</i><b>{equippedItemCount}</b>
+                                  <i>IT</i><b>{equippedItemCount}</b>
                                 </span>
                                 {threeStarCount>0&&<span className="three-star" title={t("reviewQueue.signal.threeStar")+": "+threeStarCount} aria-label={t("reviewQueue.signal.threeStar")+": "+threeStarCount}>
-                                  <i>★</i><b>{threeStarCount}</b>
+                                  <i>3★</i><b>{threeStarCount}</b>
                                 </span>}
                               </div>
                             </div>
