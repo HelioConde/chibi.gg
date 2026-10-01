@@ -7,15 +7,30 @@ type Props={
   className?:string;
 };
 
+const organizedFallbacks=[
+  SITE_IMAGES.v2.frames.wideSecondary,
+  SITE_IMAGES.v2.frames.landscapeSecondary,
+  SITE_IMAGES.v2.mascots.scoutAlt,
+  SITE_IMAGES.v2.mascots.boardAlt,
+  SITE_IMAGES.v2.badges.rankAlt,
+  SITE_IMAGES.v2.badges.swordAlt,
+  SITE_IMAGES.v2.badges.heartAlt,
+  SITE_IMAGES.v2.decor.railAlt,
+  SITE_IMAGES.v2.decor.cornerAlt,
+  SITE_IMAGES.v2.frames.squareSecondary,
+  SITE_IMAGES.v2.frames.portraitSecondary,
+];
+
 export default function ArtworkRibbon({images=[],sources=[],className=""}:Props){
-  const legacy=images
-    .filter(index=>index>=0&&index<SITE_IMAGES.ui.all.length)
-    .map(index=>SITE_IMAGES.ui.all[index]);
-  const unique=[...new Set([...sources,...legacy])].filter(Boolean).slice(0,3);
+  const organized=images.map((index)=>
+    organizedFallbacks[Math.abs(index)%organizedFallbacks.length]
+    || SITE_IMAGES.ui.all[index]
+  );
+  const unique=[...new Set([...sources,...organized])].filter(Boolean).slice(0,3);
 
   if(!unique.length)return null;
 
-  return <section className={"artwork-ribbon "+className} aria-hidden="true">
+  return <section className={"artwork-ribbon artwork-ribbon-v2 "+className} aria-hidden="true">
     {unique.map((src,position)=>(
       <figure className={"artwork-ribbon-card artwork-ribbon-card-"+position} key={src}>
         <AdaptiveArtwork

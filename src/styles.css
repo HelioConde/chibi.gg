@@ -23254,3 +23254,199 @@ img[src$="chibi-ui-10.png"],
   object-fit:contain!important;
   opacity:.9!important;
 }
+
+
+/* CHIBI OUTPUT V2 EXPANDED v33 */
+
+/* Organized output-v2 is now the primary decorative language. */
+.brand-mark-image img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  transform:scale(1.08);
+  filter:saturate(1.02) contrast(1.03) drop-shadow(0 4px 12px rgba(75,226,221,.16));
+}
+
+.site-art-v2{
+  background:
+    radial-gradient(circle at 50% 45%,rgba(82,220,223,.055),transparent 43%),
+    linear-gradient(180deg,rgba(9,23,36,.88),rgba(6,16,26,.93))!important;
+}
+.site-art-v2>.adaptive-artwork{
+  object-fit:contain!important;
+  object-position:center!important;
+  padding:10px!important;
+  opacity:.58!important;
+  filter:saturate(.93) contrast(1.04) brightness(.80) drop-shadow(0 16px 30px rgba(0,0,0,.26))!important;
+}
+.site-art-home .site-art-frame-1>.adaptive-artwork,
+.site-art-coach .site-art-frame-0>.adaptive-artwork,
+.site-art-builder .site-art-frame-1>.adaptive-artwork{
+  opacity:.68!important;
+}
+.site-art-stats .site-art-frame-2,
+.site-art-leaderboard .site-art-frame-0{
+  border-color:rgba(240,194,91,.18)!important;
+}
+.site-art-comps .site-art-frame-0,
+.site-art-profile .site-art-frame-1,
+.site-art-overview .site-art-frame-0{
+  border-color:rgba(74,226,220,.18)!important;
+}
+
+/* Four-part HUD: rail + two wings + low-profile bottom piece. */
+.site-hud-overlay-v2{
+  overflow:hidden;
+}
+.site-hud-v2-wing,
+.site-hud-v2-bottom{
+  position:absolute!important;
+  z-index:1!important;
+  pointer-events:none!important;
+  user-select:none!important;
+  object-fit:contain!important;
+  opacity:.20!important;
+  filter:saturate(.82) brightness(.78) drop-shadow(0 10px 24px rgba(0,0,0,.22));
+}
+.site-hud-v2-wing{
+  top:92px!important;
+  width:min(220px,15vw)!important;
+  max-height:40vh!important;
+}
+.site-hud-v2-wing-left{
+  left:-64px!important;
+  transform:rotate(-2deg);
+}
+.site-hud-v2-wing-right{
+  right:-64px!important;
+  transform:scaleX(-1) rotate(-2deg);
+}
+.site-hud-v2-bottom{
+  left:50%!important;
+  bottom:-34px!important;
+  width:min(680px,48vw)!important;
+  max-height:125px!important;
+  transform:translateX(-50%);
+  opacity:.16!important;
+}
+
+/* Live product window uses the transparent frame as structure, never as content. */
+.home-product-reference-v2{
+  inset:auto 4% 3% auto!important;
+  width:48%!important;
+  height:42%!important;
+  object-fit:contain!important;
+  object-position:right bottom!important;
+  opacity:.20!important;
+  padding:0!important;
+  mask-image:linear-gradient(90deg,transparent,black 32%)!important;
+  -webkit-mask-image:linear-gradient(90deg,transparent,black 32%)!important;
+}
+.player-summary-reference-v2{
+  object-fit:contain!important;
+  object-position:right center!important;
+  opacity:.17!important;
+  padding:8px!important;
+}
+.history-reference-v2{
+  object-fit:contain!important;
+  object-position:right top!important;
+  opacity:.15!important;
+}
+
+/* The homepage gallery now presents transparent UI pieces as collectible product details. */
+.home-visual-showcase-v2{
+  background:
+    radial-gradient(circle at 18% 0%,rgba(69,230,223,.06),transparent 30%),
+    radial-gradient(circle at 86% 8%,rgba(139,101,255,.08),transparent 32%),
+    linear-gradient(180deg,rgba(10,24,38,.97),rgba(7,18,29,.98));
+}
+.home-visual-card-v2{
+  background:
+    radial-gradient(circle at 50% 35%,rgba(92,73,255,.10),transparent 46%),
+    linear-gradient(180deg,#0a1927,#07121d)!important;
+}
+.home-visual-card-v2>.adaptive-artwork{
+  inset:8px!important;
+  width:calc(100% - 16px)!important;
+  height:calc(100% - 16px)!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  filter:saturate(.98) contrast(1.04) brightness(.92) drop-shadow(0 16px 24px rgba(0,0,0,.22))!important;
+}
+.home-visual-card-v2:hover>.adaptive-artwork{
+  transform:translateY(-3px) scale(1.015)!important;
+  filter:saturate(1.04) contrast(1.05) brightness(.98) drop-shadow(0 18px 28px rgba(0,0,0,.28))!important;
+}
+.home-visual-card-v2 .home-visual-card-shade{
+  background:
+    linear-gradient(180deg,rgba(5,12,20,.02) 18%,rgba(5,12,20,.12) 48%,rgba(5,12,20,.92) 100%),
+    linear-gradient(90deg,rgba(4,11,19,.16),transparent 64%)!important;
+}
+.home-visual-showcase-mobile{
+  background:
+    radial-gradient(circle at 50% 30%,rgba(73,226,220,.10),transparent 42%),
+    #081521!important;
+}
+.home-visual-showcase-mobile>.adaptive-artwork{
+  object-fit:contain!important;
+  padding:5px;
+}
+
+/* Organized legacy ribbons: keep every piece readable regardless of aspect ratio. */
+.artwork-ribbon-v2 .artwork-ribbon-card{
+  background:
+    radial-gradient(circle at 50% 42%,rgba(79,216,214,.055),transparent 42%),
+    linear-gradient(180deg,#091725,#07121d)!important;
+}
+.artwork-ribbon-v2 .adaptive-artwork{
+  object-fit:contain!important;
+  object-position:center!important;
+  opacity:.84!important;
+}
+
+/* The new modal HUD stays a border/detail, not a stretched screenshot. */
+.match-modal-hud-v2{
+  object-fit:contain!important;
+  object-position:center!important;
+  opacity:.18!important;
+  max-height:145px!important;
+  inset:auto 0 0!important;
+}
+
+/* Keep phones focused on data; small v2 art remains inside bounded components only. */
+@media(max-width:820px){
+  .site-hud-v2-wing,
+  .site-hud-v2-bottom{
+    display:none!important;
+  }
+  .home-product-reference-v2,
+  .player-summary-reference-v2,
+  .history-reference-v2{
+    max-height:100%!important;
+  }
+  .home-visual-card-v2{
+    flex-basis:min(78vw,300px)!important;
+    height:174px!important;
+  }
+  .home-visual-card-v2>.adaptive-artwork{
+    inset:6px!important;
+    width:calc(100% - 12px)!important;
+    height:calc(100% - 12px)!important;
+  }
+}
+
+@media(max-width:420px){
+  .home-visual-showcase-v2{
+    padding:12px!important;
+  }
+  .home-visual-card-v2{
+    flex-basis:82vw!important;
+    height:164px!important;
+  }
+  .brand-mark-image{
+    flex:0 0 31px!important;
+    width:31px!important;
+    height:31px!important;
+  }
+}

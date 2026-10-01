@@ -1293,7 +1293,7 @@ function App() {
     <div className={"app-shell"+(compactViewport?" compact-layout":"")}>
       <header className="topbar">
         <button className="brand brand-button" onClick={resetSearch}>
-          <span className="brand-mark brand-mark-image"><img src={SITE_IMAGES.icon} alt=""/></span>
+          <span className="brand-mark brand-mark-image"><img src={SITE_IMAGES.v2.icon} alt=""/></span>
           <span>chibi<span>.gg</span></span>
         </button>
         {!compactViewport&&<nav className="product-nav" aria-label="Chibi">
@@ -1483,7 +1483,7 @@ function App() {
               <div className="home-hero-orbit home-hero-orbit-one"></div>
               <div className="home-hero-orbit home-hero-orbit-two"></div>
               <div className="home-product-window">
-                <AdaptiveArtwork className="home-product-reference-art" src={SITE_IMAGES.ui.profile} alt="" aria-hidden="true" decoding="async"/>
+                <AdaptiveArtwork className="home-product-reference-art home-product-reference-v2" src={SITE_IMAGES.v2.frames.landscapeSecondary} alt="" aria-hidden="true" decoding="async"/>
                 <div className="home-product-windowbar">
                   <span><i></i><i></i><i></i></span>
                   <small>chibi.gg / player</small>
@@ -1695,7 +1695,7 @@ function App() {
 
           <section className="player-summary-shell player-summary-visual player-summary-compact">
             <AdaptiveArtwork className="player-v2-hud-rail" src={SITE_IMAGES.v2.frames.wide} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
-            <AdaptiveArtwork className="player-summary-reference-art" src={SITE_IMAGES.ui.profile} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
+            <AdaptiveArtwork className="player-summary-reference-art player-summary-reference-v2" src={SITE_IMAGES.v2.frames.wideAltSecondary} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
             <div className="player-summary-board-art" aria-hidden="true">
               {analysisMatches[0]?.units.slice(0,5).map((unit,index)=>{
                 const entry=staticEntry(staticData?.champions,unit.characterId);
@@ -2035,7 +2035,7 @@ function App() {
             />
             <div className="content-grid profile-history-first history-section-marker">
             <section className="panel history history-with-reference" id="match-history">
-              <AdaptiveArtwork className="history-reference-art" src={SITE_IMAGES.ui.history} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
+              <AdaptiveArtwork className="history-reference-art history-reference-v2" src={SITE_IMAGES.v2.frames.wideSecondary} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
               <div className="panel-title profile-history-head">
                 <div>
                   <span>{t("profile.history.riot")}</span>
@@ -2299,7 +2299,7 @@ function App() {
       {(matchLoading || selectedMatch || matchError || studyLookup==="unavailable") && (
         <div className="match-overlay" onClick={closeMatchReview}>
           <section className="match-modal match-modal-with-hud" onClick={(e)=>e.stopPropagation()}>
-            <img className="match-modal-hud-art" src={SITE_IMAGES.hud} alt="" aria-hidden="true"/>
+            <img className="match-modal-hud-art match-modal-hud-v2" src={SITE_IMAGES.v2.hud[3]} alt="" aria-hidden="true"/>
             <button className="match-close" onClick={closeMatchReview}>×</button>
             {matchLoading && <div className="match-state">{t("match.loading")}</div>}
             {matchError && <div className="match-state error">{matchError}</div>}
