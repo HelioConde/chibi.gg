@@ -1,6 +1,7 @@
 import { TftMatch } from "../api/tft";
 import { staticEntry, tftAssetUrl, TftStaticData } from "../tftStatic";
 import HexBoard from "./HexBoard";
+import { SITE_IMAGES } from "../siteAssets";
 
 type Props={
   match:TftMatch;
@@ -8,7 +9,8 @@ type Props={
 };
 
 export default function MatchBoardMap({match,staticData}:Props){
-  return <section className="match-board-map">
+  return <section className="match-board-map match-stage-with-art">
+    <img className="match-stage-art match-stage-art-board" src={SITE_IMAGES.ui.positioning} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
     <div className="match-board-map-head">
       <div>
         <span>BOARD MAP</span>
