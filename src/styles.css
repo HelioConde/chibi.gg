@@ -30250,3 +30250,288 @@ img[src$="chibi-ui-10.png"],
 .app-shell>.match-overlay>.match-modal::-webkit-scrollbar-thumb:hover{
   background:#506a82;
 }
+
+
+/* CHIBI UX PRIORITIES v77 */
+
+/* 1. Profile level badge is explicit instead of a contextless number. */
+.player-avatar-wrap>.player-level-badge{
+  right:-8px!important;
+  bottom:-7px!important;
+  width:auto!important;
+  min-width:38px!important;
+  height:auto!important;
+  min-height:22px!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:3px!important;
+  padding:3px 5px!important;
+  border:1px solid rgba(111,149,187,.24)!important;
+  border-radius:7px!important;
+  background:#0b1724!important;
+  box-shadow:0 5px 16px rgba(0,0,0,.26)!important;
+  line-height:1!important;
+}
+.player-avatar-wrap>.player-level-badge small{
+  color:#6f8498;
+  font-size:5.3px;
+  font-weight:900;
+  letter-spacing:.4px;
+}
+.player-avatar-wrap>.player-level-badge b{
+  color:#edf5fb;
+  font-size:7.2px;
+  font-weight:950;
+}
+
+/* 2 + 7. Today has one clear primary action. Evidence remains secondary. */
+.today-card .today-evidence-link{
+  min-width:0!important;
+  min-height:0!important;
+  width:max-content!important;
+  margin-top:5px!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:#71899e!important;
+  font-size:7px!important;
+  font-weight:800!important;
+  text-decoration:underline;
+  text-decoration-color:rgba(113,137,158,.35);
+  text-underline-offset:2px;
+}
+.today-card .today-evidence-link:hover{
+  color:#8ed9dd!important;
+}
+.today-card.next .primary{
+  border-color:rgba(137,107,255,.62)!important;
+  background:linear-gradient(135deg,#745af0,#6652dc)!important;
+  color:#fff!important;
+  box-shadow:0 7px 20px rgba(105,82,221,.16)!important;
+}
+.today-tft-foot small{
+  color:#65798e;
+  font-size:6.8px;
+}
+
+/* 4 + 11. Filter groups explain their scope; queue is visibly separated from result. */
+.history-head-controls{
+  align-items:flex-end!important;
+}
+.history-filter-group{
+  display:grid;
+  gap:4px;
+}
+.history-filter-group>span{
+  padding-left:2px;
+  color:#61768b;
+  font-size:6.2px;
+  font-weight:950;
+  letter-spacing:.8px;
+}
+.history-filter-group .history-queue-tabs,
+.history-filter-group .history-filter-tabs{
+  margin:0!important;
+}
+
+/* 5 + 6 + 12. History starts compact. Board detail is explicitly expandable. */
+.profile-history-first .match-row-v2{
+  cursor:default!important;
+}
+.profile-history-first .match-row-v2:hover{
+  transform:none!important;
+}
+.profile-history-first .match-history-details{
+  margin-top:6px;
+  border:1px solid rgba(95,137,175,.12);
+  border-radius:8px;
+  background:rgba(7,17,28,.38);
+  overflow:hidden;
+}
+.profile-history-first .match-history-details>summary{
+  min-height:32px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:6px 9px;
+  list-style:none;
+  cursor:pointer;
+  user-select:none;
+}
+.profile-history-first .match-history-details>summary::-webkit-details-marker{
+  display:none;
+}
+.profile-history-first .match-history-details>summary::after{
+  content:"＋";
+  flex:0 0 auto;
+  color:#66cbd7;
+  font-size:10px;
+  font-weight:900;
+}
+.profile-history-first .match-history-details[open]>summary::after{
+  content:"−";
+}
+.profile-history-first .match-history-details>summary span{
+  color:#b8c6d3;
+  font-size:8px;
+  font-weight:850;
+}
+.profile-history-first .match-history-details>summary small{
+  color:#667b90;
+  font-size:6.5px;
+  font-weight:700;
+}
+.profile-history-first .match-history-details[open]>summary{
+  border-bottom:1px solid rgba(95,137,175,.10);
+}
+.profile-history-first .match-history-details .match-lineup-grouped{
+  margin:0!important;
+  padding:7px!important;
+}
+.profile-history-first .match-review-inline{
+  min-height:25px!important;
+  margin-bottom:2px!important;
+}
+.profile-history-first .match-review-inline>strong{
+  flex:1;
+}
+.profile-history-first .match-meta-open-analysis{
+  appearance:none;
+  width:100%!important;
+  min-height:32px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  margin:0!important;
+  padding:7px 8px!important;
+  border:1px solid rgba(239,113,126,.18)!important;
+  border-radius:8px!important;
+  background:rgba(239,113,126,.045)!important;
+  color:#e0a0a8!important;
+  font:inherit;
+  font-size:8.6px!important;
+  font-weight:900!important;
+  cursor:pointer;
+}
+.profile-history-first .match-meta-open-analysis:hover{
+  border-color:rgba(239,113,126,.34)!important;
+  background:rgba(239,113,126,.075)!important;
+  color:#ffc2c8!important;
+}
+
+/* Collapsed rows should be genuinely compact. */
+@media(min-width:1100px){
+  .profile-history-first .match-row-v2{
+    min-height:112px!important;
+    align-items:center!important;
+  }
+  .profile-history-first .match-main{
+    align-content:center!important;
+  }
+  .profile-history-first .match-history-details:not([open]){
+    margin-top:5px!important;
+  }
+  .profile-history-first .match-history-details[open]{
+    margin-top:7px!important;
+  }
+  .profile-history-first .match-row-v2:has(.match-history-details[open]){
+    min-height:166px!important;
+    align-items:start!important;
+  }
+}
+
+/* 9. Estimated board metric advertises that it has an explanation. */
+.profile-history-first .match-value-grid-core>span[title]{
+  cursor:help;
+}
+.profile-history-first .match-value-grid-core>span[title] small::after{
+  content:"  ⓘ";
+  color:#72899e;
+  font-size:.9em;
+}
+
+/* 10. Home meta loading gets real skeletons + retry instead of plain status text. */
+.home-meta-skeleton-list{
+  display:grid;
+  gap:5px;
+  padding:3px 0;
+}
+.home-meta-skeleton-row{
+  min-height:48px;
+  display:grid;
+  grid-template-columns:24px minmax(0,1fr) 44px;
+  align-items:center;
+  gap:8px;
+  padding:7px 8px;
+  border:1px solid rgba(95,137,175,.10);
+  border-radius:8px;
+  background:rgba(8,18,29,.45);
+  overflow:hidden;
+}
+.home-meta-skeleton-row>*{
+  display:block;
+  border-radius:5px;
+  background:linear-gradient(90deg,rgba(91,112,133,.08),rgba(116,141,164,.19),rgba(91,112,133,.08));
+  background-size:220% 100%;
+  animation:chibiSkeleton 1.35s ease-in-out infinite;
+}
+.home-meta-skeleton-row i{
+  width:22px;
+  height:22px;
+}
+.home-meta-skeleton-row b{
+  width:72%;
+  height:10px;
+}
+.home-meta-skeleton-row em{
+  width:38px;
+  height:12px;
+  justify-self:end;
+}
+.home-meta-error{
+  min-height:120px;
+  display:grid;
+  place-items:center;
+  align-content:center;
+  gap:8px;
+  padding:16px;
+  color:#8da0b3;
+  font-size:8px;
+  text-align:center;
+}
+.home-meta-error button{
+  min-height:30px;
+  padding:6px 10px;
+  border:1px solid rgba(91,211,207,.20);
+  border-radius:7px;
+  background:rgba(91,211,207,.045);
+  color:#9ddfdd;
+  font-size:7px;
+  font-weight:850;
+  cursor:pointer;
+}
+@keyframes chibiSkeleton{
+  0%{background-position:100% 0}
+  100%{background-position:-100% 0}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .home-meta-skeleton-row>*{
+    animation:none;
+  }
+}
+
+@media(max-width:760px){
+  .history-filter-group{
+    min-width:max-content;
+  }
+  .profile-history-first .match-history-details>summary{
+    min-height:36px;
+  }
+  .profile-history-first .match-history-details>summary span{
+    font-size:7.5px;
+  }
+}
