@@ -26685,3 +26685,242 @@ img[src$="chibi-ui-10.png"],
     font-size:8.2px!important;
   }
 }
+
+
+/* CHIBI MATCH TRAIT FLOW v60 */
+
+/* The composition header is now a connected chain instead of loose text. */
+.match-comp-title{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  gap:8px!important;
+  margin:4px 0 8px!important;
+  min-height:28px;
+  color:#edf4fa!important;
+  font-size:15px!important;
+  line-height:1.1!important;
+}
+
+.match-comp-title-node{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  min-width:0;
+}
+
+.match-comp-title-node strong{
+  color:#edf4fa;
+  font-size:15px;
+  font-weight:900;
+  letter-spacing:-.2px;
+}
+
+.match-comp-title-arrow{
+  margin:0 1px;
+  color:#69cfff;
+  font-size:15px;
+  font-weight:950;
+  line-height:1;
+  text-shadow:0 0 12px rgba(105,207,255,.18);
+}
+
+.match-comp-title-icon{
+  position:relative;
+  width:25px;
+  height:25px;
+  flex:0 0 25px;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  border:1px solid rgba(115,157,194,.24);
+  border-radius:7px;
+  background:#0d1a28;
+  color:#dce9f3;
+  font-size:10px;
+  font-weight:950;
+}
+
+.match-comp-title-icon>span{
+  position:relative;
+  z-index:1;
+}
+
+.match-comp-title-icon img{
+  position:absolute;
+  inset:3px;
+  z-index:2;
+  width:calc(100% - 6px);
+  height:calc(100% - 6px);
+  object-fit:contain;
+}
+
+.match-comp-title-icon.style-2,
+.match-comp-title-icon.style-3,
+.match-comp-title-icon.style-4{
+  border-color:rgba(223,185,96,.28);
+}
+
+/* Active trait chain */
+.match-trait-flow{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  gap:5px!important;
+  margin:4px 0 9px!important;
+}
+
+.match-trait-flow-item{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  min-width:0;
+}
+
+.match-trait-flow-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  min-height:31px;
+  padding:5px 9px 5px 6px;
+  border:1px solid rgba(95,139,177,.17);
+  border-radius:9px;
+  background:linear-gradient(180deg,rgba(12,25,39,.94),rgba(8,18,29,.94));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.018);
+}
+
+.match-trait-flow-chip.style-1{
+  border-color:rgba(112,151,188,.20);
+}
+.match-trait-flow-chip.style-2{
+  border-color:rgba(84,205,155,.24);
+}
+.match-trait-flow-chip.style-3{
+  border-color:rgba(235,190,91,.27);
+}
+.match-trait-flow-chip.style-4{
+  border-color:rgba(183,132,255,.28);
+}
+
+.match-trait-flow-icon{
+  position:relative;
+  width:22px;
+  height:22px;
+  flex:0 0 22px;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  border-radius:6px;
+  background:#101c2a;
+  color:#cbd9e5;
+  font-size:8px;
+  font-weight:950;
+}
+
+.match-trait-flow-icon>span{
+  position:relative;
+  z-index:1;
+}
+
+.match-trait-flow-icon img{
+  position:absolute;
+  inset:2px;
+  z-index:2;
+  width:calc(100% - 4px);
+  height:calc(100% - 4px);
+  object-fit:contain;
+}
+
+.match-trait-flow-copy{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  min-width:0;
+}
+
+.match-trait-flow-copy strong{
+  color:#d9e5ee;
+  font-size:10px;
+  font-weight:850;
+  line-height:1.1;
+  white-space:nowrap;
+}
+
+.match-trait-flow-copy b{
+  min-width:18px;
+  height:18px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:5px;
+  background:rgba(255,255,255,.035);
+  color:#fff;
+  font-size:9px;
+  font-weight:950;
+  line-height:1;
+}
+
+.match-trait-flow-arrow{
+  color:#5fc9f8;
+  font-size:12px;
+  font-weight:950;
+  line-height:1;
+  opacity:.92;
+}
+
+/* Remove the old loose chip spacing inside the final-board summary. */
+.match-summary-card-v2 .match-summary-main>.trait-row{
+  display:none!important;
+}
+
+@media(max-width:760px){
+  .match-comp-title{
+    gap:6px!important;
+    font-size:13px!important;
+  }
+
+  .match-comp-title-node{
+    gap:5px;
+  }
+
+  .match-comp-title-node strong{
+    font-size:13px;
+  }
+
+  .match-comp-title-arrow{
+    font-size:13px;
+  }
+
+  .match-comp-title-icon{
+    width:23px;
+    height:23px;
+    flex-basis:23px;
+  }
+
+  .match-trait-flow{
+    flex-wrap:nowrap!important;
+    overflow-x:auto!important;
+    padding-bottom:5px;
+    scrollbar-width:none;
+  }
+  .match-trait-flow::-webkit-scrollbar{display:none}
+
+  .match-trait-flow-item{
+    flex:0 0 auto;
+  }
+
+  .match-trait-flow-chip{
+    min-height:29px;
+    padding:4px 7px 4px 5px;
+  }
+
+  .match-trait-flow-icon{
+    width:20px;
+    height:20px;
+    flex-basis:20px;
+  }
+
+  .match-trait-flow-copy strong{
+    font-size:9px;
+  }
+}
