@@ -5,7 +5,7 @@ import {
   TftLeaderboardPlayer,
 } from "../api/tft";
 import { profileIconUrl, TftStaticData } from "../tftStatic";
-import { useI18n } from "../i18n";
+import { useI18n } from "../i18n";\nimport { SITE_IMAGES } from "../siteAssets";
 
 type Tier="challenger"|"grandmaster"|"master";
 
@@ -59,7 +59,7 @@ export default function LeaderboardPage({staticData,onOpenPlayer}:Props){
   },[data]);
 
   return <main className="leaderboard-page">
-    <section className="leaderboard-hero">
+    <section className="leaderboard-hero page-hero-with-reference leaderboard-hero-art">\n      <img className="page-reference-art leaderboard-reference-art" src={SITE_IMAGES.ui.all[14]} alt="" aria-hidden="true" loading="eager" decoding="async"/>
       <div>
         <span className="eyebrow">TFT LEADERBOARD</span>
         <h1>{t("leaderboard.title1")}<br/><em>{t("leaderboard.title2")}</em></h1>
