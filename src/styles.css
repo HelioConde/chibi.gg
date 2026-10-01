@@ -27750,3 +27750,138 @@ img[src$="chibi-ui-10.png"],
     padding:6px 8px!important;
   }
 }
+
+
+/* CHIBI MATCH REVIEW BALANCE v64 */
+
+/* Balance the review after trait grouping:
+   the four main synergies stay as cards, while "Outros do board" becomes a
+   compact full-width rail instead of leaving a large empty second-row area. */
+@media(min-width:1101px){
+  .match-summary-card.match-summary-card-v2{
+    padding:11px!important;
+  }
+
+  .match-summary-card-v2 .match-summary-main>span{
+    margin-bottom:2px;
+  }
+
+  .match-summary-card-v2 .match-comp-title{
+    margin:3px 0 7px!important;
+    min-height:24px!important;
+  }
+
+  .match-summary-card-v2 .match-comp-title-node strong{
+    font-size:14px!important;
+  }
+
+  .match-trait-groups{
+    align-items:start!important;
+    grid-auto-rows:auto!important;
+    gap:7px!important;
+  }
+
+  .match-trait-group{
+    align-self:start!important;
+  }
+
+  .match-trait-group-other{
+    grid-column:1/-1!important;
+    min-height:0!important;
+    display:grid!important;
+    grid-template-columns:180px minmax(0,1fr)!important;
+    align-items:center!important;
+    gap:10px!important;
+    padding:7px 9px!important;
+    border-style:dashed!important;
+  }
+
+  .match-trait-group-other .match-trait-group-head{
+    min-height:0!important;
+    grid-template-columns:24px minmax(0,1fr) 22px!important;
+  }
+
+  .match-trait-group-other .match-trait-group-head small{
+    white-space:normal!important;
+    line-height:1.15!important;
+  }
+
+  .match-trait-group-other .match-trait-group-units{
+    min-height:0!important;
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    align-items:center!important;
+    gap:5px!important;
+    padding:0!important;
+    overflow-x:auto!important;
+    scrollbar-width:none;
+  }
+
+  .match-trait-group-other .match-trait-group-units::-webkit-scrollbar{
+    display:none;
+  }
+
+  .match-trait-group-other .unit-card.compact.named{
+    flex:0 0 58px!important;
+    width:58px!important;
+    max-width:58px!important;
+    min-height:76px!important;
+    padding:3px 2px!important;
+  }
+
+  .match-trait-group-other .unit-card.compact.named .unit-portrait{
+    flex-basis:38px!important;
+    width:38px!important;
+    height:38px!important;
+  }
+
+  .match-trait-group-other .unit-card.compact.named .unit-caption{
+    width:54px!important;
+    min-height:17px!important;
+    margin:3px 0 1px!important;
+    font-size:6.6px!important;
+  }
+
+  .match-trait-group-other .unit-card.compact.named .item-icon{
+    width:11px!important;
+    height:11px!important;
+  }
+
+  .match-summary-card-v2 .match-summary-stats{
+    margin-top:3px!important;
+  }
+}
+
+/* Keep the same compact "other units" treatment on laptops. */
+@media(min-width:761px) and (max-width:1100px){
+  .match-trait-group-other{
+    grid-column:1/-1!important;
+    display:grid!important;
+    grid-template-columns:170px minmax(0,1fr)!important;
+    align-items:center!important;
+    gap:9px!important;
+    min-height:0!important;
+    padding:7px 9px!important;
+  }
+
+  .match-trait-group-other .match-trait-group-units{
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    align-items:center!important;
+    gap:5px!important;
+    padding:0!important;
+    overflow-x:auto!important;
+    scrollbar-width:none;
+  }
+
+  .match-trait-group-other .match-trait-group-units::-webkit-scrollbar{
+    display:none;
+  }
+}
+
+/* On phones "Outros" stays a normal block so touch targets remain comfortable. */
+@media(max-width:760px){
+  .match-trait-group-other{
+    display:block!important;
+  }
+}
