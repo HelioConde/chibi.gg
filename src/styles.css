@@ -25307,3 +25307,97 @@ img[src$="chibi-ui-10.png"],
     display:none!important;
   }
 }
+
+
+/* CHIBI REAL BACKGROUND v47 */
+
+/* Replace the global HUD composition with one real background artwork. */
+@media(min-width:821px){
+  .site-art-backdrop{
+    position:fixed!important;
+    z-index:0!important;
+    inset:64px 0 0!important;
+    display:block!important;
+    overflow:hidden!important;
+    pointer-events:none!important;
+    opacity:1!important;
+    contain:paint;
+    background:#06101a!important;
+  }
+
+  .site-background-art{
+    position:absolute!important;
+    inset:-4% -3%!important;
+    width:106%!important;
+    height:108%!important;
+    object-fit:cover!important;
+    object-position:center 32%!important;
+    opacity:.13!important;
+    transform:scale(1.015);
+    filter:saturate(.62) contrast(.96) brightness(.46) blur(.15px)!important;
+    mix-blend-mode:screen;
+  }
+
+  .site-background-veil{
+    position:absolute;
+    inset:0;
+    background:
+      linear-gradient(180deg,rgba(5,12,21,.30) 0%,rgba(5,12,21,.64) 34%,rgba(5,12,21,.84) 78%,rgba(5,12,21,.94) 100%),
+      radial-gradient(circle at 18% 8%,rgba(56,207,212,.035),transparent 28%),
+      radial-gradient(circle at 84% 18%,rgba(125,96,230,.04),transparent 30%);
+  }
+
+  /* Small route differences avoid identical cropping while keeping one background language. */
+  .site-background-route-home .site-background-art{
+    object-position:center 24%!important;
+    opacity:.16!important;
+  }
+  .site-background-route-matches .site-background-art,
+  .site-background-route-profile .site-background-art{
+    object-position:center 38%!important;
+    opacity:.085!important;
+  }
+  .site-background-route-overview .site-background-art,
+  .site-background-route-coach .site-background-art{
+    object-position:58% 34%!important;
+    opacity:.095!important;
+  }
+  .site-background-route-meta .site-background-art,
+  .site-background-route-comps .site-background-art,
+  .site-background-route-stats .site-background-art{
+    object-position:center 30%!important;
+    opacity:.11!important;
+  }
+  .site-background-route-builder .site-background-art,
+  .site-background-route-leaderboard .site-background-art,
+  .site-background-route-overlay .site-background-art{
+    object-position:62% 36%!important;
+    opacity:.10!important;
+  }
+  .site-background-route-legal .site-background-art{
+    opacity:.07!important;
+  }
+
+  /* The HUD component is no longer rendered; keep legacy classes inert if cached markup appears. */
+  .site-hud-overlay,
+  .site-hud-overlay-v2,
+  .site-hud-v2-rail,
+  .site-hud-v2-wing,
+  .site-hud-v2-bottom,
+  .site-hud-v2-emblem,
+  .site-hud-corner,
+  .site-hud-scanline,
+  .site-hud-icons,
+  .site-hud-texture{
+    display:none!important;
+  }
+}
+
+/* Phones stay data-first and do not pay the cost of a full viewport artwork. */
+@media(max-width:820px){
+  .site-art-backdrop,
+  .site-background-art,
+  .site-background-veil{
+    display:none!important;
+  }
+}

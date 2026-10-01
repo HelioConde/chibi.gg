@@ -60,7 +60,6 @@ import HomeStudyShelf from "./components/HomeStudyShelf";
 import HomeVisualShowcase from "./components/HomeVisualShowcase";
 import SiteArtworkBackdrop from "./components/SiteArtworkBackdrop";
 import PointerAura from "./components/PointerAura";
-import SiteHudOverlay from "./components/SiteHudOverlay";
 import AdaptiveArtwork from "./components/AdaptiveArtwork";
 import SectionMarker from "./components/SectionMarker";
 import ChibiNavIcon from "./components/ChibiNavIcon";
@@ -1360,7 +1359,6 @@ function App() {
 
       {!compactViewport&&<>
         <SiteArtworkBackdrop page={sitePage} profileTab={profileTab} hasProfile={Boolean(profile)}/>
-        <SiteHudOverlay/>
         <PointerAura/>
       </>}
 
