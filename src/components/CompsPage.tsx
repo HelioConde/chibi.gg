@@ -316,7 +316,7 @@ export default function CompsPage({
       </div>
     </section>
 
-    <ArtworkRibbon images={[19,20,11]} className="comps-art-ribbon"/>
+    <ArtworkRibbon sources={[SITE_IMAGES.v2.icons[0],SITE_IMAGES.v2.mascots.board,SITE_IMAGES.v2.frames.square]} className="comps-art-ribbon"/>
 
     <div className="meta-toolbar">
       <div>
