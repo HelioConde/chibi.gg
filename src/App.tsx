@@ -255,14 +255,31 @@ function normalizeTraitMatchValue(value:string){
     .toLowerCase();
 }
 
+/* Data Dragon occasionally exposes a different trait identifier/name shape than
+   the match payload. Keep a tiny current-set fallback so grouping never becomes
+   an empty visual when the Riot static-data naming drifts. */
+const SET18_TRAIT_MEMBERS:Record<string,string[]>={
+  "congregacao das bruxas":["camille","caitlyn","elise","cassiopeia","morgana"],
+  "coven":["camille","caitlyn","elise","cassiopeia","morgana"],
+  "vanguarda":["rakan","elise","hecarim","diana","azupora","taric"],
+  "vanguard":["rakan","elise","hecarim","diana","azupora","taric"],
+  "devastador":["akali","camille","lobo trevoguari","warwick","diana","rubrivira"],
+  "ravager":["akali","camille","murkwolf","warwick","diana","brambleback"],
+  "slayer":["akali","camille","murkwolf","warwick","diana","brambleback"],
+  "flora fatalis":["soraka","fiddlesticks"],
+};
+
+function unitDisplayName(unit:TftUnit,staticData:TftStaticData|null){
+  return staticEntry(staticData?.champions,unit.characterId)?.name||cleanName(unit.characterId);
+}
+
 function unitTraitValues(unit:TftUnit,staticData:TftStaticData|null){
   const entry=staticEntry(staticData?.champions,unit.characterId);
-  const values=entry?.traits||[];
-
+  const values=Array.isArray(entry?.traits)?entry!.traits!:[];
   return values.flatMap((value)=>{
-    const resolved=staticEntry(staticData?.traits,value)?.name||"";
+    const resolved=staticEntry(staticData?.traits,String(value))?.name||"";
     return [
-      normalizeTraitMatchValue(value),
+      normalizeTraitMatchValue(String(value)),
       normalizeTraitMatchValue(resolved),
     ].filter(Boolean);
   });
@@ -275,7 +292,12 @@ function unitHasTrait(unit:TftUnit,trait:TftTrait,staticData:TftStaticData|null)
     normalizeTraitMatchValue(traitLabel(trait,staticData)),
   ].filter(Boolean);
 
-  return targets.some((value)=>unitValues.has(value));
+  if(targets.some((value)=>unitValues.has(value)))return true;
+
+  const unitName=normalizeTraitMatchValue(unitDisplayName(unit,staticData));
+  return targets.some((target)=>
+    (SET18_TRAIT_MEMBERS[target]||[]).some((member)=>normalizeTraitMatchValue(member)===unitName)
+  );
 }
 
 function unitTraitPriority(unit:TftUnit,traits:TftTrait[],staticData:TftStaticData|null){
@@ -2412,7 +2434,7 @@ function App() {
                           : "Board TFT"}
                       </h3>
 
-                      <div className="match-trait-relations" aria-label="Relação entre sinergias e campeões">
+                      <div className="match-trait-groups" aria-label="Campeões organizados por sinergia">
                         {summaryTraits.map((trait)=>{
                           const entry=staticEntry(staticData?.traits,trait.name);
                           const image=staticData?tftAssetUrl(staticData.version,"trait",entry):"";
@@ -2421,52 +2443,71 @@ function App() {
 
                           if(!relatedUnits.length)return null;
 
-                          return <div className="match-trait-link-row" key={trait.name}>
-                            <div className={"match-trait-link-chip style-"+Math.max(0,trait.style)}>
-                              <span className="match-trait-link-chip-icon" aria-hidden="true">
+                          return <section className={"match-trait-group style-"+Math.max(0,trait.style)} key={trait.name}>
+                            <header className="match-trait-group-head">
+                              <span className="match-trait-group-icon" aria-hidden="true">
                                 <span>{label.slice(0,1)}</span>
                                 {image&&<img src={image} alt="" onError={(e)=>{e.currentTarget.style.display="none";}}/>}
                               </span>
-                              <span className="match-trait-link-chip-copy">
+                              <div>
                                 <strong>{label}</strong>
-                                <b>{trait.numUnits}</b>
-                              </span>
+                                <small>{relatedUnits.length} {relatedUnits.length===1?"campeão":"campeões"} no seu board</small>
+                              </div>
+                              <b>{trait.numUnits}</b>
+                            </header>
+
+                            <div className="match-trait-group-connector" aria-hidden="true">
+                              <span/>
                             </div>
 
-                            <span className="match-trait-link-arrow" aria-hidden="true">
-                              <i/>
-                              <b>→</b>
-                            </span>
-
-                            <div className="match-trait-unit-row">
+                            <div className="match-trait-group-units">
                               {relatedUnits.map((unit,index)=>(
-                                <TraitUnitMini
+                                <UnitVisual
                                   unit={unit}
                                   staticData={staticData}
+                                  compact
+                                  showName
                                   key={trait.name+"-"+unit.characterId+"-"+index}
                                 />
                               ))}
                             </div>
-                          </div>;
+                          </section>;
                         })}
+
+                        {(()=>{
+                          const groupedIds=new Set(
+                            summaryTraits.flatMap((trait)=>
+                              sortedUnits
+                                .filter((unit)=>unitHasTrait(unit,trait,staticData))
+                                .map((unit)=>unit.characterId)
+                            )
+                          );
+                          const remaining=sortedUnits.filter((unit)=>!groupedIds.has(unit.characterId));
+                          if(!remaining.length)return null;
+                          return <section className="match-trait-group match-trait-group-other">
+                            <header className="match-trait-group-head">
+                              <span className="match-trait-group-icon" aria-hidden="true">+</span>
+                              <div>
+                                <strong>Outros do board</strong>
+                                <small>unidades fora das 4 sinergias principais acima</small>
+                              </div>
+                              <b>{remaining.length}</b>
+                            </header>
+                            <div className="match-trait-group-units">
+                              {remaining.map((unit,index)=>(
+                                <UnitVisual
+                                  unit={unit}
+                                  staticData={staticData}
+                                  compact
+                                  showName
+                                  key={"other-"+unit.characterId+"-"+index}
+                                />
+                              ))}
+                            </div>
+                          </section>;
+                        })()}
                       </div>
 
-                      <div className="match-board-order-note">
-                        <span>BOARD ORGANIZADO</span>
-                        <small>campeões ordenados pela prioridade das sinergias acima</small>
-                      </div>
-
-                      <div className="board-row modal-board match-board-class-order">
-                        {sortedUnits.map((unit,index)=>(
-                          <UnitVisual
-                            unit={unit}
-                            staticData={staticData}
-                            compact
-                            showName
-                            key={unit.characterId+index}
-                          />
-                        ))}
-                      </div>
                     </>;
                   })()}
                   {openedMatch.augments.length>0&&<div className="augment-row match-summary-augments">
