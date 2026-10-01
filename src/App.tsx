@@ -2275,7 +2275,7 @@ function App() {
                                     ?"units-many"
                                     :""
                               )} aria-label={t("profile.history.unitsAria",{count:match.units.length})}>
-                                {match.units.map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact key={unit.characterId+index}/>)}
+                                {match.units.map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact showName key={unit.characterId+index}/>)}
                               </div>
                             </div>
                           </div>
