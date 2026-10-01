@@ -2261,7 +2261,7 @@ function App() {
         <div className="match-overlay" onClick={closeMatchReview}>
           <section className="match-modal match-modal-with-hud" onClick={(e)=>e.stopPropagation()}>
             <img className="match-modal-hud-art match-modal-hud-v2" src={SITE_IMAGES.v2.hud[3]} alt="" aria-hidden="true"/>
-            <button className="match-close" onClick={closeMatchReview}>×</button>
+            <button className="match-close" onClick={closeMatchReview} aria-label="Fechar revisão da partida" title="Fechar revisão da partida">×</button>
             {matchLoading && <div className="match-state">{t("match.loading")}</div>}
             {matchError && <div className="match-state error">{matchError}</div>}
             {studyLookup==="unavailable"&&!selectedMatch&&!matchLoading&&<div className="match-state error">
