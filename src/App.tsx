@@ -59,6 +59,7 @@ import HomeMetaPreview from "./components/HomeMetaPreview";
 import HomeSessionResume from "./components/HomeSessionResume";
 import HomeStudyShelf from "./components/HomeStudyShelf";
 import HomeVisualShowcase from "./components/HomeVisualShowcase";
+import SiteArtworkBackdrop from "./components/SiteArtworkBackdrop";
 import TeamBuilderPage from "./components/TeamBuilderPage";
 import LeaderboardPage from "./components/LeaderboardPage";
 import ProductInfoPage from "./components/ProductInfoPage";
@@ -1275,6 +1276,8 @@ function App() {
           <button className="ghost-button" onClick={()=>openInfoPage("about")}>{t("nav.howItWorks")}</button>
         </div>
       </header>
+
+      <SiteArtworkBackdrop page={sitePage} profileTab={profileTab} hasProfile={Boolean(profile)}/>
 
       {sitePage==="about"||sitePage==="privacy"||sitePage==="terms" ? (
         <ProductInfoPage
