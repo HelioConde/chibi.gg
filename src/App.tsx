@@ -1597,6 +1597,7 @@ function App() {
           </section>}
 
           <section className="player-summary-shell player-summary-visual player-summary-compact">
+            <img className="player-summary-reference-art" src={SITE_IMAGES.ui.profile} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
             <div className="player-summary-board-art" aria-hidden="true">
               {analysisMatches[0]?.units.slice(0,5).map((unit,index)=>{
                 const entry=staticEntry(staticData?.champions,unit.characterId);
@@ -1733,6 +1734,10 @@ function App() {
           </>}
 
           {profileTab==="coach"&&<>
+            <div className="coach-art-banner" aria-hidden="true">
+              <img src={SITE_IMAGES.ui.coach} alt="" loading="lazy" decoding="async"/>
+              <span></span>
+            </div>
             <ChibiCoachMode />
             <ChibiReview
               matches={analysisMatches}
@@ -1899,7 +1904,8 @@ function App() {
 
           {profileTab==="matches"&&<>
             <div className="content-grid profile-history-first">
-            <section className="panel history" id="match-history">
+            <section className="panel history history-with-reference" id="match-history">
+              <img className="history-reference-art" src={SITE_IMAGES.ui.history} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
               <div className="panel-title profile-history-head">
                 <div>
                   <span>{t("profile.history.riot")}</span>
