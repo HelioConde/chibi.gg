@@ -138,8 +138,8 @@ const messages: Record<Language, Record<string, string>> = {
     "status.warningTitle": "{{count}} aviso(s) ativo(s) retornados pelo tft-status-v1.",
 
     "metaPreview.kicker": "AMOSTRA OBSERVADA",
-    "metaPreview.title": "O que está funcionando agora.",
-    "metaPreview.desc": "Uma leitura curta do dataset observado pelo Chibi. Entre no Meta quando quiser aprofundar.",
+    "metaPreview.title": "Meta observada deste patch.",
+    "metaPreview.desc": "Boards e traits recorrentes no dataset observado pelo Chibi, com amostra explícita e acesso rápido ao detalhe.",
     "metaPreview.open": "Ver Meta completo →",
     "metaPreview.topComps": "TOP COMPS",
     "metaPreview.observedBoards": "Boards observados",
@@ -1632,8 +1632,8 @@ const messages: Record<Language, Record<string, string>> = {
     "status.warningTitle": "{{count}} active warning(s) returned by tft-status-v1.",
 
     "metaPreview.kicker": "OBSERVED SAMPLE",
-    "metaPreview.title": "What is working right now.",
-    "metaPreview.desc": "A short view of the dataset observed by Chibi. Open Meta whenever you want to go deeper.",
+    "metaPreview.title": "Observed meta for this patch.",
+    "metaPreview.desc": "Recurring boards and traits in Chibi's observed dataset, with explicit sample size and quick access to the details.",
     "metaPreview.open": "View full Meta →",
     "metaPreview.topComps": "TOP COMPS",
     "metaPreview.observedBoards": "Observed boards",

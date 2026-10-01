@@ -24310,3 +24310,168 @@ img[src$="chibi-ui-10.png"],
 .site-art-matches .site-art-frame-2{
   opacity:.45!important;
 }
+
+
+/* CHIBI HOME DENSITY v40 */
+
+/* The product showcase is a navigation surface, not a full gallery. */
+.home-visual-showcase-v2{
+  margin-top:8px!important;
+  margin-bottom:18px!important;
+  padding:16px!important;
+  border-radius:14px!important;
+}
+.home-visual-showcase-head{
+  grid-template-columns:minmax(0,1fr)!important;
+  margin-bottom:11px!important;
+}
+.home-visual-showcase-head>div:first-child{
+  max-width:780px!important;
+}
+.home-visual-showcase-head>div:first-child>span{
+  font-size:6.5px!important;
+  letter-spacing:1.15px!important;
+}
+.home-visual-showcase-head h2{
+  max-width:760px!important;
+  margin:4px 0 5px!important;
+  font-size:clamp(20px,2.5vw,30px)!important;
+}
+.home-visual-showcase-head p{
+  max-width:760px!important;
+  font-size:8px!important;
+  line-height:1.45!important;
+}
+.home-visual-showcase-mobile{
+  display:none!important;
+}
+.home-visual-showcase-grid{
+  grid-template-columns:1.15fr 1fr 1fr!important;
+  grid-auto-rows:138px!important;
+  gap:7px!important;
+}
+.home-visual-history{
+  grid-row:span 1!important;
+}
+.home-visual-coach{
+  grid-column:span 2!important;
+}
+.home-visual-card-v2{
+  border-radius:10px!important;
+}
+.home-visual-card-v2>.adaptive-artwork{
+  inset:5px!important;
+  width:calc(100% - 10px)!important;
+  height:calc(100% - 10px)!important;
+}
+.home-visual-card-copy{
+  padding:9px!important;
+}
+.home-visual-card-copy small{
+  font-size:5.5px!important;
+}
+.home-visual-card-copy strong{
+  max-width:88%;
+  font-size:8px!important;
+  line-height:1.24!important;
+}
+.home-visual-card-copy em{
+  margin-top:3px!important;
+  font-size:5px!important;
+}
+
+/* Meta starts closer and reads as data, not another marketing chapter. */
+.home-meta-preview-v2{
+  margin-bottom:44px!important;
+}
+.home-meta-intro-v2{
+  margin-bottom:10px!important;
+}
+.home-meta-intro-v2 h2{
+  margin:5px 0 4px!important;
+  font-size:clamp(24px,3vw,34px)!important;
+}
+.home-meta-intro-v2 p{
+  max-width:680px!important;
+  font-size:8px!important;
+  line-height:1.45!important;
+}
+.home-meta-grid-v2{
+  gap:8px!important;
+}
+
+/* Builder remains a final CTA but no longer consumes a full screen. */
+.home-builder-v2{
+  min-height:320px!important;
+  gap:22px!important;
+  padding:22px!important;
+  border-radius:15px!important;
+}
+.home-builder-copy h2{
+  margin:7px 0 8px!important;
+  font-size:clamp(28px,3.4vw,40px)!important;
+}
+.home-builder-copy p{
+  font-size:8.5px!important;
+  line-height:1.5!important;
+}
+.home-builder-copy button{
+  margin-top:14px!important;
+  padding:9px 13px!important;
+}
+.home-builder-demo{
+  padding:11px!important;
+  border-radius:11px!important;
+}
+.home-builder-board{
+  gap:4px!important;
+  margin:8px 0!important;
+}
+.home-builder-demo-footer{
+  margin-top:7px!important;
+}
+
+/* Section rhythm: the page should feel continuous, not like stacked landing pages. */
+.landing-v2 .section-marker{
+  margin-top:22px!important;
+  margin-bottom:8px!important;
+}
+.landing-v2 .section-marker.compact{
+  margin-top:14px!important;
+}
+
+@media(max-width:1000px){
+  .home-visual-showcase-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    grid-auto-rows:132px!important;
+  }
+  .home-visual-coach{
+    grid-column:span 1!important;
+  }
+  .home-builder-v2{
+    min-height:0!important;
+  }
+}
+
+@media(max-width:640px){
+  .home-visual-showcase-v2{
+    padding:12px!important;
+  }
+  .home-visual-showcase-grid{
+    display:flex!important;
+    gap:7px!important;
+    overflow-x:auto!important;
+    margin:0 -12px!important;
+    padding:0 12px 4px!important;
+  }
+  .home-visual-card-v2{
+    flex:0 0 min(76vw,280px)!important;
+    height:146px!important;
+  }
+  .home-meta-preview-v2{
+    margin-bottom:32px!important;
+  }
+  .home-builder-v2{
+    padding:16px!important;
+  }
+}

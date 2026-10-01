@@ -27,13 +27,9 @@ export default function HomeVisualShowcase({onOpenProfile,onOpenComps,onOpenStat
   return <section className="home-visual-showcase home-visual-showcase-v2" aria-label="Chibi.gg product preview">
     <header className="home-visual-showcase-head">
       <div>
-        <span>CHIBI UI · OUTPUT V2</span>
-        <h2>Informação de TFT com leitura mais rápida</h2>
-        <p>Os novos recortes agora fazem parte do produto: molduras, HUD, mascotes e detalhes visuais reforçam cada contexto sem competir com os dados.</p>
-      </div>
-      <div className="home-visual-showcase-mobile">
-        <AdaptiveArtwork src={SITE_IMAGES.v2.showcase.mobile} alt="" loading="lazy" decoding="async"/>
-        <span>Mobile safe</span>
+        <span>CHIBI EM AÇÃO</span>
+        <h2>Entenda a partida sem abrir cinco telas.</h2>
+        <p>Histórico, composição, augments, posicionamento e revisão conectados para você entender o que aconteceu e decidir o próximo passo.</p>
       </div>
     </header>
 
