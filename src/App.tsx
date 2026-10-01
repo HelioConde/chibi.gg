@@ -2245,7 +2245,6 @@ function App() {
                               <span className="match-review-inline-dot" aria-hidden="true"/>
                               <span className="match-review-inline-label">{cue.label}</span>
                               <strong>{cue.title}</strong>
-                              <span className="match-review-inline-action">{t("profile.history.openAnalysis")} →</span>
                             </div>
 
                             <div className="match-lineup match-lineup-grouped">
@@ -2344,6 +2343,7 @@ function App() {
                               <span><b>{match.goldLeft}G</b><small>{t("profile.history.gold")}</small></span>
                               <span><b>Nv {match.level}</b><small>{t("profile.history.level")}</small></span>
                             </div>
+                            <span className="match-meta-open-analysis">{t("profile.history.openAnalysis")} <b>→</b></span>
                           </div>
                         </button>;
                       })}
