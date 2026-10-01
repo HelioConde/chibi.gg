@@ -28954,3 +28954,327 @@ img[src$="chibi-ui-10.png"],
     flex-basis:36px!important;
   }
 }
+
+
+/* CHIBI HISTORY DETAIL BALANCE v69 */
+
+/* Desktop history: use the available canvas instead of keeping the class cards
+   bunched at the left with unreadably small labels. */
+@media(min-width:1100px){
+  .profile-history-first .match-row-v2{
+    grid-template-columns:56px minmax(0,1fr) 168px!important;
+    min-height:166px!important;
+    padding:10px 12px!important;
+    column-gap:12px!important;
+  }
+
+  .profile-history-first .match-main{
+    min-width:0!important;
+    grid-template-rows:auto auto auto auto!important;
+    align-content:start!important;
+    gap:2px!important;
+    padding-right:0!important;
+  }
+
+  .profile-history-first .match-context-line{
+    margin:0 0 3px!important;
+    gap:7px!important;
+  }
+  .profile-history-first .match-context-line span{
+    font-size:7.4px!important;
+    line-height:1.15!important;
+  }
+
+  .profile-history-first .match-row-title{
+    min-height:20px!important;
+    margin:0 0 2px!important;
+  }
+  .profile-history-first .match-row-title>div:first-child{
+    gap:7px!important;
+  }
+  .profile-history-first .match-row-title>div:first-child>strong{
+    max-width:none!important;
+    color:#e8f0f7!important;
+    font-size:10.5px!important;
+    line-height:1.15!important;
+  }
+  .profile-history-first .match-review-label{
+    padding:3px 6px!important;
+    font-size:6.2px!important;
+  }
+
+  .profile-history-first .match-review-inline{
+    width:100%!important;
+    max-width:none!important;
+    min-height:28px!important;
+    gap:8px!important;
+    margin:2px 0 5px!important;
+  }
+  .profile-history-first .match-review-inline-dot{
+    width:7px!important;
+    height:7px!important;
+    flex-basis:7px!important;
+  }
+  .profile-history-first .match-review-inline-label{
+    font-size:8px!important;
+    letter-spacing:.35px!important;
+  }
+  .profile-history-first .match-review-inline>strong{
+    overflow:visible!important;
+    color:#c3ced9!important;
+    font-size:9px!important;
+    line-height:1.25!important;
+    text-overflow:clip!important;
+    white-space:normal!important;
+  }
+
+  .profile-history-first .match-lineup-grouped{
+    width:100%!important;
+    min-width:0!important;
+    margin-top:3px!important;
+  }
+
+  /* Four logical columns: 3 primary traits + Outros. */
+  .profile-history-first .match-history-class-groups{
+    width:100%!important;
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    align-items:stretch!important;
+    gap:8px!important;
+    overflow:visible!important;
+    padding:0!important;
+  }
+
+  .profile-history-first .match-history-class-group{
+    min-width:0!important;
+    width:auto!important;
+    max-width:none!important;
+    min-height:104px!important;
+    padding:7px 8px 8px!important;
+    border-radius:10px!important;
+  }
+
+  .profile-history-first .match-history-class-head{
+    min-height:29px!important;
+    grid-template-columns:22px minmax(0,1fr) 22px!important;
+    gap:6px!important;
+    padding-bottom:6px!important;
+  }
+
+  .profile-history-first .match-history-class-icon{
+    width:22px!important;
+    height:22px!important;
+  }
+
+  .profile-history-first .match-history-class-copy strong{
+    font-size:8.2px!important;
+    line-height:1.1!important;
+  }
+
+  .profile-history-first .match-history-class-copy small{
+    font-size:6px!important;
+    line-height:1.1!important;
+  }
+
+  .profile-history-first .match-history-class-head>b{
+    width:22px!important;
+    height:22px!important;
+    font-size:8px!important;
+  }
+
+  .profile-history-first .match-history-class-units{
+    width:100%!important;
+    min-width:0!important;
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    justify-content:flex-start!important;
+    gap:6px!important;
+    padding:11px 0 0!important;
+  }
+
+  .profile-history-first .match-history-class-units::before{
+    left:18px!important;
+    right:18px!important;
+  }
+
+  .profile-history-first .match-history-class-units .unit-card.compact.named{
+    flex:0 0 52px!important;
+    width:52px!important;
+    max-width:52px!important;
+    min-height:78px!important;
+    padding:3px 2px 4px!important;
+  }
+
+  .profile-history-first .match-history-class-units .unit-card.compact.named .unit-portrait{
+    flex-basis:41px!important;
+    width:41px!important;
+    height:41px!important;
+  }
+
+  .profile-history-first .match-history-class-units .unit-card.compact.named .unit-caption{
+    width:48px!important;
+    min-height:16px!important;
+    margin:3px 0 1px!important;
+    color:#dde7ef!important;
+    font-size:6.8px!important;
+    line-height:1.05!important;
+  }
+
+  .profile-history-first .match-history-class-units .unit-card.compact.named .item-icon{
+    width:12px!important;
+    height:12px!important;
+  }
+
+  .profile-history-first .match-history-grouped-augments{
+    min-height:20px!important;
+    margin-top:5px!important;
+    gap:5px!important;
+  }
+  .profile-history-first .match-history-grouped-augments>span:first-child{
+    font-size:6px!important;
+  }
+  .profile-history-first .match-history-grouped-augments .match-augment-icon{
+    width:18px!important;
+    height:18px!important;
+    flex-basis:18px!important;
+  }
+
+  /* Result rail: make placement/tactician easy to read, not decorative. */
+  .profile-history-first .match-result-rail{
+    align-self:center!important;
+    gap:6px!important;
+  }
+  .profile-history-first .match-tactician{
+    width:44px!important;
+    height:44px!important;
+  }
+  .profile-history-first .match-result-rail .placement{
+    width:44px!important;
+    min-width:44px!important;
+    height:30px!important;
+    min-height:30px!important;
+    font-size:11px!important;
+  }
+
+  /* Facts belong together in the right rail. The analysis CTA lives here too. */
+  .profile-history-first .match-meta-rich{
+    width:168px!important;
+    min-width:168px!important;
+    align-self:stretch!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:center!important;
+    gap:7px!important;
+    padding-left:10px!important;
+  }
+
+  .profile-history-first .match-scan-facts-rail{
+    gap:4px!important;
+    margin-bottom:0!important;
+  }
+  .profile-history-first .match-scan-facts-rail>span{
+    height:22px!important;
+    padding:0 4px!important;
+  }
+  .profile-history-first .match-scan-facts-rail i{
+    font-size:5.8px!important;
+  }
+  .profile-history-first .match-scan-facts-rail b{
+    font-size:7px!important;
+  }
+
+  .profile-history-first .match-value-grid-core{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:4px!important;
+  }
+  .profile-history-first .match-value-grid-core>span{
+    min-height:38px!important;
+    padding:5px 3px!important;
+  }
+  .profile-history-first .match-value-grid-core b{
+    font-size:8.5px!important;
+  }
+  .profile-history-first .match-value-grid-core small{
+    font-size:5.8px!important;
+  }
+
+  .profile-history-first .match-meta-open-analysis{
+    width:100%;
+    min-height:30px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    border:1px solid rgba(239,113,126,.15);
+    border-radius:8px;
+    background:rgba(239,113,126,.045);
+    color:#d89ba3;
+    font-size:7.5px;
+    font-weight:900;
+    line-height:1;
+  }
+  .profile-history-first .match-meta-open-analysis b{
+    font-size:9px;
+  }
+
+  /* Session header labels were too tiny compared with the match cards. */
+  .profile-history-first .history-session-titleline>span{
+    font-size:7.5px!important;
+  }
+  .profile-history-first .history-session-titleline>strong{
+    font-size:9px!important;
+  }
+  .profile-history-first .history-session-titleline>small{
+    font-size:6.5px!important;
+  }
+  .profile-history-first .history-session-stats small{
+    font-size:6.5px!important;
+  }
+  .profile-history-first .history-session-stats b{
+    font-size:9.5px!important;
+  }
+}
+
+/* Laptop/tablet: preserve grouping and larger text, but allow horizontal class scroll. */
+@media(min-width:761px) and (max-width:1099px){
+  .profile-history-first .match-history-class-copy strong{
+    font-size:7.6px!important;
+  }
+  .profile-history-first .match-history-class-copy small{
+    font-size:5.7px!important;
+  }
+  .profile-history-first .match-history-class-units .unit-caption{
+    font-size:6.4px!important;
+  }
+  .profile-history-first .match-context-line span{
+    font-size:6.8px!important;
+  }
+  .profile-history-first .match-review-inline-label{
+    font-size:7.4px!important;
+  }
+  .profile-history-first .match-review-inline>strong{
+    font-size:8.4px!important;
+  }
+}
+
+/* Mobile keeps the information order but protects tap/readability. */
+@media(max-width:760px){
+  .profile-history-first .match-review-inline-label{
+    font-size:7px!important;
+  }
+  .profile-history-first .match-review-inline>strong{
+    font-size:8px!important;
+  }
+  .profile-history-first .match-history-class-copy strong{
+    font-size:7.2px!important;
+  }
+  .profile-history-first .match-history-class-copy small{
+    font-size:5.5px!important;
+  }
+  .profile-history-first .match-history-class-units .unit-caption{
+    font-size:6.2px!important;
+  }
+  .profile-history-first .match-meta-open-analysis{
+    display:none;
+  }
+}
