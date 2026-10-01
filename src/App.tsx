@@ -751,15 +751,6 @@ function App() {
     matchLoading,
   ]);
 
-  const latestPlayedAt=useMemo(
-    ()=>Math.max(0,...analysisMatches.map((m)=>Number(m.playedAt)||0)),
-    [analysisMatches]
-  );
-
-  const freshnessDays=latestPlayedAt
-    ? Math.floor((Date.now()-latestPlayedAt)/86400000)
-    : null;
-
   function updateProfileUrl(
     tab:ProfileTab=profileTab,
     queue:number|null=selectedQueue,
