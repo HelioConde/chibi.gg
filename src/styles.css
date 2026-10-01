@@ -30761,3 +30761,458 @@ img[src$="chibi-ui-10.png"],
     grid-template-columns:1fr;
   }
 }
+
+
+/* CHIBI UX SYSTEM v79 */
+
+/* Design tokens: one shared visual language for hierarchy, interaction and states. */
+:root{
+  --chibi-bg:#07111c;
+  --chibi-surface:#0b1826;
+  --chibi-surface-2:#0e1d2d;
+  --chibi-border:rgba(104,145,181,.18);
+  --chibi-border-soft:rgba(104,145,181,.10);
+  --chibi-text:#e7eef6;
+  --chibi-text-2:#aab9c8;
+  --chibi-text-3:#73879b;
+  --chibi-primary:#6b5cff;
+  --chibi-primary-strong:#7c6cff;
+  --chibi-success:#66d0a6;
+  --chibi-warning:#e1aa72;
+  --chibi-risk:#ef7d89;
+  --chibi-info:#63cbd6;
+  --chibi-radius-sm:7px;
+  --chibi-radius-md:10px;
+  --chibi-radius-lg:14px;
+  --chibi-shadow-soft:0 8px 24px rgba(0,0,0,.16);
+  --chibi-shadow-focus:0 0 0 3px rgba(107,92,255,.22);
+  --chibi-touch:44px;
+  --chibi-type-xs:7px;
+  --chibi-type-sm:8px;
+  --chibi-type-body:9px;
+  --chibi-type-label:10px;
+  --chibi-type-card:12px;
+  --chibi-type-section:20px;
+  --chibi-type-page:30px;
+}
+
+/* Global hierarchy and readable support copy. */
+body{
+  color:var(--chibi-text);
+}
+small,
+.helper,
+.muted{
+  color:var(--chibi-text-3);
+}
+.panel,
+.player-summary-shell,
+.today-tft,
+.history,
+.coach-review,
+.builder-workspace,
+.meta-explorer,
+.leaderboard-table-panel{
+  border-color:var(--chibi-border)!important;
+  border-radius:var(--chibi-radius-md)!important;
+}
+
+/* Primary action has one unmistakable product color. */
+button.primary,
+.today-card.next .primary,
+.player-coach-button,
+.home-search-v2>button[type="submit"]{
+  border-color:rgba(124,108,255,.72)!important;
+  background:linear-gradient(135deg,var(--chibi-primary-strong),var(--chibi-primary))!important;
+  color:#fff!important;
+}
+
+/* Secondary actions stay quiet. */
+button.secondary,
+.ghost-button,
+.refresh-button,
+.share-analysis-button{
+  background:rgba(255,255,255,.018)!important;
+  border-color:var(--chibi-border)!important;
+  color:var(--chibi-text-2)!important;
+}
+
+/* Keyboard focus is always visible. */
+:where(button,a,input,select,textarea,summary,[tabindex]):focus-visible{
+  outline:2px solid var(--chibi-info)!important;
+  outline-offset:2px!important;
+  box-shadow:var(--chibi-shadow-focus)!important;
+}
+
+/* Long-scroll navigation remains available. */
+.topbar{
+  position:sticky!important;
+  top:0;
+  z-index:1200!important;
+  background:rgba(5,14,24,.94)!important;
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--chibi-border-soft)!important;
+}
+.product-nav button.active{
+  color:#fff!important;
+  background:rgba(107,92,255,.10)!important;
+  box-shadow:inset 0 -2px 0 var(--chibi-primary-strong)!important;
+}
+.profile-tabs-clean{
+  position:sticky!important;
+  top:62px;
+  z-index:900!important;
+  background:rgba(7,17,28,.94)!important;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.profile-tabs-clean .profile-tab-list button.active{
+  color:#fff!important;
+  box-shadow:inset 0 -3px 0 var(--chibi-info)!important;
+}
+
+/* History filter header can stay visible without turning the entire section into a wall. */
+@media(min-width:1100px){
+  .profile-history-first .profile-history-head{
+    position:sticky;
+    top:104px;
+    z-index:70;
+    padding-top:8px!important;
+    padding-bottom:8px!important;
+    background:linear-gradient(180deg,rgba(10,24,38,.98),rgba(10,24,38,.94))!important;
+    border-bottom:1px solid var(--chibi-border-soft);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+  }
+}
+
+/* Self-explanatory controls: same shape/state language everywhere. */
+.history-density-tabs,
+.history-sort-tabs{
+  display:flex;
+  gap:4px;
+}
+.history-density-tabs button,
+.history-sort-tabs button{
+  min-height:30px;
+  padding:6px 9px;
+  border:1px solid var(--chibi-border);
+  border-radius:7px;
+  background:rgba(255,255,255,.015);
+  color:var(--chibi-text-3);
+  font-size:7.4px;
+  font-weight:850;
+  cursor:pointer;
+}
+.history-density-tabs button.active,
+.history-sort-tabs button.active{
+  border-color:rgba(99,203,214,.40);
+  background:rgba(99,203,214,.08);
+  color:#dffbfb;
+}
+.history-filter-summary{
+  min-height:32px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  padding:6px 10px;
+  border-top:1px solid var(--chibi-border-soft);
+  border-bottom:1px solid var(--chibi-border-soft);
+  background:rgba(7,17,28,.34);
+}
+.history-filter-summary span{
+  color:var(--chibi-text-3);
+  font-size:7px;
+}
+.history-filter-summary span b{
+  margin-right:3px;
+  color:var(--chibi-text);
+  font-size:8px;
+  font-variant-numeric:tabular-nums;
+}
+.history-filter-summary em{
+  margin-left:auto;
+  color:#83d6d8;
+  font-size:7px;
+  font-style:normal;
+  font-weight:850;
+}
+
+/* Data, interpretation and recommendation are visually separated. */
+.data-origin-badge{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:17px;
+  padding:2px 5px;
+  border-radius:5px;
+  font-size:5.8px!important;
+  font-weight:950!important;
+  letter-spacing:.55px;
+}
+.data-origin-badge.riot{
+  border:1px solid rgba(92,211,165,.18);
+  background:rgba(92,211,165,.05);
+  color:#84d8b5;
+}
+.data-origin-badge.chibi{
+  border:1px solid rgba(126,107,255,.22);
+  background:rgba(126,107,255,.07);
+  color:#ae9fff;
+}
+.match-context-line{
+  display:flex!important;
+  align-items:center!important;
+  gap:5px!important;
+  flex-wrap:wrap!important;
+}
+.match-context-chip{
+  display:inline-flex;
+  align-items:center;
+  min-height:19px;
+  padding:3px 6px;
+  border:1px solid rgba(104,145,181,.10);
+  border-radius:6px;
+  background:rgba(255,255,255,.018);
+  color:#7e91a4!important;
+  font-size:7.3px!important;
+}
+.match-review-inline{
+  gap:7px!important;
+}
+
+/* Compact vs detailed history modes. */
+.history-density-compact .match-row-v2{
+  min-height:104px!important;
+}
+.history-density-compact .match-history-details:not([open]){
+  background:rgba(7,17,28,.22)!important;
+}
+.history-density-detailed .match-row-v2{
+  min-height:164px!important;
+}
+.history-density-detailed .match-history-details{
+  background:rgba(7,17,28,.50)!important;
+}
+.match-history-details{
+  transition:border-color .16s ease,background-color .16s ease;
+}
+.match-history-details[open]{
+  border-color:rgba(99,203,214,.18)!important;
+}
+
+/* Result meaning never depends on color alone: placement remains numeric and gets a stable shape. */
+.match-result-rail .placement{
+  font-variant-numeric:tabular-nums;
+  border-width:1px!important;
+}
+.match-result-rail .placement.p1{
+  border-color:rgba(232,197,102,.34)!important;
+  background:rgba(232,197,102,.08)!important;
+}
+.match-result-rail .placement.p2{
+  border-color:rgba(102,208,166,.30)!important;
+  background:rgba(102,208,166,.06)!important;
+}
+.match-result-rail .placement.p7{
+  border-color:rgba(239,125,137,.34)!important;
+  background:rgba(239,125,137,.07)!important;
+}
+
+/* Session groups read as distinct blocks, not one endless list. */
+.history-session-group{
+  position:relative;
+  margin-top:10px!important;
+  padding-top:1px;
+}
+.history-session-group+.history-session-group{
+  margin-top:16px!important;
+  padding-top:14px!important;
+  border-top:1px solid rgba(107,147,181,.16);
+}
+.history-session-head{
+  border-radius:8px!important;
+}
+
+/* Standard hover/selected/loading/empty states. */
+:is(.panel,article,section).is-interactive{
+  transition:transform .16s ease,border-color .16s ease,background-color .16s ease;
+}
+:is(.panel,article,section).is-interactive:hover{
+  border-color:rgba(99,203,214,.22)!important;
+}
+.is-selected{
+  border-color:rgba(107,92,255,.44)!important;
+  box-shadow:0 0 0 1px rgba(107,92,255,.12)!important;
+}
+.history-empty-filter,
+.meta-page-state,
+.home-meta-error{
+  border:1px dashed rgba(104,145,181,.18)!important;
+  border-radius:10px!important;
+  background:rgba(8,18,29,.38)!important;
+}
+
+/* Tables and comparison numbers align consistently. */
+.meta-table article>b,
+.leaderboard-table article>strong,
+.leaderboard-table article>span,
+.coach-outcome-compare-grid strong,
+.match-value-grid-core b,
+.history-session-stats b{
+  font-variant-numeric:tabular-nums;
+}
+.meta-table article>b,
+.leaderboard-table article>strong,
+.leaderboard-table article>span{
+  text-align:right;
+}
+
+/* Support copy should not become unreadably wide. */
+.today-card p,
+.coach-review p,
+.match-review-overview p,
+.autopsy-diagnosis p,
+.builder-decision-card p,
+.global-meta-disclaimer{
+  max-width:78ch;
+}
+
+/* Buttons and icon controls meet mobile touch guidance. */
+@media(max-width:820px){
+  :where(button,.match-close,.mobile-product-menu-trigger,summary){
+    min-height:var(--chibi-touch);
+  }
+
+  .profile-tabs-clean{
+    top:56px!important;
+  }
+
+  .profile-history-first .profile-history-head{
+    position:static!important;
+  }
+
+  .history-head-controls{
+    width:100%;
+    display:flex!important;
+    flex-wrap:wrap!important;
+    gap:8px!important;
+    overflow:visible!important;
+  }
+
+  .history-filter-group{
+    max-width:100%;
+    min-width:0!important;
+  }
+
+  .history-filter-group>div{
+    display:flex;
+    flex-wrap:wrap;
+    max-width:100%;
+  }
+
+  .history-set-tabs button,
+  .history-queue-tabs button,
+  .history-filter-tabs button,
+  .history-density-tabs button,
+  .history-sort-tabs button{
+    min-height:40px!important;
+    font-size:8px!important;
+  }
+
+  .history-filter-summary em{
+    width:100%;
+    margin-left:0;
+  }
+
+  /* Profile and match metrics become predictable two-column blocks. */
+  .player-summary-kpis,
+  .match-value-grid-core,
+  .match-summary-stats,
+  .coach-session-metrics{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+
+  /* Wide leaderboard table becomes stacked cards. */
+  .leaderboard-table-head{
+    display:none!important;
+  }
+  .leaderboard-table>article{
+    display:grid!important;
+    grid-template-columns:32px minmax(0,1fr) auto!important;
+    gap:8px!important;
+    align-items:center!important;
+    padding:10px!important;
+  }
+  .leaderboard-table>article>.leaderboard-player{
+    min-width:0;
+  }
+  .leaderboard-table>article>span,
+  .leaderboard-table>article>strong{
+    text-align:left!important;
+  }
+  .leaderboard-table>article>button{
+    grid-column:1/-1;
+    width:100%;
+    min-height:44px;
+  }
+
+  /* Long text wraps instead of shrinking. */
+  .match-review-inline>strong,
+  .today-card p,
+  .history-session-titleline,
+  .match-history-class-copy strong{
+    white-space:normal!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+  }
+}
+
+/* Respect user motion preferences globally, not only pointer decoration. */
+@media(prefers-reduced-motion:reduce){
+  *,
+  *::before,
+  *::after{
+    scroll-behavior:auto!important;
+    animation-duration:.001ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.001ms!important;
+  }
+}
+
+/* High-contrast OS preference gets a stronger border/text treatment automatically. */
+@media(prefers-contrast:more){
+  :root{
+    --chibi-border:rgba(188,214,235,.48);
+    --chibi-border-soft:rgba(188,214,235,.28);
+    --chibi-text-2:#d0dae3;
+    --chibi-text-3:#aebdcc;
+  }
+  button,
+  input,
+  select,
+  textarea,
+  summary,
+  .panel{
+    border-color:var(--chibi-border)!important;
+  }
+}
+
+/* Decorative artwork should never compete with information. */
+:is(.page-reference-art,.history-reference-art,.player-kpi-art,.v2-panel-accent-feature,.match-stage-art){
+  filter:saturate(.82);
+}
+
+/* Smooth but restrained expansion in normal motion mode. */
+@media(prefers-reduced-motion:no-preference){
+  .match-history-details[open] .match-lineup-grouped{
+    animation:chibiDetailsIn .16s ease-out both;
+  }
+}
+@keyframes chibiDetailsIn{
+  from{opacity:0;transform:translateY(-3px)}
+  to{opacity:1;transform:translateY(0)}
+}
