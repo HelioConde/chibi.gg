@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { TftMatch, TftMatchDetail, TftUnit } from "../api/tft";
 import { SITE_IMAGES } from "../siteAssets";
+import AdaptiveArtwork from "./AdaptiveArtwork";
 
 type Props={
   target:TftMatch;
@@ -131,7 +132,7 @@ export default function MatchReviewOverview({target,detail}:Props){
   },[target,detail]);
 
   return <section className="match-review-overview match-stage-with-art">
-    <img className="match-stage-art match-stage-art-economy" src={SITE_IMAGES.ui.economy} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
+    <AdaptiveArtwork className="match-stage-art match-stage-art-economy" src={SITE_IMAGES.ui.economy} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
     <div className="match-review-overview-head">
       <div>
         <span>CHIBI MATCH REVIEW 2.0</span>
