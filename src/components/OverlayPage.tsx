@@ -182,6 +182,7 @@ export default function OverlayPage({
 
   return <main className="overlay-page">
     <section className="overlay-page-hero overlay-page-hero-art">
+      <AdaptiveArtwork className="v2-hero-emblem v2-hero-emblem-companion" src={SITE_IMAGES.v2.mascots.scout} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
       <AdaptiveArtwork className="overlay-page-art" src={SITE_IMAGES.ui.all[15]} alt="" aria-hidden="true" loading="eager" decoding="async"/>
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>{t("common.backProfile")}</button>}
