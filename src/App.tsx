@@ -60,6 +60,8 @@ import HomeSessionResume from "./components/HomeSessionResume";
 import HomeStudyShelf from "./components/HomeStudyShelf";
 import HomeVisualShowcase from "./components/HomeVisualShowcase";
 import SiteArtworkBackdrop from "./components/SiteArtworkBackdrop";
+import PointerAura from "./components/PointerAura";
+import SiteHudOverlay from "./components/SiteHudOverlay";
 import AdaptiveArtwork from "./components/AdaptiveArtwork";
 import TeamBuilderPage from "./components/TeamBuilderPage";
 import LeaderboardPage from "./components/LeaderboardPage";
@@ -1279,6 +1281,8 @@ function App() {
       </header>
 
       <SiteArtworkBackdrop page={sitePage} profileTab={profileTab} hasProfile={Boolean(profile)}/>
+      <SiteHudOverlay/>
+      <PointerAura/>
 
       {sitePage==="about"||sitePage==="privacy"||sitePage==="terms" ? (
         <ProductInfoPage
