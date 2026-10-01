@@ -123,11 +123,11 @@ export default function HomeMetaPreview({
               <em>{comp.games>=8?comp.top4Rate+"%":t("metaPreview.sample")}</em>
             </button>
           )):loadState==="error"
-            ?<div className="home-meta-error">
+            ?<div className="home-meta-error" role="alert" aria-live="assertive">
               <span>Não foi possível carregar as comps agora.</span>
               <button onClick={()=>setReloadKey(value=>value+1)}>Tentar novamente</button>
             </div>
-            :<div className="home-meta-skeleton-list" aria-label="Carregando comps observadas">
+            :<div className="home-meta-skeleton-list" role="status" aria-live="polite" aria-label="Carregando comps observadas">
               {[0,1,2].map(index=><span className="home-meta-skeleton-row" key={index}><i/><b/><em/></span>)}
             </div>}
         </div>
@@ -161,7 +161,7 @@ export default function HomeMetaPreview({
               <span>Não foi possível carregar as traits agora.</span>
               <button onClick={()=>setReloadKey(value=>value+1)}>Tentar novamente</button>
             </div>
-            :<div className="home-meta-skeleton-list" aria-label="Carregando traits">
+            :<div className="home-meta-skeleton-list" role="status" aria-live="polite" aria-label="Carregando traits">
               {[0,1,2].map(index=><span className="home-meta-skeleton-row" key={index}><i/><b/><em/></span>)}
             </div>}
         </div>
