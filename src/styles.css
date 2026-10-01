@@ -30787,13 +30787,13 @@ img[src$="chibi-ui-10.png"],
   --chibi-shadow-soft:0 8px 24px rgba(0,0,0,.16);
   --chibi-shadow-focus:0 0 0 3px rgba(107,92,255,.22);
   --chibi-touch:44px;
-  --chibi-type-xs:7px;
-  --chibi-type-sm:8px;
-  --chibi-type-body:9px;
-  --chibi-type-label:10px;
-  --chibi-type-card:12px;
-  --chibi-type-section:20px;
-  --chibi-type-page:30px;
+  --chibi-type-xs:10px;
+  --chibi-type-sm:11px;
+  --chibi-type-body:12px;
+  --chibi-type-label:11px;
+  --chibi-type-card:14px;
+  --chibi-type-section:22px;
+  --chibi-type-page:32px;
 }
 
 /* Global hierarchy and readable support copy. */
@@ -30901,7 +30901,7 @@ button.secondary,
   border-radius:7px;
   background:rgba(255,255,255,.015);
   color:var(--chibi-text-3);
-  font-size:7.4px;
+  font-size:10px;
   font-weight:850;
   cursor:pointer;
 }
@@ -30924,18 +30924,18 @@ button.secondary,
 }
 .history-filter-summary span{
   color:var(--chibi-text-3);
-  font-size:7px;
+  font-size:10px;
 }
 .history-filter-summary span b{
   margin-right:3px;
   color:var(--chibi-text);
-  font-size:8px;
+  font-size:11px;
   font-variant-numeric:tabular-nums;
 }
 .history-filter-summary em{
   margin-left:auto;
   color:#83d6d8;
-  font-size:7px;
+  font-size:10px;
   font-style:normal;
   font-weight:850;
 }
@@ -30949,7 +30949,7 @@ button.secondary,
   min-height:17px;
   padding:2px 5px;
   border-radius:5px;
-  font-size:5.8px!important;
+  font-size:8px!important;
   font-weight:950!important;
   letter-spacing:.55px;
 }
@@ -30978,7 +30978,7 @@ button.secondary,
   border-radius:6px;
   background:rgba(255,255,255,.018);
   color:#7e91a4!important;
-  font-size:7.3px!important;
+  font-size:9px!important;
 }
 .match-review-inline{
   gap:7px!important;
