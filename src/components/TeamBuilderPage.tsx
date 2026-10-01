@@ -138,6 +138,8 @@ export default function TeamBuilderPage({
   const [units,setUnits]=useState<HexBoardUnit[]>([]);
   const [targetLevel,setTargetLevel]=useState(8);
   const [variantA,setVariantA]=useState<HexBoardUnit[]|null>(null);
+  const [boardReason,setBoardReason]=useState("");
+  const [variantAReason,setVariantAReason]=useState("");
   const [savedPresets,setSavedPresets]=useState<BuilderPreset[]>(()=>getBuilderPresets());
   const [copied,setCopied]=useState(false);
   const [costFilter,setCostFilter]=useState<number>(0);
@@ -1059,6 +1061,7 @@ export default function TeamBuilderPage({
       targetLevel,
       units,
       augments:selectedAugments,
+      note:boardReason.trim(),
     }));
   }
 
@@ -1066,6 +1069,7 @@ export default function TeamBuilderPage({
     setUnits(preset.units.map(unit=>({...unit,items:[...(unit.items||[])]})));
     setTargetLevel(preset.targetLevel);
     setSelectedAugments([...(preset.augments||[])].slice(0,3));
+    setBoardReason(preset.note||"");
     setSelectedId(null);
     setSelectedItemHex(null);
     setPositioningMode(false);
@@ -1173,16 +1177,28 @@ export default function TeamBuilderPage({
           <button onClick={()=>{
             setVariantA(units.map(unit=>({...unit,items:[...(unit.items||[])]})));
             setVariantAAugments([...selectedAugments]);
+            setVariantAReason(boardReason.trim());
           }} disabled={!units.length}>
             {variantA?t("builder.updateA"):t("builder.saveA")}
           </button>
           {variantA&&<button className="secondary" onClick={()=>{
             setUnits(variantA.map(unit=>({...unit,items:[...(unit.items||[])]})));
             setSelectedAugments([...variantAAugments]);
+            setBoardReason(variantAReason);
             setSelectedId(null);
           }}>{t("builder.restoreA")}</button>}
-          <button className="secondary" onClick={()=>{setUnits([]);setSelectedAugments([]);setSelectedId(null);setSelectedItemHex(null);setMovingHex(null);setTransitionBase(null);setTransitionBaseAugments([]);setTransitionProgress({});setEconomyGold("");setEconomyReserve("");}}>{t("builder.clearBoard")}</button>
+          <button className="secondary" onClick={()=>{setUnits([]);setSelectedAugments([]);setBoardReason("");setVariantAReason("");setSelectedId(null);setSelectedItemHex(null);setMovingHex(null);setTransitionBase(null);setTransitionBaseAugments([]);setTransitionProgress({});setEconomyGold("");setEconomyReserve("");}}>{t("builder.clearBoard")}</button>
         </div>
+        <label className="builder-version-rationale">
+          <span>POR QUE ESTA VERSÃO?</span>
+          <textarea
+            value={boardReason}
+            maxLength={280}
+            onChange={event=>setBoardReason(event.target.value)}
+            placeholder="Ex.: priorizar frontline, manter carry seguro e usar estes itens/Augments porque sustentam a condição principal do board."
+          />
+          <small>{boardReason.length}/280 · esta justificativa é salva junto da versão</small>
+        </label>
       </div>
     </section>
 
@@ -1735,7 +1751,7 @@ export default function TeamBuilderPage({
           <h2>{t("builder.ab.heading")}</h2>
           <p>{t("builder.ab.desc")}</p>
         </div>
-        <button onClick={()=>{setVariantA(null);setVariantAAugments([]);}}>{t("builder.ab.discard")}</button>
+        <button onClick={()=>{setVariantA(null);setVariantAAugments([]);setVariantAReason("");}}>{t("builder.ab.discard")}</button>
       </div>
 
       <div className="builder-ab-grid">
@@ -1745,6 +1761,7 @@ export default function TeamBuilderPage({
           <small>{variantAEvaluation.average!=null
             ?t("builder.ab.history",{average:variantAEvaluation.average.toFixed(2),top4:variantAEvaluation.top4Rate??"—"})
             :t("builder.ab.insufficient")}</small>
+          {variantAReason&&<p className="builder-version-note">{variantAReason}</p>}
         </article>
 
         <article className="builder-ab-card current">
@@ -1753,6 +1770,7 @@ export default function TeamBuilderPage({
           <small>{average!=null
             ?t("builder.ab.history",{average:average.toFixed(2),top4:top4Rate??"—"})
             :t("builder.ab.insufficient")}</small>
+          {boardReason.trim()&&<p className="builder-version-note">{boardReason.trim()}</p>}
         </article>
 
         <article className="builder-ab-diff">
@@ -1808,6 +1826,7 @@ export default function TeamBuilderPage({
               <div>
                 <strong>{preset.name}</strong>
                 <small>{t("builder.saved.meta",{units:preset.units.length,augments:preset.augments?.length||0,date:new Date(preset.createdAt).toLocaleDateString(locale,{day:"2-digit",month:"2-digit"})})}</small>
+                {preset.note&&<em className="builder-saved-note">{preset.note}</em>}
               </div>
             </button>
             <button
