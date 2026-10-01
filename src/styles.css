@@ -27559,3 +27559,194 @@ img[src$="chibi-ui-10.png"],
     max-width:70px!important;
   }
 }
+
+
+/* CHIBI MATCH REVIEW PAGE LAYOUT v63 */
+
+/* Desktop: let the final-board analysis own the width instead of reserving a
+   tall metrics sidebar. This keeps the first review screen dense and readable. */
+@media(min-width:1101px){
+  .app-shell>.match-overlay>.match-modal{
+    width:min(1180px,calc(100vw - 48px))!important;
+  }
+
+  .match-summary-card.match-summary-card-v2{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:9px!important;
+    padding:12px!important;
+  }
+
+  .match-summary-main{
+    min-width:0;
+  }
+
+  .match-trait-groups{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:8px!important;
+    margin:7px 0 5px!important;
+  }
+
+  .match-trait-group{
+    min-height:0!important;
+    padding:8px 8px 9px!important;
+  }
+
+  .match-trait-group-other{
+    grid-column:span 2!important;
+  }
+
+  .match-trait-group-head{
+    min-height:31px!important;
+    grid-template-columns:24px minmax(0,1fr) 22px!important;
+    gap:6px!important;
+  }
+
+  .match-trait-group-icon{
+    width:24px!important;
+    height:24px!important;
+  }
+
+  .match-trait-group-head>b{
+    width:22px!important;
+    height:22px!important;
+    font-size:9px!important;
+  }
+
+  .match-trait-group-head strong{
+    font-size:9px!important;
+  }
+
+  .match-trait-group-head small{
+    font-size:5.5px!important;
+  }
+
+  .match-trait-group-connector{
+    height:11px!important;
+    margin-left:10px!important;
+  }
+
+  .match-trait-group-units{
+    gap:5px!important;
+    padding:10px 0 0!important;
+  }
+
+  .match-trait-group-units::before{
+    left:16px!important;
+    right:16px!important;
+  }
+
+  .match-trait-group-units .unit-card.compact.named{
+    flex:0 0 62px!important;
+    width:62px!important;
+    max-width:62px!important;
+    min-height:85px!important;
+    padding:3px 2px 4px!important;
+  }
+
+  .match-trait-group-units .unit-card.compact.named .unit-portrait{
+    flex-basis:42px!important;
+    width:42px!important;
+    height:42px!important;
+  }
+
+  .match-trait-group-units .unit-card.compact.named .unit-caption{
+    width:58px!important;
+    min-height:19px!important;
+    margin:3px 0 1px!important;
+    font-size:7px!important;
+  }
+
+  .match-trait-group-units .unit-card.compact.named .item-row{
+    min-height:12px!important;
+  }
+
+  .match-trait-group-units .unit-card.compact.named .item-icon{
+    width:12px!important;
+    height:12px!important;
+  }
+
+  /* Metrics become a compact scan strip instead of a tall right rail. */
+  .match-summary-card-v2 .match-summary-stats{
+    width:100%;
+    grid-template-columns:repeat(6,minmax(0,1fr))!important;
+    gap:6px!important;
+    margin-top:5px!important;
+    align-self:start!important;
+    align-content:start!important;
+  }
+
+  .match-summary-card-v2 .match-summary-stats>span{
+    min-height:48px!important;
+    padding:6px 9px!important;
+  }
+
+  .match-summary-card-v2 .match-summary-stats small{
+    font-size:6px!important;
+  }
+
+  .match-summary-card-v2 .match-summary-stats b{
+    margin-top:3px!important;
+    font-size:13px!important;
+  }
+}
+
+/* Typical laptop widths: two trait blocks per row and a 3x2 metric strip. */
+@media(min-width:761px) and (max-width:1100px){
+  .app-shell>.match-overlay>.match-modal{
+    width:calc(100vw - 24px)!important;
+    max-width:none!important;
+  }
+
+  .match-summary-card.match-summary-card-v2{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:8px!important;
+  }
+
+  .match-trait-groups{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:8px!important;
+  }
+
+  .match-trait-group-other{
+    grid-column:span 2!important;
+  }
+
+  .match-summary-card-v2 .match-summary-stats{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:6px!important;
+    margin-top:5px!important;
+  }
+
+  .match-summary-card-v2 .match-summary-stats>span{
+    min-height:46px!important;
+  }
+}
+
+/* Phone layout stays vertical, but the metric blocks no longer dominate height. */
+@media(max-width:760px){
+  .match-summary-card.match-summary-card-v2{
+    grid-template-columns:1fr!important;
+    gap:8px!important;
+    padding:10px!important;
+  }
+
+  .match-trait-groups{
+    grid-template-columns:1fr!important;
+    gap:7px!important;
+  }
+
+  .match-trait-group-other{
+    grid-column:auto!important;
+  }
+
+  .match-summary-card-v2 .match-summary-stats{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:5px!important;
+    margin-top:5px!important;
+  }
+
+  .match-summary-card-v2 .match-summary-stats>span{
+    min-height:44px!important;
+    padding:6px 8px!important;
+  }
+}
