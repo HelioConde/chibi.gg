@@ -29912,3 +29912,60 @@ img[src$="chibi-ui-10.png"],
     color:#6f8296!important;
   }
 }
+
+
+/* CHIBI PROFILE ART FLOW FIX v74 */
+
+/* Decorative profile artwork must never participate in desktop grid sizing.
+   It was still a normal-flow grid child on desktop, which explained the large
+   empty vertical area inside the player card despite compact content. */
+@media(min-width:1100px){
+  .player-summary-shell.player-summary-visual{
+    position:relative!important;
+    overflow:hidden!important;
+  }
+
+  .player-summary-shell>.player-summary-reference-art,
+  .player-summary-shell>.player-summary-reference-v2{
+    position:absolute!important;
+    z-index:1!important;
+    inset:0 0 0 auto!important;
+    width:34%!important;
+    height:100%!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+    object-fit:cover!important;
+    object-position:right center!important;
+    opacity:.08!important;
+    pointer-events:none!important;
+    mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.58) 35%,black 72%)!important;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.58) 35%,black 72%)!important;
+  }
+
+  .player-summary-shell>.player-v2-hud-rail{
+    position:absolute!important;
+    z-index:1!important;
+    pointer-events:none!important;
+  }
+
+  .player-summary-shell>.player-summary-board-art{
+    position:absolute!important;
+    z-index:1!important;
+    pointer-events:none!important;
+  }
+
+  .player-summary-shell>.player-summary-main,
+  .player-summary-shell>.player-summary-kpis,
+  .player-summary-shell>.player-summary-actions,
+  .player-summary-shell>.player-summary-source{
+    position:relative!important;
+    z-index:3!important;
+  }
+
+  .player-summary-shell.player-summary-compact{
+    height:auto!important;
+    min-height:82px!important;
+    max-height:none!important;
+  }
+}
