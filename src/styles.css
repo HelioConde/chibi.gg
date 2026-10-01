@@ -20765,3 +20765,82 @@ body::before{
     scroll-snap-align:start;
   }
 }
+
+/* CHIBI COACH FLOW v19 */
+.coach-strategy-layer{
+  margin:10px 0;
+  overflow:hidden;
+  border:1px solid rgba(96,139,178,.16);
+  border-radius:13px;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(145,111,255,.04),transparent 30%),
+    linear-gradient(180deg,#0b1724,#08131f);
+}
+.coach-strategy-layer>summary{
+  min-height:58px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:12px 14px;
+  list-style:none;
+  cursor:pointer;
+}
+.coach-strategy-layer>summary::-webkit-details-marker{display:none}
+.coach-strategy-layer>summary>span{
+  min-width:0;
+  display:grid;
+  gap:2px;
+}
+.coach-strategy-layer>summary b{
+  color:#dfe8f4;
+  font-size:10px;
+}
+.coach-strategy-layer>summary small{
+  max-width:720px;
+  color:#6f8095;
+  font-size:7px;
+  line-height:1.45;
+}
+.coach-strategy-layer>summary em{
+  flex:0 0 auto;
+  padding:6px 8px;
+  border:1px solid rgba(69,230,223,.15);
+  border-radius:8px;
+  background:rgba(69,230,223,.045);
+  color:#79e7e2;
+  font-size:7px;
+  font-style:normal;
+  font-weight:900;
+}
+.coach-strategy-layer>summary em::after{
+  content:" +";
+}
+.coach-strategy-layer[open]>summary{
+  border-bottom:1px solid rgba(96,139,178,.12);
+}
+.coach-strategy-layer[open]>summary em::after{
+  content:" −";
+}
+.coach-strategy-content{
+  display:grid;
+  gap:10px;
+  padding:10px;
+}
+.coach-strategy-content>*{
+  margin:0!important;
+}
+.coach-secondary-panel,
+.coach-strategy-layer{
+  box-shadow:0 12px 36px rgba(0,0,0,.07);
+}
+@media(max-width:760px){
+  .coach-strategy-layer>summary{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .coach-strategy-layer>summary em{
+    width:100%;
+    text-align:center;
+  }
+}
