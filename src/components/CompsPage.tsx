@@ -4,6 +4,7 @@ import { staticEntry, tftAssetUrl, TftStaticData } from "../tftStatic";
 import DDragonArt from "./DDragonArt";
 import { saveStudyShelfItem } from "../studyShelf";
 import { useI18n } from "../i18n";
+import { SITE_IMAGES } from "../siteAssets";
 
 type Props={
   staticData:TftStaticData|null;
@@ -280,7 +281,8 @@ export default function CompsPage({
   }
 
   return <main className="comps-page comps-page-v2">
-    <section className="comps-hero">
+    <section className="comps-hero page-hero-with-reference">
+      <img className="page-reference-art page-reference-comps" src={SITE_IMAGES.ui.comps} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
       <div>
         {hasProfile&&<button className="back-search" onClick={onBack}>{t("common.backProfile")}</button>}
         <span className="eyebrow">{t("comps.eyebrow")}</span>
