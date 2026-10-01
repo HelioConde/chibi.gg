@@ -18387,3 +18387,247 @@ body[data-chibi-coach-mode="essential"] .coach-secondary-stack{display:none!impo
     display:none;
   }
 }
+
+
+/* -----------------------------------------------------------------------
+   UX simplification pass v4 — Today in TFT
+   ----------------------------------------------------------------------- */
+
+.player-summary-compact{
+  grid-template-columns:minmax(0,1fr) auto!important;
+  grid-template-areas:
+    "identity actions"
+    "source source"!important;
+}
+.player-summary-compact .player-summary-actions{
+  justify-content:flex-end;
+}
+
+.today-tft{
+  margin:9px 0 7px;
+  padding:16px;
+  border:1px solid rgba(117,99,231,.34);
+  border-radius:14px;
+  background:
+    radial-gradient(circle at 84% -12%,rgba(117,99,231,.1),transparent 30%),
+    linear-gradient(180deg,#0d121b,#0a0f17);
+}
+.today-tft-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:12px;
+}
+.today-tft-head>div>span{
+  display:block;
+  color:#9381ff;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:1.1px;
+}
+.today-tft-head h2{
+  margin:4px 0 3px;
+  font-size:clamp(20px,2.4vw,28px);
+  line-height:1.08;
+  letter-spacing:-.7px;
+}
+.today-tft-head p{
+  margin:0;
+  color:#7c879a;
+  font-size:9px;
+  line-height:1.5;
+}
+.today-tft-head>small{
+  flex:0 0 auto;
+  color:#6f7b8f;
+  font-size:8px;
+  padding-top:3px;
+}
+
+.today-tft-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+}
+.today-card{
+  min-height:160px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  padding:13px;
+  border:1px solid #232b3b;
+  border-radius:11px;
+  background:#0b1018;
+}
+.today-card>span{
+  color:#6f7d92;
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.9px;
+}
+.today-card h3{
+  margin:8px 0 6px;
+  font-size:14px;
+  line-height:1.15;
+}
+.today-card p{
+  margin:0;
+  color:#818ca0;
+  font-size:8.5px;
+  line-height:1.5;
+}
+.today-card button{
+  margin-top:auto;
+  padding:7px 9px;
+  border:1px solid #30394e;
+  border-radius:7px;
+  background:#111722;
+  color:#aeb8ca;
+  font-size:8px;
+  font-weight:900;
+  cursor:pointer;
+}
+.today-card button:hover{
+  border-color:#57617f;
+  color:#fff;
+}
+.today-card .primary,
+.today-card.next button{
+  border-color:#6556d4;
+  background:rgba(117,99,231,.13);
+  color:#d2caff;
+}
+.today-card.moment.good,
+.today-card.strength{
+  border-color:rgba(72,209,153,.2);
+}
+.today-card.moment.bad,
+.today-card.attention.warning{
+  border-color:rgba(255,157,91,.24);
+}
+.today-card.next{
+  border-color:rgba(117,99,231,.32);
+}
+.today-card.next.active{
+  border-color:rgba(72,209,153,.28);
+  background:linear-gradient(145deg,rgba(72,209,153,.045),#0b1018);
+}
+
+.today-tft-foot{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid #202738;
+}
+.today-tft-foot span{
+  color:#657185;
+  font-size:8px;
+  line-height:1.4;
+}
+.today-tft-foot button{
+  flex:0 0 auto;
+  border:0;
+  background:transparent;
+  color:#9f91ff;
+  font-size:8px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.overview-primary-plan{
+  margin:10px 0 14px;
+  border:1px solid #222a3a;
+  border-radius:12px;
+  overflow:hidden;
+  background:#0a0f17;
+}
+.overview-primary-plan>summary{
+  min-height:58px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:12px 14px;
+  cursor:pointer;
+  list-style:none;
+}
+.overview-primary-plan>summary::-webkit-details-marker{display:none}
+.overview-primary-plan>summary span{
+  display:grid;
+  gap:2px;
+}
+.overview-primary-plan>summary b{
+  color:#d7dfea;
+  font-size:10px;
+}
+.overview-primary-plan>summary small{
+  color:#6c788b;
+  font-size:8px;
+}
+.overview-primary-plan>summary em{
+  color:#9686f6;
+  font-size:8px;
+  font-style:normal;
+  font-weight:900;
+}
+.overview-primary-plan>summary em::after{content:" +"}
+.overview-primary-plan[open]>summary{
+  border-bottom:1px solid #222a3a;
+}
+.overview-primary-plan[open]>summary em::after{content:" −"}
+.overview-primary-plan-content{
+  padding:10px;
+}
+.overview-primary-plan-content>.action-center{
+  margin:0!important;
+}
+
+@media(max-width:1040px){
+  .today-tft-grid{
+    grid-template-columns:1fr 1fr;
+  }
+}
+@media(max-width:820px){
+  .player-summary-compact{
+    grid-template-columns:1fr!important;
+    grid-template-areas:
+      "identity"
+      "actions"
+      "source"!important;
+  }
+}
+@media(max-width:620px){
+  .today-tft{
+    padding:12px;
+  }
+  .today-tft-head{
+    flex-direction:column;
+    gap:5px;
+  }
+  .today-tft-grid{
+    grid-template-columns:1fr;
+  }
+  .today-card{
+    min-height:0;
+  }
+  .today-card button{
+    width:100%;
+    margin-top:12px;
+  }
+  .today-tft-foot{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .today-tft-foot button{
+    width:100%;
+    padding:7px 0;
+    text-align:left;
+  }
+  .overview-primary-plan>summary{
+    align-items:flex-start;
+  }
+}

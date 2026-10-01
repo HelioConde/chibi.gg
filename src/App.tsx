@@ -46,6 +46,7 @@ import ChibiFlex from "./components/ChibiFlex";
 import ChibiIdentity from "./components/ChibiIdentity";
 import ChibiPool from "./components/ChibiPool";
 import ChibiActionCenter from "./components/ChibiActionCenter";
+import ChibiToday from "./components/ChibiToday";
 import ChibiSessionMode from "./components/ChibiSessionMode";
 import StyleShift from "./components/StyleShift";
 import GlobalMetaPage from "./components/GlobalMetaPage";
@@ -749,15 +750,6 @@ function App() {
     openedMatchNavigation.older?.id,
     matchLoading,
   ]);
-
-  const latestPlayedAt=useMemo(
-    ()=>Math.max(0,...analysisMatches.map((m)=>Number(m.playedAt)||0)),
-    [analysisMatches]
-  );
-
-  const freshnessDays=latestPlayedAt
-    ? Math.floor((Date.now()-latestPlayedAt)/86400000)
-    : null;
 
   function updateProfileUrl(
     tab:ProfileTab=profileTab,
@@ -1628,26 +1620,6 @@ function App() {
               </div>
             </div>
 
-            <div className="player-summary-kpis">
-              <article>
-                <span>{t("profile.average")}</span>
-                <strong>{dna.avgPlacement??"—"}</strong>
-                <small>{t("profile.gamesFilter",{count:headlineStats.total})}</small>
-              </article>
-              <article>
-                <span>Top 4</span>
-                <strong>{headlineStats.total<8
-                  ? headlineStats.top4+"/"+headlineStats.total
-                  : dna.top4Rate+"%"}</strong>
-                <small>{headlineStats.total<8?t("profile.initialSample"):t("profile.sampleRate")}</small>
-              </article>
-              <article>
-                <span>{t("profile.latest")}</span>
-                <strong>{latestPlayedAt?formatWhen(latestPlayedAt,locale,t):"—"}</strong>
-                <small>{freshnessDays!=null&&freshnessDays>14?t("profile.oldSample"):t("profile.latestMatch")}</small>
-              </article>
-            </div>
-
             <div className="player-summary-actions">
               <button className="player-coach-button" onClick={()=>changeProfileTab("coach")}>Chibi Review</button>
               <button className="refresh-button" onClick={searchPlayer} disabled={loading}>{demoMode?t("profile.restartDemo"):loading?t("profile.updating"):t("profile.update")}</button>
@@ -1667,6 +1639,15 @@ function App() {
           </section>
 
           {error && <div className="profile-error">{error}</div>}
+
+          <ChibiToday
+            playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
+            matches={analysisMatches}
+            staticData={staticData}
+            onEvidence={showEvidence}
+            onOpenCoach={()=>changeProfileTab("coach")}
+            onOpenOverview={()=>changeProfileTab("overview")}
+          />
 
           <nav className="profile-tabs simplified-tabs profile-tabs-clean" aria-label={t("profile.tabsAria")}>
             <div className="profile-tab-list">
@@ -1688,19 +1669,30 @@ function App() {
               onEvidence={showEvidence}
             />
 
-            <ChibiActionCenter
-              playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
-              matches={analysisMatches}
-              onEvidence={showEvidence}
-              onReviewQueue={openReviewQueue}
-            />
-
             <ActiveGoalStrip
               playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
               matches={analysisMatches}
               onEvidence={showEvidence}
               onOpenCoach={()=>changeProfileTab("coach")}
             />
+
+            <details className="overview-primary-plan">
+              <summary>
+                <span>
+                  <b>{t("actionCenter.title")}</b>
+                  <small>{t("today.foot")}</small>
+                </span>
+                <em>{t("profile.details")}</em>
+              </summary>
+              <div className="overview-primary-plan-content">
+                <ChibiActionCenter
+                  playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
+                  matches={analysisMatches}
+                  onEvidence={showEvidence}
+                  onReviewQueue={openReviewQueue}
+                />
+              </div>
+            </details>
 
             <PlayerEvolution
               playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
