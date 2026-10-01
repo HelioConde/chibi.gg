@@ -23593,3 +23593,198 @@ img[src$="chibi-ui-10.png"],
     height:60px!important;
   }
 }
+
+
+/* CHIBI HISTORY RESULT LANGUAGE v35 */
+
+/* Placement becomes the first visual read while keeping the card mostly neutral. */
+.match-row-v2{
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+}
+.match-row-v2::before{
+  content:"";
+  position:absolute;
+  z-index:0;
+  left:0;
+  top:8px;
+  bottom:8px;
+  width:2px;
+  border-radius:999px;
+  opacity:.72;
+}
+.match-row-v2.placement-band-win::before{
+  width:3px;
+  background:linear-gradient(180deg,rgba(243,201,91,.15),rgba(243,201,91,.92),rgba(243,201,91,.14));
+  box-shadow:0 0 16px rgba(243,201,91,.18);
+}
+.match-row-v2.placement-band-top4::before{
+  background:linear-gradient(180deg,rgba(78,217,171,.08),rgba(78,217,171,.72),rgba(78,217,171,.08));
+}
+.match-row-v2.placement-band-mid::before{
+  background:linear-gradient(180deg,rgba(92,158,218,.05),rgba(92,158,218,.42),rgba(92,158,218,.05));
+}
+.match-row-v2.placement-band-bottom::before{
+  background:linear-gradient(180deg,rgba(238,111,124,.06),rgba(238,111,124,.60),rgba(238,111,124,.06));
+}
+.match-row-v2>*{
+  position:relative;
+  z-index:2;
+}
+
+/* output-v2 placement emblem sits behind tactician/placement and never affects flow. */
+.match-result-rail{
+  isolation:isolate;
+}
+.match-result-art{
+  position:absolute!important;
+  z-index:-1!important;
+  left:50%!important;
+  top:50%!important;
+  width:68px!important;
+  height:68px!important;
+  transform:translate(-50%,-50%);
+  object-fit:contain!important;
+  pointer-events:none!important;
+  user-select:none!important;
+  opacity:.11!important;
+  filter:saturate(.95) contrast(1.04) brightness(.9) drop-shadow(0 8px 18px rgba(0,0,0,.18));
+}
+.match-result-art-win{
+  width:76px!important;
+  height:76px!important;
+  opacity:.17!important;
+}
+.match-result-art-top4{opacity:.12!important}
+.match-result-art-mid{opacity:.07!important}
+.match-result-art-bottom{opacity:.10!important}
+
+/* Short numeric scan: board size, augments, items and 3-star units. */
+.match-row-title{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:8px!important;
+}
+.match-row-title>div:first-child{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.match-row-title>div:first-child>strong{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.match-scan-facts{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  gap:3px;
+}
+.match-scan-facts>span{
+  min-width:28px;
+  height:21px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  padding:0 5px;
+  border:1px solid rgba(99,142,179,.10);
+  border-radius:6px;
+  background:rgba(12,27,41,.66);
+  color:#75879b;
+  font-size:6px;
+}
+.match-scan-facts i{
+  color:#667f98;
+  font-size:6px;
+  font-style:normal;
+}
+.match-scan-facts b{
+  color:#a9b8c9;
+  font-size:7px;
+}
+.match-scan-facts .three-star{
+  border-color:rgba(236,191,83,.16);
+  background:rgba(236,191,83,.035);
+}
+.match-scan-facts .three-star i,
+.match-scan-facts .three-star b{
+  color:#e3bd62;
+}
+
+/* Units remain complete; improve separation instead of hiding overflow. */
+.match-history-units{
+  align-items:start!important;
+}
+.match-history-units .unit-card{
+  transition:transform .15s ease,filter .15s ease;
+}
+.match-row-v2:hover .match-history-units .unit-card{
+  filter:brightness(1.025);
+}
+.match-history-units .unit-card:hover{
+  transform:translateY(-2px);
+  z-index:4;
+}
+.match-history-units .item-row{
+  margin-top:2px!important;
+}
+
+/* First place gets a slightly clearer placement tile, not a full golden card. */
+.match-row-v2.placement-band-win .placement{
+  border-color:rgba(239,197,84,.30)!important;
+  background:linear-gradient(180deg,rgba(239,197,84,.11),rgba(239,197,84,.045))!important;
+  color:#f0cf75!important;
+}
+.match-row-v2.placement-band-top4 .placement{
+  background:rgba(75,209,165,.045)!important;
+}
+.match-row-v2.placement-band-bottom .placement{
+  background:rgba(235,112,126,.04)!important;
+}
+
+@media(max-width:820px){
+  .match-result-art{
+    width:54px!important;
+    height:54px!important;
+    opacity:.075!important;
+  }
+  .match-result-art-win{
+    width:60px!important;
+    height:60px!important;
+    opacity:.11!important;
+  }
+  .match-row-title{
+    align-items:flex-start!important;
+  }
+  .match-scan-facts{
+    gap:2px;
+  }
+  .match-scan-facts>span{
+    min-width:24px;
+    height:19px;
+    padding:0 4px;
+  }
+  .match-scan-facts>span:nth-child(2),
+  .match-scan-facts>span:nth-child(3){
+    display:none;
+  }
+  .match-row-v2::before{
+    top:6px;
+    bottom:6px;
+  }
+}
+
+@media(max-width:420px){
+  .match-scan-facts>span{
+    min-width:22px;
+    padding:0 3px;
+  }
+  .match-result-art{
+    opacity:.06!important;
+  }
+}

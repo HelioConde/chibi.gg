@@ -268,6 +268,27 @@ function UnitVisual({unit,staticData,compact=false}:{unit:TftUnit;staticData:Tft
   </div>;
 }
 
+
+function MatchResultAccent({placement}:{placement:number}){
+  const band=placement===1?"win":placement<=4?"top4":placement>=7?"bottom":"mid";
+  const src=placement===1
+    ? SITE_IMAGES.v2.badges.rankAlt
+    :placement<=4
+      ?SITE_IMAGES.v2.badges.heartAlt
+      :placement>=7
+        ?SITE_IMAGES.v2.badges.swordAlt
+        :SITE_IMAGES.v2.decor.cornerAlt;
+
+  return <AdaptiveArtwork
+    className={"match-result-art match-result-art-"+band}
+    src={src}
+    alt=""
+    aria-hidden="true"
+    loading="lazy"
+    decoding="async"
+  />;
+}
+
 function TacticianVisual({
   companion,
   staticData,
@@ -2127,8 +2148,12 @@ function App() {
                     <div className="history-session-games">
                       {session.displayMatches.map((match)=>{
                         const cue=matchReviewCue(match,t);
-                        return <button className={"match-row match-button match-row-v2 cue-"+cue.tone} key={match.id} onClick={()=>openMatch(match)}>
+                        const threeStarCount=match.units.filter(unit=>unit.tier>=3).length;
+                        const equippedItemCount=match.units.reduce((sum,unit)=>sum+unit.itemNames.length,0);
+                        const placementBand=match.placement===1?"win":match.placement<=4?"top4":match.placement>=7?"bottom":"mid";
+                        return <button className={"match-row match-button match-row-v2 cue-"+cue.tone+" placement-band-"+placementBand} key={match.id} onClick={()=>openMatch(match)}>
                           <div className="match-result-rail">
+                            <MatchResultAccent placement={match.placement}/>
                             <TacticianVisual companion={match.companion} staticData={staticData}/>
                             <div className={"placement "+placementClass(match.placement)}>{match.placement}º</div>
                           </div>
@@ -2149,6 +2174,20 @@ function App() {
                                   className={"match-review-label "+cue.tone}
                                   title={cue.title}
                                 >{cue.label}</span>
+                              </div>
+                              <div className="match-scan-facts" aria-label="Resumo visual da composição">
+                                <span title={t("profile.history.unitsAria",{count:match.units.length})} aria-label={t("profile.history.unitsAria",{count:match.units.length})}>
+                                  <i>◆</i><b>{match.units.length}</b>
+                                </span>
+                                <span title={t("profile.history.augmentsAria")} aria-label={t("profile.history.augmentsAria")}>
+                                  <i>✦</i><b>{match.augments.length}</b>
+                                </span>
+                                <span title="Itens equipados" aria-label={"Itens equipados: "+equippedItemCount}>
+                                  <i>◇</i><b>{equippedItemCount}</b>
+                                </span>
+                                {threeStarCount>0&&<span className="three-star" title="Unidades 3 estrelas" aria-label={"Unidades 3 estrelas: "+threeStarCount}>
+                                  <i>★</i><b>{threeStarCount}</b>
+                                </span>}
                               </div>
                             </div>
 
