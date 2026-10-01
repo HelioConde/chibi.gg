@@ -20457,3 +20457,311 @@ body::before{
     max-width:none;
   }
 }
+
+/* CHIBI DECISION PAGES v18 */
+
+/* Comps: answer-first decision strip */
+.comp-decision-strip{
+  margin:10px 0;
+  padding:14px;
+  border:1px solid rgba(96,139,178,.16);
+  border-radius:13px;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(69,230,223,.035),transparent 28%),
+    linear-gradient(180deg,#0b1724,#08131f);
+}
+.comp-decision-strip-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:10px;
+}
+.comp-decision-strip-head>div{
+  max-width:760px;
+}
+.comp-decision-strip-head span,
+.statistics-quick-head span{
+  color:#70e7e2;
+  font-size:7px;
+  font-weight:950;
+  letter-spacing:1px;
+}
+.comp-decision-strip-head h2,
+.statistics-quick-head h2{
+  margin:4px 0 4px;
+  color:#e8f0fa;
+  font-size:17px;
+  letter-spacing:-.35px;
+}
+.comp-decision-strip-head p,
+.statistics-quick-head p{
+  margin:0;
+  color:#718197;
+  font-size:8px;
+  line-height:1.5;
+}
+.comp-decision-cards{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+}
+.comp-decision-card{
+  position:relative;
+  min-width:0;
+  min-height:112px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:
+    "label metric"
+    "name metric"
+    "open open";
+  align-items:start;
+  gap:5px 10px;
+  padding:12px;
+  overflow:hidden;
+  border:1px solid rgba(98,139,177,.14);
+  border-radius:10px;
+  background:#0b1825;
+  color:inherit;
+  text-align:left;
+  transition:transform .16s ease,border-color .16s ease,background .16s ease;
+}
+.comp-decision-card::after{
+  content:"";
+  position:absolute;
+  width:110px;
+  height:110px;
+  right:-60px;
+  bottom:-70px;
+  border:1px solid rgba(69,230,223,.055);
+  border-radius:50%;
+  pointer-events:none;
+}
+.comp-decision-card:hover:not(:disabled){
+  transform:translateY(-2px);
+  border-color:rgba(69,230,223,.25);
+  background:#0e1d2c;
+}
+.comp-decision-card.active{
+  border-color:rgba(69,230,223,.32);
+  background:
+    linear-gradient(135deg,rgba(69,230,223,.055),transparent 52%),
+    #0c1b29;
+  box-shadow:inset 0 0 0 1px rgba(69,230,223,.035);
+}
+.comp-decision-card:disabled{
+  opacity:.48;
+  cursor:default;
+}
+.comp-decision-card>span{
+  grid-area:label;
+  color:#6f8197;
+  font-size:6px;
+  font-weight:950;
+  letter-spacing:.8px;
+}
+.comp-decision-card>strong{
+  grid-area:name;
+  overflow:hidden;
+  color:#dfe8f4;
+  font-size:11px;
+  line-height:1.28;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.comp-decision-card>div{
+  grid-area:metric;
+  min-width:58px;
+  display:grid;
+  justify-items:end;
+  gap:1px;
+}
+.comp-decision-card>div b{
+  color:#79eae5;
+  font-size:15px;
+  line-height:1;
+}
+.comp-decision-card>div small{
+  color:#607187;
+  font-size:5.5px;
+}
+.comp-decision-card>em{
+  grid-area:open;
+  align-self:end;
+  margin-top:6px;
+  color:#77889d;
+  font-size:6px;
+  font-style:normal;
+  font-weight:850;
+}
+.comp-guide-panel-v2{
+  scroll-margin-top:74px;
+}
+
+/* Statistics: compact overview before full table */
+.statistics-quick-read{
+  margin:10px 0;
+  padding:14px;
+  border:1px solid rgba(96,139,178,.16);
+  border-radius:13px;
+  background:
+    radial-gradient(circle at 0 0,rgba(145,111,255,.035),transparent 28%),
+    linear-gradient(180deg,#0b1724,#08131f);
+}
+.statistics-quick-head{
+  margin-bottom:10px;
+}
+.statistics-quick-head>div{
+  max-width:760px;
+}
+.statistics-quick-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+}
+.statistics-quick-card{
+  min-width:0;
+  min-height:88px;
+  display:grid;
+  grid-template-columns:24px 42px minmax(0,1fr) auto;
+  grid-template-areas:
+    "rank icon copy metrics"
+    "rank icon open metrics";
+  gap:5px 8px;
+  align-items:center;
+  padding:10px;
+  border:1px solid rgba(98,139,177,.14);
+  border-radius:10px;
+  background:#0b1825;
+  color:inherit;
+  text-align:left;
+  transition:transform .16s ease,border-color .16s ease,background .16s ease;
+}
+.statistics-quick-card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(69,230,223,.24);
+  background:#0e1d2c;
+}
+.statistics-quick-card.active{
+  border-color:rgba(69,230,223,.3);
+  background:rgba(69,230,223,.035);
+}
+.statistics-quick-rank{
+  grid-area:rank;
+  align-self:start;
+  color:#53677e;
+  font-size:7px;
+  font-weight:950;
+}
+.statistics-quick-icon{
+  grid-area:icon;
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  border:1px solid rgba(103,144,182,.18);
+  border-radius:9px;
+  background:#111f2d;
+}
+.statistics-quick-icon img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.statistics-quick-icon.items img,
+.statistics-quick-icon.traits img{
+  object-fit:contain;
+  padding:4px;
+}
+.statistics-quick-copy{
+  grid-area:copy;
+  min-width:0;
+  display:grid;
+  gap:1px;
+}
+.statistics-quick-copy small{
+  color:#65768b;
+  font-size:5.5px;
+  font-weight:850;
+}
+.statistics-quick-copy strong{
+  overflow:hidden;
+  color:#dfe8f4;
+  font-size:10px;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.statistics-quick-copy em{
+  overflow:hidden;
+  color:#6d7e92;
+  font-size:6px;
+  font-style:normal;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.statistics-quick-metrics{
+  grid-area:metrics;
+  display:grid;
+  justify-items:end;
+  gap:2px;
+  padding-left:8px;
+  border-left:1px solid rgba(98,139,177,.1);
+}
+.statistics-quick-metrics b{
+  color:#75e4df;
+  font-size:8px;
+}
+.statistics-quick-metrics small{
+  color:#6b7c91;
+  font-size:6px;
+}
+.statistics-quick-card>i{
+  grid-area:open;
+  color:#718398;
+  font-size:5.5px;
+  font-style:normal;
+  font-weight:850;
+}
+.statistics-entity-detail{
+  scroll-margin-top:74px;
+}
+
+/* Push methodology behind the answer, not in front of it */
+.statistics-sample-guide{
+  margin-top:8px!important;
+  opacity:.92;
+}
+.statistics-sample-guide:not([open])>summary{
+  min-height:42px;
+}
+
+/* Mobile: horizontal decision rails instead of tall stacks */
+@media(max-width:760px){
+  .comp-decision-strip,
+  .statistics-quick-read{
+    padding:11px;
+    margin-inline:0;
+  }
+  .comp-decision-cards,
+  .statistics-quick-grid{
+    display:flex;
+    gap:7px;
+    overflow-x:auto;
+    margin-inline:-11px;
+    padding:0 11px 4px;
+    scrollbar-width:none;
+    scroll-snap-type:x proximity;
+  }
+  .comp-decision-cards::-webkit-scrollbar,
+  .statistics-quick-grid::-webkit-scrollbar{display:none}
+  .comp-decision-card{
+    flex:0 0 min(78vw,300px);
+    scroll-snap-align:start;
+  }
+  .statistics-quick-card{
+    flex:0 0 min(84vw,330px);
+    scroll-snap-align:start;
+  }
+}
