@@ -2056,14 +2056,16 @@ function App() {
                           </div>
 
                           <div className="match-meta match-meta-rich">
-                            <div className="match-value-grid">
+                            <div className="match-value-grid match-value-grid-core">
                               <span title={t("profile.history.boardEstimateTitle")}><b>~{boardValue(match,staticData)}G</b><small>{t("profile.history.boardEstimate")}</small></span>
                               <span><b>{match.goldLeft}G</b><small>{t("profile.history.gold")}</small></span>
-                              <span><b>{match.level}</b><small>{t("profile.history.level")}</small></span>
-                              <span><b>{analysisMatches.some(row=>(row.playersEliminated||0)>0)?(match.playersEliminated||0):"—"}</b><small>{t("profile.history.elim")}</small></span>
+                              <span><b>Nv {match.level}</b><small>{t("profile.history.level")}</small></span>
                             </div>
-                            <strong>{match.damageToPlayers>0?t("profile.history.damage",{value:match.damageToPlayers}):t("profile.history.damageNA")}</strong>
-                            <small>{t("profile.history.openAnalysis")}</small>
+                            <div className={"match-fast-read "+cue.tone}>
+                              <span>{cue.label}</span>
+                              <strong>{cue.title}</strong>
+                              <small>{t("profile.history.openAnalysis")} →</small>
+                            </div>
                           </div>
                         </button>;
                       })}
