@@ -25772,3 +25772,59 @@ img[src$="chibi-ui-10.png"],
     grid-template-columns:repeat(4,minmax(38px,1fr));
   }
 }
+
+
+/* CHIBI MATCH REVIEW STRIP ALIGNMENT v52 */
+
+/* Close the review strip visually: content fills the row and CTA stays at the edge. */
+.match-review-strip{
+  width:100%!important;
+  max-width:720px!important;
+  grid-template-columns:24px minmax(0,1fr) max-content!important;
+  column-gap:9px!important;
+  padding-right:6px!important;
+}
+
+.match-review-strip-copy{
+  width:100%!important;
+  min-width:0!important;
+}
+
+.match-review-strip-action{
+  justify-self:end!important;
+  min-width:92px!important;
+  padding-inline:9px!important;
+}
+
+.match-review-strip-copy>strong{
+  max-width:none!important;
+}
+
+/* In desktop history, let the strip follow the actual content column instead of
+   ending early and leaving a dark empty tail. */
+@media(min-width:1100px){
+  .profile-history-first .match-review-strip{
+    width:100%!important;
+    max-width:none!important;
+  }
+
+  .profile-history-first .match-main{
+    padding-right:4px!important;
+  }
+
+  .profile-history-first .match-review-strip-action{
+    min-width:96px!important;
+  }
+}
+
+/* Cursor aura should never overpower interactive content in dense history rows. */
+.profile-history-first ~ .pointer-aura,
+.profile-history-first .pointer-aura{
+  opacity:.22!important;
+}
+
+@media(max-width:760px){
+  .match-review-strip{
+    grid-template-columns:22px minmax(0,1fr)!important;
+  }
+}
