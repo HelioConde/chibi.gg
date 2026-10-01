@@ -41,7 +41,8 @@ export default function PointerAura(){
       y=event.clientY;
       if(!frame)frame=requestAnimationFrame(draw);
 
-      const next=(event.target as HTMLElement|null)?.closest(REACTIVE_SELECTOR) as HTMLElement|null;
+      const target=event.target instanceof Element?event.target:null;
+      const next=target?.closest(REACTIVE_SELECTOR) as HTMLElement|null;
       if(active!==next){
         active?.classList.remove("hud-reactive-hover");
         active=next;
@@ -53,7 +54,7 @@ export default function PointerAura(){
         active.style.setProperty("--hud-my",`${event.clientY-rect.top}px`);
       }
 
-      const interactive=Boolean((event.target as HTMLElement|null)?.closest("button,a,input,select,textarea,[role=button]"));
+      const interactive=Boolean(target?.closest("button,a,input,select,textarea,[role=button]"));
       auraRef.current?.classList.toggle("interactive",interactive);
       coreRef.current?.classList.toggle("interactive",interactive);
       document.documentElement.style.setProperty("--pointer-x",`${event.clientX}px`);
