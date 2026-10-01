@@ -163,6 +163,13 @@ function placementClass(value:number){
   return "";
 }
 
+function placementBand(value:number){
+  if(value===1)return "win";
+  if(value<=4)return "top4";
+  if(value>=7)return "bottom";
+  return "mid";
+}
+
 function matchReviewCue(match:TftMatch,t:Translate){
   const threeStars=match.units.filter(unit=>unit.tier>=3).length;
 
@@ -269,8 +276,8 @@ function UnitVisual({unit,staticData,compact=false}:{unit:TftUnit;staticData:Tft
 }
 
 
-function MatchResultAccent({placement}:{placement:number}){
-  const band=placement===1?"win":placement<=4?"top4":placement>=7?"bottom":"mid";
+function MatchResultAccent({placement,className=""}:{placement:number;className?:string}){
+  const band=placementBand(placement);
   const src=placement===1
     ? SITE_IMAGES.v2.badges.rankAlt
     :placement<=4
@@ -280,7 +287,7 @@ function MatchResultAccent({placement}:{placement:number}){
         :SITE_IMAGES.v2.decor.cornerAlt;
 
   return <AdaptiveArtwork
-    className={"match-result-art match-result-art-"+band}
+    className={"match-result-art match-result-art-"+band+" "+className}
     src={src}
     alt=""
     aria-hidden="true"
@@ -2150,8 +2157,8 @@ function App() {
                         const cue=matchReviewCue(match,t);
                         const threeStarCount=match.units.filter(unit=>unit.tier>=3).length;
                         const equippedItemCount=match.units.reduce((sum,unit)=>sum+unit.itemNames.length,0);
-                        const placementBand=match.placement===1?"win":match.placement<=4?"top4":match.placement>=7?"bottom":"mid";
-                        return <button className={"match-row match-button match-row-v2 cue-"+cue.tone+" placement-band-"+placementBand} key={match.id} onClick={()=>openMatch(match)}>
+                        const resultBand=placementBand(match.placement);
+                        return <button className={"match-row match-button match-row-v2 cue-"+cue.tone+" placement-band-"+resultBand} key={match.id} onClick={()=>openMatch(match)}>
                           <div className="match-result-rail">
                             <MatchResultAccent placement={match.placement}/>
                             <TacticianVisual companion={match.companion} staticData={staticData}/>
@@ -2392,11 +2399,15 @@ function App() {
                       onClick={()=>openedMatchNavigation.older&&void openMatch(openedMatchNavigation.older)}
                     >{t("match.older")}</button>
                   </div>
-                  <div className={"modal-placement "+placementClass(openedMatch.placement)}>{openedMatch.placement}º</div>
+                  <div className={"match-modal-placement-wrap placement-band-"+placementBand(openedMatch.placement)}>
+                    <MatchResultAccent placement={openedMatch.placement} className="match-modal-result-art"/>
+                    <div className={"modal-placement "+placementClass(openedMatch.placement)}>{openedMatch.placement}º</div>
+                  </div>
                 </div>}
               </div>
 
-              {openedMatch&&<section className="match-summary-card">
+              {openedMatch&&<section className={"match-summary-card match-summary-card-v2 placement-band-"+placementBand(openedMatch.placement)}>
+                <MatchResultAccent placement={openedMatch.placement} className="match-summary-result-art"/>
                 <div className="match-summary-main">
                   <span>{t("match.finalBoard")}</span>
                   <h3>{activeTraits(openedMatch).slice(0,2).map((t)=>traitLabel(t,staticData)).filter(Boolean).join(" · ") || "Board TFT"}</h3>

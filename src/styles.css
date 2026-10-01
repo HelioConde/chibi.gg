@@ -23788,3 +23788,134 @@ img[src$="chibi-ui-10.png"],
     opacity:.06!important;
   }
 }
+
+
+/* CHIBI MATCH REVIEW CONTINUITY v36 */
+
+/* Carry the same result language from history card into the opened review. */
+.match-modal-head-actions{
+  align-items:center!important;
+}
+.match-modal-placement-wrap{
+  position:relative;
+  width:58px;
+  min-width:58px;
+  height:52px;
+  display:grid;
+  place-items:center;
+  isolation:isolate;
+}
+.match-modal-placement-wrap .modal-placement{
+  position:relative;
+  z-index:2;
+  width:48px!important;
+  height:42px!important;
+  display:grid!important;
+  place-items:center!important;
+  border:1px solid rgba(101,145,183,.18);
+  border-radius:10px!important;
+  background:#0b1825!important;
+  box-shadow:0 10px 24px rgba(0,0,0,.12);
+}
+.match-modal-result-art{
+  z-index:0!important;
+  width:76px!important;
+  height:76px!important;
+  opacity:.13!important;
+}
+.match-modal-placement-wrap.placement-band-win .modal-placement{
+  border-color:rgba(239,197,84,.30)!important;
+  color:#f0cf75!important;
+  background:linear-gradient(180deg,rgba(239,197,84,.10),rgba(11,24,37,.96))!important;
+}
+.match-modal-placement-wrap.placement-band-top4 .modal-placement{
+  border-color:rgba(77,213,168,.22)!important;
+}
+.match-modal-placement-wrap.placement-band-bottom .modal-placement{
+  border-color:rgba(236,112,126,.20)!important;
+}
+
+/* Board summary gets one low-opacity semantic output-v2 piece. */
+.match-summary-card-v2{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+}
+.match-summary-card-v2>*:not(.match-summary-result-art){
+  position:relative;
+  z-index:2;
+}
+.match-summary-result-art{
+  z-index:0!important;
+  left:auto!important;
+  right:14px!important;
+  top:50%!important;
+  width:150px!important;
+  height:150px!important;
+  transform:translateY(-50%) rotate(-4deg)!important;
+  opacity:.055!important;
+  mask-image:linear-gradient(90deg,transparent,black 28%)!important;
+  -webkit-mask-image:linear-gradient(90deg,transparent,black 28%)!important;
+}
+.match-summary-card-v2.placement-band-win{
+  border-color:rgba(239,197,84,.18)!important;
+  background:
+    radial-gradient(circle at 94% 12%,rgba(239,197,84,.055),transparent 28%),
+    linear-gradient(180deg,rgba(13,25,39,.97),rgba(7,16,27,.98))!important;
+}
+.match-summary-card-v2.placement-band-top4{
+  border-color:rgba(76,211,166,.14)!important;
+}
+.match-summary-card-v2.placement-band-bottom{
+  border-color:rgba(235,112,126,.13)!important;
+}
+
+/* Final-board units stay fully visible and line up more predictably. */
+.match-summary-card-v2 .modal-board{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:flex-start!important;
+  gap:6px!important;
+}
+.match-summary-card-v2 .modal-board .unit-card{
+  flex:0 0 auto;
+}
+.match-summary-card-v2 .match-summary-stats{
+  position:relative;
+  z-index:3;
+}
+
+@media(max-width:760px){
+  .match-modal-placement-wrap{
+    width:48px;
+    min-width:48px;
+    height:44px;
+  }
+  .match-modal-placement-wrap .modal-placement{
+    width:42px!important;
+    height:36px!important;
+  }
+  .match-modal-result-art{
+    width:60px!important;
+    height:60px!important;
+    opacity:.09!important;
+  }
+  .match-summary-result-art{
+    right:-12px!important;
+    width:104px!important;
+    height:104px!important;
+    opacity:.035!important;
+  }
+}
+
+@media(max-width:420px){
+  .match-summary-card-v2 .modal-board{
+    flex-wrap:nowrap!important;
+    overflow-x:auto!important;
+    padding-bottom:6px!important;
+    scrollbar-width:none;
+  }
+  .match-summary-card-v2 .modal-board::-webkit-scrollbar{
+    display:none;
+  }
+}
