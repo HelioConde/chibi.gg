@@ -1417,8 +1417,22 @@ function App() {
         </div>}
         <div className="topbar-actions">
           <LanguageSwitcher />
-          <AccountMenu />
-          <button className="ghost-button" onClick={()=>openInfoPage("about")}>{t("nav.howItWorks")}</button>
+          <AccountMenu
+            riotGameName={profile?.player.gameName}
+            riotTagLine={profile?.player.tagLine}
+            riotProfileIcon={profile&&staticData
+              ?profileIconUrl(staticData.version,profile.player.profileIconId)
+              :undefined}
+          />
+          <button
+            className="ghost-button topbar-help-button"
+            onClick={()=>openInfoPage("about")}
+            aria-label={t("nav.howItWorks")}
+            title={t("nav.howItWorks")}
+          >
+            <span aria-hidden="true">?</span>
+            <b>{t("nav.howItWorks")}</b>
+          </button>
         </div>
       </header>
 
