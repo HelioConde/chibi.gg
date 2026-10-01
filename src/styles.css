@@ -22313,3 +22313,132 @@ img[src$="chibi-ui-10.png"],
     margin-left:0!important;
   }
 }
+
+/* CHIBI CONTEXT ART RIBBONS v27 */
+
+.artwork-ribbon{
+  width:100%;
+  max-width:100%;
+  display:grid;
+  grid-template-columns:minmax(0,1.25fr) minmax(0,.9fr) minmax(0,.9fr);
+  gap:8px;
+  margin:10px 0 14px;
+  overflow:hidden;
+}
+.artwork-ribbon-card{
+  position:relative;
+  height:138px;
+  margin:0;
+  overflow:hidden;
+  border:1px solid rgba(96,141,180,.16);
+  border-radius:12px;
+  background:#081522;
+  box-shadow:0 16px 40px rgba(0,0,0,.10);
+}
+.artwork-ribbon-card .adaptive-artwork{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center 28%;
+  opacity:.72;
+  filter:saturate(.94) contrast(1.04) brightness(.82);
+  transition:transform .3s ease,opacity .3s ease;
+}
+.artwork-ribbon-card .adaptive-artwork.art-portrait{
+  object-fit:contain!important;
+  padding:5px;
+  background:
+    radial-gradient(circle at 50% 18%,rgba(69,230,223,.06),transparent 31%),
+    #081522;
+}
+.artwork-ribbon-card .adaptive-artwork.art-square{
+  object-fit:cover!important;
+  object-position:center!important;
+}
+.artwork-ribbon-card>span{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(180deg,transparent 35%,rgba(5,12,20,.62)),
+    linear-gradient(90deg,rgba(5,12,20,.16),transparent 48%,rgba(5,12,20,.12));
+}
+.artwork-ribbon-card:first-child{
+  height:154px;
+}
+.artwork-ribbon:hover .artwork-ribbon-card .adaptive-artwork{
+  opacity:.82;
+}
+.artwork-ribbon-card:hover .adaptive-artwork{
+  transform:scale(1.025);
+}
+
+/* subtle section-specific framing */
+.meta-art-ribbon .artwork-ribbon-card:first-child,
+.stats-art-ribbon .artwork-ribbon-card:first-child{
+  border-color:rgba(145,111,255,.20);
+}
+.comps-art-ribbon .artwork-ribbon-card:first-child,
+.builder-art-ribbon .artwork-ribbon-card:first-child{
+  border-color:rgba(69,230,223,.20);
+}
+.leaderboard-art-ribbon .artwork-ribbon-card:first-child{
+  border-color:rgba(244,200,94,.18);
+}
+.overlay-art-ribbon .artwork-ribbon-card:first-child{
+  border-color:rgba(85,168,255,.19);
+}
+
+/* Compact clients keep the images visible but contained in a short horizontal rail. */
+.app-shell.compact-layout .artwork-ribbon{
+  display:flex!important;
+  width:100%!important;
+  max-width:100%!important;
+  gap:7px!important;
+  margin:8px 0 12px!important;
+  padding:0 0 3px!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  scrollbar-width:none;
+  scroll-snap-type:x proximity;
+}
+.app-shell.compact-layout .artwork-ribbon::-webkit-scrollbar{
+  display:none;
+}
+.app-shell.compact-layout .artwork-ribbon-card,
+.app-shell.compact-layout .artwork-ribbon-card:first-child{
+  flex:0 0 min(72vw,270px)!important;
+  width:min(72vw,270px)!important;
+  height:108px!important;
+  min-width:0!important;
+  scroll-snap-align:start;
+  border-radius:10px!important;
+}
+.app-shell.compact-layout .artwork-ribbon-card .adaptive-artwork{
+  position:static!important;
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  max-height:108px!important;
+  opacity:.72!important;
+}
+.app-shell.compact-layout .artwork-ribbon-card .adaptive-artwork.art-portrait{
+  object-fit:contain!important;
+  padding:4px!important;
+}
+.app-shell.compact-layout .artwork-ribbon-card .adaptive-artwork.art-landscape,
+.app-shell.compact-layout .artwork-ribbon-card .adaptive-artwork.art-square{
+  object-fit:cover!important;
+}
+
+@media(max-width:420px){
+  .app-shell.compact-layout .artwork-ribbon-card,
+  .app-shell.compact-layout .artwork-ribbon-card:first-child{
+    flex-basis:76vw!important;
+    width:76vw!important;
+    height:102px!important;
+  }
+  .app-shell.compact-layout .artwork-ribbon-card .adaptive-artwork{
+    max-height:102px!important;
+  }
+}
