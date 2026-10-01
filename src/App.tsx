@@ -2162,13 +2162,11 @@ function App() {
                               </div>
                             </div>
 
-                            <div className={"match-review-strip "+cue.tone}>
-                              <span className="match-review-strip-icon" aria-hidden="true">{cue.tone==="bad"?"!":cue.tone==="good"?"✓":"·"}</span>
-                              <div className="match-review-strip-copy">
-                                <span>{cue.label}</span>
-                                <strong>{cue.title}</strong>
-                              </div>
-                              <span className="match-review-strip-action">{t("profile.history.openAnalysis")} →</span>
+                            <div className={"match-review-inline "+cue.tone}>
+                              <span className="match-review-inline-dot" aria-hidden="true"/>
+                              <span className="match-review-inline-label">{cue.label}</span>
+                              <strong>{cue.title}</strong>
+                              <span className="match-review-inline-action">{t("profile.history.openAnalysis")} →</span>
                             </div>
 
                             <div className="match-lineup">
