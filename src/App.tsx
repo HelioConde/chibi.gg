@@ -1694,6 +1694,7 @@ function App() {
           </section>}
 
           <section className="player-summary-shell player-summary-visual player-summary-compact">
+            <AdaptiveArtwork className="player-v2-hud-rail" src={SITE_IMAGES.v2.frames.wide} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
             <AdaptiveArtwork className="player-summary-reference-art" src={SITE_IMAGES.ui.profile} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
             <div className="player-summary-board-art" aria-hidden="true">
               {analysisMatches[0]?.units.slice(0,5).map((unit,index)=>{
@@ -1844,8 +1845,9 @@ function App() {
           </>}
 
           {profileTab==="coach"&&<>
-            <div className="coach-art-banner" aria-hidden="true">
-              <AdaptiveArtwork src={SITE_IMAGES.ui.coach} alt="" loading="lazy" decoding="async"/>
+            <div className="coach-art-banner coach-art-banner-v2" aria-hidden="true">
+              <AdaptiveArtwork className="coach-v2-frame" src={SITE_IMAGES.v2.frames.landscape} alt="" loading="lazy" decoding="async"/>
+              <AdaptiveArtwork className="coach-v2-mascot" src={SITE_IMAGES.v2.mascots.board} alt="" loading="lazy" decoding="async"/>
               <span></span>
             </div>
             <ChibiCoachMode />
