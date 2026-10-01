@@ -246,18 +246,23 @@ function traitLabel(trait:TftTrait, staticData:TftStaticData|null){
   return staticEntry(staticData?.traits,trait.name)?.name || fallbackTraitName(trait.name);
 }
 
-function UnitVisual({unit,staticData,compact=false}:{unit:TftUnit;staticData:TftStaticData|null;compact?:boolean}){
+function UnitVisual({
+  unit,
+  staticData,
+  compact=false,
+  showName=false,
+}:{unit:TftUnit;staticData:TftStaticData|null;compact?:boolean;showName?:boolean}){
   const entry=staticEntry(staticData?.champions,unit.characterId);
   const name=entry?.name || cleanName(unit.characterId);
   const image=staticData? tftAssetUrl(staticData.version,"champion",entry) : "";
 
-  return <div className={"unit-card "+(compact?"compact":"")} title={name}>
+  return <div className={"unit-card "+(compact?"compact ":"")+(showName?"named":"")} title={name}>
     <div className={"unit-portrait cost-"+Math.max(1,Math.min(5,Number(entry?.tier||unit.rarity||1)))}>
       <span className="unit-fallback">{name.slice(0,2)}</span>
       {image&&<img src={image} alt={name} onError={(e)=>{e.currentTarget.style.display="none";}}/>}
       <div className="unit-stars">{"★".repeat(Math.max(1,Math.min(3,unit.tier||1)))}</div>
     </div>
-    {!compact&&<div className="unit-caption">{name}</div>}
+    {(!compact||showName)&&<div className="unit-caption">{name}</div>}
     <div className="item-row">
       {unit.itemNames.slice(0,3).map((itemId,index)=>{
         const item=staticEntry(staticData?.items,itemId);
@@ -2325,7 +2330,7 @@ function App() {
                     {activeTraits(openedMatch).slice(0,4).map((trait)=><span className={"trait-chip style-"+Math.max(0,trait.style)} key={trait.name}>{traitLabel(trait,staticData)} {trait.numUnits}</span>)}
                   </div>
                   <div className="board-row modal-board">
-                    {openedMatch.units.map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact key={unit.characterId+index}/>)}
+                    {openedMatch.units.map((unit,index)=><UnitVisual unit={unit} staticData={staticData} compact showName key={unit.characterId+index}/>)}
                   </div>
                   {openedMatch.augments.length>0&&<div className="augment-row match-summary-augments">
                     {openedMatch.augments.slice(0,3).map((augment)=><AugmentVisual id={augment} staticData={staticData} key={augment}/>)}

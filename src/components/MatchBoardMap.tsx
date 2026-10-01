@@ -9,6 +9,15 @@ type Props={
   staticData:TftStaticData|null;
 };
 
+function fallbackUnitName(value:string){
+  return String(value||"")
+    .replace(/^TFT\d+_/i,"")
+    .replace(/^Set\d+_/i,"")
+    .replace(/_/g," ")
+    .replace(/([a-z])([A-Z])/g,"$1 $2")
+    .trim();
+}
+
 export default function MatchBoardMap({match,staticData}:Props){
   return <section className="match-board-map match-stage-with-art">
     <AdaptiveArtwork className="match-stage-art match-stage-art-board" src={SITE_IMAGES.ui.positioning} alt="" aria-hidden="true" loading="lazy" decoding="async"/>
@@ -27,9 +36,11 @@ export default function MatchBoardMap({match,staticData}:Props){
         {match.units.map((unit,index)=>{
           const entry=staticEntry(staticData?.champions,unit.characterId);
           const image=staticData?tftAssetUrl(staticData.version,"champion",entry):"";
-          return <div key={unit.characterId+index}>
-            <span>{image&&<img src={image} alt=""/>}</span>
+          const name=entry?.name||fallbackUnitName(unit.characterId);
+          return <div className="match-board-unit" key={unit.characterId+index} title={name}>
+            <span>{image&&<img src={image} alt={name}/>}</span>
             <small>{"★".repeat(Math.max(1,Math.min(3,unit.tier||1)))}</small>
+            <strong>{name}</strong>
           </div>;
         })}
       </div>
