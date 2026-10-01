@@ -14,6 +14,7 @@ import DDragonArt from "./DDragonArt";
 import { useI18n } from "../i18n";
 import { SITE_IMAGES } from "../siteAssets";
 import AdaptiveArtwork from "./AdaptiveArtwork";
+import ArtworkRibbon from "./ArtworkRibbon";
 import { saveStudyShelfItem } from "../studyShelf";
 
 export type StatisticsCategory="champions"|"traits"|"items";
@@ -347,6 +348,8 @@ export default function StatisticsPage({
         <b>{t(maturity==="robusta"?"common.maturity.robust":maturity==="crescendo"?"common.maturity.growing":"common.maturity.initial")}</b>
       </div>
     </section>
+
+    <ArtworkRibbon images={[10,18,4]} className="stats-art-ribbon"/>
 
     <section className="statistics-toolbar">
       <div className="statistics-categories">
