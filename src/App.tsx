@@ -2176,6 +2176,12 @@ function App() {
                               </div>
                             </div>
 
+                            <div className={"match-fast-read match-fast-read-inline "+cue.tone}>
+                              <span>{cue.label}</span>
+                              <strong>{cue.title}</strong>
+                              <small>{t("profile.history.openAnalysis")} →</small>
+                            </div>
+
                             <div className="match-lineup">
                               <div className="match-history-support">
                                 <div className="trait-row compact-traits">
@@ -2213,11 +2219,6 @@ function App() {
                               <span title={t("profile.history.boardEstimateTitle")}><b>~{boardValue(match,staticData)}G</b><small>{t("profile.history.boardEstimate")}</small></span>
                               <span><b>{match.goldLeft}G</b><small>{t("profile.history.gold")}</small></span>
                               <span><b>Nv {match.level}</b><small>{t("profile.history.level")}</small></span>
-                            </div>
-                            <div className={"match-fast-read "+cue.tone}>
-                              <span>{cue.label}</span>
-                              <strong>{cue.title}</strong>
-                              <small>{t("profile.history.openAnalysis")} →</small>
                             </div>
                           </div>
                         </button>;
