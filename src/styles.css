@@ -19799,3 +19799,236 @@ body::before{
     scroll-snap-align:start;
   }
 }
+
+/* CHIBI PAGE ART DIRECTION v15 */
+
+/* Shared artwork treatment: decorative, never replaces live data */
+.player-summary-shell,
+.history-with-reference,
+.coach-art-banner,
+.page-hero-with-reference{
+  position:relative;
+  isolation:isolate;
+}
+.player-summary-shell>*:not(.player-summary-reference-art),
+.history-with-reference>*:not(.history-reference-art),
+.page-hero-with-reference>*:not(.page-reference-art){
+  position:relative;
+  z-index:2;
+}
+
+/* Profile header artwork */
+.player-summary-reference-art{
+  position:absolute;
+  z-index:0;
+  inset:0 0 0 auto;
+  width:min(47%,620px);
+  height:100%;
+  object-fit:cover;
+  object-position:center 24%;
+  opacity:.085;
+  filter:saturate(.88) contrast(1.08) brightness(.78);
+  pointer-events:none;
+  mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.28) 18%,black 70%);
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.28) 18%,black 70%);
+}
+.player-summary-shell::after{
+  content:"";
+  position:absolute;
+  z-index:1;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  background:linear-gradient(90deg,rgba(7,16,27,.93) 0%,rgba(7,16,27,.72) 48%,rgba(7,16,27,.28) 100%);
+}
+.player-summary-board-art{
+  z-index:2!important;
+}
+
+/* History artwork lives in the title zone and fades before match rows */
+.history-with-reference{
+  overflow:hidden;
+}
+.history-reference-art{
+  position:absolute;
+  z-index:0;
+  top:0;
+  right:0;
+  width:min(52%,560px);
+  height:155px;
+  object-fit:cover;
+  object-position:center 15%;
+  opacity:.075;
+  filter:saturate(.9) contrast(1.05) brightness(.8);
+  pointer-events:none;
+  mask-image:linear-gradient(90deg,transparent,black 42%,black);
+  -webkit-mask-image:linear-gradient(90deg,transparent,black 42%,black);
+}
+.history-with-reference::before{
+  content:"";
+  position:absolute;
+  z-index:1;
+  top:0;
+  right:0;
+  width:min(58%,620px);
+  height:170px;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg,transparent,rgba(7,15,24,.25) 34%,rgba(7,15,24,.62)),
+    linear-gradient(180deg,rgba(7,15,24,.12),rgba(7,15,24,.94));
+}
+.history-with-reference .profile-history-head{
+  min-height:74px;
+}
+
+/* Coach gets a cinematic entry without adding more text */
+.coach-art-banner{
+  height:150px;
+  margin:2px 0 11px;
+  overflow:hidden;
+  border:1px solid rgba(88,213,215,.16);
+  border-radius:14px;
+  background:#081522;
+  box-shadow:0 16px 45px rgba(0,0,0,.13);
+}
+.coach-art-banner img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center 20%;
+  opacity:.35;
+  filter:saturate(.9) contrast(1.08) brightness(.78);
+}
+.coach-art-banner span{
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(90deg,rgba(6,14,23,.93) 0%,rgba(6,14,23,.46) 48%,rgba(6,14,23,.74) 100%),
+    linear-gradient(180deg,rgba(6,14,23,.12),rgba(6,14,23,.88));
+}
+.coach-art-banner::after{
+  content:"CHIBI COACH";
+  position:absolute;
+  z-index:2;
+  left:18px;
+  bottom:15px;
+  color:#8bf2ed;
+  font-size:8px;
+  font-weight:950;
+  letter-spacing:1.5px;
+  text-shadow:0 3px 16px rgba(0,0,0,.55);
+}
+
+/* Meta / Comps / Stats page heroes */
+.page-hero-with-reference{
+  min-height:188px;
+}
+.page-reference-art{
+  position:absolute;
+  z-index:0;
+  inset:0 0 0 auto;
+  width:min(48%,590px);
+  height:100%;
+  object-fit:cover;
+  object-position:center 22%;
+  opacity:.16;
+  filter:saturate(.88) contrast(1.05) brightness(.75);
+  pointer-events:none;
+  mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.45) 28%,black 80%);
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.45) 28%,black 80%);
+}
+.page-hero-with-reference::before{
+  content:"";
+  position:absolute;
+  z-index:1;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg,rgba(8,17,28,.98) 0%,rgba(8,17,28,.84) 44%,rgba(8,17,28,.38) 78%,rgba(8,17,28,.58) 100%),
+    linear-gradient(180deg,rgba(8,17,28,.16),rgba(8,17,28,.65));
+}
+.page-reference-comps{
+  object-position:center 16%;
+}
+.page-reference-stats{
+  object-position:center 20%;
+}
+.page-reference-meta{
+  object-position:center 18%;
+}
+
+/* Keep title copy dominant above decorative art */
+.global-meta-hero>div:first-of-type,
+.comps-hero>div:first-of-type,
+.statistics-hero>div:first-of-type{
+  max-width:760px;
+}
+.global-meta-hero .meta-dataset-card,
+.comps-hero .meta-dataset-card,
+.statistics-hero .meta-dataset-card{
+  z-index:3;
+}
+
+/* Slightly stronger page identity on live content panels */
+.comps-page-v2 .comp-answer-card-v2,
+.statistics-page .statistics-table,
+.global-meta-page .meta-explorer{
+  box-shadow:0 18px 54px rgba(0,0,0,.11);
+}
+.comps-page-v2 .comp-answer-card-v2::before,
+.global-meta-page .meta-explorer::before{
+  content:"";
+  display:block;
+  width:38px;
+  height:2px;
+  margin-bottom:12px;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--chibi-cyan),transparent);
+}
+
+/* Mobile: remove heavyweight ambience where it costs more than it helps */
+@media(max-width:760px){
+  .player-summary-reference-art{
+    width:100%;
+    opacity:.045;
+    mask-image:linear-gradient(180deg,black,transparent 74%);
+    -webkit-mask-image:linear-gradient(180deg,black,transparent 74%);
+  }
+  .player-summary-shell::after{
+    background:linear-gradient(180deg,rgba(7,16,27,.5),rgba(7,16,27,.93) 64%);
+  }
+  .history-reference-art{
+    width:100%;
+    height:110px;
+    opacity:.045;
+    mask-image:linear-gradient(180deg,black,transparent 90%);
+    -webkit-mask-image:linear-gradient(180deg,black,transparent 90%);
+  }
+  .history-with-reference::before{
+    width:100%;
+    height:125px;
+    background:linear-gradient(180deg,rgba(7,15,24,.38),rgba(7,15,24,.96));
+  }
+  .coach-art-banner{
+    height:105px;
+    margin-top:0;
+  }
+  .coach-art-banner img{
+    opacity:.23;
+  }
+  .page-hero-with-reference{
+    min-height:0;
+  }
+  .page-reference-art{
+    width:100%;
+    opacity:.055;
+    object-position:center top;
+    mask-image:linear-gradient(180deg,black,transparent 90%);
+    -webkit-mask-image:linear-gradient(180deg,black,transparent 90%);
+  }
+  .page-hero-with-reference::before{
+    background:linear-gradient(180deg,rgba(8,17,28,.52),rgba(8,17,28,.95) 78%);
+  }
+}
