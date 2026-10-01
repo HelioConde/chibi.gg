@@ -420,6 +420,8 @@ function App() {
     query:"",
     view:"stats",
   });
+  const [compactViewport,setCompactViewport]=useState(()=>window.matchMedia("(max-width: 820px)").matches);
+  const [mobileNavOpen,setMobileNavOpen]=useState(false);
   const [sitePage,setSitePage]=useState<
     "main"|"meta"|"comps"|"stats"|"builder"|"leaderboard"|"overlay"|"about"|"privacy"|"terms"
   >(
@@ -443,6 +445,17 @@ function App() {
                       ?"terms"
                       :"main"
   );
+
+  useEffect(()=>{
+    const mobileMedia=window.matchMedia("(max-width: 820px)");
+    const syncViewport=()=>{
+      setCompactViewport(mobileMedia.matches);
+      if(!mobileMedia.matches)setMobileNavOpen(false);
+    };
+    syncViewport();
+    mobileMedia.addEventListener("change",syncViewport);
+    return ()=>mobileMedia.removeEventListener("change",syncViewport);
+  },[]);
 
   useEffect(()=>{
     loadTftStaticData().then(setStaticData).catch(()=>{});
@@ -1257,14 +1270,14 @@ function App() {
           <span className="brand-mark brand-mark-image"><img src={SITE_IMAGES.icon} alt=""/></span>
           <span>chibi<span>.gg</span></span>
         </button>
-        <nav className="product-nav" aria-label="Chibi">
+        {!compactViewport&&<nav className="product-nav" aria-label="Chibi">
           <button className={sitePage==="meta"?"active":""} onClick={openMeta}>{t("nav.meta")}</button>
           <button className={sitePage==="comps"?"active":""} onClick={openComps}>{t("nav.comps")}</button>
           <button className={sitePage==="stats"?"active":""} onClick={()=>openStats()}>{t("nav.statistics")}</button>
           <button className={"builder-nav-button "+(sitePage==="builder"?"active":"")} onClick={()=>openBuilder([])}>{t("nav.builder")}</button>
           <button className={sitePage==="leaderboard"?"active":""} onClick={openLeaderboard}>{t("nav.leaderboard")}</button>
           <button className={"companion-nav-button "+(sitePage==="overlay"?"active":"")} onClick={openOverlay}>{t("nav.companion")}</button>
-        </nav>
+        </nav>}
         <GlobalSearch
           staticData={staticData}
           recentPlayers={recentPlayers}
@@ -1273,6 +1286,23 @@ function App() {
           onSearchPlayer={(value)=>{void searchFromGlobal(value);}}
           onOpenPage={openExplorePage}
         />
+        {compactViewport&&<div className="mobile-product-menu">
+          <button
+            className="mobile-product-menu-trigger"
+            type="button"
+            aria-label="Abrir navegação"
+            aria-expanded={mobileNavOpen}
+            onClick={()=>setMobileNavOpen(value=>!value)}
+          >☰</button>
+          {mobileNavOpen&&<div className="mobile-product-menu-panel">
+            <button className={sitePage==="meta"?"active":""} onClick={()=>{openMeta();setMobileNavOpen(false);}}>{t("nav.meta")}</button>
+            <button className={sitePage==="comps"?"active":""} onClick={()=>{openComps();setMobileNavOpen(false);}}>{t("nav.comps")}</button>
+            <button className={sitePage==="stats"?"active":""} onClick={()=>{openStats();setMobileNavOpen(false);}}>{t("nav.statistics")}</button>
+            <button className={sitePage==="builder"?"active":""} onClick={()=>{openBuilder([]);setMobileNavOpen(false);}}>{t("nav.builder")}</button>
+            <button className={sitePage==="leaderboard"?"active":""} onClick={()=>{openLeaderboard();setMobileNavOpen(false);}}>{t("nav.leaderboard")}</button>
+            <button className={sitePage==="overlay"?"active":""} onClick={()=>{openOverlay();setMobileNavOpen(false);}}>{t("nav.companion")}</button>
+          </div>}
+        </div>
         <div className="topbar-actions">
           <LanguageSwitcher />
           <AccountMenu />
@@ -1280,9 +1310,11 @@ function App() {
         </div>
       </header>
 
-      <SiteArtworkBackdrop page={sitePage} profileTab={profileTab} hasProfile={Boolean(profile)}/>
-      <SiteHudOverlay/>
-      <PointerAura/>
+      {!compactViewport&&<>
+        <SiteArtworkBackdrop page={sitePage} profileTab={profileTab} hasProfile={Boolean(profile)}/>
+        <SiteHudOverlay/>
+        <PointerAura/>
+      </>}
 
       {sitePage==="about"||sitePage==="privacy"||sitePage==="terms" ? (
         <ProductInfoPage
