@@ -29803,3 +29803,112 @@ img[src$="chibi-ui-10.png"],
     font-size:9px!important;
   }
 }
+
+
+/* CHIBI PROFILE SPACE POLISH v73 */
+
+/* Final desktop profile polish from the current live capture:
+   reclaim dead vertical space above the history and keep supporting copy readable. */
+@media(min-width:1100px){
+  .profile-page>.back-search,
+  .back-search{
+    margin:8px 0 7px!important;
+    font-size:8.5px!important;
+    line-height:1.2!important;
+  }
+
+  .player-summary-shell.player-summary-compact{
+    min-height:0!important;
+    margin-top:4px!important;
+    padding:10px 12px 9px!important;
+    grid-template-columns:minmax(330px,1.08fr) minmax(360px,.86fr) auto!important;
+    grid-template-areas:
+      "identity kpis actions"
+      "source   source actions"!important;
+    grid-template-rows:auto auto!important;
+    align-items:center!important;
+    column-gap:14px!important;
+    row-gap:4px!important;
+  }
+
+  .player-summary-compact .player-summary-main{
+    min-height:48px!important;
+    align-self:center!important;
+  }
+
+  .player-summary-compact .player-avatar-wrap .avatar{
+    width:48px!important;
+    height:48px!important;
+  }
+
+  .player-summary-compact .player-summary-source{
+    align-self:start!important;
+    min-height:20px!important;
+    margin-top:0!important;
+  }
+
+  .player-summary-compact .riot-data-bar.compact{
+    min-height:20px!important;
+    padding-top:1px!important;
+  }
+
+  .player-summary-compact .player-summary-actions{
+    align-self:center!important;
+  }
+
+  .player-summary-compact .player-summary-actions button{
+    min-height:34px!important;
+    padding:7px 11px!important;
+    font-size:7.6px!important;
+  }
+
+  .player-summary-kpis{
+    align-self:center!important;
+  }
+
+  .player-kpi-card{
+    min-height:50px!important;
+    padding:7px 9px!important;
+  }
+
+  /* Reduce the visual card height caused by background art, not by content. */
+  .player-summary-reference-v2,
+  .player-summary-board-art{
+    max-height:96px!important;
+  }
+
+  .player-v2-hud-rail{
+    height:50px!important;
+    bottom:-8px!important;
+  }
+
+  /* Decision panel copy should read as normal UI text, not annotation text. */
+  .today-tft-head p{
+    max-width:820px!important;
+  }
+  .today-card p{
+    color:#71869a!important;
+  }
+  .today-tft-foot span{
+    color:#647a90!important;
+  }
+
+  /* History helper line and session stats get one last contrast lift. */
+  .history-section-marker p,
+  .profile-history-first .history-session-titleline>small,
+  .profile-history-first .history-session-stats small{
+    color:#71879b!important;
+  }
+
+  .profile-history-first .match-context-line{
+    color:#71879a!important;
+  }
+
+  .profile-history-first .match-history-class-copy small{
+    color:#71869a!important;
+  }
+
+  .profile-history-first .match-value-grid-core small{
+    color:#6f8296!important;
+  }
+}
