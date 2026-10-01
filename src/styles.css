@@ -26249,3 +26249,86 @@ img[src$="chibi-ui-10.png"],
     white-space:normal;
   }
 }
+
+
+/* CHIBI AUTOPSY DEDUP v56 */
+
+/* Overview already owns the big metric cards; Autopsy keeps only comparative evidence. */
+.autopsy-evidence-line,
+.autopsy-above-inline{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-height:34px;
+  margin-top:7px;
+  padding:6px 9px;
+  border:1px solid rgba(96,139,178,.12);
+  border-radius:8px;
+  background:rgba(8,18,29,.58);
+}
+
+.autopsy-evidence-line>span,
+.autopsy-above-inline>span{
+  flex:0 0 auto;
+  color:#74bfe9;
+  font-size:5.5px;
+  font-weight:950;
+  letter-spacing:.7px;
+}
+
+.autopsy-evidence-line>strong{
+  min-width:0;
+  overflow:hidden;
+  color:#9eacbb;
+  font-size:6.4px;
+  font-weight:750;
+  line-height:1.3;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.autopsy-evidence-line em{
+  color:#576c82;
+  font-size:.9em;
+  font-style:normal;
+  font-weight:700;
+}
+
+.autopsy-above-inline{
+  border-color:rgba(103,174,214,.12);
+}
+
+.autopsy-above-inline>strong{
+  flex:0 0 auto;
+  color:#dbe7f1;
+  font-size:10px;
+}
+
+.autopsy-above-inline>small{
+  min-width:0;
+  overflow:hidden;
+  color:#7b8da1;
+  font-size:6.3px;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* Old metric grids are no longer rendered; neutralize legacy spacing if cached markup appears. */
+.autopsy-facts-v2,
+.autopsy-above{
+  margin-top:7px!important;
+}
+
+@media(max-width:760px){
+  .autopsy-evidence-line,
+  .autopsy-above-inline{
+    align-items:flex-start;
+    flex-wrap:wrap;
+    gap:4px 6px;
+  }
+  .autopsy-evidence-line>strong,
+  .autopsy-above-inline>small{
+    flex-basis:100%;
+    white-space:normal;
+  }
+}

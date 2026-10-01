@@ -87,48 +87,29 @@ export default function LobbyAutopsy({target,detail,staticData}:Props){
       </div>
     </details>}
 
-    <div className="autopsy-facts autopsy-facts-v2">
-      <div>
-        <span>Board estimado</span>
-        <strong>{autopsy.benchmarks.yourBoardValue}g</strong>
-        <small>Top 4 {autopsy.benchmarks.top4BoardValue==null?"—":autopsy.benchmarks.top4BoardValue+"g"}</small>
-      </div>
-      <div>
-        <span>Itens</span>
-        <strong>{autopsy.benchmarks.yourItems}</strong>
-        <small>Top 4 {autopsy.benchmarks.top4Items??"—"}</small>
-      </div>
-      <div>
-        <span>Nível</span>
-        <strong>{autopsy.benchmarks.yourLevel}</strong>
-        <small>Top 4 {autopsy.benchmarks.top4Level??"—"}</small>
-      </div>
-      <div>
-        <span>3★</span>
-        <strong>{autopsy.benchmarks.yourThreeStars}</strong>
-        <small>Top 4 {autopsy.benchmarks.top4ThreeStars??"—"}</small>
-      </div>
-      <div>
-        <span>Ouro final</span>
-        <strong>{autopsy.benchmarks.yourGold}g</strong>
-        <small>Lobby {autopsy.benchmarks.lobbyGold??"—"}g</small>
-      </div>
-      <div>
-        <span>Contestadas</span>
-        <strong>{autopsy.contested.length}</strong>
-        <small>{autopsy.contested.filter(row=>row.itemized).length} carry(s) itemizada(s)</small>
-      </div>
+    <div className="autopsy-evidence-line">
+      <span>SNAPSHOT</span>
+      <strong>
+        Board {autopsy.benchmarks.yourBoardValue}g
+        {autopsy.benchmarks.top4BoardValue!=null&&<> <em>vs</em> Top 4 {autopsy.benchmarks.top4BoardValue}g</>}
+        {" · "}Itens {autopsy.benchmarks.yourItems}
+        {autopsy.benchmarks.top4Items!=null&&<> <em>vs</em> {autopsy.benchmarks.top4Items}</>}
+        {" · "}Nv {autopsy.benchmarks.yourLevel}
+        {autopsy.benchmarks.top4Level!=null&&<> <em>vs</em> {autopsy.benchmarks.top4Level}</>}
+        {" · "}{autopsy.benchmarks.yourThreeStars} unidade(s) 3★
+        {" · "}{autopsy.contested.length} contestada(s)
+      </strong>
     </div>
 
-    {autopsy.benchmarks.abovePlacement!=null&&<div className="autopsy-above">
-      <span>QUEM FICOU LOGO ACIMA</span>
-      <div>
-        <article><small>Colocação</small><strong>{autopsy.benchmarks.abovePlacement}º</strong></article>
-        <article><small>Board</small><strong>{autopsy.benchmarks.aboveBoardValue??"—"}g</strong></article>
-        <article><small>Itens</small><strong>{autopsy.benchmarks.aboveItems??"—"}</strong></article>
-        <article><small>Nível</small><strong>{autopsy.benchmarks.aboveLevel??"—"}</strong></article>
-        <article><small>3★</small><strong>{autopsy.benchmarks.aboveThreeStars??"—"}</strong></article>
-      </div>
+    {autopsy.benchmarks.abovePlacement!=null&&<div className="autopsy-above-inline">
+      <span>LOGO ACIMA</span>
+      <strong>{autopsy.benchmarks.abovePlacement}º</strong>
+      <small>
+        {autopsy.benchmarks.aboveBoardValue??"—"}g board
+        {" · "}{autopsy.benchmarks.aboveItems??"—"} itens
+        {" · "}Nv {autopsy.benchmarks.aboveLevel??"—"}
+        {" · "}{autopsy.benchmarks.aboveThreeStars??"—"} 3★
+      </small>
     </div>}
 
     {autopsy.contested.length>0&&<details className="autopsy-more">
