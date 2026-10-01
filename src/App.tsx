@@ -63,6 +63,7 @@ import SiteArtworkBackdrop from "./components/SiteArtworkBackdrop";
 import PointerAura from "./components/PointerAura";
 import SiteHudOverlay from "./components/SiteHudOverlay";
 import AdaptiveArtwork from "./components/AdaptiveArtwork";
+import ArtworkRibbon from "./components/ArtworkRibbon";
 import TeamBuilderPage from "./components/TeamBuilderPage";
 import LeaderboardPage from "./components/LeaderboardPage";
 import ProductInfoPage from "./components/ProductInfoPage";
@@ -1609,6 +1610,8 @@ function App() {
             <div><span>04</span><strong>{t("home.proof.4.title")}</strong><small>{t("home.proof.4.desc")}</small></div>
           </section>
 
+          <ArtworkRibbon images={[10,11,12]} className="home-art-ribbon"/>
+
           <HomeVisualShowcase
             onOpenProfile={()=>document.getElementById("home-riot-id")?.focus()}
             onOpenComps={openComps}
@@ -1721,6 +1724,19 @@ function App() {
             onEvidence={showEvidence}
             onOpenCoach={()=>changeProfileTab("coach")}
             onOpenOverview={()=>changeProfileTab("overview")}
+          />
+
+          <ArtworkRibbon
+            images={
+              profileTab==="matches"
+                ?[11,17,2]
+                :profileTab==="overview"
+                  ?[13,18,6]
+                  :profileTab==="coach"
+                    ?[16,21,8]
+                    :[14,20,9]
+            }
+            className="profile-art-ribbon"
           />
 
           <nav className="profile-tabs simplified-tabs profile-tabs-clean" aria-label={t("profile.tabsAria")}>
