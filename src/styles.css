@@ -21311,3 +21311,261 @@ img[src$="chibi-ui-10.png"],
     padding:8px 24px;
   }
 }
+
+/* CHIBI HUD INTERACTIONS v22 */
+
+/* Pointer aura: supplemental only, native cursor remains intact */
+.pointer-aura,
+.pointer-core{
+  position:fixed;
+  z-index:180;
+  left:0;
+  top:0;
+  pointer-events:none;
+  will-change:transform,width,height,opacity;
+  transition:
+    width .16s ease,
+    height .16s ease,
+    opacity .16s ease,
+    border-color .16s ease,
+    background-color .16s ease,
+    box-shadow .16s ease;
+}
+.pointer-aura{
+  width:32px;
+  height:32px;
+  margin:0;
+  border:1px solid rgba(69,230,223,.38);
+  border-radius:999px;
+  background:rgba(69,230,223,.025);
+  box-shadow:
+    0 0 0 1px rgba(69,230,223,.025) inset,
+    0 0 20px rgba(69,230,223,.10);
+}
+.pointer-core{
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:#69e8e1;
+  box-shadow:0 0 9px rgba(69,230,223,.48);
+}
+.pointer-aura.interactive{
+  width:44px;
+  height:44px;
+  border-color:rgba(151,119,255,.52);
+  background:rgba(151,119,255,.035);
+  box-shadow:0 0 26px rgba(118,95,255,.14);
+}
+.pointer-core.interactive{
+  width:7px;
+  height:7px;
+  background:#a58cff;
+  box-shadow:0 0 12px rgba(158,132,255,.55);
+}
+.pointer-aura.down{
+  width:25px;
+  height:25px;
+  border-color:rgba(244,200,94,.6);
+}
+.pointer-core.down{
+  width:9px;
+  height:9px;
+  background:#f4c85e;
+}
+.pointer-aura.hidden,
+.pointer-core.hidden{
+  opacity:0;
+}
+
+/* Global HUD overlay */
+.site-hud-overlay{
+  position:fixed;
+  z-index:8;
+  inset:64px 0 0;
+  overflow:hidden;
+  pointer-events:none;
+  contain:paint;
+}
+.site-hud-overlay::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  opacity:.7;
+  background:
+    radial-gradient(
+      260px circle at var(--pointer-x,-500px) var(--pointer-y,-500px),
+      rgba(69,230,223,.055),
+      rgba(69,230,223,.018) 35%,
+      transparent 72%
+    );
+}
+.site-hud-texture{
+  position:absolute;
+  inset:0;
+  width:100%!important;
+  height:100%!important;
+  padding:0!important;
+  object-fit:cover!important;
+  object-position:center!important;
+  opacity:.022;
+  filter:saturate(.45) contrast(1.1);
+  mix-blend-mode:screen;
+}
+.site-hud-corner{
+  position:absolute;
+  width:34px;
+  height:34px;
+  opacity:.34;
+}
+.site-hud-corner::before,
+.site-hud-corner::after{
+  content:"";
+  position:absolute;
+  background:linear-gradient(90deg,rgba(69,230,223,.78),rgba(69,230,223,.03));
+}
+.site-hud-corner::before{
+  width:34px;
+  height:1px;
+}
+.site-hud-corner::after{
+  width:1px;
+  height:34px;
+}
+.site-hud-corner-tl{left:18px;top:18px}
+.site-hud-corner-tr{right:18px;top:18px;transform:scaleX(-1)}
+.site-hud-corner-bl{left:18px;bottom:18px;transform:scaleY(-1)}
+.site-hud-corner-br{right:18px;bottom:18px;transform:scale(-1)}
+.site-hud-scanline{
+  position:absolute;
+  left:0;
+  right:0;
+  top:20%;
+  height:1px;
+  opacity:.14;
+  background:linear-gradient(90deg,transparent 3%,rgba(69,230,223,.4) 20%,rgba(155,125,255,.38) 50%,rgba(69,230,223,.34) 80%,transparent 97%);
+  box-shadow:0 0 12px rgba(69,230,223,.12);
+  animation:chibi-hud-scan 10s linear infinite;
+}
+@keyframes chibi-hud-scan{
+  0%{transform:translateY(-12vh);opacity:0}
+  8%{opacity:.13}
+  50%{opacity:.08}
+  92%{opacity:.13}
+  100%{transform:translateY(82vh);opacity:0}
+}
+
+/* Reactivity without replacing each component's own background/pseudo elements */
+.hud-reactive-hover{
+  border-color:rgba(69,230,223,.26)!important;
+  box-shadow:
+    0 16px 38px rgba(0,0,0,.17),
+    0 0 0 1px rgba(69,230,223,.035) inset,
+    0 0 24px rgba(69,230,223,.045)!important;
+}
+.match-row-v2.hud-reactive-hover,
+.comp-decision-card.hud-reactive-hover,
+.statistics-quick-card.hud-reactive-hover,
+.tier-entity.hud-reactive-hover,
+.home-visual-card.hud-reactive-hover,
+.comp-row.hud-reactive-hover,
+.builder-decision-card.hud-reactive-hover{
+  transform:translateY(-2px);
+}
+
+/* Thin technical rails on major surfaces */
+.home-hero-v2,
+.player-summary-shell,
+.comps-hero,
+.statistics-hero,
+.global-meta-hero,
+.builder-hero,
+.leaderboard-hero,
+.overlay-page-hero,
+.match-modal{
+  position:relative;
+}
+.home-hero-v2::after,
+.comps-hero::after,
+.statistics-hero::after,
+.global-meta-hero::after,
+.builder-hero::after,
+.leaderboard-hero::after,
+.overlay-page-hero::after{
+  content:"";
+  position:absolute;
+  z-index:4;
+  left:14px;
+  right:14px;
+  bottom:8px;
+  height:1px;
+  pointer-events:none;
+  opacity:.28;
+  background:linear-gradient(90deg,transparent,rgba(69,230,223,.45) 16%,rgba(69,230,223,.08) 54%,rgba(152,117,255,.30) 84%,transparent);
+}
+
+/* Tiny corner notches via outline, no pseudo collision */
+.panel,
+.match-row-v2,
+.comp-decision-card,
+.statistics-quick-card,
+.comp-row,
+.coach-secondary-panel,
+.coach-strategy-layer,
+.match-detail-layer{
+  outline:1px solid transparent;
+  outline-offset:-1px;
+  transition:
+    transform .16s ease,
+    border-color .16s ease,
+    box-shadow .16s ease,
+    outline-color .16s ease;
+}
+.hud-reactive-hover{
+  outline-color:rgba(69,230,223,.055);
+}
+
+/* Respect accessibility / low-power input */
+@media(pointer:coarse){
+  .pointer-aura,
+  .pointer-core{
+    display:none!important;
+  }
+  .site-hud-overlay::before{
+    display:none;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .pointer-aura,
+  .pointer-core{
+    display:none!important;
+  }
+  .site-hud-scanline{
+    animation:none;
+    opacity:.05;
+  }
+  .hud-reactive-hover{
+    transform:none!important;
+  }
+}
+@media(max-width:760px){
+  .site-hud-overlay{
+    inset:58px 0 0;
+  }
+  .site-hud-texture{
+    opacity:.014;
+  }
+  .site-hud-corner{
+    width:22px;
+    height:22px;
+    opacity:.22;
+  }
+  .site-hud-corner::before{width:22px}
+  .site-hud-corner::after{height:22px}
+  .site-hud-corner-tl{left:9px;top:9px}
+  .site-hud-corner-tr{right:9px;top:9px}
+  .site-hud-corner-bl{left:9px;bottom:9px}
+  .site-hud-corner-br{right:9px;bottom:9px}
+  .site-hud-scanline{
+    opacity:.05;
+  }
+}
