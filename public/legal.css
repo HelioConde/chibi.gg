@@ -31,3 +31,8 @@ code{padding:2px 5px;border-radius:5px;background:#141d29;color:#b6adff}
 .notice p{margin-bottom:0}
 .footer{margin-top:28px;padding-top:18px;border-top:1px solid #20283a;color:#657286;font-size:12px;line-height:1.6}
 @media(max-width:700px){.top{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.hero{padding-top:34px}}
+
+.footer-nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.footer-nav a{padding:7px 9px;border:1px solid #273047;border-radius:7px;color:#a9b3c3;text-decoration:none;font-size:12px;font-weight:850}
+.footer-nav a:hover{border-color:#6c5bd5;background:rgba(117,99,231,.10);color:#e8edf5}
+.footer-meta{color:#657286}
