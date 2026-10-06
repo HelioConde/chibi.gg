@@ -1,6 +1,6 @@
 # Pós-partida do Chibi Native Companion
 
-O Companion chama exclusivamente as Edge Functions públicas já usadas pelo site. A base padrão é `https://pbosggnpdzrirjhuswkj.supabase.co/functions/v1` e pode ser substituída por `CHIBI_API_BASE` em desenvolvimento.
+O Companion chama exclusivamente as Edge Functions públicas já usadas pelo site. A base padrão é `https://bieihhaobdztjyoweewa.supabase.co/functions/v1` e pode ser substituída por `CHIBI_API_BASE` em desenvolvimento.
 
 ## Chamadas
 
