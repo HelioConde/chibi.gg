@@ -1,0 +1,41 @@
+name: Build Chibi Companion Windows
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: companion
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install frontend dependencies
+        run: npm install
+
+      - name: Build Windows companion
+        run: npm run desktop:build
+
+      - name: Upload installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: chibi-companion-windows
+          if-no-files-found: error
+          path: |
+            companion/src-tauri/target/release/bundle/msi/**
+            companion/src-tauri/target/release/bundle/nsis/**
