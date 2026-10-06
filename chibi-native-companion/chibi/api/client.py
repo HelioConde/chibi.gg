@@ -6,7 +6,7 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-DEFAULT_BASE = "https://pbosggnpdzrirjhuswkj.supabase.co/functions/v1"
+DEFAULT_BASE = "https://bieihhaobdztjyoweewa.supabase.co/functions/v1"
 
 class ChibiApiError(RuntimeError):
     def __init__(self, status: int | None, code: str, message: str = "") -> None:
