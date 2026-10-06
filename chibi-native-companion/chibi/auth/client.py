@@ -7,8 +7,8 @@ from urllib.request import Request, urlopen
 
 from chibi.auth.secure_store import AuthSession, SecureTokenStore
 
-SUPABASE_URL = "https://pbosggnpdzrirjhuswkj.supabase.co"
-SUPABASE_PUBLISHABLE_KEY = "sb_publishable_dG9SGAICQ3pCvRxqsfvX-A_Md7NwRI-"
+SUPABASE_URL = "https://bieihhaobdztjyoweewa.supabase.co"
+SUPABASE_PUBLISHABLE_KEY = "sb_publishable_2T2H_S0Lu3qlM42kDUWI9g_3FtYXjUt"
 
 
 class ChibiAuthError(RuntimeError):
