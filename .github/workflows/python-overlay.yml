@@ -1,0 +1,36 @@
+name: Validate Python Overlay
+
+on:
+  push:
+    branches:
+      - main
+      - "feat/**"
+      - "fix/**"
+    paths:
+      - "overlay-python/**"
+      - ".github/workflows/python-overlay.yml"
+  pull_request:
+    paths:
+      - "overlay-python/**"
+      - ".github/workflows/python-overlay.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  python-overlay:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compile Python sources
+        run: python -m compileall -q overlay-python
+
+      - name: Validate example snapshot JSON
+        run: python -m json.tool overlay-python/snapshot.example.json > /dev/null
