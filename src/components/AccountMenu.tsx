@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../supabase";
+import { useI18n } from "../i18n";
 
 type Mode="login"|"signup";
 
@@ -15,6 +16,8 @@ export default function AccountMenu({
   riotTagLine,
   riotProfileIcon,
 }:Props){
+  const { language } = useI18n();
+  const label=(pt:string,en:string)=>language==="en"?en:pt;
   const [session,setSession]=useState<Session|null>(null);
   const rootRef=useRef<HTMLDivElement|null>(null);
   const triggerRef=useRef<HTMLButtonElement|null>(null);
@@ -68,10 +71,10 @@ export default function AccountMenu({
         });
         if(error)throw error;
         if(data.session){
-          setMessage("Conta criada e conectada.");
+          setMessage(label("Conta criada e conectada.","Account created and connected."));
           setOpen(false);
         }else{
-          setMessage("Conta criada. Confirme o e-mail para entrar.");
+          setMessage(label("Conta criada. Confirme o e-mail para entrar.","Account created. Confirm your email to sign in."));
         }
       }else{
         const {error}=await supabase.auth.signInWithPassword({email,password});
@@ -79,7 +82,7 @@ export default function AccountMenu({
         setOpen(false);
       }
     }catch(error){
-      setMessage(error instanceof Error?error.message:"Não foi possível autenticar.");
+      setMessage(error instanceof Error?error.message:label("Não foi possível autenticar.","Could not sign in."));
     }finally{
       setBusy(false);
     }
@@ -96,10 +99,10 @@ export default function AccountMenu({
   }
 
   const hasRiotIdentity=Boolean(riotGameName);
-  const primaryLabel=riotGameName|| (session?"Minha conta":"Entrar");
+  const primaryLabel=riotGameName|| (session?label("Minha conta","My account"):label("Entrar","Sign in"));
   const secondaryLabel=hasRiotIdentity
     ? (riotTagLine?"#"+riotTagLine:"Riot ID")
-    : (session?"Chibi conectado":"Conta Chibi");
+    : (session?label("Chibi conectado","Chibi connected"):label("Conta Chibi","Chibi account"));
 
   return <div className="account-menu" ref={rootRef}>
     <button
@@ -111,7 +114,7 @@ export default function AccountMenu({
       aria-haspopup="dialog"
       title={hasRiotIdentity
         ? "Riot ID: "+riotGameName+(riotTagLine?"#"+riotTagLine:"")
-        : session?"Conta Chibi":"Entrar no Chibi"}
+        : session?label("Conta Chibi","Chibi account"):label("Entrar no Chibi","Sign in to Chibi")}
       type="button"
     >
       <span className="account-menu-avatar" aria-hidden="true">
@@ -130,7 +133,7 @@ export default function AccountMenu({
       className="account-menu-panel"
       id="chibi-account-menu"
       role="dialog"
-      aria-label="Conta Chibi"
+      aria-label={label("Conta Chibi","Chibi account")}
     >
       {hasRiotIdentity&&<div className="account-riot-identity">
         <span className="account-riot-avatar" aria-hidden="true">
@@ -139,20 +142,20 @@ export default function AccountMenu({
             :riotGameName?.slice(0,1).toUpperCase()}
         </span>
         <span>
-          <small>RIOT ID EM USO</small>
+          <small>{label("RIOT ID EM USO","ACTIVE RIOT ID")}</small>
           <strong>{riotGameName}<em>{riotTagLine?"#"+riotTagLine:""}</em></strong>
         </span>
       </div>}
 
       {session?<>
         <div className="account-session-block">
-          <span>CONTA CHIBI</span>
-          <strong>{session.user.email?.split("@")[0]||"Conta conectada"}</strong>
+          <span>{label("CONTA CHIBI","CHIBI ACCOUNT")}</span>
+          <strong>{session.user.email?.split("@")[0]||label("Conta conectada","Connected account")}</strong>
           <small>{session.user.email}</small>
-          <p>Seu Companion pode usar esta conta para enviar partidas gravadas após o jogo.</p>
+          <p>{label("Seu Companion pode usar esta conta para enviar partidas gravadas após o jogo.","Your Companion can use this account to upload recorded matches after the game.")}</p>
         </div>
         <button className="ghost-button account-menu-action" disabled={busy} onClick={logout}>
-          {busy?"Saindo...":"Sair da conta"}
+          {busy?label("Saindo...","Signing out..."):label("Sair da conta","Sign out")}
         </button>
       </>:<>
         <div className="account-auth-tabs">
@@ -160,17 +163,17 @@ export default function AccountMenu({
             className={mode==="login"?"ghost-button active":"ghost-button"}
             onClick={()=>{setMode("login");setMessage("");}}
             type="button"
-          >Entrar</button>
+          >{label("Entrar","Sign in")}</button>
           <button
             className={mode==="signup"?"ghost-button active":"ghost-button"}
             onClick={()=>{setMode("signup");setMessage("");}}
             type="button"
-          >Criar conta</button>
+          >{label("Criar conta","Create account")}</button>
         </div>
 
         <form onSubmit={submit} className="account-auth-form">
           <label>
-            <span>E-mail</span>
+            <span>{label("E-mail","Email")}</span>
             <input
               type="email"
               autoComplete="email"
@@ -180,7 +183,7 @@ export default function AccountMenu({
             />
           </label>
           <label>
-            <span>Senha</span>
+            <span>{label("Senha","Password")}</span>
             <input
               type="password"
               autoComplete={mode==="signup"?"new-password":"current-password"}
@@ -191,7 +194,7 @@ export default function AccountMenu({
             />
           </label>
           <button className="ghost-button account-menu-action" disabled={busy} type="submit">
-            {busy?"Aguarde...":mode==="signup"?"Criar conta":"Entrar"}
+            {busy?label("Aguarde...","Please wait..."):mode==="signup"?label("Criar conta","Create account"):label("Entrar","Sign in")}
           </button>
         </form>
         {message&&<small className="account-auth-message" role="status" aria-live="polite">{message}</small>}
