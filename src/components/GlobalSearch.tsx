@@ -12,6 +12,7 @@ type Props={
   onOpenStats:(category:Category,query:string)=>void;
   onSearchPlayer:(riotId:string)=>void;
   onOpenPage:(page:"meta"|"comps"|"stats"|"builder"|"overlay")=>void;
+  onPrepare:()=>void;
 };
 
 type StaticResult={
@@ -44,6 +45,7 @@ export default function GlobalSearch({
   onOpenStats,
   onSearchPlayer,
   onOpenPage,
+  onPrepare,
 }:Props){
   const { t } = useI18n();
   const [open,setOpen]=useState(false);
@@ -56,6 +58,7 @@ export default function GlobalSearch({
     const onKey=(event:KeyboardEvent)=>{
       if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="k"){
         event.preventDefault();
+        onPrepare();
         setOpen(true);
         requestAnimationFrame(()=>inputRef.current?.focus());
       }
@@ -67,7 +70,7 @@ export default function GlobalSearch({
     };
     window.addEventListener("keydown",onKey);
     return ()=>window.removeEventListener("keydown",onKey);
-  },[open]);
+  },[open,onPrepare]);
 
   const staticRows=useMemo(()=>[
     ...rowsFrom(staticData?.champions,"champions"),
@@ -146,6 +149,7 @@ export default function GlobalSearch({
 
   return <>
     <button ref={triggerRef} type="button" className="global-search-trigger" aria-haspopup="dialog" aria-expanded={open} onClick={()=>{
+      onPrepare();
       setOpen(true);
       requestAnimationFrame(()=>inputRef.current?.focus());
     }}>
