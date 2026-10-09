@@ -49,6 +49,8 @@ export default function GlobalSearch({
   const [open,setOpen]=useState(false);
   const [query,setQuery]=useState("");
   const inputRef=useRef<HTMLInputElement|null>(null);
+  const triggerRef=useRef<HTMLButtonElement|null>(null);
+  const dialogRef=useRef<HTMLElement|null>(null);
 
   useEffect(()=>{
     const onKey=(event:KeyboardEvent)=>{
@@ -57,7 +59,11 @@ export default function GlobalSearch({
         setOpen(true);
         requestAnimationFrame(()=>inputRef.current?.focus());
       }
-      if(event.key==="Escape") setOpen(false);
+      if(event.key==="Escape"){
+        setOpen(false);
+        setQuery("");
+        requestAnimationFrame(()=>triggerRef.current?.focus());
+      }
     };
     window.addEventListener("keydown",onKey);
     return ()=>window.removeEventListener("keydown",onKey);
@@ -95,7 +101,30 @@ export default function GlobalSearch({
   function close(){
     setOpen(false);
     setQuery("");
+    requestAnimationFrame(()=>triggerRef.current?.focus());
   }
+
+  useEffect(()=>{
+    if(!open)return;
+    const handleTab=(event:KeyboardEvent)=>{
+      if(event.key!=="Tab"||!dialogRef.current)return;
+      const candidates=Array.from(dialogRef.current.querySelectorAll<HTMLElement>(
+        "button:not([disabled]),input:not([disabled]),a[href],select:not([disabled])"
+      ));
+      if(!candidates.length)return;
+      const first=candidates[0];
+      const last=candidates[candidates.length-1];
+      if(event.shiftKey&&document.activeElement===first){
+        event.preventDefault();
+        last.focus();
+      }else if(!event.shiftKey&&document.activeElement===last){
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown",handleTab);
+    return ()=>document.removeEventListener("keydown",handleTab);
+  },[open]);
 
   function selectEntity(row:StaticResult){
     onOpenStats(row.category,row.name);
@@ -116,7 +145,7 @@ export default function GlobalSearch({
   }
 
   return <>
-    <button className="global-search-trigger" onClick={()=>{
+    <button ref={triggerRef} type="button" className="global-search-trigger" aria-haspopup="dialog" aria-expanded={open} onClick={()=>{
       setOpen(true);
       requestAnimationFrame(()=>inputRef.current?.focus());
     }}>
@@ -126,7 +155,7 @@ export default function GlobalSearch({
     </button>
 
     {open&&<div className="global-search-backdrop" onClick={close}>
-      <section className="global-search-modal" onClick={event=>event.stopPropagation()}>
+      <section ref={dialogRef} role="dialog" aria-modal="true" aria-label={t("search.trigger")} className="global-search-modal" onClick={event=>event.stopPropagation()}>
         <div className="global-search-input">
           <span>⌕</span>
           <input
@@ -135,8 +164,10 @@ export default function GlobalSearch({
             onChange={event=>setQuery(event.target.value)}
             onKeyDown={event=>{if(event.key==="Enter")submit();}}
             placeholder={t("search.placeholder")}
+            aria-label={t("search.placeholder")}
           />
-          {query&&<button onClick={()=>setQuery("")}>×</button>}
+          {query&&<button type="button" aria-label={t("search.clear")=== "search.clear" ? "Limpar pesquisa" : t("search.clear")} onClick={()=>{setQuery("");inputRef.current?.focus();}}>×</button>}
+          <button type="button" className="global-search-close" aria-label="Fechar pesquisa" onClick={close}>Fechar</button>
         </div>
 
         {!query&&<div className="global-search-pages">
