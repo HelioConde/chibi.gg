@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   fetchTftComps,
   fetchTftStats,
@@ -66,8 +66,30 @@ export default function HomeMetaPreview({
   const [comps,setComps]=useState<TftGlobalComps|null>(null);
   const [loadState,setLoadState]=useState<"loading"|"ready"|"error">("loading");
   const [reloadKey,setReloadKey]=useState(0);
+  const containerRef=useRef<HTMLElement|null>(null);
+  const [visible,setVisible]=useState(false);
+
+  // Data below the hero should not compete for bandwidth with the initial paint.
+  useEffect(()=>{
+    if(visible)return;
+    const node=containerRef.current;
+    if(!node)return;
+    if(typeof IntersectionObserver==="undefined"){
+      setVisible(true);
+      return;
+    }
+    const observer=new IntersectionObserver(entries=>{
+      if(entries.some(entry=>entry.isIntersecting)){
+        setVisible(true);
+        observer.disconnect();
+      }
+    },{rootMargin:"700px 0px"});
+    observer.observe(node);
+    return ()=>observer.disconnect();
+  },[visible]);
 
   useEffect(()=>{
+    if(!visible)return;
     let cancelled=false;
     setLoadState("loading");
     Promise.allSettled([
@@ -85,12 +107,12 @@ export default function HomeMetaPreview({
       );
     });
     return ()=>{cancelled=true;};
-  },[reloadKey]);
+  },[reloadKey,visible]);
 
   const topTraits=stats?.traits.slice(0,3)||[];
   const topComps=comps?.comps.slice(0,3)||[];
 
-  return <section className="home-meta-preview home-meta-preview-v2">
+  return <section ref={containerRef} className="home-meta-preview home-meta-preview-v2">
     <div className="home-meta-intro-v2">
       <div className="home-meta-titleblock">
         <div className="home-meta-kickerline">
