@@ -535,3 +535,18 @@
     min-height: 48px !important;
   }
 }
+
+
+/* Legitimately empty Riot statistics must not look like infinite loading. */
+.app-shell .home-meta-empty {
+  display: flex;
+  align-items: center;
+  min-height: 100px;
+  padding: 18px;
+  border: 1px dashed rgba(165, 204, 218, .3);
+  border-radius: 12px;
+  color: #c5d8e5;
+  background: rgba(14, 34, 48, .35);
+  font-size: 13px;
+  line-height: 1.6;
+}
