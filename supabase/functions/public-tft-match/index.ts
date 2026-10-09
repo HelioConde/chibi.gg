@@ -98,4 +98,11 @@ Deno.serve(async (req) => {
       cache: cacheState,
     },
   });
+  }catch(error){
+    console.error("[public-tft-match] unhandled", error instanceof Error?error.name:"unknown");
+    return json({
+      error:"match_unexpected_error",
+      message:"Não foi possível abrir esta partida. Tente novamente em instantes.",
+    },502);
+  }
 });
