@@ -329,3 +329,15 @@
     border-color: #9db7cb !important;
   }
 }
+
+/* Follow-up measured WCAG issues in the Builder planning/curve widgets. */
+.app-shell .builder-slot-state > span,
+.app-shell .builder-plan-card > span,
+.app-shell .builder-plan-card > small,
+.app-shell .builder-cost-curve > b > em,
+.app-shell .builder-cost-curve > b > strong {
+  color: #c5d8e5 !important;
+  opacity: 1 !important;
+  font-size: max(11px,.6875rem) !important;
+  line-height: 1.45 !important;
+}
