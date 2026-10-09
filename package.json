@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "predev": "node scripts/optimize-images.mjs",
-    "prebuild": "node scripts/optimize-images.mjs"
+    "prebuild": "node scripts/optimize-images.mjs",
+    "postbuild": "node scripts/prune-dist-artwork.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
