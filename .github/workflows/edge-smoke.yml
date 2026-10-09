@@ -1,0 +1,32 @@
+name: Riot Edge Production Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "supabase/functions/**"
+      - "src/api/tft.ts"
+      - "scripts/check-tft-edge.mjs"
+      - ".github/workflows/edge-smoke.yml"
+  schedule:
+    - cron: "15 11 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: edge-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  production-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate deployed public Riot endpoints
+        run: node scripts/check-tft-edge.mjs
