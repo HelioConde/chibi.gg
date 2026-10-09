@@ -28,6 +28,9 @@ Deno.serve(async (req) => {
   const start = Math.max(0, Math.min(100, num(body?.start)));
   const count = Math.max(1, Math.min(20, num(body?.count) || 10));
 
+  if (gameName.length > 64 || tagLine.length > 16) {
+    return json({ error: "invalid_riot_id", message: "Riot ID acima do limite permitido." }, 400);
+  }
   if (!gameName || !tagLine) {
     return json({ error: "riot_id_required", message: "Use o formato Nome#TAG." }, 400);
   }
@@ -50,11 +53,20 @@ Deno.serve(async (req) => {
   const regionalBase = "https://" + region + ".api.riotgames.com";
   const headers = riotHeaders(riotApiKey);
 
-  const idsRes = await fetch(
-    regionalBase + "/tft/match/v1/matches/by-puuid/" + encodeURIComponent(puuid) +
-      "/ids?start=" + start + "&count=" + count,
-    { headers, signal: AbortSignal.timeout(8000) },
-  );
+  let idsRes: Response;
+  try {
+    idsRes = await fetch(
+      regionalBase + "/tft/match/v1/matches/by-puuid/" + encodeURIComponent(puuid) +
+        "/ids?start=" + start + "&count=" + count,
+      { headers, signal: AbortSignal.timeout(8000) },
+    );
+  } catch (error) {
+    console.error("[public-tft-history] Riot match id lookup unavailable", error instanceof Error ? error.name : "unknown");
+    return json({
+      error: "riot_unreachable",
+      message: "A Riot demorou a responder. Tente carregar o histórico novamente em instantes.",
+    }, 502);
+  }
 
   if (!idsRes.ok) {
     if (idsRes.status === 429) return json({ error: "rate_limited", message: "Limite da Riot atingido. Tente novamente em instantes." }, 429);
