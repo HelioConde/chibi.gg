@@ -281,6 +281,7 @@ Deno.serve(async(req)=>{
         summoner:!summonerRes?.ok,
         ranked:!leagueRes?.ok,
         history:!idsRes?.ok,
+        matchDetails:detailResult.failed>0,
       },
       source:{
         account:"account-v1",
@@ -291,6 +292,8 @@ Deno.serve(async(req)=>{
         cache:{
           hits:detailResult.cacheHits,
           fetched:detailResult.fetched,
+          failed:detailResult.failed,
+          rateLimited:detailResult.rateLimited,
         },
       },
     });
