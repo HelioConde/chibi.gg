@@ -22,7 +22,14 @@ class TFTChampionResolver:
     # Observed checkpoint alias: this historical key is emitted as a unit id by
     # the client in some matches although current static data also contains an
     # item with the same identifier. Keep that exceptional evidence centralized.
-    _CHAMPION_ALIASES = {"DA_SteadfastHeart": ("DA_18_Leona", "Leona")}
+    # Stable checkpoint IDs seen in the tracker fixtures. These resolve even when
+    # a fresh installation has not downloaded the optional Data Dragon cache.
+    # Unknown IDs remain unresolved rather than being guessed from their suffix.
+    _CHAMPION_ALIASES = {
+        "DA_SteadfastHeart": ("DA_18_Leona", "Leona"),
+        "DA_18_Cassiopeia": ("DA_18_Cassiopeia", "Cassiopeia"),
+        "DA_18_Varus": ("DA_18_Varus", "Varus"),
+    }
 
     def __init__(self, assets: TftAssets | None = None) -> None:
         self.assets = (assets or TftAssets()).load_cache()
