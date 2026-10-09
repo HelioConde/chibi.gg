@@ -2058,6 +2058,11 @@ function App() {
             <span>{error}</span>
             {hasMore&&<button type="button" disabled={loadingMore} onClick={()=>void loadMore()}>Tentar novamente</button>}
           </div>}
+          {profile.partial?.matchDetails&&<div className="profile-data-warning" role="status">
+            <span>{locale.startsWith("en")
+              ?"Some Riot match details could not be loaded right now. The available results remain usable; you can refresh later."
+              :"Algumas partidas não puderam ser carregadas pela Riot agora. Os resultados disponíveis continuam acessíveis; atualize mais tarde."}</span>
+          </div>}
 
           <ChibiToday
             playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
