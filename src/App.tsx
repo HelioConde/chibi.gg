@@ -75,7 +75,7 @@ import ProductInfoPage from "./components/ProductInfoPage";
 import RiotServiceStatus from "./components/RiotServiceStatus";
 import RiotDataBar from "./components/RiotDataBar";
 
-import AccountMenu from "./components/AccountMenu";
+import AccountMenu from "./components/DeferredAccountMenu";
 import { SITE_IMAGES } from "./siteAssets";
 import { LanguageSwitcher, useI18n } from "./i18n";
 import { DEMO_PROFILE, demoMatchDetail, isDemoMatchId } from "./demoProfile";
