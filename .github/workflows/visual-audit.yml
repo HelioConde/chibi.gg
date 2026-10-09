@@ -8,6 +8,8 @@ on:
       - "public/**"
       - "index.html"
       - "package.json"
+      - "vite.config.ts"
+      - "scripts/**"
       - "playwright.config.cjs"
       - "tests/e2e/**"
       - ".github/workflows/visual-audit.yml"
@@ -25,7 +27,7 @@ concurrency:
 jobs:
   visual-audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -34,7 +36,7 @@ jobs:
       - name: Install project and browser test runner
         run: |
           npm install
-          npm install --no-save @playwright/test@1.56.1
+          npm install --no-save @playwright/test@1.56.1 @axe-core/playwright@4.10.2 lighthouse@12.8.2
           npx playwright install --with-deps chromium
       - name: Typecheck and build
         run: |
@@ -42,6 +44,16 @@ jobs:
           npm run build
       - name: Capture desktop and mobile screenshots
         run: npx playwright test --config=playwright.config.cjs
+      - name: Measure mobile Lighthouse on built site
+        shell: bash
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4179 --strictPort > /tmp/chibi-preview.log 2>&1 &
+          for i in {1..25}; do
+            curl -fsS http://127.0.0.1:4179/chibi.gg/ > /dev/null && break || sleep 2
+          done
+          export CHROME_PATH="$(node -e 'process.stdout.write(require("playwright").chromium.executablePath())')"
+          npx lighthouse http://127.0.0.1:4179/chibi.gg/ --only-categories=performance,accessibility,best-practices,seo --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --output=json --output-path=visual-audit/lighthouse-mobile.json --quiet
+          node -e 'const l=require("./visual-audit/lighthouse-mobile.json");console.log("LIGHTHOUSE MOBILE",Object.fromEntries(Object.entries(l.categories).map(([key,val])=>[key,Math.round(val.score*100)])),"LCP",l.audits["largest-contentful-paint"].displayValue,"CLS",l.audits["cumulative-layout-shift"].displayValue)'
       - name: Upload screenshots and failure evidence
         if: always()
         uses: actions/upload-artifact@v4
