@@ -41,6 +41,26 @@ async function worker() {
   }
 }
 await Promise.all(Array.from({ length: 4 }, () => worker()));
+// Thumbnail-only assets prevent multi-megabyte source icons competing with the LCP headline.
+async function writeThumb(source, target, width, format="webp") {
+  const data = sharp(source, { limitInputPixels: 100_000_000 }).resize(width, width, {
+    fit: "contain",
+    withoutEnlargement: true,
+  });
+  if (format === "png") await data.png({ compressionLevel: 9 }).toFile(target);
+  else await data.webp({ quality: 84, effort: 4, alphaQuality: 90 }).toFile(target);
+}
+const brand = join(root, "output-v2", "icon", "element_001.png");
+await writeThumb(brand, join(root, "output-v2", "icon", "brand-96.webp"), 96);
+await writeThumb(brand, new URL("../public/favicon-64.png", import.meta.url).pathname, 64, "png");
+await writeThumb(brand, new URL("../public/apple-touch-icon.png", import.meta.url).pathname, 180, "png");
+await writeThumb(join(root,"icon.png"), join(root,"icon-small.webp"), 96);
+for (let i=1;i<=11;i++) {
+  const file="element_"+String(i).padStart(3,"0");
+  const base=join(root,"output-v2","icons");
+  await writeThumb(join(base,file+".png"),join(base,file+"-small.webp"),64);
+}
+
 if (failures.length) {
   for (const failure of failures.slice(0, 12)) console.error("WebP conversion failed", failure);
   process.exitCode = 1;
