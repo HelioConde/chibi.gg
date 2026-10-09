@@ -30,7 +30,15 @@ export async function resolveRiotAccount(
     "https://" + region + ".api.riotgames.com/riot/account/v1/accounts/by-riot-id/" +
     encodeURIComponent(gameName) + "/" + encodeURIComponent(tagLine);
 
-  const response = await fetch(url, { headers: riotHeaders(apiKey) });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      headers: riotHeaders(apiKey),
+      signal: AbortSignal.timeout(8000),
+    });
+  } catch {
+    return { ok: false as const, status: 502, account: null, region };
+  }
   if (!response.ok) {
     return { ok: false as const, status: response.status, account: null, region };
   }
