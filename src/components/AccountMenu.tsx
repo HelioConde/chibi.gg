@@ -30,6 +30,12 @@ export default function AccountMenu({
   const [busy,setBusy]=useState(false);
   const [message,setMessage]=useState("");
 
+  // The account module may finish loading after the user requested it.
+  // Reconcile that request instead of losing the click during lazy mounting.
+  useEffect(()=>{
+    if(initiallyOpen)setOpen(true);
+  },[initiallyOpen]);
+
   useEffect(()=>{
     void supabase.auth.getSession().then(({data})=>setSession(data.session));
     const {data}=supabase.auth.onAuthStateChange((_event,next)=>setSession(next));
