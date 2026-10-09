@@ -634,6 +634,21 @@ function App() {
     if(sitePage!=="main"||profile)ensureStaticData();
   },[sitePage,profile,ensureStaticData]);
 
+  const [fullStylesReady,setFullStylesReady]=useState(false);
+  const [fullStylesError,setFullStylesError]=useState(false);
+  const needsFullStyles=sitePage!=="main"||Boolean(profile);
+
+  useEffect(()=>{
+    if(!needsFullStyles||fullStylesReady)return;
+    let active=true;
+    void import("./advancedStyles").then(()=>{
+      if(active){setFullStylesReady(true);setFullStylesError(false);}
+    }).catch(()=>{
+      if(active)setFullStylesError(true);
+    });
+    return ()=>{active=false;};
+  },[needsFullStyles,fullStylesReady]);
+
   useEffect(()=>{
     try{localStorage.setItem("chibi.history.density",historyDensity);}catch{}
   },[historyDensity]);
@@ -1565,7 +1580,13 @@ function App() {
         <PointerAura/>
       </>}
 
-      <Suspense fallback={<main className="page-load-fallback" role="status" aria-live="polite">{t("home.loading.title")}</main>}>
+      {needsFullStyles&&!fullStylesReady
+        ?<main className="page-load-fallback" role="status" aria-live="polite">
+          {fullStylesError
+            ?<button type="button" onClick={()=>window.location.reload()}>Falha ao carregar os estilos. Atualizar página</button>
+            :t("home.loading.title")}
+        </main>
+        :<Suspense fallback={<main className="page-load-fallback" role="status" aria-live="polite">{t("home.loading.title")}</main>}>
       {sitePage==="about"||sitePage==="privacy"||sitePage==="terms" ? (
         <ProductInfoPage
           page={sitePage}
@@ -2886,7 +2907,7 @@ function App() {
           </section>
         </div>
       )}
-      </Suspense>
+      </Suspense>}
     </div>
   );
 }
