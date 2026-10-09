@@ -360,3 +360,18 @@
   font-size: max(11px,.6875rem) !important;
   line-height: 1.5 !important;
 }
+
+
+/* WCAG contrast policy for all Builder supporting copy. Old V2--V8 layers
+   used 6--8px text and low contrast; source facts must stay readable. */
+.app-shell .builder-page :is(small, p),
+.app-shell .builder-context-overlap :is(span,small),
+.app-shell .builder-augment-selected .builder-subhead :is(span,small),
+.app-shell .builder-augment-history .builder-subhead :is(span,small),
+.app-shell .builder-augment-history .builder-empty-check,
+.app-shell .builder-page .empty :is(span,small,p) {
+  color: #c9dce8 !important;
+  opacity: 1 !important;
+  font-size: max(11px,.6875rem) !important;
+  line-height: 1.5 !important;
+}
