@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { TftMatch } from "../api/tft";
 import { answerChibiQuestion, AskChibiAnswer } from "../analysis/askChibi";
 
@@ -41,6 +41,8 @@ const QUICK_QUESTIONS=[
 
 export default function AskChibi({playerName,playerKey,matches,onEvidence}:Props){
   const [open,setOpen]=useState(false);
+  const inputRef=useRef<HTMLInputElement|null>(null);
+  const fabRef=useRef<HTMLButtonElement|null>(null);
   const [input,setInput]=useState("");
   const [counter,setCounter]=useState(1);
   const [items,setItems]=useState<ChatItem[]>([]);
@@ -57,9 +59,13 @@ export default function AskChibi({playerName,playerKey,matches,onEvidence}:Props
   },[]);
 
   useEffect(()=>{
-    if(!open) return;
+    if(!open)return;
+    inputRef.current?.focus();
     const onKey=(event:KeyboardEvent)=>{
-      if(event.key==="Escape") setOpen(false);
+      if(event.key==="Escape"){
+        setOpen(false);
+        fabRef.current?.focus();
+      }
     };
     window.addEventListener("keydown",onKey);
     return ()=>window.removeEventListener("keydown",onKey);
@@ -102,6 +108,9 @@ export default function AskChibi({playerName,playerKey,matches,onEvidence}:Props
 
   return <>
     <button
+      ref={fabRef}
+      aria-expanded={open}
+      aria-controls="chibi-ask-drawer"
       className={"ask-chibi-fab "+(open?"open":"")}
       onClick={()=>setOpen(value=>!value)}
       aria-label={open?"Fechar Ask Chibi":"Abrir Ask Chibi"}
@@ -115,7 +124,7 @@ export default function AskChibi({playerName,playerKey,matches,onEvidence}:Props
 
     {open&&<div className="ask-chibi-backdrop" onClick={()=>setOpen(false)}/>}
 
-    <aside className={"ask-chibi-drawer "+(open?"open":"")} aria-hidden={!open}>
+    <aside id="chibi-ask-drawer" className={"ask-chibi-drawer "+(open?"open":"")} aria-hidden={!open} inert={!open} role="dialog" aria-modal={open} aria-label="Ask Chibi">
       <header className="ask-chibi-head">
         <div>
           <span>ASK CHIBI</span>
@@ -193,6 +202,7 @@ export default function AskChibi({playerName,playerKey,matches,onEvidence}:Props
 
       <form className="ask-chibi-input" onSubmit={submit}>
         <input
+          ref={inputRef}
           value={input}
           onChange={event=>setInput(event.target.value.slice(0,180))}
           placeholder="Ex.: por que estou terminando em 5º?"
