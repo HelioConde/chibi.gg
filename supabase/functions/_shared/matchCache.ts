@@ -108,20 +108,33 @@ export async function getOrFetchMatches(
   const cache=await readCachedMatches(matchIds);
   const missing=matchIds.filter(id=>!cache.has(id));
 
-  const fetchedRaw=await Promise.all(
-    missing.map(async(matchId)=>{
+  // Developer Riot keys have strict request budgets. A burst of 20 calls at
+  // once can exhaust the shared quota even if the initial account lookup worked.
+  // Keep the input order stable while limiting active upstream lookups to four.
+  const MAX_PARALLEL_RIOT_MATCHES=4;
+  const fetchedRaw:Array<any|null>=new Array(missing.length).fill(null);
+  let cursor=0;
+  let rateLimited=false;
+  const workers=Array.from({length:Math.min(MAX_PARALLEL_RIOT_MATCHES,missing.length)},async()=>{
+    while(!rateLimited){
+      const index=cursor++;
+      if(index>=missing.length)return;
       try{
         const response=await fetch(
-          regionalBase+"/tft/match/v1/matches/"+encodeURIComponent(matchId),
+          regionalBase+"/tft/match/v1/matches/"+encodeURIComponent(missing[index]),
           {headers,signal:AbortSignal.timeout(8000)},
         );
-        if(!response.ok)return null;
-        return await response.json();
+        if(response.status===429){
+          rateLimited=true;
+          return;
+        }
+        if(response.ok)fetchedRaw[index]=await response.json();
       }catch{
-        return null;
+        // A missing detail cannot stop already cached history from rendering.
       }
-    }),
-  );
+    }
+  });
+  await Promise.all(workers);
 
   const freshRaw=fetchedRaw.filter(Boolean);
   if(freshRaw.length)await writeCachedMatches(freshRaw,region);
@@ -139,5 +152,7 @@ export async function getOrFetchMatches(
     rawFetched:freshRaw,
     cacheHits:matchIds.filter(id=>cache.has(id)).length,
     fetched:freshRaw.length,
+    failed:missing.length-freshRaw.length,
+    rateLimited,
   };
 }
