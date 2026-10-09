@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../supabase";
 
@@ -16,6 +16,8 @@ export default function AccountMenu({
   riotProfileIcon,
 }:Props){
   const [session,setSession]=useState<Session|null>(null);
+  const rootRef=useRef<HTMLDivElement|null>(null);
+  const triggerRef=useRef<HTMLButtonElement|null>(null);
   const [open,setOpen]=useState(false);
   const [mode,setMode]=useState<Mode>("login");
   const [email,setEmail]=useState("");
@@ -28,6 +30,27 @@ export default function AccountMenu({
     const {data}=supabase.auth.onAuthStateChange((_event,next)=>setSession(next));
     return ()=>data.subscription.unsubscribe();
   },[]);
+
+  useEffect(()=>{
+    if(!open)return;
+    const onKey=(event:KeyboardEvent)=>{
+      if(event.key!=="Escape")return;
+      event.stopPropagation();
+      setOpen(false);
+      triggerRef.current?.focus();
+    };
+    const onPointerDown=(event:PointerEvent)=>{
+      if(event.target instanceof Node&&!rootRef.current?.contains(event.target)){
+        setOpen(false);
+      }
+    };
+    document.addEventListener("keydown",onKey);
+    document.addEventListener("pointerdown",onPointerDown);
+    return ()=>{
+      document.removeEventListener("keydown",onKey);
+      document.removeEventListener("pointerdown",onPointerDown);
+    };
+  },[open]);
 
   async function submit(event:FormEvent){
     event.preventDefault();
@@ -78,11 +101,14 @@ export default function AccountMenu({
     ? (riotTagLine?"#"+riotTagLine:"Riot ID")
     : (session?"Chibi conectado":"Conta Chibi");
 
-  return <div className="account-menu">
+  return <div className="account-menu" ref={rootRef}>
     <button
+      ref={triggerRef}
       className={"account-menu-trigger"+(hasRiotIdentity?" has-riot-id":"")}
       onClick={()=>setOpen(value=>!value)}
       aria-expanded={open}
+      aria-controls="chibi-account-menu"
+      aria-haspopup="dialog"
       title={hasRiotIdentity
         ? "Riot ID: "+riotGameName+(riotTagLine?"#"+riotTagLine:"")
         : session?"Conta Chibi":"Entrar no Chibi"}
@@ -102,6 +128,7 @@ export default function AccountMenu({
 
     {open&&<div
       className="account-menu-panel"
+      id="chibi-account-menu"
       role="dialog"
       aria-label="Conta Chibi"
     >
@@ -167,7 +194,7 @@ export default function AccountMenu({
             {busy?"Aguarde...":mode==="signup"?"Criar conta":"Entrar"}
           </button>
         </form>
-        {message&&<small className="account-auth-message">{message}</small>}
+        {message&&<small className="account-auth-message" role="status" aria-live="polite">{message}</small>}
       </>}
     </div>}
   </div>;
