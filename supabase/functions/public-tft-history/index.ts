@@ -130,4 +130,11 @@ Deno.serve(async (req) => {
       cache: { hits: detailResult.cacheHits, fetched: detailResult.fetched },
     },
   });
+  }catch(error){
+    console.error("[public-tft-history] unhandled", error instanceof Error?error.name:"unknown");
+    return json({
+      error:"history_unexpected_error",
+      message:"Não foi possível carregar o histórico. Tente novamente em instantes.",
+    },502);
+  }
 });
