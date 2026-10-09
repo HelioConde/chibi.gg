@@ -192,6 +192,10 @@ test("public TFT meta uses authorized lightweight requests when scrolled into vi
 
 test("account menu is accessible and usable even when its SDK is deferred",async ({page})=>{
   await page.goto("/",{waitUntil:"domcontentloaded"});
+  if(test.info().project.name==="mobile-chromium"){
+    await page.getByRole("button",{name:"Abrir navegação"}).click();
+    await expect(page.locator(".mobile-nav-account")).toBeVisible();
+  }
   const trigger=page.locator(".account-menu-trigger");
   await expect(trigger).toBeVisible();
   await trigger.click();
