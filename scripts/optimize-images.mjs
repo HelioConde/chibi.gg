@@ -1,8 +1,9 @@
-import { readdir, stat, mkdir } from "node:fs/promises";
+import { readdir, stat } from "node:fs/promises";
 import { join, extname } from "node:path";
+import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
-const root = new URL("../public/img/", import.meta.url).pathname;
+const root = fileURLToPath(new URL("../public/img/", import.meta.url));
 const pngs = [];
 
 async function discover(dir) {
@@ -28,7 +29,6 @@ async function worker() {
         skipped++;
         continue;
       }
-      await mkdir(new URL(".", "file://" + output).pathname, { recursive: true });
       const result = await sharp(path, { limitInputPixels: 100_000_000 })
         .webp({ quality: 82, effort: 4, alphaQuality: 90 })
         .toFile(output);
