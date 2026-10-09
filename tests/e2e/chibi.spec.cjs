@@ -400,3 +400,66 @@ test("Riot pagination advances by upstream IDs when some match details are missi
   expect(starts).toEqual([20,40]);
   await expect(more).toHaveCount(0);
 });
+
+
+test("late Riot profile response cannot replace an opened demo",async ({page})=>{
+  let releaseProfile=()=>{};
+  let markRequest=()=>{};
+  const requestStarted=new Promise(resolve=>{markRequest=resolve;});
+  await page.route("**/functions/v1/public-tft-profile",async route=>{
+    if(route.request().method()==="OPTIONS"){
+      return route.fulfill({status:200,headers:{
+        "access-control-allow-origin":"*",
+        "access-control-allow-headers":"authorization, apikey, content-type",
+        "access-control-allow-methods":"POST, OPTIONS",
+      }});
+    }
+    markRequest();
+    await new Promise(resolve=>{releaseProfile=resolve;});
+    return route.fulfill({
+      status:200,
+      headers:{"access-control-allow-origin":"*","content-type":"application/json"},
+      body:JSON.stringify({
+        player:{gameName:"StalePlayer",tagLine:"TEST",platform:"BR1",level:10,profileIconId:0},
+        ranked:[],summary:{matches:0,averagePlacement:null,top4Rate:0,winRate:0,firsts:0,eighths:0},
+        matches:[],paging:{start:0,count:20,requested:0,returned:0},
+      }),
+    });
+  });
+  await page.goto("/?player=StalePlayer&tag=TEST&region=br1",{waitUntil:"domcontentloaded"});
+  await requestStarted;
+  await page.locator(".home-review-demo-button").click();
+  await expect(page).toHaveURL(/demo=review/);
+  await expect(page.locator(".profile-page")).toBeVisible({timeout:15000});
+  releaseProfile();
+  await page.waitForTimeout(450);
+  await expect(page).toHaveURL(/demo=review/);
+  await expect(page.locator(".profile-page")).toBeVisible();
+});
+
+test("empty Riot meta responses replace all skeletons with an informative state",async ({page})=>{
+  const headers={
+    "access-control-allow-origin":"*",
+    "access-control-allow-headers":"authorization, apikey, content-type",
+    "access-control-allow-methods":"POST, OPTIONS",
+    "content-type":"application/json",
+  };
+  for(const endpoint of ["public-tft-comps","public-tft-stats"]){
+    await page.route("**/functions/v1/"+endpoint,route=>{
+      if(route.request().method()==="OPTIONS"){
+        return route.fulfill({status:200,headers});
+      }
+      return route.fulfill({
+        status:200,
+        headers,
+        body:JSON.stringify(endpoint==="public-tft-comps"
+          ?{context:{setNumber:18,queueId:1100,minGames:4},sampleParticipants:0,comps:[]}
+          :{context:{setNumber:18,queueId:1100,minGames:4},sampleParticipants:0,traits:[],champions:[],items:[]}),
+      });
+    });
+  }
+  await page.goto("/",{waitUntil:"domcontentloaded"});
+  await page.locator(".home-meta-preview").scrollIntoViewIfNeeded();
+  await expect(page.locator(".home-meta-empty")).toHaveCount(2,{timeout:15000});
+  await expect(page.locator(".home-meta-skeleton-list")).toHaveCount(0);
+});
