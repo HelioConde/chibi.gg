@@ -59,7 +59,7 @@ export default function GlobalSearch({
         setOpen(true);
         requestAnimationFrame(()=>inputRef.current?.focus());
       }
-      if(event.key==="Escape"){
+      if(event.key==="Escape"&&open){
         setOpen(false);
         setQuery("");
         requestAnimationFrame(()=>triggerRef.current?.focus());
@@ -67,7 +67,7 @@ export default function GlobalSearch({
     };
     window.addEventListener("keydown",onKey);
     return ()=>window.removeEventListener("keydown",onKey);
-  },[]);
+  },[open]);
 
   const staticRows=useMemo(()=>[
     ...rowsFrom(staticData?.champions,"champions"),
