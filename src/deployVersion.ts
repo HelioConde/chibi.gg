@@ -93,7 +93,8 @@ export function startDeployWatcher(){
     if(!document.hidden)void checkForDeploy();
   };
 
-  window.setTimeout(()=>{ void checkForDeploy(); },2500);
+  // Version polling should not compete with the first meaningful paint.
+  window.setTimeout(()=>{ void checkForDeploy(); },8000);
   timer=window.setInterval(()=>{ void checkForDeploy(); },CHECK_INTERVAL_MS);
 
   window.addEventListener("focus",onFocus);
