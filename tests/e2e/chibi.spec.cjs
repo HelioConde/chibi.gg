@@ -493,3 +493,32 @@ test("partial Riot profile has a readable warning instead of silently hiding mis
   await expect(page.locator(".profile-data-warning")).toBeVisible();
   await expect(page.locator(".profile-data-warning")).toContainText(/Algumas partidas|Some Riot match details/);
 });
+
+
+test("match-review X is always visible and closes the modal even after scrolling",async ({page})=>{
+  await page.goto("/?demo=review",{waitUntil:"domcontentloaded"});
+  await expect(page.locator(".profile-page")).toBeVisible({timeout:20000});
+  const open=page.locator(".match-meta-open-analysis").first();
+  await expect(open).toBeVisible({timeout:15000});
+  await open.click();
+  const overlay=page.locator(".match-overlay");
+  const close=overlay.getByRole("button",{name:"Fechar revisão da partida"});
+  const modal=overlay.locator(".match-modal");
+  await expect(overlay).toBeVisible();
+  await expect(close).toBeVisible();
+  const before=await close.boundingBox();
+  expect(before).not.toBeNull();
+  await modal.evaluate(el=>{el.scrollTop=Math.min(950,el.scrollHeight-el.clientHeight);});
+  await page.waitForTimeout(150);
+  const after=await close.boundingBox();
+  expect(after).not.toBeNull();
+  const viewport=page.viewportSize();
+  expect(after.x).toBeGreaterThanOrEqual(0);
+  expect(after.y).toBeGreaterThanOrEqual(0);
+  expect(after.y+after.height).toBeLessThan(viewport.height);
+  expect(after.x+after.width).toBeLessThan(viewport.width);
+  expect(Math.abs(after.y-before.y)).toBeLessThan(3);
+  await page.screenshot({path:`visual-audit/${test.info().project.name}-review-close-visible.png`,animations:"disabled"});
+  await close.click();
+  await expect(overlay).toHaveCount(0);
+});
