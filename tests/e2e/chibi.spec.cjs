@@ -162,3 +162,42 @@ test("optimized favicon and navigation art fit actual display sizes", async ({re
     expect(bytes.length,asset+" empty").toBeGreaterThan(200);
   }
 });
+
+
+test("public TFT meta uses authorized lightweight requests when scrolled into view",async ({page})=>{
+  const requests=[];
+  await page.route("**/functions/v1/public-tft-**",async route=>{
+    const req=route.request();
+    if(req.url().includes("public-tft-comps")||req.url().includes("public-tft-stats")){
+      requests.push({url:req.url(),headers:req.headers()});
+      const stats=req.url().includes("public-tft-stats");
+      return route.fulfill({
+        status:200,
+        contentType:"application/json",
+        body:JSON.stringify(stats
+          ?{context:{setNumber:18,queueId:1100,minGames:4},sampleParticipants:0,champions:[],traits:[],items:[]}
+          :{context:{setNumber:18,queueId:1100,minGames:4},sampleParticipants:0,comps:[]}),
+      });
+    }
+    return route.continue();
+  });
+  await page.goto("/",{waitUntil:"domcontentloaded"});
+  await page.locator(".home-meta-preview").scrollIntoViewIfNeeded();
+  await expect.poll(()=>requests.length,{timeout:15000}).toBeGreaterThanOrEqual(2);
+  for(const entry of requests){
+    expect(entry.headers["apikey"]).toMatch(/^sb_publishable_/);
+    expect(entry.headers["authorization"]).toContain("Bearer sb_publishable_");
+  }
+});
+
+test("account menu is accessible and usable even when its SDK is deferred",async ({page})=>{
+  await page.goto("/",{waitUntil:"domcontentloaded"});
+  const trigger=page.locator(".account-menu-trigger");
+  await expect(trigger).toBeVisible();
+  await trigger.click();
+  const panel=page.locator(".account-menu-panel");
+  await expect(panel).toBeVisible({timeout:20000});
+  await expect(panel).toHaveAttribute("role","dialog");
+  await page.keyboard.press("Escape");
+  await expect(panel).toHaveCount(0);
+});
