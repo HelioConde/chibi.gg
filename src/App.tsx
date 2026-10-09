@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import {
   fetchTftHistory,
   fetchTftMatch,
@@ -49,10 +49,10 @@ import ChibiActionCenter from "./components/ChibiActionCenter";
 import ChibiToday from "./components/ChibiToday";
 import ChibiSessionMode from "./components/ChibiSessionMode";
 import StyleShift from "./components/StyleShift";
-import GlobalMetaPage from "./components/GlobalMetaPage";
-import CompsPage from "./components/CompsPage";
-import OverlayPage from "./components/OverlayPage";
-import StatisticsPage, { StatisticsCategory } from "./components/StatisticsPage";
+
+
+
+import type { StatisticsCategory } from "./components/StatisticsPage";
 import GlobalSearch from "./components/GlobalSearch";
 import HomeMetaPreview from "./components/HomeMetaPreview";
 import HomeSessionResume from "./components/HomeSessionResume";
@@ -63,8 +63,8 @@ import PointerAura from "./components/PointerAura";
 import AdaptiveArtwork from "./components/AdaptiveArtwork";
 import SectionMarker from "./components/SectionMarker";
 import ChibiNavIcon from "./components/ChibiNavIcon";
-import TeamBuilderPage from "./components/TeamBuilderPage";
-import LeaderboardPage from "./components/LeaderboardPage";
+
+
 import ProductInfoPage from "./components/ProductInfoPage";
 import AskChibi from "./components/AskChibi";
 import ChibiMemory from "./components/ChibiMemory";
@@ -485,6 +485,13 @@ function matchRoundLabel(match:TftMatch){
   const step=1+(offset%7);
   return "Stage "+stage+"-"+step;
 }
+
+const GlobalMetaPage = lazy(() => import("./components/GlobalMetaPage"));
+const CompsPage = lazy(() => import("./components/CompsPage"));
+const StatisticsPage = lazy(() => import("./components/StatisticsPage"));
+const TeamBuilderPage = lazy(() => import("./components/TeamBuilderPage"));
+const LeaderboardPage = lazy(() => import("./components/LeaderboardPage"));
+const OverlayPage = lazy(() => import("./components/OverlayPage"));
 
 function App() {
   const { t, locale } = useI18n();
@@ -1483,6 +1490,7 @@ function App() {
         <PointerAura/>
       </>}
 
+      <Suspense fallback={<main className="page-load-fallback" role="status" aria-live="polite">{t("home.loading.title")}</main>}>
       {sitePage==="about"||sitePage==="privacy"||sitePage==="terms" ? (
         <ProductInfoPage
           page={sitePage}
@@ -2799,6 +2807,7 @@ function App() {
           </section>
         </div>
       )}
+      </Suspense>
     </div>
   );
 }
