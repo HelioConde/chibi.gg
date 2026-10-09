@@ -570,6 +570,11 @@ function App() {
   const [studyOpenedMatchId,setStudyOpenedMatchId]=useState("");
   const [studyLookup,setStudyLookup]=useState<"idle"|"searching"|"unavailable">("idle");
   const studyAttempts=useRef(0);
+  // Request generations prevent slower Riot replies from restoring abandoned
+  // profiles, match modals and pages after users navigate elsewhere.
+  const profileRequestId=useRef(0);
+  const historyRequestId=useRef(0);
+  const matchRequestId=useRef(0);
   const [statsTarget,setStatsTarget]=useState<{
     category:StatisticsCategory;
     query:string;
@@ -1082,6 +1087,8 @@ function App() {
   }
 
   function showCounterEvidence(ids:string[],label:string){
+    ++matchRequestId.current;
+    setMatchLoading(false);
     setSelectedMatch(null);
     setOpenedMatch(null);
     setMatchError("");
@@ -1097,6 +1104,9 @@ function App() {
     updateUrl=true,
   ){
     const safeTab:ProfileTab=initialTab==="share"?"matches":initialTab;
+    ++profileRequestId.current;
+    ++historyRequestId.current;
+    ++matchRequestId.current;
     setDemoMode(true);
     setSitePage("main");
     setRiotId("Chibi Review Demo#DEMO");
@@ -1145,8 +1155,12 @@ function App() {
     initialQueue:number|null=null,
     initialSet:number|null=null,
   ){
+    const requestId=++profileRequestId.current;
+    ++historyRequestId.current;
+    ++matchRequestId.current;
     setDemoMode(false);
     setLoading(true);
+    setLoadingMore(false);
     setError("");
     setProfile(null);
     setMatches([]);
@@ -1163,6 +1177,7 @@ function App() {
 
     try{
       const data=await fetchTftProfile(gameName,tagLine,region);
+      if(requestId!==profileRequestId.current)return;
       setProfile(data);
       setMatches(data.matches || []);
       scrollPageTop();
@@ -1211,9 +1226,11 @@ function App() {
         window.history.replaceState({},"",url.toString());
       }
     }catch(err){
-      setError(err instanceof Error ? err.message : t("profile.error.player"));
+      if(requestId===profileRequestId.current){
+        setError(err instanceof Error ? err.message : t("profile.error.player"));
+      }
     }finally{
-      setLoading(false);
+      if(requestId===profileRequestId.current)setLoading(false);
     }
   }
 
@@ -1281,6 +1298,8 @@ function App() {
     const parsed=splitRiotId(riotId);
     if(!parsed) return;
 
+    const requestId=++historyRequestId.current;
+    const currentProfileRequest=profileRequestId.current;
     setLoadingMore(true);
     setError("");
 
@@ -1292,6 +1311,7 @@ function App() {
         historyOffset,
         20,
       );
+      if(requestId!==historyRequestId.current||currentProfileRequest!==profileRequestId.current)return;
 
       const next=result.matches || [];
       setMatches((current)=>{
@@ -1301,13 +1321,19 @@ function App() {
       setHistoryOffset(current=>Math.max(current,historyOffset+20));
       setHasMore((result.paging?.requested??next.length)>=20);
     }catch(err){
-      setError(err instanceof Error ? err.message : t("profile.error.more"));
+      if(requestId===historyRequestId.current&&currentProfileRequest===profileRequestId.current){
+        setError(err instanceof Error ? err.message : t("profile.error.more"));
+      }
     }finally{
-      setLoadingMore(false);
+      if(requestId===historyRequestId.current&&currentProfileRequest===profileRequestId.current){
+        setLoadingMore(false);
+      }
     }
   }
 
   function closeMatchReview(){
+    ++matchRequestId.current;
+    setMatchLoading(false);
     setSelectedMatch(null);
     setOpenedMatch(null);
     setMatchError("");
@@ -1326,6 +1352,7 @@ function App() {
   }
 
   async function openMatch(match:TftMatch){
+    const requestId=++matchRequestId.current;
     setMatchLoading(true);
     setMatchError("");
     setSelectedMatch(null);
@@ -1342,11 +1369,13 @@ function App() {
 
     try{
       const detail=await fetchTftMatch(match.id);
-      setSelectedMatch(detail);
+      if(requestId===matchRequestId.current)setSelectedMatch(detail);
     }catch(err){
-      setMatchError(err instanceof Error ? err.message : t("profile.error.match"));
+      if(requestId===matchRequestId.current){
+        setMatchError(err instanceof Error ? err.message : t("profile.error.match"));
+      }
     }finally{
-      setMatchLoading(false);
+      if(requestId===matchRequestId.current)setMatchLoading(false);
     }
   }
 
@@ -1489,6 +1518,12 @@ function App() {
   }
 
   function resetSearch(){
+    ++profileRequestId.current;
+    ++historyRequestId.current;
+    ++matchRequestId.current;
+    setLoading(false);
+    setLoadingMore(false);
+    setMatchLoading(false);
     setDemoMode(false);
     setSitePage("main");
     setProfile(null);
