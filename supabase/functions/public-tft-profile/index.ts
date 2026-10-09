@@ -65,6 +65,10 @@ Deno.serve(async(req)=>{
     const tagLine=String(body?.tagLine||"").trim();
     const platform=String(body?.platform||"br1").toLowerCase();
 
+    if(gameName.length>64||tagLine.length>16){
+      return json({error:"invalid_riot_id",message:"Riot ID acima do limite permitido."},400);
+    }
+
     if(!gameName||!tagLine){
       return json({
         error:"riot_id_required",
