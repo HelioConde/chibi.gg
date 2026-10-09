@@ -463,3 +463,33 @@ test("empty Riot meta responses replace all skeletons with an informative state"
   await expect(page.locator(".home-meta-empty")).toHaveCount(2,{timeout:15000});
   await expect(page.locator(".home-meta-skeleton-list")).toHaveCount(0);
 });
+
+
+test("partial Riot profile has a readable warning instead of silently hiding missing matches",async ({page})=>{
+  const headers={
+    "access-control-allow-origin":"*",
+    "access-control-allow-methods":"POST, OPTIONS",
+    "access-control-allow-headers":"authorization, apikey, content-type",
+    "content-type":"application/json",
+  };
+  await page.route("**/functions/v1/public-tft-profile",route=>{
+    if(route.request().method()==="OPTIONS")return route.fulfill({status:200,headers});
+    return route.fulfill({
+      status:200,
+      headers,
+      body:JSON.stringify({
+        player:{gameName:"PartialPlayer",tagLine:"TEST",platform:"BR1",level:8,profileIconId:0},
+        ranked:[],
+        summary:{matches:0,averagePlacement:null,top4Rate:0,winRate:0,firsts:0,eighths:0},
+        matches:[],
+        paging:{start:0,count:20,requested:20,returned:0},
+        partial:{summoner:false,ranked:false,history:false,matchDetails:true},
+        source:{account:"account-v1",summoner:"tft-summoner-v1",ranked:"tft-league-v1",matches:"tft-match-v1",retrievedAt:Date.now(),cache:{hits:0,fetched:0,failed:20,rateLimited:true}},
+      }),
+    });
+  });
+  await page.goto("/?player=PartialPlayer&tag=TEST&region=br1",{waitUntil:"domcontentloaded"});
+  await expect(page.locator(".profile-page")).toBeVisible({timeout:20000});
+  await expect(page.locator(".profile-data-warning")).toBeVisible();
+  await expect(page.locator(".profile-data-warning")).toContainText(/Algumas partidas|Some Riot match details/);
+});
