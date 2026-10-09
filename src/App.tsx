@@ -2472,6 +2472,10 @@ function App() {
             <a href={import.meta.env.BASE_URL+"about.html"}>{t("legal.about")}</a>
             <a href={import.meta.env.BASE_URL+"privacy.html"}>{t("legal.privacy")}</a>
             <a href={import.meta.env.BASE_URL+"terms.html"}>{t("legal.terms")}</a>
+            <a href={import.meta.env.BASE_URL+"meta-tft.html"}>Guia Meta TFT</a>
+            <a href={import.meta.env.BASE_URL+"composicoes-tft.html"}>Guia Composições</a>
+            <a href={import.meta.env.BASE_URL+"historico-tft.html"}>Guia Histórico</a>
+            <a href={import.meta.env.BASE_URL+"builder-tft.html"}>Guia Builder</a>
             <a href="https://github.com/HelioConde/chibi.gg" target="_blank" rel="noreferrer">GitHub ↗</a>
           </nav>
         </div>
