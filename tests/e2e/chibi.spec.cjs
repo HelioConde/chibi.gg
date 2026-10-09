@@ -264,3 +264,71 @@ test("full Builder remains scrollable after lazy route CSS loads",async ({page})
   const expectedHeight=test.info().project.name==="mobile-chromium"?2100:1600;
   expect(dimensions.html.scrollHeight).toBeGreaterThan(expectedHeight);
 });
+
+
+test("public aggregate requests are deduplicated while profiles remain uncached",async ({page})=>{
+  let statusCalls=0;
+  await page.route("**/functions/v1/public-tft-status",async route=>{
+    if(route.request().method()==="OPTIONS"){
+      return route.fulfill({status:200,headers:{
+        "access-control-allow-origin":"*",
+        "access-control-allow-headers":"authorization, apikey, content-type",
+        "access-control-allow-methods":"POST, OPTIONS",
+      }});
+    }
+    const input=route.request().postDataJSON();
+    if(input.platform!=="oc1")return route.continue();
+    statusCalls++;
+    return route.fulfill({
+      status:200,
+      headers:{"access-control-allow-origin":"*","content-type":"application/json"},
+      body:JSON.stringify({platform:"OC1",id:"ok",name:"TFT",locales:[],maintenances:[],incidents:[],operational:true,checkedAt:Date.now(),source:"tft-status-v1"}),
+    });
+  });
+  await page.goto("/",{waitUntil:"domcontentloaded"});
+  const result=await page.evaluate(async()=>{
+    const api=await import("/src/api/tft.ts");
+    const rows=await Promise.all([
+      api.fetchTftStatus("oc1"),
+      api.fetchTftStatus("oc1"),
+      api.fetchTftStatus("oc1"),
+    ]);
+    return rows.map(row=>row.platform);
+  });
+  expect(result).toEqual(["OC1","OC1","OC1"]);
+  expect(statusCalls).toBe(1);
+});
+
+test("temporary public API failures can be retried immediately",async ({page})=>{
+  let attempts=0;
+  await page.route("**/functions/v1/public-tft-status",async route=>{
+    if(route.request().method()==="OPTIONS"){
+      return route.fulfill({status:200,headers:{
+        "access-control-allow-origin":"*",
+        "access-control-allow-headers":"authorization, apikey, content-type",
+        "access-control-allow-methods":"POST, OPTIONS",
+      }});
+    }
+    if(route.request().postDataJSON().platform!=="jp1")return route.continue();
+    attempts++;
+    const unavailable=attempts===1;
+    return route.fulfill({
+      status:unavailable?503:200,
+      headers:{"access-control-allow-origin":"*","content-type":"application/json"},
+      body:JSON.stringify(unavailable
+        ?{error:"riot_unreachable",message:"Serviço temporariamente indisponível"}
+        :{platform:"JP1",id:"ok",name:"TFT",locales:[],maintenances:[],incidents:[],operational:true,checkedAt:Date.now(),source:"tft-status-v1"}),
+    });
+  });
+  await page.goto("/",{waitUntil:"domcontentloaded"});
+  const result=await page.evaluate(async()=>{
+    const api=await import("/src/api/tft.ts");
+    let code="";
+    try{await api.fetchTftStatus("jp1");}
+    catch(error){code=error.code;}
+    const recovered=await api.fetchTftStatus("jp1");
+    return {code,platform:recovered.platform};
+  });
+  expect(result).toEqual({code:"riot_unreachable",platform:"JP1"});
+  expect(attempts).toBe(2);
+});
