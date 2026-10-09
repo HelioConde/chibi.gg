@@ -1,5 +1,8 @@
 export function siteImage(name:string){
-  return import.meta.env.BASE_URL+"img/"+name;
+  // Every PNG in public/img has a generated WebP counterpart from prebuild/predev.
+  // Keep original PNGs for legal pages, social crawlers and safe backward compatibility.
+  const optimizedName=name.replace(/\\.png$/i,".webp");
+  return import.meta.env.BASE_URL+"img/"+optimizedName;
 }
 
 function outputV2Element(group:string,index:number){
