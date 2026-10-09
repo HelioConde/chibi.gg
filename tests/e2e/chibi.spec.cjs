@@ -233,3 +233,34 @@ test("advanced pages load full CSS before rendering content",async ({page})=>{
   expect(sample.display).not.toBe("none");
   expect(sample.padding).not.toBe("");
 });
+
+
+test("full Builder remains scrollable after lazy route CSS loads",async ({page})=>{
+  await page.goto("/#builder",{waitUntil:"domcontentloaded"});
+  await expect(page.locator(".builder-page")).toBeVisible({timeout:20000});
+  await page.waitForTimeout(350);
+  const dimensions=await page.evaluate(()=>{
+    const builder=document.querySelector(".builder-page");
+    const shell=document.querySelector(".app-shell");
+    const root=document.getElementById("root");
+    const metrics=(element)=>element?{
+      height:Math.round(element.getBoundingClientRect().height),
+      scrollHeight:element.scrollHeight,
+      overflowY:getComputedStyle(element).overflowY,
+      position:getComputedStyle(element).position,
+      maxHeight:getComputedStyle(element).maxHeight,
+    }:null;
+    return {
+      viewport:innerHeight,
+      html:metrics(document.documentElement),
+      body:metrics(document.body),
+      root:metrics(root),
+      shell:metrics(shell),
+      builder:metrics(builder),
+      fullCssLoaded:!!Array.from(document.styleSheets).find(sheet=>(sheet.href||"").includes("styles-full")),
+    };
+  });
+  console.log("BUILDER_SCROLL_DIAGNOSTIC",JSON.stringify(dimensions));
+  const expectedHeight=test.info().project.name==="mobile-chromium"?2100:1600;
+  expect(dimensions.html.scrollHeight).toBeGreaterThan(expectedHeight);
+});
