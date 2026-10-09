@@ -332,3 +332,62 @@ test("temporary public API failures can be retried immediately",async ({page})=>
   expect(result).toEqual({code:"riot_unreachable",platform:"JP1"});
   expect(attempts).toBe(2);
 });
+
+
+test("Riot pagination advances by upstream IDs when some match details are missing",async ({page})=>{
+  const now=Date.now();
+  const matches=Array.from({length:18},(_,i)=>({
+    id:"BR1_"+(7654321000+i),
+    playedAt:now-i*3000000,
+    duration:1800,
+    queueId:1100,
+    setNumber:18,
+    setName:"Set 18",
+    gameVersion:"16.19.1",
+    placement:(i%8)+1,
+    level:8,
+    goldLeft:10,
+    damageToPlayers:25,
+    augments:[],
+    traits:[],
+    units:[],
+  }));
+  await page.route("**/functions/v1/public-tft-profile",route=>route.fulfill({
+    status:200,
+    contentType:"application/json",
+    headers:{"access-control-allow-origin":"*"},
+    body:JSON.stringify({
+      player:{gameName:"QAPlayer",tagLine:"TEST",platform:"BR1",level:100,profileIconId:0},
+      ranked:[],
+      summary:{matches:18,averagePlacement:4.5,top4Rate:50,winRate:6,firsts:1,eighths:2},
+      matches,
+      paging:{start:0,count:20,requested:20,returned:18},
+      partial:{summoner:false,ranked:false,history:false},
+    }),
+  }));
+  const starts=[];
+  await page.route("**/functions/v1/public-tft-history",route=>{
+    const body=route.request().postDataJSON();
+    starts.push(body.start);
+    return route.fulfill({
+      status:200,
+      contentType:"application/json",
+      headers:{"access-control-allow-origin":"*"},
+      body:JSON.stringify({
+        matches:[],
+        paging:{start:body.start,count:20,requested:starts.length===1?20:0,returned:0},
+      }),
+    });
+  });
+  await page.goto("/?player=QAPlayer&tag=TEST&region=br1",{waitUntil:"domcontentloaded"});
+  await expect(page.locator(".profile-page")).toBeVisible({timeout:20000});
+  const more=page.locator(".load-more");
+  await expect(more).toBeVisible();
+  await more.click();
+  await expect.poll(()=>starts.length).toBe(1);
+  await expect(more).toBeEnabled();
+  await more.click();
+  await expect.poll(()=>starts.length).toBe(2);
+  expect(starts).toEqual([20,40]);
+  await expect(more).toHaveCount(0);
+});
