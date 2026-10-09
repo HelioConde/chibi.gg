@@ -61,10 +61,12 @@ export default function HomeMetaPreview({
   onOpenComps,
   onOpenStats,
 }:Props){
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [stats,setStats]=useState<TftGlobalStats|null>(null);
   const [comps,setComps]=useState<TftGlobalComps|null>(null);
   const [loadState,setLoadState]=useState<"loading"|"ready"|"error">("loading");
+  const [statsFailed,setStatsFailed]=useState(false);
+  const [compsFailed,setCompsFailed]=useState(false);
   const [reloadKey,setReloadKey]=useState(0);
   const containerRef=useRef<HTMLElement|null>(null);
   const [visible,setVisible]=useState(false);
@@ -92,6 +94,10 @@ export default function HomeMetaPreview({
     if(!visible)return;
     let cancelled=false;
     setLoadState("loading");
+    setStatsFailed(false);
+    setCompsFailed(false);
+    setStats(null);
+    setComps(null);
     Promise.allSettled([
       fetchTftStats(0,1100,4,20),
       fetchTftComps(0,1100,4,8),
@@ -99,7 +105,9 @@ export default function HomeMetaPreview({
       if(cancelled)return;
       const [statsResult,compsResult]=results;
       if(statsResult.status==="fulfilled")setStats(statsResult.value);
+      else setStatsFailed(true);
       if(compsResult.status==="fulfilled")setComps(compsResult.value);
+      else setCompsFailed(true);
       setLoadState(
         statsResult.status==="rejected"&&compsResult.status==="rejected"
           ?"error"
@@ -144,11 +152,13 @@ export default function HomeMetaPreview({
               </span>
               <em>{comp.games>=8?comp.top4Rate+"%":t("metaPreview.sample")}</em>
             </button>
-          )):loadState==="error"
+          )):compsFailed
             ?<div className="home-meta-error" role="alert" aria-live="assertive">
-              <span>Não foi possível carregar as comps agora.</span>
-              <button onClick={()=>setReloadKey(value=>value+1)}>Tentar novamente</button>
+              <span>{language==="en"?"Compositions are temporarily unavailable.":"Não foi possível carregar as comps agora."}</span>
+              <button onClick={()=>setReloadKey(value=>value+1)}>{language==="en"?"Try again":"Tentar novamente"}</button>
             </div>
+            :loadState==="ready"
+              ?<div className="home-meta-empty" role="status">{language==="en"?"No compositions recorded for this selection yet.":"Ainda não há composições observadas para esta seleção."}</div>
             :<div className="home-meta-skeleton-list" role="status" aria-live="polite" aria-label="Carregando comps observadas">
               {[0,1,2].map(index=><span className="home-meta-skeleton-row" key={index}><i/><b/><em/></span>)}
             </div>}
@@ -178,11 +188,13 @@ export default function HomeMetaPreview({
               </span>
               <em>{row.games>=8?row.top4Rate+"%":t("metaPreview.sample")}</em>
             </button>;
-          }):loadState==="error"
-            ?<div className="home-meta-error">
-              <span>Não foi possível carregar as traits agora.</span>
-              <button onClick={()=>setReloadKey(value=>value+1)}>Tentar novamente</button>
+          }):statsFailed
+            ?<div className="home-meta-error" role="alert" aria-live="assertive">
+              <span>{language==="en"?"Trait statistics are temporarily unavailable.":"Não foi possível carregar as características agora."}</span>
+              <button onClick={()=>setReloadKey(value=>value+1)}>{language==="en"?"Try again":"Tentar novamente"}</button>
             </div>
+            :loadState==="ready"
+              ?<div className="home-meta-empty" role="status">{language==="en"?"No traits recorded for this selection yet.":"Ainda não há características observadas para esta seleção."}</div>
             :<div className="home-meta-skeleton-list" role="status" aria-live="polite" aria-label="Carregando traits">
               {[0,1,2].map(index=><span className="home-meta-skeleton-row" key={index}><i/><b/><em/></span>)}
             </div>}
