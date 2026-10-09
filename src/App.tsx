@@ -2643,10 +2643,11 @@ function App() {
       </footer>
 
       {(matchLoading || selectedMatch || matchError || studyLookup==="unavailable") && (
-        <div className="match-overlay" onClick={closeMatchReview}>
+        <div className="match-overlay" role="dialog" aria-modal="true" aria-label="Revisão da partida" onClick={closeMatchReview}>
+          {/* Keep close outside the scrolling modal: it must remain visible after scrolling. */}
+          <button type="button" className="match-close match-close-floating" onClick={(event)=>{event.stopPropagation();closeMatchReview();}} aria-label="Fechar revisão da partida" title="Fechar revisão da partida"><span aria-hidden="true">×</span></button>
           <section className="match-modal match-modal-with-hud" onClick={(e)=>e.stopPropagation()}>
             <img className="match-modal-hud-art match-modal-hud-v2" src={SITE_IMAGES.v2.hud[3]} alt="" aria-hidden="true"/>
-            <button className="match-close" onClick={closeMatchReview} aria-label="Fechar revisão da partida" title="Fechar revisão da partida">×</button>
             {matchLoading && <div className="match-state">{t("match.loading")}</div>}
             {matchError && <div className="match-state error" role="alert">
               <p>{matchError}</p>
