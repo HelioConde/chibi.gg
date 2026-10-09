@@ -1444,12 +1444,12 @@ function App() {
           <span>chibi<span>.gg</span></span>
         </button>
         {!compactViewport&&<nav className="product-nav" aria-label="Chibi">
-          <button className={sitePage==="meta"?"active":""} onClick={openMeta}><ChibiNavIcon kind="meta"/><span>{t("nav.meta")}</span></button>
-          <button className={sitePage==="comps"?"active":""} onClick={openComps}><ChibiNavIcon kind="comps"/><span>{t("nav.comps")}</span></button>
-          <button className={sitePage==="stats"?"active":""} onClick={()=>openStats()}><ChibiNavIcon kind="statistics"/><span>{t("nav.statistics")}</span></button>
-          <button className={"builder-nav-button "+(sitePage==="builder"?"active":"")} onClick={()=>openBuilder([])}><ChibiNavIcon kind="builder"/><span>{t("nav.builder")}</span></button>
-          <button className={sitePage==="leaderboard"?"active":""} onClick={openLeaderboard}><ChibiNavIcon kind="ranking"/><span>{t("nav.leaderboard")}</span></button>
-          <button className={"companion-nav-button "+(sitePage==="overlay"?"active":"")} onClick={openOverlay}><ChibiNavIcon kind="companion"/><span>{t("nav.companion")}</span></button>
+          <button className={sitePage==="meta"?"active":""} aria-current={sitePage==="meta"?"page":undefined} onClick={openMeta}><ChibiNavIcon kind="meta"/><span>{t("nav.meta")}</span></button>
+          <button className={sitePage==="comps"?"active":""} aria-current={sitePage==="comps"?"page":undefined} onClick={openComps}><ChibiNavIcon kind="comps"/><span>{t("nav.comps")}</span></button>
+          <button className={sitePage==="stats"?"active":""} aria-current={sitePage==="stats"?"page":undefined} onClick={()=>openStats()}><ChibiNavIcon kind="statistics"/><span>{t("nav.statistics")}</span></button>
+          <button className={"builder-nav-button "+(sitePage==="builder"?"active":"")} aria-current={sitePage==="builder"?"page":undefined} onClick={()=>openBuilder([])}><ChibiNavIcon kind="builder"/><span>{t("nav.builder")}</span></button>
+          <button className={sitePage==="leaderboard"?"active":""} aria-current={sitePage==="leaderboard"?"page":undefined} onClick={openLeaderboard}><ChibiNavIcon kind="ranking"/><span>{t("nav.leaderboard")}</span></button>
+          <button className={"companion-nav-button "+(sitePage==="overlay"?"active":"")} aria-current={sitePage==="overlay"?"page":undefined} onClick={openOverlay}><ChibiNavIcon kind="companion"/><span>{t("nav.companion")}</span></button>
         </nav>}
         <GlobalSearch
           staticData={staticData}
@@ -1465,18 +1465,19 @@ function App() {
             type="button"
             aria-label="Abrir navegação"
             aria-expanded={mobileNavOpen}
+            aria-controls="chibi-mobile-nav"
             onClick={()=>setMobileNavOpen(value=>!value)}
           >
             <span>{t("nav.menu")}</span>
             <b>☰</b>
           </button>
-          {mobileNavOpen&&<div className="mobile-product-menu-panel">
-            <button className={sitePage==="meta"?"active":""} onClick={()=>{openMeta();setMobileNavOpen(false);}}><ChibiNavIcon kind="meta"/><span>{t("nav.meta")}</span></button>
-            <button className={sitePage==="comps"?"active":""} onClick={()=>{openComps();setMobileNavOpen(false);}}><ChibiNavIcon kind="comps"/><span>{t("nav.comps")}</span></button>
-            <button className={sitePage==="stats"?"active":""} onClick={()=>{openStats();setMobileNavOpen(false);}}><ChibiNavIcon kind="statistics"/><span>{t("nav.statistics")}</span></button>
-            <button className={sitePage==="builder"?"active":""} onClick={()=>{openBuilder([]);setMobileNavOpen(false);}}><ChibiNavIcon kind="builder"/><span>{t("nav.builder")}</span></button>
-            <button className={sitePage==="leaderboard"?"active":""} onClick={()=>{openLeaderboard();setMobileNavOpen(false);}}><ChibiNavIcon kind="ranking"/><span>{t("nav.leaderboard")}</span></button>
-            <button className={sitePage==="overlay"?"active":""} onClick={()=>{openOverlay();setMobileNavOpen(false);}}><ChibiNavIcon kind="companion"/><span>{t("nav.companion")}</span></button>
+          {mobileNavOpen&&<div className="mobile-product-menu-panel" id="chibi-mobile-nav" role="navigation" aria-label={t("nav.menu")}>
+            <button className={sitePage==="meta"?"active":""} aria-current={sitePage==="meta"?"page":undefined} onClick={()=>{openMeta();setMobileNavOpen(false);}}><ChibiNavIcon kind="meta"/><span>{t("nav.meta")}</span></button>
+            <button className={sitePage==="comps"?"active":""} aria-current={sitePage==="comps"?"page":undefined} onClick={()=>{openComps();setMobileNavOpen(false);}}><ChibiNavIcon kind="comps"/><span>{t("nav.comps")}</span></button>
+            <button className={sitePage==="stats"?"active":""} aria-current={sitePage==="stats"?"page":undefined} onClick={()=>{openStats();setMobileNavOpen(false);}}><ChibiNavIcon kind="statistics"/><span>{t("nav.statistics")}</span></button>
+            <button className={sitePage==="builder"?"active":""} aria-current={sitePage==="builder"?"page":undefined} onClick={()=>{openBuilder([]);setMobileNavOpen(false);}}><ChibiNavIcon kind="builder"/><span>{t("nav.builder")}</span></button>
+            <button className={sitePage==="leaderboard"?"active":""} aria-current={sitePage==="leaderboard"?"page":undefined} onClick={()=>{openLeaderboard();setMobileNavOpen(false);}}><ChibiNavIcon kind="ranking"/><span>{t("nav.leaderboard")}</span></button>
+            <button className={sitePage==="overlay"?"active":""} aria-current={sitePage==="overlay"?"page":undefined} onClick={()=>{openOverlay();setMobileNavOpen(false);}}><ChibiNavIcon kind="companion"/><span>{t("nav.companion")}</span></button>
           </div>}
         </div>}
         <div className="topbar-actions">
