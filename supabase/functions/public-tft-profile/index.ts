@@ -271,6 +271,12 @@ Deno.serve(async(req)=>{
         eighths,
       },
       matches,
+      paging:{
+        start:0,
+        count:20,
+        requested:requestedIds.length,
+        returned:matches.length,
+      },
       partial:{
         summoner:!summonerRes?.ok,
         ranked:!leagueRes?.ok,
