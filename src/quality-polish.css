@@ -304,3 +304,28 @@
     gap: 8px 13px !important;
   }
 }
+
+
+/* Measured WCAG contrast fixes from the 09/10 desktop and mobile axe reports. */
+.app-shell .ask-chibi-context > span,
+.app-shell .ask-chibi-foot,
+.app-shell .builder-decision-card > span,
+.app-shell .builder-board-facts > article > span,
+.app-shell .builder-slot-state > small {
+  color: #cadbe6 !important;
+  opacity: 1 !important;
+}
+.app-shell .ask-chibi-context > span,
+.app-shell .ask-chibi-foot { font-size: max(12px,.75rem) !important; }
+.app-shell .builder-decision-card > span,
+.app-shell .builder-board-facts > article > span,
+.app-shell .builder-slot-state > small { font-size: max(12px,.75rem) !important; }
+@media (prefers-contrast: more) {
+  .app-shell { --chibi-focus-ring: #c0fffd; }
+  .app-shell :is(a,button,input,select,textarea,summary):focus-visible {
+    outline-width: 4px !important;
+  }
+  .app-shell :is(.panel,.builder-decision-card,.home-visual-card,.home-paths-v3>button) {
+    border-color: #9db7cb !important;
+  }
+}
