@@ -15,3 +15,5 @@ work/
 
 # Generated at predev/prebuild; source PNG artwork remains versioned.
 public/img/**/*.webp
+public/favicon-64.png
+public/apple-touch-icon.png
