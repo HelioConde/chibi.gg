@@ -211,9 +211,33 @@ export type TftMatchDetail = {
   };
 };
 
-async function invoke<T>(name:string, body:Record<string,unknown>):Promise<T>{
+// Public, non-personal aggregates are safe to share across widgets for a short time.
+// Never cache player profiles, match history or match details in memory.
+const aggregateTtl:Record<string,number>={
+  "public-tft-meta":45_000,
+  "public-tft-comps":45_000,
+  "public-tft-stats":45_000,
+  "public-tft-status":90_000,
+  "public-tft-leaderboard":30_000,
+};
+const aggregateCache=new Map<string,{expires:number,promise:Promise<unknown>}>();
+const MAX_AGGREGATE_CACHE=24;
+
+export class RiotApiError extends Error{
+  constructor(
+    message:string,
+    readonly status:number,
+    readonly code:string,
+    readonly retryAfterSeconds:number|null=null,
+  ){
+    super(message);
+    this.name="RiotApiError";
+  }
+}
+
+async function requestTft<T>(name:string,body:Record<string,unknown>):Promise<T>{
   if(!/^public-tft-[a-z-]+$/.test(name)){
-    throw new Error("O endpoint solicitado não está disponível para consultas públicas.");
+    throw new RiotApiError("Endpoint não disponível para consultas públicas.",400,"invalid_endpoint");
   }
 
   let response:Response;
@@ -222,33 +246,70 @@ async function invoke<T>(name:string, body:Record<string,unknown>):Promise<T>{
       method:"POST",
       headers:{
         "Content-Type":"application/json",
-        "apikey":PUBLIC_API_KEY,
-        // Matches the public publishable-key request sent by supabase-js.
-        "Authorization":"Bearer "+PUBLIC_API_KEY,
+        apikey:PUBLIC_API_KEY,
+        Authorization:"Bearer "+PUBLIC_API_KEY,
       },
       body:JSON.stringify(body),
       signal:AbortSignal.timeout(15000),
     });
   }catch(error){
     const timeout=error instanceof Error&&(error.name==="TimeoutError"||error.name==="AbortError");
-    throw new Error(timeout
-      ?"A consulta demorou demais. Tente novamente."
-      :"Não foi possível conectar ao serviço de TFT. Confira sua conexão e tente novamente.");
+    throw new RiotApiError(
+      timeout?"A consulta demorou demais. Tente novamente.":"Não foi possível conectar ao serviço de TFT. Confira sua conexão.",
+      0,
+      timeout?"network_timeout":"network_unavailable",
+    );
   }
 
-  const data=await response.json().catch(()=>null);
-  if(!response.ok||!data||typeof data!=="object"){
-    const message=typeof data?.message==="string" ?data.message
-      :typeof data?.error==="string" ?data.error
-      :response.status===429?"Muitas consultas. Aguarde antes de tentar novamente."
+  const data:unknown=await response.json().catch(()=>null);
+  const payload=data&&typeof data==="object"&&!Array.isArray(data)
+    ?data as Record<string,unknown>:null;
+  if(!response.ok||!payload||typeof payload.error==="string"){
+    const code=typeof payload?.error==="string"?payload.error:response.ok?"invalid_response":"upstream_failed";
+    const retryAfter=Number(response.headers.get("retry-after"));
+    const wait=Number.isFinite(retryAfter)&&retryAfter>0
+      ?Math.min(Math.ceil(retryAfter),3600):null;
+    const fallback=response.status===429?"Limite de consultas atingido. Aguarde e tente novamente."
       :response.status>=500?"Serviço de TFT temporariamente indisponível."
-      :"Falha ao consultar os dados oficiais da Riot.";
-    throw new Error(message);
+      :"Não foi possível consultar os dados oficiais da Riot.";
+    throw new RiotApiError(
+      typeof payload?.message==="string"&&payload.message?payload.message:fallback,
+      response.status,
+      code,
+      wait,
+    );
   }
-  if(data.error){
-    throw new Error(typeof data.message==="string"?data.message:String(data.error));
+  return payload as T;
+}
+
+function invoke<T>(name:string,body:Record<string,unknown>):Promise<T>{
+  const ttl=aggregateTtl[name];
+  if(!ttl)return requestTft<T>(name,body);
+
+  const key=name+":"+JSON.stringify(body);
+  const now=Date.now();
+  const existing=aggregateCache.get(key);
+  if(existing&&existing.expires>now)return existing.promise as Promise<T>;
+  aggregateCache.delete(key);
+
+  // Clear old entries first, and cap distinct query variations (sets/regions).
+  for(const [cacheKey,entry] of aggregateCache){
+    if(entry.expires<=now)aggregateCache.delete(cacheKey);
   }
-  return data as T;
+  while(aggregateCache.size>=MAX_AGGREGATE_CACHE){
+    const oldest=aggregateCache.keys().next().value;
+    if(!oldest)break;
+    aggregateCache.delete(oldest);
+  }
+
+  const promise=requestTft<T>(name,body);
+  aggregateCache.set(key,{expires:now+ttl,promise});
+  // Rejections must never be cached: a recovered Riot or Supabase service can
+  // immediately be queried again using the existing retry buttons.
+  void promise.catch(()=>{
+    if(aggregateCache.get(key)?.promise===promise)aggregateCache.delete(key);
+  });
+  return promise;
 }
 
 export function fetchTftProfile(gameName:string, tagLine:string, platform:string){
