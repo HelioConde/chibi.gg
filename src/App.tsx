@@ -1714,7 +1714,10 @@ function App() {
                 <small>{t("home.demo.subtitle")}</small>
               </button>
 
-              {error && <div className="lookup-error">{error}</div>}
+              {error && <div className="lookup-error" role="alert">
+                <span>{error}</span>
+                {splitRiotId(riotId)&&<button type="button" disabled={loading} onClick={()=>void searchPlayer()}>Tentar novamente</button>}
+              </div>}
 
               {recentPlayers[0]&&<button className="home-last-player" onClick={()=>void openRecentPlayer(recentPlayers[0])}>
                 <span className="home-last-player-avatar">
@@ -2007,7 +2010,10 @@ function App() {
             </div>
           </section>
 
-          {error && <div className="profile-error">{error}</div>}
+          {error && <div className="profile-error" role="alert">
+            <span>{error}</span>
+            {hasMore&&<button type="button" disabled={loadingMore} onClick={()=>void loadMore()}>Tentar novamente</button>}
+          </div>}
 
           <ChibiToday
             playerKey={profile.player.platform+":"+profile.player.gameName+"#"+profile.player.tagLine}
@@ -2593,7 +2599,13 @@ function App() {
             <img className="match-modal-hud-art match-modal-hud-v2" src={SITE_IMAGES.v2.hud[3]} alt="" aria-hidden="true"/>
             <button className="match-close" onClick={closeMatchReview} aria-label="Fechar revisão da partida" title="Fechar revisão da partida">×</button>
             {matchLoading && <div className="match-state">{t("match.loading")}</div>}
-            {matchError && <div className="match-state error">{matchError}</div>}
+            {matchError && <div className="match-state error" role="alert">
+              <p>{matchError}</p>
+              <div className="study-retry-actions">
+                {openedMatch&&<button type="button" onClick={()=>void openMatch(openedMatch)}>{t("match.retry")}</button>}
+                <button type="button" className="secondary" onClick={closeMatchReview}>{t("match.viewProfile")}</button>
+              </div>
+            </div>}
             {studyLookup==="unavailable"&&!selectedMatch&&!matchLoading&&<div className="match-state error">
               <h2>{t("match.unavailable.title")}</h2>
               <p>{t("match.unavailable.desc")}</p>
