@@ -125,10 +125,16 @@ Deno.serve(async (req) => {
     },
     paging: { start, count, requested: requestedIds.length, returned: matches.length },
     matches,
+    partial:{matchDetails:detailResult.failed>0},
     source: {
       matches: "tft-match-v1",
       retrievedAt: Date.now(),
-      cache: { hits: detailResult.cacheHits, fetched: detailResult.fetched },
+      cache: {
+        hits: detailResult.cacheHits,
+        fetched: detailResult.fetched,
+        failed: detailResult.failed,
+        rateLimited: detailResult.rateLimited,
+      },
     },
   });
   }catch(error){
