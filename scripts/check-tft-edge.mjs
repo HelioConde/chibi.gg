@@ -46,4 +46,21 @@ for(const check of checks){
   console.log("PASS",check.endpoint,check.code,response.status);
   passed++;
 }
-console.log("CHIBI_EDGE_SMOKE",passed+"/"+checks.length.toString().replace(/^/, "")+" input tests plus "+(passed-checks.length)+" CORS checks passed");
+for(const endpoint of [...new Set(checks.map(x=>x.endpoint))]){
+  const response=await fetch(base+"/"+endpoint,{
+    method:"POST",
+    headers:{
+      Origin:origin,"Content-Type":"application/json",
+      apikey:publishable,
+      Authorization:"Bearer "+publishable,
+    },
+    body:"{",
+    signal:AbortSignal.timeout(15000),
+  });
+  const data=await response.json().catch(()=>null);
+  assert.equal(response.status,400,endpoint+" malformed JSON HTTP status");
+  assert.equal(data?.error,"invalid_json",endpoint+" malformed JSON response");
+  console.log("PASS",endpoint,"invalid_json",response.status);
+  passed++;
+}
+console.log("CHIBI_EDGE_SMOKE",passed,"production checks passed");
