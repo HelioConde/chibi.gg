@@ -26,7 +26,8 @@ Deno.serve(async (req) => {
   const gameName = String(body?.gameName || "").trim();
   const tagLine = String(body?.tagLine || "").trim();
   const platform = String(body?.platform || "br1").toLowerCase();
-  const start = Math.max(0, Math.min(100, num(body?.start)));
+  // Riot history can exceed 120 games; never cap requests at page 100.
+  const start = Math.max(0, Math.min(2000, Math.floor(num(body?.start))));
   const count = Math.max(1, Math.min(20, num(body?.count) || 10));
 
   if (gameName.length > 64 || tagLine.length > 16) {
@@ -122,7 +123,7 @@ Deno.serve(async (req) => {
       tagLine: String(accountResult.account?.tagLine || tagLine),
       platform: platform.toUpperCase(),
     },
-    paging: { start, count, returned: matches.length },
+    paging: { start, count, requested: requestedIds.length, returned: matches.length },
     matches,
     source: {
       matches: "tft-match-v1",
