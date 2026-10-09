@@ -1,0 +1,29 @@
+name: Riot Edge Unit Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "supabase/functions/_shared/**"
+      - "tests/edge/**"
+      - ".github/workflows/edge-unit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: riot-edge-unit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  edge-unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Test Riot match budget and cache safety without network access
+        run: deno test --allow-env tests/edge/match-cache.test.ts
