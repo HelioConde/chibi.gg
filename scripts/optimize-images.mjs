@@ -52,8 +52,8 @@ async function writeThumb(source, target, width, format="webp") {
 }
 const brand = join(root, "output-v2", "icon", "element_001.png");
 await writeThumb(brand, join(root, "output-v2", "icon", "brand-96.webp"), 96);
-await writeThumb(brand, new URL("../public/favicon-64.png", import.meta.url).pathname, 64, "png");
-await writeThumb(brand, new URL("../public/apple-touch-icon.png", import.meta.url).pathname, 180, "png");
+await writeThumb(brand, fileURLToPath(new URL("../public/favicon-64.png", import.meta.url)), 64, "png");
+await writeThumb(brand, fileURLToPath(new URL("../public/apple-touch-icon.png", import.meta.url)), 180, "png");
 await writeThumb(join(root,"icon.png"), join(root,"icon-small.webp"), 96);
 for (let i=1;i<=11;i++) {
   const file="element_"+String(i).padStart(3,"0");
