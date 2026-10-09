@@ -1,3 +1,6 @@
+const fs = require("node:fs");
+const path = require("node:path");
+const AxeBuilder = require("@axe-core/playwright").default;
 const { test, expect } = require("@playwright/test");
 
 async function checkLayout(page, label) {
@@ -84,4 +87,61 @@ test("history typography is readable on both viewport sizes", async ({ page }) =
   expect(sizes.description).toBeGreaterThanOrEqual(12);
   expect(sizes.button).toBeGreaterThanOrEqual(11);
   expect(sizes.textFits).toBeTruthy();
+});
+
+
+for (const size of [320, 375, 430]) {
+  test(`narrow viewport ${size}px: navigation and form remain usable`, async ({ page }) => {
+    await page.setViewportSize({ width: size, height: 720 });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await expect(page.locator("#home-riot-id")).toBeVisible();
+    const input = page.locator("#home-riot-id");
+    await input.fill("AlchemyFlames#br1");
+    await expect(input).toHaveValue("AlchemyFlames#br1");
+    await checkLayout(page, "narrow-" + size);
+    const rect = await input.boundingBox();
+    expect(rect.width).toBeGreaterThan(150);
+  });
+}
+
+for (const route of ["/", "/?demo=review", "/#builder"]) {
+  test(`WCAG audit: ${route}`, async ({ page }) => {
+    await page.goto(route, { waitUntil: "domcontentloaded" });
+    await expect(page.locator(".app-shell main")).toBeVisible();
+    const results = await new AxeBuilder({ page }).withTags(["wcag2a","wcag2aa","wcag21a","wcag21aa"]).analyze();
+    const summary = {
+      route,
+      project: test.info().project.name,
+      counts: results.violations.reduce((memo, issue) => {
+        memo[issue.impact || "unknown"] = (memo[issue.impact || "unknown"] || 0) + 1;
+        return memo;
+      }, {}),
+      issues: results.violations.map(issue => ({
+        id: issue.id, impact: issue.impact,
+        targets: issue.nodes.slice(0,5).map(n => n.target),
+        help: issue.help,
+      })),
+    };
+    fs.mkdirSync("visual-audit", { recursive: true });
+    const filename = route === "/" ? "home" : route.includes("demo") ? "demo" : "builder";
+    fs.writeFileSync(path.join("visual-audit", `axe-${test.info().project.name}-${filename}.json`),JSON.stringify(summary,null,2));
+    console.log("AXE",JSON.stringify(summary));
+    const critical = results.violations.filter(issue => issue.impact === "critical");
+    expect(critical, "critical WCAG findings: " + JSON.stringify(critical.map(i=>i.id))).toHaveLength(0);
+  });
+}
+
+test("local artwork and static metadata never point to missing assets", async ({page}) => {
+  const missing = [];
+  page.on("response", response => {
+    const url = response.url();
+    if (url.includes("/img/") && url.startsWith("http://127.0.0.1:4173/") && response.status() >= 400) {
+      missing.push({ url, status: response.status() });
+    }
+  });
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await page.locator(".home-visual-showcase").scrollIntoViewIfNeeded();
+  await page.locator(".home-builder-v2").scrollIntoViewIfNeeded();
+  await page.waitForTimeout(500);
+  expect(missing).toEqual([]);
 });
