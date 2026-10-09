@@ -9,19 +9,21 @@ type Props={
   riotGameName?:string;
   riotTagLine?:string;
   riotProfileIcon?:string;
+  initiallyOpen?:boolean;
 };
 
 export default function AccountMenu({
   riotGameName,
   riotTagLine,
   riotProfileIcon,
+  initiallyOpen=false,
 }:Props){
   const { language } = useI18n();
   const label=(pt:string,en:string)=>language==="en"?en:pt;
   const [session,setSession]=useState<Session|null>(null);
   const rootRef=useRef<HTMLDivElement|null>(null);
   const triggerRef=useRef<HTMLButtonElement|null>(null);
-  const [open,setOpen]=useState(false);
+  const [open,setOpen]=useState(initiallyOpen);
   const [mode,setMode]=useState<Mode>("login");
   const [email,setEmail]=useState("");
   const [password,setPassword]=useState("");
