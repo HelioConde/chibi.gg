@@ -539,6 +539,8 @@ function App() {
   const [loadingMore,setLoadingMore]=useState(false);
   const [error,setError]=useState("");
   const [hasMore,setHasMore]=useState(true);
+  // Riot API offset counts requested IDs, not the number of normalized matches.
+  const [historyOffset,setHistoryOffset]=useState(0);
   const [selectedMatch,setSelectedMatch]=useState<TftMatchDetail|null>(null);
   const [matchLoading,setMatchLoading]=useState(false);
   const [matchError,setMatchError]=useState("");
@@ -811,14 +813,15 @@ function App() {
         const parsed=splitRiotId(riotId);
         if(!parsed){ setStudyLookup("unavailable"); return; }
         studyAttempts.current+=1;
-        fetchTftHistory(parsed.gameName,parsed.tagLine,platform,matches.length,20)
+        fetchTftHistory(parsed.gameName,parsed.tagLine,platform,historyOffset,20)
           .then(result=>{
             const next=result.matches||[];
             setMatches(current=>{
               const seen=new Set(current.map(match=>match.id));
               return [...current,...next.filter(match=>!seen.has(match.id))];
             });
-            setHasMore(next.length>=20);
+            setHistoryOffset(current=>Math.max(current,historyOffset+20));
+            setHasMore((result.paging?.requested??next.length)>=20);
             setStudyLookup(next.length?"idle":"searching");
           })
           .catch(()=>setStudyLookup(studyAttempts.current>=3?"unavailable":"idle"));
@@ -832,7 +835,7 @@ function App() {
     setEvidenceLabel("Chibi Study · "+focus.label);
     setProfileTab("matches");
     void openMatch(target);
-  },[profile,matches,studyRequest,studyOpenedMatchId,studyLookup,riotId,platform]);
+  },[profile,matches,studyRequest,studyOpenedMatchId,studyLookup,riotId,platform,historyOffset]);
 
   const staticCurrentSet=useMemo(()=>latestTftSetNumber(staticData),[staticData]);
   const isHistoricalSet=Boolean(currentSet&&staticCurrentSet&&currentSet<staticCurrentSet);
@@ -1104,6 +1107,7 @@ function App() {
     setLoadingMore(false);
     setError("");
     setHasMore(false);
+    setHistoryOffset(0);
     setSelectedMatch(null);
     setOpenedMatch(null);
     setMatchError("");
@@ -1147,6 +1151,7 @@ function App() {
     setProfile(null);
     setMatches([]);
     setHasMore(true);
+    setHistoryOffset(0);
     setSelectedMatch(null);
     setOpenedMatch(null);
     setSelectedSet(initialSet);
@@ -1161,7 +1166,8 @@ function App() {
       setProfile(data);
       setMatches(data.matches || []);
       scrollPageTop();
-      setHasMore((data.matches?.length || 0) >= 20);
+      setHistoryOffset(20);
+      setHasMore((data.paging?.requested??data.matches?.length??0)>=20);
 
       const recentRank=data.ranked?.find((row)=>String(row.queueType).toUpperCase()==="RANKED_TFT")
         || data.ranked?.find((row)=>String(row.queueType).toUpperCase().includes("RANKED_TFT"))
@@ -1283,7 +1289,7 @@ function App() {
         parsed.gameName,
         parsed.tagLine,
         platform,
-        matches.length,
+        historyOffset,
         20,
       );
 
@@ -1292,7 +1298,8 @@ function App() {
         const seen=new Set(current.map((m)=>m.id));
         return [...current,...next.filter((m)=>!seen.has(m.id))];
       });
-      setHasMore(next.length >= 20);
+      setHistoryOffset(current=>Math.max(current,historyOffset+20));
+      setHasMore((result.paging?.requested??next.length)>=20);
     }catch(err){
       setError(err instanceof Error ? err.message : t("profile.error.more"));
     }finally{
@@ -1486,6 +1493,8 @@ function App() {
     setSitePage("main");
     setProfile(null);
     setMatches([]);
+    setHistoryOffset(0);
+    setHasMore(true);
     setError("");
     setSelectedMatch(null);
     setOpenedMatch(null);
