@@ -352,7 +352,14 @@ test("Riot pagination advances by upstream IDs when some match details are missi
     traits:[],
     units:[],
   }));
-  await page.route("**/functions/v1/public-tft-profile",route=>route.fulfill({
+  const corsHeaders={
+    "access-control-allow-origin":"*",
+    "access-control-allow-methods":"POST, OPTIONS",
+    "access-control-allow-headers":"apikey, authorization, content-type",
+  };
+  await page.route("**/functions/v1/public-tft-profile",route=>{
+    if(route.request().method()==="OPTIONS")return route.fulfill({status:200,headers:corsHeaders});
+    return route.fulfill({
     status:200,
     contentType:"application/json",
     headers:{"access-control-allow-origin":"*"},
@@ -364,9 +371,11 @@ test("Riot pagination advances by upstream IDs when some match details are missi
       paging:{start:0,count:20,requested:20,returned:18},
       partial:{summoner:false,ranked:false,history:false},
     }),
-  }));
+    });
+  });
   const starts=[];
   await page.route("**/functions/v1/public-tft-history",route=>{
+    if(route.request().method()==="OPTIONS")return route.fulfill({status:200,headers:corsHeaders});
     const body=route.request().postDataJSON();
     starts.push(body.start);
     return route.fulfill({
