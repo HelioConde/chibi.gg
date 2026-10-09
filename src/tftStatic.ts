@@ -184,7 +184,11 @@ export function loadTftStaticData():Promise<TftStaticData>{
       tacticians:tactician?.data||{},
       queues:queues?.data||{},
     };
-  })();
+  })().catch((error)=>{
+    // Do not permanently cache a failed network lookup: the next attempt can recover.
+    cached=null;
+    throw error;
+  });
 
   return cached;
 }
