@@ -2,7 +2,8 @@ import { readdir, stat, unlink } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const distRoot = fileURLToPath(new URL("../dist/img/output-v2/", import.meta.url));
+const imageRoot = fileURLToPath(new URL("../dist/img/", import.meta.url));
+const distRoot = join(imageRoot,"output-v2");
 const keep = new Set(["icon/element_001.png"]);
 let total = 0, removed = 0, savedBytes = 0, missing = [];
 async function scan(dir, relative = "") {
@@ -24,6 +25,21 @@ async function scan(dir, relative = "") {
 }
 try {
   await scan(distRoot);
+  // These 22 original UI pieces are referenced exclusively through siteAssets.ts,
+  // which selects the generated WebP variants. Preserve art.png (social sharing)
+  // and icon/hud PNGs used by legal pages and integrations.
+  for (const name of await readdir(imageRoot)) {
+    if (!/^chibi-ui-\d{2}\.png$/i.test(name)) continue;
+    total++;
+    const source=join(imageRoot,name);
+    const counterpart=source.replace(/\.png$/i,".webp");
+    const webp=await stat(counterpart).catch(()=>null);
+    if(!webp||webp.size<100){missing.push(name);continue;}
+    const original=await stat(source);
+    await unlink(source);
+    removed++;
+    savedBytes+=original.size;
+  }
 } catch (error) {
   console.error("Could not safely prune duplicate images from the production build",error);
   process.exitCode=1;
