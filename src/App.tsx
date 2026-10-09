@@ -1,4 +1,4 @@
-import { FormEvent, lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   fetchTftHistory,
   fetchTftMatch,
@@ -583,6 +583,37 @@ function App() {
                       :"main"
   );
 
+  const staticLoadStarted=useRef(false);
+  const ensureStaticData=useCallback(()=>{
+    if(staticLoadStarted.current)return;
+    staticLoadStarted.current=true;
+    void loadTftStaticData().then(setStaticData).catch(()=>{
+      // Allow retry after a network outage.
+      staticLoadStarted.current=false;
+    });
+  },[]);
+
+  // Only load optional Data Dragon dictionaries once users need them.
+  // Keep direct profile, demo and deep links immediately usable.
+  useEffect(()=>{
+    const params=new URLSearchParams(window.location.search);
+    if(params.has("player")||params.get("demo")==="review"||window.location.hash){
+      ensureStaticData();
+      return;
+    }
+    const timer=window.setTimeout(ensureStaticData,5000);
+    const prepare=()=>{window.clearTimeout(timer);ensureStaticData();};
+    window.addEventListener("chibi:prepare-static",prepare);
+    return ()=>{
+      window.clearTimeout(timer);
+      window.removeEventListener("chibi:prepare-static",prepare);
+    };
+  },[ensureStaticData]);
+
+  useEffect(()=>{
+    if(sitePage!=="main"||profile)ensureStaticData();
+  },[sitePage,profile,ensureStaticData]);
+
   useEffect(()=>{
     try{localStorage.setItem("chibi.history.density",historyDensity);}catch{}
   },[historyDensity]);
@@ -615,8 +646,6 @@ function App() {
   },[]);
 
   useEffect(()=>{
-    loadTftStaticData().then(setStaticData).catch(()=>{});
-
     const refreshRecentPlayers=()=>setRecentPlayers(getRecentPlayers());
     window.addEventListener("chibi:recent-players",refreshRecentPlayers);
 
@@ -1458,6 +1487,7 @@ function App() {
           onOpenStats={openStats}
           onSearchPlayer={(value)=>{void searchFromGlobal(value);}}
           onOpenPage={openExplorePage}
+          onPrepare={ensureStaticData}
         />
         {compactViewport&&<div className="mobile-product-menu">
           <button
