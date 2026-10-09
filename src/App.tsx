@@ -21,33 +21,33 @@ import {
 } from "./tftStatic";
 import { buildChibiDNA } from "./analysis/chibiInsights";
 import ChibiInnovations from "./components/ChibiInnovations";
-import ChibiReview from "./components/ChibiReview";
-import ChibiSessionPlan from "./components/ChibiSessionPlan";
+
+
 import ActiveGoalStrip from "./components/ActiveGoalStrip";
-import ChibiLearningLab from "./components/ChibiLearningLab";
-import ChibiLearningPath from "./components/ChibiLearningPath";
-import ChibiBoardDrill from "./components/ChibiBoardDrill";
-import ChibiJournalPatterns from "./components/ChibiJournalPatterns";
+
+
+
+
 import ChibiLessons from "./components/ChibiLessons";
 import ChibiCoachMode from "./components/ChibiCoachMode";
 import ChibiStudyShare, { studyFocusById } from "./components/ChibiStudyShare";
 import ChibiStudyReply from "./components/ChibiStudyReply";
-import MatchJournal from "./components/MatchJournal";
-import PatchAdaptation from "./components/PatchAdaptation";
+
+
 import BoardCounterfactual from "./components/BoardCounterfactual";
-import LobbyAutopsy from "./components/LobbyAutopsy";
+
 import MatchScorecard from "./components/MatchScorecard";
-import MatchReviewOverview from "./components/MatchReviewOverview";
+
 import MatchReviewNavigator from "./components/MatchReviewNavigator";
-import MatchStory from "./components/MatchStory";
+
 import ChibiShareCard from "./components/ChibiShareCard";
-import PersonalVsGlobalMeta from "./components/PersonalVsGlobalMeta";
+
 import ChibiFlex from "./components/ChibiFlex";
 import ChibiIdentity from "./components/ChibiIdentity";
-import ChibiPool from "./components/ChibiPool";
+
 import ChibiActionCenter from "./components/ChibiActionCenter";
 import ChibiToday from "./components/ChibiToday";
-import ChibiSessionMode from "./components/ChibiSessionMode";
+
 import StyleShift from "./components/StyleShift";
 
 
@@ -69,7 +69,7 @@ import ProductInfoPage from "./components/ProductInfoPage";
 import AskChibi from "./components/AskChibi";
 import ChibiMemory from "./components/ChibiMemory";
 import ReviewQueue from "./components/ReviewQueue";
-import PlayerEvolution from "./components/PlayerEvolution";
+
 import DDragonArt from "./components/DDragonArt";
 import MatchBoardMap from "./components/MatchBoardMap";
 import RiotServiceStatus from "./components/RiotServiceStatus";
@@ -486,6 +486,21 @@ function matchRoundLabel(match:TftMatch){
   return "Stage "+stage+"-"+step;
 }
 
+const ChibiLearningLab = lazy(() => import("./components/ChibiLearningLab"));
+const ChibiReview = lazy(() => import("./components/ChibiReview"));
+const PlayerEvolution = lazy(() => import("./components/PlayerEvolution"));
+const PersonalVsGlobalMeta = lazy(() => import("./components/PersonalVsGlobalMeta"));
+const ChibiSessionPlan = lazy(() => import("./components/ChibiSessionPlan"));
+const ChibiLearningPath = lazy(() => import("./components/ChibiLearningPath"));
+const MatchJournal = lazy(() => import("./components/MatchJournal"));
+const ChibiSessionMode = lazy(() => import("./components/ChibiSessionMode"));
+const PatchAdaptation = lazy(() => import("./components/PatchAdaptation"));
+const MatchStory = lazy(() => import("./components/MatchStory"));
+const ChibiBoardDrill = lazy(() => import("./components/ChibiBoardDrill"));
+const ChibiJournalPatterns = lazy(() => import("./components/ChibiJournalPatterns"));
+const MatchReviewOverview = lazy(() => import("./components/MatchReviewOverview"));
+const LobbyAutopsy = lazy(() => import("./components/LobbyAutopsy"));
+const ChibiPool = lazy(() => import("./components/ChibiPool"));
 const GlobalMetaPage = lazy(() => import("./components/GlobalMetaPage"));
 const CompsPage = lazy(() => import("./components/CompsPage"));
 const StatisticsPage = lazy(() => import("./components/StatisticsPage"));
