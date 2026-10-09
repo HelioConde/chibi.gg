@@ -375,3 +375,16 @@
   font-size: max(11px,.6875rem) !important;
   line-height: 1.5 !important;
 }
+
+
+/* Axe WCAG AA: Augment library labels and inactive cost filter controls. */
+.app-shell .builder-augment-library,
+.app-shell .builder-augment-library .builder-subhead > span,
+.app-shell .builder-augment-library .builder-subhead > small,
+.app-shell .builder-cost-filters > button,
+.app-shell .builder-cost-filters > [class^="cost-"] {
+  color: #cedfe9 !important;
+  opacity: 1 !important;
+  font-size: max(11px,.6875rem) !important;
+  line-height: 1.4 !important;
+}
