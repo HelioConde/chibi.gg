@@ -1,4 +1,7 @@
-import { supabase } from "../supabase";
+// Public TFT functions do not require a signed-in Supabase client.
+// Keep the browser's auth SDK out of the landing page bundle.
+const PUBLIC_FUNCTIONS_BASE="https://bieihhaobdztjyoweewa.supabase.co/functions/v1/";
+const PUBLIC_API_KEY="sb_publishable_2T2H_S0Lu3qlM42kDUWI9g_3FtYXjUt";
 
 export type TftTrait = {
   name: string;
@@ -209,27 +212,42 @@ export type TftMatchDetail = {
 };
 
 async function invoke<T>(name:string, body:Record<string,unknown>):Promise<T>{
-  const { data, error } = await supabase.functions.invoke(name, { body });
-
-  if (error) {
-    const context=(error as {context?:unknown})?.context;
-    if(context instanceof Response){
-      try{
-        const detail=await context.clone().json();
-        if(detail?.message) throw new Error(String(detail.message));
-        if(detail?.error) throw new Error(String(detail.error));
-      }catch(parsed){
-        if(parsed instanceof Error && parsed.message!==error.message) throw parsed;
-      }
-    }
-
-    throw new Error(error.message || "Falha ao consultar os dados oficiais da Riot.");
+  if(!/^public-tft-[a-z-]+$/.test(name)){
+    throw new Error("O endpoint solicitado não está disponível para consultas públicas.");
   }
 
-  if (data?.error) {
-    throw new Error(data.message || data.error);
+  let response:Response;
+  try{
+    response=await fetch(PUBLIC_FUNCTIONS_BASE+name,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "apikey":PUBLIC_API_KEY,
+        // Matches the public publishable-key request sent by supabase-js.
+        "Authorization":"Bearer "+PUBLIC_API_KEY,
+      },
+      body:JSON.stringify(body),
+      signal:AbortSignal.timeout(15000),
+    });
+  }catch(error){
+    const timeout=error instanceof Error&&(error.name==="TimeoutError"||error.name==="AbortError");
+    throw new Error(timeout
+      ?"A consulta demorou demais. Tente novamente."
+      :"Não foi possível conectar ao serviço de TFT. Confira sua conexão e tente novamente.");
   }
 
+  const data=await response.json().catch(()=>null);
+  if(!response.ok||!data||typeof data!=="object"){
+    const message=typeof data?.message==="string" ?data.message
+      :typeof data?.error==="string" ?data.error
+      :response.status===429?"Muitas consultas. Aguarde antes de tentar novamente."
+      :response.status>=500?"Serviço de TFT temporariamente indisponível."
+      :"Falha ao consultar os dados oficiais da Riot.";
+    throw new Error(message);
+  }
+  if(data.error){
+    throw new Error(typeof data.message==="string"?data.message:String(data.error));
+  }
   return data as T;
 }
 
