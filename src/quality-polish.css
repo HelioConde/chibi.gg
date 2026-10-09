@@ -341,3 +341,13 @@
   font-size: max(11px,.6875rem) !important;
   line-height: 1.45 !important;
 }
+
+
+/* Final desktop Builder placement stats: readable text at normal zoom. */
+.app-shell .builder-position-stat > span,
+.app-shell .builder-position-stat > small {
+  color: #cbdde9 !important;
+  opacity: 1 !important;
+  font-size: max(11px,.6875rem) !important;
+  line-height: 1.45 !important;
+}
