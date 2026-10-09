@@ -351,3 +351,12 @@
   font-size: max(11px,.6875rem) !important;
   line-height: 1.45 !important;
 }
+
+
+.app-shell .builder-position-reading > div > span,
+.app-shell .builder-position-reading > div > p {
+  color: #cbdde9 !important;
+  opacity: 1 !important;
+  font-size: max(11px,.6875rem) !important;
+  line-height: 1.5 !important;
+}
