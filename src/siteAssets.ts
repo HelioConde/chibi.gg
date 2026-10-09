@@ -41,7 +41,7 @@ const V2_GROUPS={
 export const SITE_IMAGES={
   art:siteImage("art.png"),
   hud:siteImage("hud.png"),
-  icon:siteImage("icon.png"),
+  icon:siteImage("icon-small.webp"),
   icons:siteImage("icons.png"),
   ui:{
     home:CHIBI_UI_ARTS[0],
@@ -59,8 +59,8 @@ export const SITE_IMAGES={
   },
   v2:{
     hud:V2_GROUPS.hud,
-    icon:outputV2Element("icon",1),
-    icons:V2_GROUPS.icons,
+    icon:siteImage("output-v2/icon/brand-96.webp"),
+    icons:Array.from({length:11},(_,index)=>siteImage(`output-v2/icons/element_${String(index+1).padStart(3,"0")}-small.webp`)),
     packs:{
       portraitFrames:V2_GROUPS.ui03,
       wideFrames:V2_GROUPS.ui04,
