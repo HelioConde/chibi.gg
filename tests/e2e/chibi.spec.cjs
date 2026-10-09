@@ -205,3 +205,31 @@ test("account menu is accessible and usable even when its SDK is deferred",async
   await page.keyboard.press("Escape");
   await expect(panel).toHaveCount(0);
 });
+
+
+test("home uses the reduced CSS without requesting full advanced styles",async ({page})=>{
+  const cssRequests=[];
+  page.on("request",request=>{
+    if(request.url().includes(".generated.css"))cssRequests.push(request.url());
+  });
+  await page.goto("/",{waitUntil:"domcontentloaded"});
+  await expect(page.locator(".home-hero-copy h1")).toBeVisible();
+  await expect(page.locator(".home-meta-preview")).toBeAttached();
+  const heroStyle=await page.locator(".home-hero-copy h1").evaluate(node=>({
+    fontSize:parseFloat(getComputedStyle(node).fontSize),
+    color:getComputedStyle(node).color,
+  }));
+  expect(heroStyle.fontSize).toBeGreaterThan(30);
+  expect(cssRequests.filter(url=>url.includes("styles-full.generated.css"))).toHaveLength(0);
+});
+
+test("advanced pages load full CSS before rendering content",async ({page})=>{
+  await page.goto("/#builder",{waitUntil:"domcontentloaded"});
+  await expect(page.locator(".builder-page")).toBeVisible({timeout:20000});
+  const sample=await page.locator(".builder-page").evaluate(node=>({
+    display:getComputedStyle(node).display,
+    padding:getComputedStyle(node).paddingTop,
+  }));
+  expect(sample.display).not.toBe("none");
+  expect(sample.padding).not.toBe("");
+});
