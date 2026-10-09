@@ -813,25 +813,34 @@ function App() {
       const attempt=studyAttempts.current;
       if(attempt>=3){ setStudyLookup("unavailable"); return; }
       const delay=[0,2000,5000][attempt]||5000;
+      let active=true;
+      const currentProfileRequest=profileRequestId.current;
       setStudyLookup("searching");
       const timer=window.setTimeout(()=>{
+        if(!active||currentProfileRequest!==profileRequestId.current)return;
         const parsed=splitRiotId(riotId);
         if(!parsed){ setStudyLookup("unavailable"); return; }
         studyAttempts.current+=1;
         fetchTftHistory(parsed.gameName,parsed.tagLine,platform,historyOffset,20)
           .then(result=>{
+            if(!active||currentProfileRequest!==profileRequestId.current)return;
             const next=result.matches||[];
+            const requested=result.paging?.requested??next.length;
             setMatches(current=>{
               const seen=new Set(current.map(match=>match.id));
               return [...current,...next.filter(match=>!seen.has(match.id))];
             });
             setHistoryOffset(current=>Math.max(current,historyOffset+20));
-            setHasMore((result.paging?.requested??next.length)>=20);
-            setStudyLookup(next.length?"idle":"searching");
+            setHasMore(requested>=20);
+            setStudyLookup(requested<20&&!next.length?"unavailable":next.length?"idle":"searching");
           })
-          .catch(()=>setStudyLookup(studyAttempts.current>=3?"unavailable":"idle"));
+          .catch(()=>{
+            if(active&&currentProfileRequest===profileRequestId.current){
+              setStudyLookup(studyAttempts.current>=3?"unavailable":"idle");
+            }
+          });
       },delay);
-      return ()=>window.clearTimeout(timer);
+      return ()=>{active=false;window.clearTimeout(timer);};
     }
 
     const focus=studyFocusById(studyRequest.focusId);
