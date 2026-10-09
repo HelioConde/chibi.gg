@@ -56,3 +56,32 @@ for (const route of ["meta", "comps", "stats", "builder", "leaderboard", "overla
     expect(errors).toEqual([]);
   });
 }
+
+
+test("optimized local TFT artwork is served as WebP", async ({ request }) => {
+  const response = await request.get("/img/output-v2/chibi-ui-20/element_003.webp");
+  expect(response.status()).toBe(200);
+  expect(response.headers()["content-type"]).toContain("image/webp");
+  expect((await response.body()).length).toBeGreaterThan(1000);
+});
+
+test("history typography is readable on both viewport sizes", async ({ page }) => {
+  await page.goto("/?demo=review", { waitUntil: "domcontentloaded" });
+  const history = page.locator(".profile-history-first .profile-history-head");
+  await expect(history).toBeVisible();
+  const sizes = await history.evaluate(root => {
+    const title = root.querySelector(".profile-history-titlecopy h2");
+    const description = root.querySelector(".profile-history-titlecopy p");
+    const firstButton = root.querySelector(".history-head-controls button");
+    return {
+      title: parseFloat(getComputedStyle(title).fontSize),
+      description: parseFloat(getComputedStyle(description).fontSize),
+      button: firstButton ? parseFloat(getComputedStyle(firstButton).fontSize) : 0,
+      textFits: root.getBoundingClientRect().width >= title.getBoundingClientRect().width,
+    };
+  });
+  expect(sizes.title).toBeGreaterThanOrEqual(22);
+  expect(sizes.description).toBeGreaterThanOrEqual(12);
+  expect(sizes.button).toBeGreaterThanOrEqual(11);
+  expect(sizes.textFits).toBeTruthy();
+});
