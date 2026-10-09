@@ -388,3 +388,52 @@
   font-size: max(11px,.6875rem) !important;
   line-height: 1.4 !important;
 }
+
+
+/* Lighthouse mobile readability audit: promote substantive content above 12px.
+   The former 5–9px rules made critical explanatory copy unreadable at normal zoom. */
+.app-shell .site-footer-riot,
+.app-shell .home-meta-disclaimer-v2,
+.app-shell .home-builder-copy p,
+.app-shell .home-meta-intro-v2 p,
+.app-shell.compact-layout .section-marker p,
+.app-shell .home-proof-strip small,
+.app-shell .home-meta-simple-list small,
+.app-shell .site-footer-main span,
+.app-shell .home-compliance-link span {
+  font-size: 12px !important;
+  line-height: 1.6 !important;
+}
+.app-shell .home-meta-simple-list strong,
+.app-shell .home-proof-strip strong,
+.app-shell .home-meta-simple-head strong,
+.app-shell .home-review-demo-button strong {
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+}
+.app-shell .home-hero-copy .eyebrow,
+.app-shell .home-meta-kickerline > span:not(.home-section-index),
+.app-shell .home-builder-kicker,
+.app-shell .home-visual-showcase-head > div:first-child > span,
+.app-shell .home-visual-card-copy small {
+  font-size: 12px !important;
+  line-height: 1.45 !important;
+  letter-spacing: .3px !important;
+}
+.app-shell .home-builder-copy button,
+.app-shell .home-meta-intro-v2 > button,
+.app-shell .home-product-player > div > span,
+.app-shell .home-product-player small,
+.app-shell .home-product-windowbar small,
+.app-shell .home-builder-demo-head small,
+.app-shell .riot-service-status small {
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+}
+@media (max-width: 760px) {
+  .app-shell .home-product-windowbar { min-height: 42px !important; height: auto !important; }
+  .app-shell .home-product-windowbar small { overflow-wrap: anywhere; }
+  .app-shell .home-meta-simple-list button { min-height: 64px; }
+  .app-shell .home-proof-strip > div { min-width: 0; }
+  .app-shell .site-footer-riot { max-width: 80ch; }
+}
