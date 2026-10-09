@@ -1528,17 +1528,26 @@ function App() {
             <button className={sitePage==="builder"?"active":""} aria-current={sitePage==="builder"?"page":undefined} onClick={()=>{openBuilder([]);setMobileNavOpen(false);}}><ChibiNavIcon kind="builder"/><span>{t("nav.builder")}</span></button>
             <button className={sitePage==="leaderboard"?"active":""} aria-current={sitePage==="leaderboard"?"page":undefined} onClick={()=>{openLeaderboard();setMobileNavOpen(false);}}><ChibiNavIcon kind="ranking"/><span>{t("nav.leaderboard")}</span></button>
             <button className={sitePage==="overlay"?"active":""} aria-current={sitePage==="overlay"?"page":undefined} onClick={()=>{openOverlay();setMobileNavOpen(false);}}><ChibiNavIcon kind="companion"/><span>{t("nav.companion")}</span></button>
+            <div className="mobile-nav-account">
+              <AccountMenu
+                riotGameName={profile?.player.gameName}
+                riotTagLine={profile?.player.tagLine}
+                riotProfileIcon={profile&&staticData
+                  ?profileIconUrl(staticData.version,profile.player.profileIconId)
+                  :undefined}
+              />
+            </div>
           </div>}
         </div>}
         <div className="topbar-actions">
           <LanguageSwitcher />
-          <AccountMenu
+          {!compactViewport&&<AccountMenu
             riotGameName={profile?.player.gameName}
             riotTagLine={profile?.player.tagLine}
             riotProfileIcon={profile&&staticData
               ?profileIconUrl(staticData.version,profile.player.profileIconId)
               :undefined}
-          />
+          />}
           <button
             className="ghost-button topbar-help-button"
             onClick={()=>openInfoPage("about")}
