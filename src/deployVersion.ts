@@ -6,8 +6,7 @@ type DeployVersionPayload={
 };
 
 const CURRENT_VERSION=typeof __APP_VERSION__==="string" ? __APP_VERSION__ : "dev";
-const CHECK_INTERVAL_MS=12000;
-const RELOAD_DELAY_MS=900;
+const CHECK_INTERVAL_MS=60000;
 
 let timer:number|null=null;
 let updating=false;
@@ -18,13 +17,29 @@ function versionUrl(){
   return url.toString();
 }
 
-function showUpdateNotice(){
+function showUpdateNotice(version:string){
   if(document.querySelector(".deploy-update-toast"))return;
 
   const toast=document.createElement("div");
   toast.className="deploy-update-toast";
   toast.setAttribute("role","status");
-  toast.innerHTML="<span>Nova versão publicada.<br><small>Atualizando o Chibi automaticamente…</small></span>";
+
+  const message=document.createElement("span");
+  message.textContent="Uma nova versão do Chibi está disponível.";
+  const button=document.createElement("button");
+  button.type="button";
+  button.className="deploy-update-button";
+  button.textContent="Atualizar agora";
+  button.addEventListener("click",()=>forceFreshReload(version));
+
+  const dismiss=document.createElement("button");
+  dismiss.type="button";
+  dismiss.className="deploy-update-dismiss";
+  dismiss.textContent="Depois";
+  dismiss.setAttribute("aria-label","Fechar aviso de atualização");
+  dismiss.addEventListener("click",()=>toast.remove());
+
+  toast.append(message,button,dismiss);
   document.body.appendChild(toast);
 }
 
@@ -54,11 +69,7 @@ async function checkForDeploy(){
     if(!nextVersion||nextVersion===CURRENT_VERSION)return;
 
     updating=true;
-    showUpdateNotice();
-
-    window.setTimeout(()=>{
-      forceFreshReload(nextVersion);
-    },RELOAD_DELAY_MS);
+    showUpdateNotice(nextVersion);
   }catch{
     // A falha de checagem nunca deve atrapalhar o uso normal do site.
   }
