@@ -126,8 +126,8 @@ for (const route of ["/", "/?demo=review", "/#builder"]) {
     const filename = route === "/" ? "home" : route.includes("demo") ? "demo" : "builder";
     fs.writeFileSync(path.join("visual-audit", `axe-${test.info().project.name}-${filename}.json`),JSON.stringify(summary,null,2));
     console.log("AXE",JSON.stringify(summary));
-    const critical = results.violations.filter(issue => issue.impact === "critical");
-    expect(critical, "critical WCAG findings: " + JSON.stringify(critical.map(i=>i.id))).toHaveLength(0);
+    const serious = results.violations.filter(issue => issue.impact === "critical" || issue.impact === "serious");
+    expect(serious, "high-impact WCAG findings: " + JSON.stringify(serious.map(i=>i.id))).toHaveLength(0);
   });
 }
 
@@ -144,4 +144,21 @@ test("local artwork and static metadata never point to missing assets", async ({
   await page.locator(".home-builder-v2").scrollIntoViewIfNeeded();
   await page.waitForTimeout(500);
   expect(missing).toEqual([]);
+});
+
+
+test("optimized favicon and navigation art fit actual display sizes", async ({request})=>{
+  for (const [asset,ceiling] of [
+    ["/favicon-64.png",100*1024],
+    ["/apple-touch-icon.png",150*1024],
+    ["/img/output-v2/icon/brand-96.webp",80*1024],
+    ["/img/output-v2/icons/element_001-small.webp",40*1024],
+    ["/img/icon-small.webp",80*1024],
+  ]) {
+    const response=await request.get(asset);
+    expect(response.status(),asset).toBe(200);
+    const bytes=await response.body();
+    expect(bytes.length,asset+" unexpectedly large").toBeLessThan(ceiling);
+    expect(bytes.length,asset+" empty").toBeGreaterThan(200);
+  }
 });
