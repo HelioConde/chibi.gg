@@ -25,6 +25,12 @@ Deno.serve(async (req) => {
 
   const matchId = String(body?.matchId || "").trim();
   if (!matchId) return json({ error: "match_id_required" }, 400);
+  if (!/^(BR1|NA1|LA1|LA2|EUW1|EUN1|KR|JP1|OC1|TR1|RU|PH2|SG2|TH2|TW2|VN2)_[0-9]{4,20}$/i.test(matchId)) {
+    return json({
+      error: "invalid_match_id",
+      message: "Identificador de partida inválido.",
+    }, 400);
+  }
 
   const region = regionFromMatchId(matchId);
   const cached=await readCachedMatches([matchId]);
@@ -52,7 +58,11 @@ Deno.serve(async (req) => {
     }
 
     const rawMatch = await response.json();
-    await observeRawMatches([rawMatch]);
+    try{
+      await observeRawMatches([rawMatch]);
+    }catch(error){
+      console.error("[public-tft-match] optional observation failure", error instanceof Error?error.name:"unknown");
+    }
     await writeCachedMatches([rawMatch],region);
     normalized=normalizeMatchForCache(rawMatch);
   }
