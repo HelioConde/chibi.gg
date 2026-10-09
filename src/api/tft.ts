@@ -54,14 +54,14 @@ export type TftProfile = {
   summary: { matches:number; averagePlacement:number|null; top4Rate:number; winRate:number; firsts:number; eighths:number };
   matches: TftMatch[];
   paging?: {start:number;count:number;requested:number;returned:number};
-  partial?: { summoner:boolean; ranked:boolean; history:boolean };
+  partial?: { summoner:boolean; ranked:boolean; history:boolean; matchDetails?:boolean };
   source?: {
     account:"account-v1";
     summoner:"tft-summoner-v1";
     ranked:"tft-league-v1";
     matches:"tft-match-v1";
     retrievedAt:number;
-    cache?:{hits:number;fetched:number};
+    cache?:{hits:number;fetched:number;failed?:number;rateLimited?:boolean};
   };
 };
 
@@ -324,7 +324,7 @@ export function fetchTftHistory(
   start:number,
   count=20,
 ){
-  return invoke<{ matches:TftMatch[]; paging:{start:number;count:number;requested:number;returned:number} }>(
+  return invoke<{ matches:TftMatch[]; paging:{start:number;count:number;requested:number;returned:number}; partial?:{matchDetails:boolean} }>(
     "public-tft-history",
     { gameName, tagLine, platform, start, count },
   );
