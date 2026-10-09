@@ -3,8 +3,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { startDeployWatcher } from "./deployVersion";
 import { I18nProvider } from "./i18n";
-import "./styles.css";
-import "./quality-polish.css";
+import "./styles-home.generated.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
