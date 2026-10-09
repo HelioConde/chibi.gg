@@ -45,6 +45,7 @@ jobs:
       - name: Capture desktop and mobile screenshots
         run: npx playwright test --config=playwright.config.cjs
       - name: Measure mobile Lighthouse on built site
+        if: always()
         shell: bash
         run: |
           npm run preview -- --host 127.0.0.1 --port 4179 --strictPort > /tmp/chibi-preview.log 2>&1 &
