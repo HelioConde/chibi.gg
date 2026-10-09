@@ -12,3 +12,6 @@ work/
 .env
 .env.local
 .DS_Store
+
+# Generated at predev/prebuild; source PNG artwork remains versioned.
+public/img/**/*.webp
