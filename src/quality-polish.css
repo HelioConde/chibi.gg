@@ -1,0 +1,149 @@
+/* Quality pass – accessibility, interaction and responsive polish.
+   These overrides intentionally sit after the historical stylesheet. */
+
+:root { --chibi-focus-ring: #83e9e8; }
+
+.app-shell :is(a,button,input,select,textarea,summary,[role="button"]):focus-visible,
+.deploy-update-toast button:focus-visible {
+  outline: 3px solid var(--chibi-focus-ring) !important;
+  outline-offset: 3px;
+}
+.app-shell :is(button,input,select,textarea) { accent-color: #83e9e8; }
+.app-shell :is(button,a,summary) { -webkit-tap-highlight-color: transparent; }
+.app-shell :is(button,[role="button"]) { touch-action: manipulation; }
+.app-shell :is(.home-review-demo-button,.home-compliance-link,.home-last-player) {
+  transition: border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
+}
+.app-shell :is(.home-review-demo-button,.home-compliance-link,.home-last-player):hover {
+  border-color: rgba(114,231,225,.5) !important;
+}
+
+.page-load-fallback {
+  width: min(1180px,94vw);
+  min-height: 42vh;
+  margin: 30px auto;
+  padding: 48px 24px;
+  display: grid;
+  place-items: center;
+  color: #dde8f3;
+  text-align: center;
+  font-size: clamp(1rem,2vw,1.25rem);
+  font-weight: 700;
+}
+
+.global-search-modal { max-height: min(85dvh,820px); overflow-y: auto; }
+.global-search-input { display: flex; align-items: center; }
+.global-search-input input { min-width: 0; flex: 1; font-size: 16px !important; }
+.global-search-close {
+  flex: 0 0 auto;
+  border: 1px solid rgba(120,206,218,.28);
+  border-radius: 8px;
+  padding: 9px 11px;
+  color: #e3eef7;
+  background: #162638;
+  font-size: 12px;
+  font-weight: 750;
+}
+.global-search-close:hover { background: #254158; }
+
+.deploy-update-toast {
+  display: flex !important;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: min(450px,calc(100vw - 30px));
+  max-width: 100%;
+  z-index: 10000;
+  line-height: 1.5;
+  font-size: 13px !important;
+}
+.deploy-update-toast > span { flex: 1 1 160px; }
+.deploy-update-button {
+  padding: 8px 11px;
+  border-radius: 8px;
+  border: 1px solid rgba(129,233,226,.65);
+  background: #123b49;
+  color: #eafffe;
+  font-weight: 800;
+  cursor: pointer;
+}
+.deploy-update-dismiss {
+  padding: 8px 5px;
+  border: 0;
+  background: transparent;
+  color: #c4d4df;
+  cursor: pointer;
+}
+.deploy-update-button:hover { background: #19556a; }
+.deploy-update-dismiss:hover { color: white; }
+
+.home-hero-copy > p { max-width: 62ch; text-wrap: pretty; }
+.home-search-note, .home-compliance-link small, .home-review-demo-button small {
+  line-height: 1.55 !important;
+  font-size: max(12px,.75rem) !important;
+}
+.home-visual-card .home-visual-card-copy strong {
+  line-height: 1.25;
+  text-wrap: balance;
+}
+.home-visual-card img { object-fit: cover; }
+.home-visual-card:focus-visible {
+  border-color: var(--chibi-focus-ring) !important;
+}
+.app-shell .home-hero-v2 .home-search-v2 :is(input,select,button) {
+  min-height: 46px;
+  font-size: max(14px,.875rem) !important;
+}
+.app-shell .home-paths-v3 button,
+.app-shell .global-search-pages button { min-height: 56px; }
+.app-shell .match-detail-layer summary {
+  min-height: 44px;
+  cursor: pointer;
+}
+.app-shell .match-detail-layer summary:focus-visible { border-radius: 9px; }
+.app-shell .global-search-section-head small { font-size: 12px; }
+
+/* Existing ultra-small desktop filter labels are not legible at 9px. */
+@media (min-width: 1100px) {
+  .profile-history-first .history-filter-group > span {
+    font-size: 11px !important;
+    letter-spacing: .3px !important;
+  }
+  .profile-history-first :is(
+    .history-set-tabs,.history-queue-tabs,.history-filter-tabs,
+    .history-density-tabs,.history-sort-tabs
+  ) button {
+    min-height: 40px !important;
+    font-size: 12px !important;
+    padding: 8px 10px !important;
+  }
+}
+@media (max-width: 820px) {
+  .mobile-product-menu-panel {
+    max-height: min(65dvh,460px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .mobile-product-menu-panel button {
+    min-height: 48px !important;
+    font-size: 13px !important;
+  }
+  .global-search-modal { width: min(94vw,640px); }
+  .home-hero-v2 .home-hero-copy h1 { text-wrap: balance; }
+  .home-visual-showcase-grid { scrollbar-width: thin; }
+}
+@media (max-width: 480px) {
+  .global-search-input { gap: 4px; }
+  .global-search-close { padding: 8px; }
+  .deploy-update-toast { bottom: 12px; }
+  .home-search-note { gap: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within { scroll-behavior: auto !important; }
+  .app-shell *, .app-shell *::before, .app-shell *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
