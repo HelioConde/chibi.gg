@@ -267,3 +267,40 @@
   .profile-history-first .history-head-controls { grid-template-columns: 1fr 1fr !important; gap: 12px 8px !important; }
   .profile-history-first .history-head-controls button { font-size: 11px !important; padding: 7px 8px !important; }
 }
+
+
+/* Final screenshot pass: text that should be read, not treated as decoration. */
+.app-shell .home-hero-benefits span {
+  font-size: 11px !important;
+  line-height: 1.55 !important;
+  letter-spacing: .1px !important;
+}
+.app-shell .home-paths-v3 > button small {
+  font-size: 10px !important;
+  line-height: 1.35 !important;
+}
+.app-shell .home-paths-v3 > button p {
+  font-size: 12px !important;
+  line-height: 1.5 !important;
+}
+.app-shell .home-visual-showcase-head p {
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+}
+.app-shell .site-footer-main nav a {
+  font-size: 12px !important;
+  line-height: 1.6 !important;
+}
+.app-shell .site-footer-riot {
+  font-size: 11px !important;
+  line-height: 1.55 !important;
+  max-width: 120ch;
+}
+@media (max-width: 820px) {
+  .app-shell .home-hero-benefits span { font-size: 12px !important; }
+  .app-shell .site-footer-main nav {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px 13px !important;
+  }
+}
