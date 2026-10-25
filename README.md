@@ -1,4 +1,21 @@
-# chibi.gg
+# chibi.gg — entenda suas partidas de TFT
+
+**Análises de Teamfight Tactics orientadas à melhoria: o que aconteceu, por quê e o que testar na próxima partida.**
+
+![TFT](https://img.shields.io/badge/TFT-análise%20de%20partidas-64748b) ![React](https://img.shields.io/badge/React-frontend-149ECA?logo=react&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+
+## Comece pelo essencial
+
+- Pesquise um **Riot ID** para analisar perfil e histórico disponíveis.
+- Use o **Action Center**, o review guiado e as comparações para identificar decisões.
+- Explore composições, estatísticas e ferramentas de estudo conforme sua necessidade.
+- Para desenvolver localmente, execute `npm install`, `npm run dev`, `npm run typecheck` e `npm run build`.
+
+> **Limite importante:** análises dependem dos dados permitidos pela Riot API. Este é um projeto independente, sem afiliação com Riot Games.
+
+A documentação abaixo detalha estado de implementação, dataset, infraestrutura e validações.
+
+---
 
 Tracker **TFT-first** focado em uma pergunta simples:
 
