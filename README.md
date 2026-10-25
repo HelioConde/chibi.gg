@@ -1,192 +1,86 @@
-# chibi.gg — entenda suas partidas de TFT
+<div align="center">
 
-**Análises de Teamfight Tactics orientadas à melhoria: o que aconteceu, por quê e o que testar na próxima partida.**
+<h1>🎯 chibi.gg</h1>
 
-![TFT](https://img.shields.io/badge/TFT-análise%20de%20partidas-64748b) ![React](https://img.shields.io/badge/React-frontend-149ECA?logo=react&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+<strong>Seu coach de decisões para Teamfight Tactics — baseado no que suas partidas mostram</strong>
 
-## Comece pelo essencial
+<p>Entenda o que aconteceu, encontre padrões e escolha uma melhoria para tentar no próximo jogo.</p>
 
-- Pesquise um **Riot ID** para analisar perfil e histórico disponíveis.
-- Use o **Action Center**, o review guiado e as comparações para identificar decisões.
-- Explore composições, estatísticas e ferramentas de estudo conforme sua necessidade.
-- Para desenvolver localmente, execute `npm install`, `npm run dev`, `npm run typecheck` e `npm run build`.
+<a href="https://github.com/HelioConde/chibi.gg"><img alt="TFT Analysis" src="https://img.shields.io/badge/TFT-AN%C3%81LISE%20PESSOAL-7c3aed?style=for-the-badge"></a>
 
-> **Limite importante:** análises dependem dos dados permitidos pela Riot API. Este é um projeto independente, sem afiliação com Riot Games.
+<p><a href="#o-que-a-plataforma-oferece"><strong>Recursos</strong></a> · <a href="#desenvolvimento"><strong>Instalação</strong></a> · <a href="#fontes-e-limites"><strong>Limites de dados</strong></a></p>
 
-A documentação abaixo detalha estado de implementação, dataset, infraestrutura e validações.
+</div>
 
 ---
 
-Tracker **TFT-first** focado em uma pergunta simples:
+## O problema que queremos resolver
 
-> **o que deu errado, o que fazer agora e quais partidas provam isso?**
+Trackers tradicionais entregam muitos dados. O **chibi.gg** organiza as estatísticas de **Teamfight Tactics** em perguntas práticas: *o que deu errado, o que eu deveria revisar e quais partidas sustentam essa leitura?*
 
-O chibi.gg não tenta ser apenas mais um site de estatísticas ou uma tier list. A prioridade é transformar dados de Teamfight Tactics em uma leitura rápida, acionável e verificável.
+O produto é uma aplicação independente, com áreas de análise já implementadas e validações de plataforma ainda necessárias. O objetivo não é prever a próxima partida ou substituir o julgamento do jogador.
 
-## Estado atual
-
-A **Etapa 1** está estável, as três prioridades da **Etapa 2** estão concluídas e o produto está preparado para a revisão da Riot.
-
-Principais áreas já implementadas:
-
-- busca pública por Riot ID;
-- perfil TFT e rank;
-- histórico de partidas;
-- Chibi DNA e análise pessoal;
-- Action Center;
-- Review e evolução do jogador;
-- Journal;
-- review guiado de partida;
-- Lobby Autopsy;
-- Counterfactual usando o próprio histórico;
-- Meta global baseado no Chibi Dataset;
-- Comps v2 com decisão de spot, familiaridade pessoal separada do sinal global e filtros de confiança/estabilidade/popularidade;
-- Statistics;
-- Leaderboard;
-- Team Builder;
-- Overlay;
-- Overlay desktop em Python em [`overlay-python/`](overlay-python/);
-- Study / compartilhamento;
-- observações anônimas no Supabase;
-- GitHub Pages com deploy automático;
-- reviewer entry point em `/review.html`;
-- demo sintética de revisão em `/?demo=review`;
-- páginas estáveis de Como funciona, Privacidade e Termos;
-- plano documentado de Riot Sign On para pós-aprovação.
-
-## Filosofia de produto
-
-A hierarquia de informação deve ser:
+## A jornada de análise
 
 ```text
-AGORA
-↓
-O QUE DEU ERRADO
-↓
-O QUE FAZER
-↓
-PROVA
-↓
-DETALHES
+     AGORA
+       ↓
+ O QUE ACONTECEU
+       ↓
+ O QUE REVISAR
+       ↓
+ DADOS / PROVAS
+       ↓
+ DETALHES
 ```
 
-Dados avançados não devem competir com a resposta principal.
+## O que a plataforma oferece
 
-## Stack
+| Área | O que faz |
+| --- | --- |
+| **Perfil e histórico** | Busca por Riot ID, rank e partidas recentes |
+| **Chibi DNA** | Leitura de estilo e padrões do jogador |
+| **Action Center** | Sugestões de revisão orientadas pela própria amostra |
+| **Review** | Revisão guiada de partidas e decisões |
+| **Comps e estatísticas** | Composições, filtros e análises com contexto |
+| **Journal** | Registros pessoais e acompanhamento |
+| **Board / Team Builder** | Ferramentas para explorar alternativas |
+| **Companion** | Experimentos de overlay e aplicativo desktop em Python |
 
-- React
-- TypeScript
-- Vite
-- Supabase
-- Riot TFT API
-- GitHub Actions
-- GitHub Pages
-- Python + PySide6 para o Companion desktop
+O código também contém experiências como *Lobby Autopsy*, comparações contrafactuais e uma base de referência chamada **Chibi Dataset**.
 
-## Desenvolvimento local
+## Desenvolvimento
+
+**Stack:** React, TypeScript, Vite, Supabase e integrações Riot. Há um companion Python/PySide6 em `overlay-python/`.
 
 ```bash
+git clone https://github.com/HelioConde/chibi.gg.git
+cd chibi.gg
 npm install
 npm run dev
 ```
 
-Validação obrigatória:
+Para validar o frontend:
 
 ```bash
 npm run typecheck
 npm run build
 ```
 
-## Deploy
+O build inclui rotinas de geração/otimização dos recursos e partes de QA específicas do repositório.
 
-O workflow em `.github/workflows/deploy-pages.yml` executa:
+## Fontes e limites
 
-1. checkout;
-2. Node 22;
-3. instalação das dependências;
-4. TypeScript check;
-5. build;
-6. geração do artifact;
-7. deploy no GitHub Pages quando o push é feito em `main`.
+- Consultas dependem da disponibilidade e das permissões da Riot API.
+- A análise de uma amostra pessoal **não prova** que uma unidade, item ou augment causou um resultado.
+- Metadados globais e recomendações precisam ter suas fontes e períodos identificados.
+- O produto não é oficialmente afiliado ou endossado pela Riot Games.
+- Aprovação, lançamento amplo e serviços sociais dependem de requisitos externos que não são resolvidos apenas pelo frontend.
 
-## Backend
+## Guias e histórico
 
-As integrações com Riot ficam em Supabase Edge Functions.
+[Documentação técnica anterior](docs/README_HISTORY_2026-10-25.md) · [Repositório](https://github.com/HelioConde/chibi.gg)
 
-Nunca colocar Riot API key ou Supabase service role no frontend.
+---
 
-Principais funções:
-
-- `public-tft-profile`
-- `public-tft-history`
-- `public-tft-match`
-- `public-tft-meta`
-- `public-tft-comps`
-- `public-tft-stats`
-- `public-tft-leaderboard`
-
-## Chibi Dataset
-
-O dataset é formado por observações anônimas das partidas consultadas no produto.
-
-Ele **não representa toda a população de TFT**.
-
-As telas devem manter visíveis, quando relevante:
-
-- tamanho da amostra;
-- confiança;
-- linguagem cautelosa para amostras pequenas;
-- distinção entre observação e causalidade.
-
-## Limitação importante da Riot API
-
-O Match API público fornece principalmente o estado final da partida.
-
-Não tratar como conhecido:
-
-- timing exato de roll;
-- ouro em stages específicos;
-- trajetória de HP;
-- shops;
-- scouting;
-- posicionamento round a round;
-- motivo causal de uma derrota.
-
-## Continuar no Codex
-
-O checkpoint técnico e o plano da próxima etapa estão em:
-
-**[`docs/CODEX_HANDOFF.md`](docs/CODEX_HANDOFF.md)**
-
-Checklist público/técnico para a revisão da Riot:
-
-**[`docs/RIOT_REVIEW_CHECKLIST.md`](docs/RIOT_REVIEW_CHECKLIST.md)**
-
-Rascunho preservado para a Production Application:
-
-**[`docs/RIOT_APPLICATION_DRAFT.md`](docs/RIOT_APPLICATION_DRAFT.md)**
-
-Plano técnico para a transição para Riot Sign On após aprovação:
-
-**[`docs/RSO_PLAN.md`](docs/RSO_PLAN.md)**
-
-Antes de continuar o projeto no Codex, leia esse arquivo inteiro.
-
-As três prioridades atuais da Etapa 2 estão concluídas:
-
-- Comps v2 — decisão de spot;
-- assinatura adaptativa de comps (`adaptive-traits-v2`);
-- Ask Chibi evidence-first.
-
-O próximo gate é a **Riot Production Application**. A review readiness já está implementada.
-
-Links públicos úteis para o reviewer:
-
-- `/review.html` — ponto de entrada da revisão;
-- `/?demo=review` — demo sintética, sem depender da Riot API;
-- `/about.html` — como funciona e limites;
-- `/privacy.html` — privacidade;
-- `/terms.html` — termos;
-- `/riot.txt` — arquivo de verificação.
-
-Depois da aprovação, o fluxo pessoal deve avançar para Riot Sign On conforme `docs/RSO_PLAN.md` e as instruções provisionadas pela Riot.
+<div align="center"><strong>Desenvolvido por <a href="https://github.com/HelioConde">Hélio Conde</a></strong></div>
